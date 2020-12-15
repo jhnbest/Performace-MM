@@ -1,0 +1,113 @@
+<template>
+  <div class="login-container">
+    <el-form class="login-main sub-center-center" :model="formData" :rules="formRules" ref="formData" label-position="left" label-width="0px">
+      <h2 class="title">通信工程处绩效管理系统</h2>
+      <el-form-item prop="name">
+        <el-input type="text" v-model="formData.name" placeholder="账号" clearable></el-input>
+      </el-form-item>
+      <el-form-item prop="password">
+        <el-input type="password" v-model="formData.password" placeholder="密码" clearable></el-input>
+      </el-form-item>
+      <el-form-item class="btn-box">
+        <el-button type="primary" @click="submitLogin('formData')">登录</el-button>
+        <el-button @click="resetForm('formData')">重置</el-button>
+        <span style="margin-left: 40px;margin-right: 10px" class="link-type" @click="handleChangePassword">修改密码</span>
+      </el-form-item>
+    </el-form>
+    <PasswordEdit v-if="showFlag.passwordEdit" ref="passwordEdit"/>
+  </div>
+</template>
+
+<script>
+import { userLogin } from '@/config/interface'
+import PasswordEdit from '@/components/PasswordEdit/PasswordEdit'
+export default {
+  data () {
+    const validate = (rule, value, callback) => {
+      const reg = /^[0-9a-zA-Z~!·@#$%^&*()_+-= <>,.:;'"]*$/
+      if (!value) {
+        callback(new Error('请输入内容'))
+      } else if (!reg.test(value)) {
+        callback(new Error('内容需为字母或数字'))
+      } else {
+        callback()
+      }
+    }
+    return {
+      formData: {
+        name: null,
+        password: null
+      },
+      formRules: {
+        name: [
+          { validator: validate, trigger: 'blur' }
+        ],
+        password: [
+          { validator: validate, trigger: 'blur' }
+        ]
+      },
+      reqFlag: {
+        login: true
+      },
+      showFlag: {
+        passwordEdit: true
+      }
+    }
+  },
+  methods: {
+    submitLogin (formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          const url = userLogin
+          if (this.reqFlag.login) {
+            this.reqFlag.login = false
+            let params = {
+              name: this.formData.name,
+              password: this.$md5(this.formData.password)
+            }
+            this.$http(url, params)
+            .then(res => {
+              if (res.code == 1) {
+                let data = res.data
+                localStorage.setItem('userInfo', JSON.stringify(data))
+                this.$store.dispatch('saveUserInfo', data)
+                this.$common.toast('登陆成功', 'success', false)
+                this.$router.push({
+                  path: '/home/dashboard',
+                  query: {}
+                })
+              }
+              this.reqFlag.login = true
+            })
+          }
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
+    resetForm (formName) {
+      this.$refs[formName].resetFields()
+    },
+    handleChangePassword () {
+      this.showFlag.passwordEdit = true
+      this.$nextTick(() => {
+        this.$refs.passwordEdit.init()
+      })
+    }
+  },
+  components: {
+    PasswordEdit
+  }
+}
+</script>
+
+<style scoped lang="scss">
+.login-container{position: relative; width: 100vw; height: 100vh;background-image:url('../assets/images/login_bg.png'); background-size: cover; overflow: hidden;
+  .login-main{ -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; background-clip: padding-box; width: 350px; padding: 35px 35px 15px; background: #fff; border: 1px solid #eaeaea; box-shadow: 0 0 25px #cac6c6;
+    h3{text-align: center;}
+    h2{text-align: center;}
+    .btn-box{text-align: right;}
+  }
+}
+</style>

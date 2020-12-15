@@ -1,0 +1,340 @@
+<template>
+  <div v-if="$store.state.userInfo.role !== '普通成员'">
+    <el-form class="main-search" :inline="true">
+      <el-form-item label="申报月份" prop="title">
+        <el-date-picker
+          v-model="formData.title"
+          type="month"
+          format="yyyy 第 MM 月"
+          value-format="yyyy-MM"
+          placeholder="选择月"
+          :picker-options="pickerOptions"
+          style="width: 150px"
+          @change="handelDateChange">
+        </el-date-picker>
+      </el-form-item>
+<!--      <el-form-item style="margin-left: 30px">-->
+<!--        <el-button type="primary" size="medium" @click="handleSearchClick">查询</el-button>-->
+<!--      </el-form-item>-->
+    </el-form>
+    <!-- 分割线 start -->
+    <div class="hr-10"></div>
+    <!-- 分割线 end -->
+    <div class="main-content">
+<!--      <el-badge :value="unReviewProjectCount" class="item">-->
+<!--        <el-button class="clickStyle" @click="handleUnReview" size="medium">待审</el-button>-->
+<!--      </el-badge>-->
+<!--      <el-button style="margin-left: 20px" class="clickStyle" @click="handleReviewed" size="medium">已审</el-button>-->
+      <el-radio-group v-model="formData.selectType" @change="handleSelectTypeChange">
+        <el-badge :value="unReviewProjectCount" class="item">
+          <el-radio-button label="已审"></el-radio-button>
+          <el-radio-button label="待审"></el-radio-button>
+        </el-badge>
+      </el-radio-group>
+      <br>
+      <br>
+      <el-tabs v-if="formData.refreshTabs" type="card" v-model="formData.reviewPerson">
+        <el-tab-pane
+          v-for="groupUser in groupUsers"
+          :key="groupUser.id"
+          :name="String(groupUser.id)">
+          <span slot="label">
+            {{groupUser.name}}
+            <el-badge v-if="isShowCount(groupUser)"
+                      :value="formData.reviewType === 'unReview'? groupUser.unReviewProjectCount : groupUser.reviewedProjectCount"
+                      class="item"></el-badge>
+          </span>
+          <ReviewedPerson v-if="formData.reviewPerson === String(groupUser.id)"
+                        :info="{id: groupUser.id, title: formData.title, reviewType: formData.reviewType}"
+                        @reviewPass="handleReviewPass"></ReviewedPerson>
+        </el-tab-pane>
+      </el-tabs>
+    </div>
+  </div>
+  <div v-else>
+    <h2>暂无权限</h2>
+  </div>
+</template>
+<script>
+  import ReviewedPerson from './childViews/ReviewedPerson'
+  import { getGroupUserName, getUnReviewProjectCount } from '@/config/interface'
+    export default {
+      data () {
+        return {
+          formData: {
+            title: this.$moment().format('YYYY-MM'),
+            reviewPerson: '',
+            reviewType: 'unReview',
+            refreshTabs: true,
+            selectType: '待审'
+          },
+          pickerOptions: {
+            disabledDate (time) {
+              return time.getTime() > Date.now()
+            }
+          },
+          reqFlag: {
+            getGroupUsers: true,
+            getUnReviewProjectCount: true,
+            getReviewedProjectCount: true
+          },
+          groupUsers: []
+        }
+      },
+      methods: {
+        init () {
+          console.log(this.$store.state.userInfo)
+          if (this.$store.state.userInfo.role === '组长' || this.$store.state.userInfo.role === '管理员') {
+            this.getGroupUsers().then(res => {
+              this.getUnReviewProjectCount(res).then(res => {
+                this.groupUsers = res
+                for (let item of this.groupUsers) {
+                  console.log(item)
+                  if (item.unReviewProjectCount !== 0) {
+                    this.formData.reviewPerson = String(item.id)
+                    break
+                  }
+                }
+              })
+            })
+          }
+        },
+        getGroupUsers () {
+          let it = this
+          return new Promise(function (resolve, reject) {
+            if (it.reqFlag.getGroupUsers) {
+              it.reqFlag.getGroupUsers = false
+              const url = getGroupUserName
+              let params = {
+                role: it.$store.state.userInfo.role,
+                groupName: it.$options.filters['groupNameFilters'](it.$store.state.userInfo.groupName)
+              }
+              it.$http(url, params)
+                .then(res => {
+                  if (res.code === 1) {
+                    let data = res.data
+                    console.log('getUnReviewProjectList')
+                    console.log(data)
+                    resolve(data)
+                  }
+                  it.reqFlag.getGroupUsers = true
+                })
+            }
+          })
+        },
+        getUnReviewProjectCount (data) {
+          let it = this
+          return new Promise(function (resolve, reject) {
+            if (it.reqFlag.getUnReviewProjectCount) {
+              it.reqFlag.getUnReviewProjectCount = false
+              const url = getUnReviewProjectCount
+              let params = {
+                searchPerson: data,
+                applyMonth: it.formData.title,
+                type: 'unReview'
+              }
+              it.$http(url, params)
+                .then(res => {
+                  if (res.code === 1) {
+                    console.log('getUnReviewProjectCount')
+                    console.log(res.data)
+                    let data = res.data
+                    resolve(data)
+                  }
+                  it.reqFlag.getUnReviewProjectCount = true
+                })
+            }
+          })
+        },
+        getReviewedProjectCount (data) {
+          let it = this
+          return new Promise(function (resolve, reject) {
+            if (it.reqFlag.getReviewedProjectCount) {
+              it.reqFlag.getReviewedProjectCount = false
+              const url = getUnReviewProjectCount
+              let params = {
+                searchPerson: data,
+                applyMonth: it.formData.title,
+                type: 'reviewed'
+              }
+              it.$http(url, params)
+                .then(res => {
+                  if (res.code === 1) {
+                    console.log('getUnReviewProjectCount')
+                    console.log(res.data)
+                    let data = res.data
+                    resolve(data)
+                  }
+                  it.reqFlag.getReviewedProjectCount = true
+                })
+            }
+          })
+        },
+        handelDateChange () {
+          if (this.$store.state.userInfo.role === '组长' || this.$store.state.userInfo.role === '管理员') {
+            if (this.formData.reviewType === 'reviewed') {
+              this.getGroupUsers().then(res => {
+                this.getReviewedProjectCount(res).then(res => {
+                  this.groupUsers = res
+                  for (let item of this.groupUsers) {
+                    console.log(item)
+                    if (item.reviewedProjectCount !== 0) {
+                      this.formData.reviewPerson = String(item.id)
+                      break
+                    }
+                  }
+                  this.formData.refreshTabs = false
+                  setTimeout(() => {
+                    this.formData.refreshTabs = true
+                  }, this.$store.state.refreshInterval)
+                })
+              })
+            } else if (this.formData.reviewType === 'unReview') {
+              this.init()
+              this.formData.refreshTabs = false
+              setTimeout(() => {
+                this.formData.refreshTabs = true
+              }, this.$store.state.refreshInterval)
+            }
+          }
+        },
+        handleUnReview () {
+          this.formData.reviewType = 'unReview'
+          this.init()
+          this.formData.refreshTabs = false
+          setTimeout(() => {
+            this.formData.refreshTabs = true
+          }, this.$store.state.refreshInterval)
+        },
+        handleReviewed () {
+          this.formData.reviewType = 'reviewed'
+          if (this.$store.state.userInfo.role === '组长' || this.$store.state.userInfo.role === '管理员') {
+            this.getGroupUsers().then(res => {
+              this.getReviewedProjectCount(res).then(res => {
+                this.groupUsers = res
+              })
+            })
+          }
+          this.formData.refreshTabs = false
+          setTimeout(() => {
+            this.formData.refreshTabs = true
+          }, this.$store.state.refreshInterval)
+        },
+        /* 子组件回调 */
+        handleReviewPass () {
+          this.getUnReviewProjectCount(this.groupUsers).then(res => {
+            this.groupUsers = res
+          })
+        },
+        handleSelectTypeChange (params) {
+          if (params === '已审') {
+            this.formData.reviewType = 'reviewed'
+            if (this.$store.state.userInfo.role === '组长' || this.$store.state.userInfo.role === '管理员') {
+              this.getGroupUsers().then(res => {
+                this.getReviewedProjectCount(res).then(res => {
+                  this.groupUsers = res
+                  for (let item of this.groupUsers) {
+                    console.log(item)
+                    if (item.reviewedProjectCount !== 0) {
+                      this.formData.reviewPerson = String(item.id)
+                      break
+                    }
+                  }
+                })
+              })
+            }
+            this.formData.refreshTabs = false
+            setTimeout(() => {
+              this.formData.refreshTabs = true
+            }, this.$store.state.refreshInterval)
+          } else if (params === '待审') {
+            this.formData.reviewType = 'unReview'
+            this.init()
+            this.formData.refreshTabs = false
+            setTimeout(() => {
+              this.formData.refreshTabs = true
+            }, this.$store.state.refreshInterval)
+          }
+        }
+      },
+      computed: {
+        unReviewProjectCount () {
+          let totalNum = 0
+          for (let item of this.groupUsers) {
+            console.log(item)
+            totalNum += item.unReviewProjectCount
+          }
+          return totalNum
+        },
+        reviewedProjectCount () {
+          let totalNum = 0
+          for (let item of this.groupUsers) {
+            console.log(item)
+            totalNum += item.reviewedProjectCount
+          }
+          return totalNum
+        },
+        isShowCount () {
+          return function (groupUser) {
+            if (this.formData.reviewType === 'unReview') {
+              if (groupUser.unReviewProjectCount === 0) {
+                return false
+              } else {
+                return true
+              }
+            } else if (this.formData.reviewType === 'reviewed') {
+              if (groupUser.reviewedProjectCount === 0) {
+                return false
+              } else {
+                return true
+              }
+            }
+          }
+        }
+      },
+      components: {
+        ReviewedPerson
+      },
+      created () {
+        this.init()
+      },
+      filters: {
+        groupNameFilters (groupName) {
+          switch (groupName) {
+            case '技术标准组':
+              return 1
+            case '工程组':
+              return 2
+            case '通信组':
+              return 3
+            case '处经理':
+              return 4
+            default:
+              return -1
+          }
+        }
+      },
+      name: 'workTimeReview'
+    }
+</script>
+
+<style scoped>
+  .clickStyle {
+    width: 90px;
+    font-size: 14px;
+    background: #429e73;
+    color: #fff;
+  }
+  .clickStyle:hover {
+    background: #099a56;
+    color: #fff;
+  }
+  .clickStyle:focus {
+    background: #b41f1f;
+    color: #fff;
+  }
+  .clickStyle:active {
+    background: #b41f1f;
+    color: #fff;
+  }
+</style>
