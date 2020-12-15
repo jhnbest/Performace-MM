@@ -363,20 +363,24 @@ function insertAssignProjectDetailOP(sql, arrayParams) {
     })
 }
 
-async function insertAssignProjectDetail(sql, arrayParams, data, insertID) {
+async function insertAssignProjectDetail(sql, arrayParams, data, insertID, res) {
     let aPLID = insertID
     let i = 0
+    let result = []
     for (let item of data) {
         let projectStage = item.projectTypeID
         let baseWorkTime = item.workTime
         let kValue = item.kValue
         let avaiableWorkTime = item.avaiableWorkTime
         arrayParams = [aPLID, projectStage, baseWorkTime, kValue, avaiableWorkTime]
-        await insertAssignProjectDetailOP(sql, arrayParams).then(res => {
+        await insertAssignProjectDetailOP(sql, arrayParams).then(res1 => {
+            let obj = {
+                projectStage: projectStage,
+                insertID: res1.insertId
+            }
+            result.push(obj)
             if (i++ === data.length - 1) {
-                return new Promise(function (resolve, reject) {
-                    resolve(res)
-                })
+                return $http.writeJson(res, {code: 1, data: result, message: '成功'})
             }
         })
     }
@@ -457,7 +461,7 @@ function updateMonthProcessObsoleteStatus(data) {
 }
 
 const workStation = {
-    /* 获取未完成的指派任务列表 */
+    // 获取未完成的指派任务列表
     getAssignProjectList (req, res) {
         $http.userVerify(req, res, () => {
             let data = req.body
@@ -508,7 +512,7 @@ const workStation = {
             })
         })
     },
-    /* 保存计划进展 */
+    // 保存计划进展
     submitPlanProcess (req, res) {
         let data = req.body
         console.log(data)
@@ -547,14 +551,13 @@ const workStation = {
             }
         })
     },
-    /* 保存指派项目 */
+    // 保存指派项目
     submitAssignWorkDetail (req, res) {
         let data = req.body
         let sql = null
         let arrayParams = []
         console.log(data)
         let projectTypeID = data.parentID
-        let projectType = data.tableData[0].projectType
         let projectName = data.tableData[0].projectName2
         let userID = data.tableData[0].projectManagerID
         let assignerID = data.userId
@@ -564,7 +567,6 @@ const workStation = {
             totalWorkTime += item.workTime
         }
         let curTime = $time.formatTime()
-        console.log(curTime)
         sql = $sql.workStation.insertAssignProjectList
         arrayParams = [userID, curTime, projectTypeID, projectName, assignerID, totalWorkTime, projectLevel]
         insertAssignProjectList(sql, arrayParams).then( res1 => {
@@ -572,12 +574,10 @@ const workStation = {
             let insertID = res1.insertId
             sql = $sql.workStation.insertAssignProjectDetail
             arrayParams = []
-            insertAssignProjectDetail(sql, arrayParams, data.tableData, insertID).then( res2 => {
-                return $http.writeJson(res, {code: 1, message: '成功'})
-            })
+            insertAssignProjectDetail(sql, arrayParams, data.tableData, insertID, res).then()
         })
     },
-    /* 获取每月进展对应工时 */
+    // 获取每月进展对应工时
     async getMonthProcessDiff (req, res) {
         let params = req.body
         console.log(params)
@@ -600,7 +600,7 @@ const workStation = {
             })
         }
     },
-    /* 获取已指派项目列表 */
+    // 获取已指派项目列表
     getAssignedProject (req, res) {
         let data = req.body
         console.log(data)
@@ -615,7 +615,7 @@ const workStation = {
             }
         })
     },
-    /* 更新已指派项目 */
+    // 更新已指派项目
     updateAssignProjectList (req, res) {
         let data = req.body.data
         console.log(data)
@@ -629,7 +629,7 @@ const workStation = {
             }
         })
     },
-    /* 删除已指派项目 */
+    // 删除已指派项目
     deleteAssignProject (req, res) {
         let data = req.body
         console.log(data)

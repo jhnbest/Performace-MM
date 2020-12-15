@@ -510,12 +510,12 @@
             }
           })
         },
-        /* 重置表单 */
+        // 重置表单
         resetForm (formData) {
           this.$refs[formData].resetFields()
           this.tableData = []
         },
-        /* 删除按钮 */
+        // 删除按钮
         handleDelete (row, index) {
           this.tableData.splice(index, 1)
         },
@@ -614,19 +614,19 @@
               }
             })
         },
-        /* 取消 */
+        // 取消
         handleCancel (row) {
           row.editable = !row.editable
         },
-        /* 项目级别过滤方法 */
+        // 项目级别过滤方法
         projectLevelsFilter (value, row) {
           return row.projectLevel === value
         },
-        /* 项目经理过滤方法 */
+        // 项目经理过滤方法
         usersFilterMethod (value, row) {
           return row.projectManagerID === value
         },
-        /* 删除操作 */
+        // 删除操作
         handleAssignDelete (row, index) {
           this.$common.msgBox('confirm', '操作提示', '确定删除？', () => {
             if (this.reqFlag.deleteAssignProject) {
@@ -648,7 +648,7 @@
             }
           })
         },
-        /* 获取指派项目计划&进展明细 */
+        // 获取指派项目计划&进展明细
         getAssignProjectDetail (id) {
           let it = this
           return new Promise(function (resolve, reject) {
@@ -673,14 +673,14 @@
             }
           })
         },
-        /* 查看项目详情 */
+        // 查看项目详情
         handleProjectDetailClick (row) {
           this.showFlag.projectDetail = true
           this.getAssignProjectDetail(row.id)
           this.checkAssignProjectID = row.id
           this.assignProjectName = row.projectName
         },
-        /* 表格列合并方法 */
+        // 表格列合并方法
         objectSpanMethod ({ row, column, rowIndex, columnIndex }) {
           if (columnIndex === 0 || columnIndex === 1 || columnIndex === 2 || columnIndex === 3 || columnIndex === 4) {
             if (rowIndex % 2 === 0) {
@@ -696,14 +696,14 @@
             }
           }
         },
-        /* 上一年度进展 */
+        // 上一年度进展
         handleDecYear () {
           if (this.reqFlag.getAssignProjectDetail) {
             this.formData.yearNum -= 1
             this.getAssignProjectDetail(this.checkAssignProjectID)
           }
         },
-        /* 下一年度进展 */
+        // 下一年度进展
         handleAddYear () {
           if (this.reqFlag.getAssignProjectDetail) {
             this.formData.yearNum += 1

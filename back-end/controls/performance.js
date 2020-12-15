@@ -647,7 +647,7 @@ const performance = {
             })
         }
     },
-    /* 新增工时申报 */
+    // 新增工时申报
     workTimeSubmit (req, res) {
         let data = req.body
         console.log('===performace.js workTimeSubmit')

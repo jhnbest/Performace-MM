@@ -37,6 +37,16 @@
             clearable
             style="width: 350%"></el-cascader>
         </el-form-item>
+        <br>
+        <el-form-item label="项目级别" prop="projectLevel">
+          <el-select v-model="formData.projectLevel" placeholder="请选择">
+            <el-option v-for="item in projectLevels"
+                       :key="item.value"
+                       :label="item.text"
+                       :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
         <!-- 分割线 start -->
         <div class="hr-10"></div>
         <!-- 分割线 end -->
@@ -45,9 +55,9 @@
         <el-table
           :data="formData.workTypeTimeDetail"
           stripe
-          style="width: 90%;margin: auto">
+          style="width: 97%;margin: auto">
           <el-table-column type="index" align="center" label="序号"></el-table-column>
-          <el-table-column align="center" label="项目名称">
+          <el-table-column align="center" label="项目名称" width="150%">
             <template slot-scope="scope">
               <el-form-item
                 :prop="'workTypeTimeDetail.' + scope.$index + '.projectName'"
@@ -59,7 +69,7 @@
           </el-table-column>
           <el-table-column label="项目类型" prop="workType" align="center"></el-table-column>
           <el-table-column label="基本工时" prop="baseWorkTime" align="center" width="80%"></el-table-column>
-          <el-table-column label="K值" prop="defaultKValue" align="center" width="170%">
+          <el-table-column label="K值" prop="defaultKValue" align="center" width="150%">
             <template slot-scope="scope">
               <el-form-item
                 :prop="'workTypeTimeDetail.' + scope.$index + '.defaultKValue'"
@@ -77,7 +87,7 @@
               </el-form-item>
             </template>
           </el-table-column>
-          <el-table-column label="系数" align="center" width="170%">
+          <el-table-column label="系数" align="center" width="150%">
             <template slot-scope="scope">
               <el-form-item :prop="'workTypeTimeDetail.' + scope.$index + '.defaultCofficient'"
                             :rules="formRules.Cofficient"
@@ -91,7 +101,7 @@
               </el-form-item>
             </template>
           </el-table-column>
-          <el-table-column label="进展" align="center">
+          <el-table-column label="进展" align="center" width="100%">
             <template slot-scope="scope">
               <el-form-item
                 :prop="'workTypeTimeDetail.' + scope.$index + '.applyProcess'"
@@ -109,7 +119,7 @@
               </el-form-item>
             </template>
           </el-table-column>
-          <el-table-column label="工时分配" align="center">
+          <el-table-column label="工时分配" align="center" width="100%">
             <template slot-scope="scope">
               <span class="link-type" @click="handleWorkTimeAssign(scope.row, scope.$index)">点击分配</span>
             </template>
@@ -123,14 +133,6 @@
               </el-input>
             </template>
           </el-table-column>
-<!--          <el-table-column label="操作" align="center" width="200">-->
-<!--            <template slot-scope="scope">-->
-<!--              <el-button size="mini"-->
-<!--                         type="danger"-->
-<!--                         plain-->
-<!--                         @click="handleDeleteWorkDetail(scope.row, scope.$index)">删除</el-button>-->
-<!--            </template>-->
-<!--          </el-table-column>-->
         </el-table>
       </el-form>
       <Assign v-if="showFlag.workTimeAssign" ref="workTimeAssign" @assignDetail="handleAssign"/>
@@ -138,7 +140,7 @@
 </template>
 
 <script>
-  import { workTypeList, workTimeSubmit, getWorkTime,
+  import { workTypeList, workTimeSubmit, getWorkTime, submitAssignWorkDetail,
     getUsersName, getProjectType, getWorkTimeNew, workTimeTemporary } from '@/config/interface'
   import Assign from '@/components/Cop/workTimeAssign'
     export default {
@@ -190,7 +192,8 @@
             usersList: [],
             partWorkTime: 0,
             partTableData: [],
-            workTypeTimeDetail: []
+            workTypeTimeDetail: [],
+            projectLevel: 1
           },
           formRules: {
             title: [
@@ -232,6 +235,9 @@
             applyProcess: [
               { required: true, message: '请填写进展', trigger: 'change' },
               { type: 'number', max: 100 }
+            ],
+            projectLevel: [
+              { required: true, message: '请选择项目级别', trigger: 'change' }
             ]
           },
           reqFlag: {
@@ -249,47 +255,100 @@
               return time.getTime() > Date.now()
             }
           },
-          workTime: 0
+          workTime: 0,
+          projectLevels: [{
+            value: 1,
+            text: '普通任务'
+          }, {
+            value: 2,
+            text: '处室重点任务'
+          }, {
+            value: 3,
+            text: '部门重点任务'
+          }, {
+            value: 4,
+            text: '公司重点任务'
+          }]
         }
-      },
-      components: {
-        Assign
       },
       methods: {
         // 初始化
         init () {
           this.getProjectType()
         },
+        // 提交至工时明细列表
+        onSubmitWorkTimeList (formData) {
+          const url = workTimeSubmit
+          if (this.reqFlag.add) {
+            this.reqFlag.add = false
+            let title = this.formData.title
+            let params = {
+              submitType: 'insert',
+              submitDate: title,
+              data: this.formData.workTypeTimeDetail
+            }
+            this.$http(url, params)
+              .then(res => {
+                if (res.code === 1) {
+                  this.$common.toast('添加成功', 'success', false)
+                  this.onCancel(formData)
+                } else {
+                  console.log(res.code)
+                  this.$common.toast('添加失败', 'success', false)
+                  this.onCancel(formData)
+                }
+                this.reqFlag.add = true
+              })
+          }
+        },
+        // 提交至项目明细列表
+        onSubmitProjectList () {
+          const url = submitAssignWorkDetail
+          let params = {
+            parentID: this.formData.projectType[0][0],
+            projectLevel: this.formData.projectLevel,
+            tableData: []
+          }
+          for (let item of this.formData.workTypeTimeDetail) {
+            let obj = {
+              avaiableWorkTime: item.avaiableWorkTime,
+              defaultAssignWorkTime: item.defaultAssignWorkTime,
+              dynamicKValue: item.dynamicKValue,
+              isConference: item.isConference,
+              kValue: item.defaultKValue,
+              projectManagerID: this.$store.state.userInfo.id,
+              projectName2: item.projectName,
+              projectTypeID: item.projectTypeID,
+              workTime: item.avaiableWorkTime
+            }
+            params.tableData.push(obj)
+          }
+          let it = this
+          return new Promise(function (resolve, reject) {
+            it.$http(url, params)
+              .then(res => {
+                if (res.code === 1) {
+                  console.log(res.data)
+                  for (let i = 0; i < res.data.length; i++) { // 插入项目明细ID
+                    it.formData.workTypeTimeDetail[i].apdID = res.data[i].insertID
+                  }
+                  resolve(res.data)
+                }
+              })
+          })
+        },
         // 提交工时申报
         onSubmitWorkTime (formData) {
           this.$refs[formData].validate(valid => {
             if (valid) {
-              const url = workTimeSubmit
-              if (this.reqFlag.add) {
-                this.reqFlag.add = false
-                let title = this.formData.title
-                let params = {
-                  submitType: 'insert',
-                  submitDate: title,
-                  data: this.formData.workTypeTimeDetail
-                }
-                this.$http(url, params)
-                  .then(res => {
-                    if (res.code === 1) {
-                      this.$common.toast('添加成功', 'success', false)
-                      this.onCancel(formData)
-                    } else {
-                      console.log(res.code)
-                      this.$common.toast('添加失败', 'success', false)
-                      this.onCancel(formData)
-                    }
-                    this.reqFlag.add = true
-                  })
-              }
+              this.onSubmitProjectList().then(res => {
+                console.log(res)
+                this.onSubmitWorkTimeList(formData)
+              })
             }
           })
         },
-        /* 暂存工时申报 */
+        // 暂存工时申报
         onTemporaryWorkTime (formData) {
           this.$refs[formData].validate(valid => {
             if (valid) {
@@ -324,7 +383,7 @@
           this.$router.push({ path: '/home/Performance' })
           this.$refs[formName].resetFields()
         },
-        /* 获取申报类型 */
+        // 获取申报类型
         getProjectType () {
           const url = getProjectType
           if (this.reqFlag.getProjectType) {
@@ -342,7 +401,7 @@
               })
           }
         },
-        /* 获取用户姓名 */
+        // 获取用户姓名
         getUsersName (isOpen) {
           if (isOpen) {
             console.log('===Performance.vue getUsersName')
@@ -379,7 +438,7 @@
             }
           }
         },
-        /* 获取项目明细 */
+        // 获取项目明细
         handleProjectTypeChange (selectItem) {
           console.log('PerformanceAddNew.vue handleProjectTypeChange')
           console.log(selectItem)
@@ -463,7 +522,7 @@
             }
           }
         },
-        /* 删除工时明细记录 */
+        // 删除工时明细记录
         handleDeleteWorkDetail (row, index) {
           console.log('===PerformanceAddNew.vue handleDeleteWorkDetail')
           console.log(row)
@@ -482,7 +541,7 @@
             this.formData.projectType.splice(deleteIndex, 1)
           })
         },
-        /* 参与人员变化处理 */
+        // 参与人员变化处理
         handlePartChange () {
           let selectUsers = []
           let tableUsers = []
@@ -601,7 +660,7 @@
           selectUsersLen = selectUsers.length
           let tableUsersLen = tableUsers.length
           let difference = selectUsers.filter(x => tableUsers.indexOf(x) === -1)
-                                      .concat(tableUsers.filter(x => selectUsers.indexOf(x) === -1))
+            .concat(tableUsers.filter(x => selectUsers.indexOf(x) === -1))
           console.log(difference)
           console.log(selectUsersLen)
           console.log(tableUsersLen)
@@ -631,7 +690,7 @@
             }
           }
         },
-        /* 工时分配点击 */
+        // 工时分配点击
         handleWorkTimeAssign (row, index) {
           this.showFlag.workTimeAssign = true
           let rowCop = JSON.parse(JSON.stringify(row))
@@ -681,6 +740,9 @@
           row.avaiableWorkTime = row.baseWorkTime * row.defaultKValue * row.defaultCofficient * row.applyProcess * 0.01
           row.workTimeAssign[0].assignWorkTime = row.baseWorkTime * row.defaultKValue * row.defaultCofficient * row.applyProcess * 0.01
         }
+      },
+      components: {
+        Assign
       },
       created () {
         console.log('===PerformanceAdd.vue created')
