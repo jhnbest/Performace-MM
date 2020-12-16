@@ -653,6 +653,27 @@ const workStation = {
             })
         })
     },
+    // 更新项目明细
+    updateAssignWorkDetail (req, res) {
+        let data = req.body
+        console.log(data)
+    },
+    // 获取项目明细
+    getAssignWorkDetail (req, res) {
+        let data = req.body
+        console.log(data)
+        let sql = $sql.workStation.getAssignWorkDetail
+        let arrayParams = [data.apdID]
+        $http.connPool(sql, arrayParams, (err, result) => {
+            if (err) {
+                return $http.writeJson(res, {code: -2, message:'失败', errMsg: err})
+            } else {
+                result = JSON.parse(JSON.stringify(result))
+                console.log(result)
+                return $http.writeJson(res, {code: 1, data: result[0], message: '成功'})
+            }
+        })
+    },
     updateAssignProjectFilled (req, res) {
         let data = req.body
         let sql = $sql.workStation.updateAssignProjectFilled

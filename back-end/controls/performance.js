@@ -147,6 +147,7 @@ function workTimeInsertOP(params, i, operate) {
         let reviewCofficient = params.data[i].reviewCofficient
         let avaiableWorkTime = params.data[i].avaiableWorkTime
         let applyProcess = params.data[i].applyProcess
+        let apdID = params.data[i].apdID
         let updateTime = $time.formatTime()
         let submitStatus = null
         let reviewStatus = '0'
@@ -159,7 +160,7 @@ function workTimeInsertOP(params, i, operate) {
         if (params.submitType === 'insert') {  //新增
             sql = $sql.performance.addProject
             arrayParams = [submitID, projectName, projectTypeID, applyKValue, reviewKValue, applyCofficient, reviewCofficient, submitTime,
-                updateTime, applyMonth, submitStatus, submitComments, avaiableWorkTime, applyProcess]
+                updateTime, applyMonth, submitStatus, submitComments, avaiableWorkTime, applyProcess, apdID]
         } else if (params.submitType === 'update') { //更新
             if (operate === '1') { // 提交
                 sql = $sql.performance.updateRejectProject
@@ -630,7 +631,7 @@ const performance = {
             })
         })
     },
-    /* 获取项目类型对应的工时详情 */
+    // 获取项目类型对应的工时详情
     async getWorkTimeNew (req, res) {
         let data = req.body
         let sql = $sql.performance.selectProjectTime
@@ -738,7 +739,7 @@ const performance = {
             })
         })
     },
-    /* 获取项目信息 */
+    // 获取项目信息
     getProjectInfo (req, res) {
         console.log('===performance.js getProjectInfo')
         let data = req.body

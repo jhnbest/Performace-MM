@@ -38,6 +38,16 @@
             clearable
             style="width: 350%"></el-cascader>
         </el-form-item>
+        <br>
+        <el-form-item label="项目级别" prop="projectLevel">
+          <el-select v-model="formData.projectLevel" placeholder="请选择" v-if="formData.isShowProjectLevel">
+            <el-option v-for="item in projectLevels"
+                       :key="item.value"
+                       :label="item.text"
+                       :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
         <!-- 分割线 start -->
         <div class="hr-10"></div>
         <!-- 分割线 end -->
@@ -46,21 +56,21 @@
         <el-table
           :data="formData.workTypeTimeDetail"
           stripe
-          style="width: 90%;margin: auto">
+          style="width: 97%;margin: auto">
           <el-table-column type="index" align="center" label="序号"></el-table-column>
-          <el-table-column align="center" label="项目名称">
+          <el-table-column align="center" label="项目名称" width="150%">
             <template slot-scope="scope">
               <el-form-item
                 :prop="'workTypeTimeDetail.' + scope.$index + '.projectName'"
                 :rules="formRules.projectName"
                 style="margin: auto">
-                <el-input type="textarea" size="mini" v-model="scope.row.projectName"></el-input>
+                <el-input type="textarea" v-model="scope.row.projectName" autosize></el-input>
               </el-form-item>
             </template>
           </el-table-column>
-          <el-table-column prop="workType" label="项目类型" align="center"></el-table-column>
-          <el-table-column prop="baseWorkTime" label="基本工时" align="center" width="80%"></el-table-column>
-          <el-table-column prop="defaultKValue" label="K值" align="center" width="170%">
+          <el-table-column label="项目类型" prop="workType" align="center"></el-table-column>
+          <el-table-column label="基本工时" prop="baseWorkTime" align="center" width="80%"></el-table-column>
+          <el-table-column label="K值" prop="defaultKValue" align="center" width="150%">
             <template slot-scope="scope">
               <el-form-item
                 :prop="'workTypeTimeDetail.' + scope.$index + '.defaultKValue'"
@@ -72,12 +82,13 @@
                                  :disabled="!scope.row.dynamicKValue"
                                  :min="1.0"
                                  :precision="1"
-                                 @change="handleKValueCoffChange(scope.row)">
+                                 @change="handleKValueCoffChange(scope.row, scope.$index)"
+                                 style="width: 70%">
                 </el-input-number>
               </el-form-item>
             </template>
           </el-table-column>
-          <el-table-column prop="coefficient" label="系数" align="center" width="170%">
+          <el-table-column label="系数" align="center" width="150%">
             <template slot-scope="scope">
               <el-form-item :prop="'workTypeTimeDetail.' + scope.$index + '.defaultCofficient'"
                             :rules="formRules.Cofficient"
@@ -85,17 +96,36 @@
                 <el-input-number size="mini"
                                  v-model="scope.row.defaultCofficient"
                                  :min="1.0"
-                                 @change="handleKValueCoffChange(scope.row)">
+                                 @change="handleKValueCoffChange(scope.row, scope.$index)"
+                                 style="width: 70%">
                 </el-input-number>
               </el-form-item>
             </template>
           </el-table-column>
-          <el-table-column label="工时分配" align="center">
+          <el-table-column label="进展" align="center" width="100%">
+            <template slot-scope="scope">
+              <el-form-item
+                :prop="'workTypeTimeDetail.' + scope.$index + '.applyProcess'"
+                :rules="formRules.applyProcess"
+                style="margin: auto">
+                <div>
+                  <el-input v-model.number="scope.row.applyProcess"
+                            type="number"
+                            size="mini"
+                            style="width: 70%"
+                            :max="100"
+                            @change="handleKValueCoffChange(scope.row, scope.$index)"></el-input>
+                  <span> %</span>
+                </div>
+              </el-form-item>
+            </template>
+          </el-table-column>
+          <el-table-column label="工时分配" align="center" width="100%">
             <template slot-scope="scope">
               <span class="link-type" @click="handleWorkTimeAssign(scope.row, scope.$index)">点击分配</span>
             </template>
           </el-table-column>
-          <el-table-column prop="remarks" label="备注" align="center">
+          <el-table-column label="备注" prop="remarks" align="center" width="200%">
             <template slot-scope="scope">
               <el-input size="mini"
                         type="textarea"
@@ -104,14 +134,6 @@
               </el-input>
             </template>
           </el-table-column>
-<!--          <el-table-column label="操作" align="center" width="200">-->
-<!--            <template slot-scope="scope">-->
-<!--              <el-button size="mini"-->
-<!--                         type="danger"-->
-<!--                         plain-->
-<!--                         @click="handleDeleteWorkDetail(scope.row, scope.$index)">删除</el-button>-->
-<!--            </template>-->
-<!--          </el-table-column>-->
         </el-table>
       </el-form>
       <Assign v-if="showFlag.workTimeAssign" ref="workTimeAssign" @assignDetail="handleAssign"/>
@@ -119,7 +141,8 @@
 </template>
 
 <script>
-  import { workTimeSubmit, getProjectInfo, getUsersName, getProjectType, getWorkTimeNew, workTimeTemporary } from '@/config/interface'
+  import { workTimeSubmit, getProjectInfo, getUsersName, getProjectType, getWorkTimeNew, workTimeTemporary,
+    updateAssignWorkDetail, getAssignWorkDetail } from '@/config/interface'
   import Assign from '@/components/Cop/workTimeAssign'
     export default {
       data () {
@@ -172,7 +195,9 @@
             partWorkTime: 0,
             partTableData: [],
             workTypeTimeDetail: [],
-            isShowProjectType: true
+            isShowProjectType: true,
+            projectLevel: null,
+            isShowProjectLevel: true
           },
           formRules: {
             title: [
@@ -210,6 +235,9 @@
             ],
             projectType: [
               { required: true, message: '请选择项目类型', trigger: 'change' }
+            ],
+            projectLevel: [
+              { required: true, message: '请选择项目级别', trigger: 'change' }
             ]
           },
           reqFlag: {
@@ -227,127 +255,211 @@
               return time.getTime() > Date.now()
             }
           },
-          workTime: 0
+          workTime: 0,
+          apdID: null,
+          aplID: null,
+          projectLevels: [{
+            value: 1,
+            text: '普通任务'
+          }, {
+            value: 2,
+            text: '处室重点任务'
+          }, {
+            value: 3,
+            text: '部门重点任务'
+          }, {
+            value: 4,
+            text: '公司重点任务'
+          }]
         }
       },
       components: {
         Assign
       },
       methods: {
+        // 初始化
         init () {
           this.getUsersName()
           this.getProjectType()
-          this.getProjectInfo()
+          this.getProjectInfo().then(res => {
+            this.getProjectDetail(res)
+          })
         },
-        /* 获取工时申报详情 */
+        // 获取项目申报明细
+        getProjectDetail (param) {
+          const url = getAssignWorkDetail
+          let params = {
+            apdID: param.apdID
+          }
+          this.$http(url, params)
+            .then(res => {
+              if (res.code === 1) {
+                console.log(res.data)
+                this.apdID = res.data.apdID
+                this.aplID = res.data.aplID
+                this.formData.projectLevel = res.data.projectLevel
+                // console.log(this.formData.projectLevel)
+                // this.formData.isShowProjectLevel = false
+                // setTimeout(() => {
+                //   this.formData.isShowProjectLevel = true
+                // }, this.$store.state.refreshInterval)
+              }
+            })
+        },
+        // 获取工时申报详情
         getProjectInfo () {
           let url = getProjectInfo
           let params = {
             id: this.id
           }
-          this.$http(url, params)
-            .then(res => {
-              if (res.code === 1) {
-                let data = res.data
-                let multipleSelect = []
-                let defaultCurrentUserWorkTime = []
-                let workTimeAssignInsertID = []
-                let tmp = []
-                console.log(data)
-                this.formData.title = data.workTimeList[0].applyMonth
-                this.formData.projectType.push(data.projectTypeCheck) // get项目类型
-                this.formData.isShowProjectType = false
-                setTimeout(() => {
-                  this.formData.isShowProjectType = true
-                }, this.$store.state.refreshInterval)
-                /* 遍历工时分配信息 */
-                for (let item of data.workTimeAssign) {
-                  if (item.userID !== this.$store.state.userInfo.id) {
-                    multipleSelect.push(item.userID)
-                  }
-                  workTimeAssignInsertID.push(item.id)
-                  /* 插入填报人信息 */
-                  if (item.userID === this.$store.state.userInfo.id) {
-                    let obj = {
-                      id: item.userID,
-                      groupName: this.$store.state.userInfo.groupName,
-                      name: this.$store.state.userInfo.name,
-                      applyRole: item.assignRole,
-                      assignWorkTime: item.workTime,
-                      deleteAble: false
+          let it = this
+          return new Promise(function (resolve, reject) {
+            it.$http(url, params)
+              .then(res => {
+                if (res.code === 1) {
+                  let data = res.data
+                  let multipleSelect = []
+                  let defaultCurrentUserWorkTime = []
+                  let workTimeAssignInsertID = []
+                  let tmp = []
+                  console.log(data)
+                  it.formData.title = data.workTimeList[0].applyMonth
+                  it.formData.projectType.push(data.projectTypeCheck) // get项目类型
+                  it.formData.isShowProjectType = false
+                  setTimeout(() => {
+                    it.formData.isShowProjectType = true
+                  }, it.$store.state.refreshInterval)
+                  /* 遍历工时分配信息 */
+                  for (let item of data.workTimeAssign) {
+                    if (item.userID !== it.$store.state.userInfo.id) {
+                      multipleSelect.push(item.userID)
                     }
-                    defaultCurrentUserWorkTime.push(obj)
-                  }
-                  /* 插入协作者信息 */
-                  tmp = this.formData.usersList[1].options.find((iItem) => {
-                    if (iItem.id === item.userID) {
+                    workTimeAssignInsertID.push(item.id)
+                    /* 插入填报人信息 */
+                    if (item.userID === it.$store.state.userInfo.id) {
                       let obj = {
-                        id: iItem.id,
-                        groupName: iItem.groupName,
-                        name: iItem.name,
+                        id: item.userID,
+                        groupName: it.$store.state.userInfo.groupName,
+                        name: it.$store.state.userInfo.name,
                         applyRole: item.assignRole,
                         assignWorkTime: item.workTime,
                         deleteAble: false
                       }
                       defaultCurrentUserWorkTime.push(obj)
-                      return 0
                     }
-                  })
+                    /* 插入协作者信息 */
+                    tmp = it.formData.usersList[1].options.find((iItem) => {
+                      if (iItem.id === item.userID) {
+                        let obj = {
+                          id: iItem.id,
+                          groupName: iItem.groupName,
+                          name: iItem.name,
+                          applyRole: item.assignRole,
+                          assignWorkTime: item.workTime,
+                          deleteAble: false
+                        }
+                        defaultCurrentUserWorkTime.push(obj)
+                        return 0
+                      }
+                    })
+                  }
+                  let obj = {
+                    projectTypeID: data.workTimeList[0].projectTypeID,
+                    projectName: data.workTimeList[0].projectName,
+                    workType: data.projectName,
+                    baseWorkTime: data.workTime,
+                    defaultKValue: data.workTimeList[0].applyKValue,
+                    dynamicKValue: data.dynamicKValue,
+                    defaultCofficient: data.workTimeList[0].applyCofficient,
+                    workTimeAssign: [],
+                    submitComments: data.workTimeList[0].submitComments,
+                    multipleAssign: data.workTimeAssign.length > 1,
+                    multipleSelect: multipleSelect,
+                    workTimeAssignInsertID: workTimeAssignInsertID,
+                    avaiableWorkTime: data.workTimeList[0].avaiableWorkTime,
+                    isConference: data.isConference,
+                    defaultAssignWorkTime: data.defaultAssignWorkTime,
+                    applyProcess: data.workTimeList[0].applyProcess,
+                    apdID: data.workTimeList[0].apdID
+                  }
+                  console.log('====')
+                  console.log(obj)
+                  // obj.avaiableWorkTime = obj.baseWorkTime * obj.defaultKValue * obj.defaultCofficient
+                  obj.workTimeAssign = defaultCurrentUserWorkTime
+                  it.formData.workTypeTimeDetail.push(obj)
+                  resolve(obj)
                 }
-                let obj = {
-                  projectTypeID: data.workTimeList[0].projectTypeID,
-                  projectName: data.workTimeList[0].projectName,
-                  workType: data.projectName,
-                  baseWorkTime: data.workTime,
-                  defaultKValue: data.workTimeList[0].applyKValue,
-                  dynamicKValue: data.dynamicKValue,
-                  defaultCofficient: data.workTimeList[0].applyCofficient,
-                  workTimeAssign: [],
-                  submitComments: data.workTimeList[0].submitComments,
-                  multipleAssign: data.workTimeAssign.length > 1,
-                  multipleSelect: multipleSelect,
-                  workTimeAssignInsertID: workTimeAssignInsertID,
-                  avaiableWorkTime: data.workTimeList[0].avaiableWorkTime,
-                  isConference: data.isConference,
-                  defaultAssignWorkTime: data.defaultAssignWorkTime
-                }
-                // obj.avaiableWorkTime = obj.baseWorkTime * obj.defaultKValue * obj.defaultCofficient
-                obj.workTimeAssign = defaultCurrentUserWorkTime
-                this.formData.workTypeTimeDetail.push(obj)
-              }
-            })
+              })
+          })
         },
-        /* 提交工时申报 */
+        // 提交至工时明细列表
+        onSubmitWorkTimeList (formData) {
+          const url = workTimeSubmit
+          if (this.reqFlag.edit) {
+            this.reqFlag.edit = false
+            let title = this.formData.title
+            let params = {
+              projectID: this.id,
+              submitType: 'update',
+              submitDate: title,
+              data: this.formData.workTypeTimeDetail
+            }
+            this.$http(url, params)
+              .then(res => {
+                if (res.code === 1) {
+                  this.$common.toast('提交成功', 'success', false)
+                  this.onCancel(formData)
+                } else {
+                  this.$common.toast('提交失败', 'success', false)
+                  this.onCancel(formData)
+                }
+                this.reqFlag.edit = true
+              })
+          }
+        },
+        // 提交至项目明细列表
+        onSubmitProjectList () {
+          const url = updateAssignWorkDetail
+          let params = {
+            apdID: this.apdID,
+            aplID: this.aplID,
+            projectLevel: this.formData.projectLevel,
+            tableData: []
+          }
+          for (let item of this.formData.workTypeTimeDetail) {
+            let obj = {
+              avaiableWorkTime: item.avaiableWorkTime,
+              defaultAssignWorkTime: item.defaultAssignWorkTime,
+              dynamicKValue: item.dynamicKValue,
+              isConference: item.isConference,
+              kValue: item.defaultKValue,
+              projectManagerID: this.$store.state.userInfo.id,
+              projectName2: item.projectName,
+              projectTypeID: item.projectTypeID,
+              workTime: item.avaiableWorkTime,
+              applyProcess: item.applyProcess
+            }
+            params.tableData.push(obj)
+          }
+          let it = this
+          return new Promise(function (resolve, reject) {
+            it.$http(url, params)
+              .then(res => {
+                if (res.code === 1) {
+                  console.log(res.data)
+                  resolve(res.data)
+                }
+              })
+          })
+        },
+        // 提交工时申报（更新）
         onSubmitWorkTime (formData) {
           this.$refs[formData].validate(valid => {
             if (valid) {
-              const url = workTimeSubmit
-              if (this.reqFlag.edit) {
-                this.reqFlag.edit = false
-                let title = this.formData.title
-                let params = {
-                  projectID: this.id,
-                  submitType: 'update',
-                  submitDate: title,
-                  data: this.formData.workTypeTimeDetail
-                }
-                this.$http(url, params)
-                  .then(res => {
-                    if (res.code === 1) {
-                      this.$common.toast('提交成功', 'success', false)
-                      this.onCancel(formData)
-                    } else {
-                      console.log(res.code)
-                      this.$common.toast('提交失败', 'success', false)
-                      this.onCancel(formData)
-                    }
-                    this.reqFlag.edit = true
-                  })
-              }
             }
           })
         },
-        /* 暂存工时申报 */
+        // 暂存工时申报
         onTemporaryWorkTime (formData) {
           this.$refs[formData].validate(valid => {
             if (valid) {

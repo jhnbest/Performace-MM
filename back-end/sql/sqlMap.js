@@ -59,7 +59,7 @@ const sqlMap = {
     selectProjectType: 'select projectTypeID, projectName from projecttypenew where projectParentID = ? and obsoleteStatus != 1',
     selectProjectTime: 'select projectTypeID, projectName, workTime, dynamicKValue, isConference, defaultAssignWorkTime from projecttypenew where projectTypeID = ?',
     addProject: 'insert into worktimelist (submitID, projectName, projectTypeID, applyKValue, reviewKValue, applyCofficient, reviewCofficient, submitTime, ' +
-        'updateTime, applyMonth, submitStatus, submitComments, avaiableWorkTime, applyProcess) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        'updateTime, applyMonth, submitStatus, submitComments, avaiableWorkTime, applyProcess, apdID) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
     addWorkAssign: 'insert into worktimeassign (userID, projectID, workTime, assignRole) values (?, ?, ?, ?)',
     updateProject: 'update worktimelist set submitID = ?, projectName = ?, projectTypeID = ?, applyKValue = ?, reviewKValue = ?, applyCofficient = ?, ' +
         'reviewCofficient = ?, updateTime = ?, applyMonth = ?, submitStatus = ?, submitComments = ?, avaiableWorkTime = ? where id = ?',
@@ -145,7 +145,9 @@ const sqlMap = {
     deleteAssignProjectDetail: 'update assignprojectdetail set obsoleteStatus = 1 where aPLID = ?',
     getAssignProjectDetailID: 'select id from assignprojectdetail where aPLID = ?',
     updateMonthProcessObsoleteStatus: 'update monthprocess set obsoleteStatus = 1 where aPDID in (?)',
-    updateAssignProjectFilled: 'update assignprojectlist set isFilled = 1 where id = ?'
+    updateAssignProjectFilled: 'update assignprojectlist set isFilled = 1 where id = ?',
+    getAssignWorkDetail: 'select apd.id as apdID, apd.aPLID as aplID, apl.projectLevel from assignprojectdetail apd left join' +
+        ' assignprojectlist apl on apd.aPLID = apl.id where apd.id = ?'
   }
 }
 module.exports = sqlMap;

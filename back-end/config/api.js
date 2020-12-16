@@ -50,5 +50,7 @@ module.exports = {
     getAssignedProject: path + '/workStation/getAssignedProject', // 获取每月进展对应工时
     updateAssignProjectList: path + '/workStation/updateAssignProjectList', // 更新已指派项目
     deleteAssignProject: path + '/workStation/deleteAssignProject', // 删除已指派项目
-    updateAssignProjectFilled: path + '/workStation/updateAssignProjectFilled' // 更新指派项目是否填报字段
+    updateAssignProjectFilled: path + '/workStation/updateAssignProjectFilled', // 更新指派项目是否填报字段
+    updateAssignWorkDetail: path + '/workStation/updateAssignWorkDetail', // 更新项目明细
+    getAssignWorkDetail: path + '/workStation/getAssignWorkDetail' // 获取项目明细
 };

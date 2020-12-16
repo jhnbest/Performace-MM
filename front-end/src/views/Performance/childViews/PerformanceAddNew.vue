@@ -357,7 +357,6 @@
                 this.reqFlag.add = false
               }
               let title = this.formData.title
-
               let params = {
                 submitType: 'insert',
                 submitDate: title,

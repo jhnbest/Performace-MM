@@ -406,7 +406,7 @@
         }
       },
       methods: {
-        /* 初始化 */
+        // 初始化
         init () {
           console.log('===JJProjectPlanProcess.vue')
           console.log('init')
@@ -414,9 +414,8 @@
           this.formData.projectName = this.$route.query.projectName
           this.getAssignProjectDetail(this.$route.query.projectID)
         },
-        /* 提交工时申报 */
+        // 提交工时申报
         handleWorkTimeApply (formData) {
-          console.log(this.$refs)
           this.$refs[formData].validate((valid) => {
             if (valid) {
               let url = workTimeTemporary
@@ -442,21 +441,21 @@
         handleBack () {
           this.$router.push({ path: '/home/workStation' })
         },
-        /* 上一年度进展 */
+        // 上一年度进展
         handleDecYear () {
           if (this.reqFlag.getAssignProjectDetail) {
             this.formData.yearNum -= 1
             this.getAssignProjectDetail(this.$route.query.projectID)
           }
         },
-        /* 下一年度进展 */
+        // 下一年度进展
         handleAddYear () {
           if (this.reqFlag.getAssignProjectDetail) {
             this.formData.yearNum += 1
             this.getAssignProjectDetail(this.$route.query.projectID)
           }
         },
-        /* 获取指派项目计划&进展明细操作 */
+        // 获取指派项目计划&进展明细操作
         httpGetAssignProjectDetail (id, yearNum) {
           let it = this
           return new Promise(function (resolve, reject) {
@@ -478,7 +477,7 @@
             }
           })
         },
-        /* 获取指派项目计划&进展明细 */
+        // 获取指派项目计划&进展明细
         getAssignProjectDetail (id) {
           let it = this
           this.httpGetAssignProjectDetail(id, this.formData.yearNum)
@@ -490,11 +489,11 @@
               it.formData.tableDataCache = JSON.parse(JSON.stringify(it.formData.tableData))
             })
         },
-        /* 编辑按钮 */
+        // 表格编辑按钮
         handleEdit (row, index) {
           row.editable = true
         },
-        // 保存数据
+        // 表格保存按钮
         handleSave (row, index) {
           console.log(row)
           const url = submitPlanProcess
@@ -520,14 +519,14 @@
             this.formData.tableDataCache[index][item] = row[item]
           }
         },
-        /* 取消按钮 */
+        // 取消按钮
         handleCancel (row, index) {
           for (let item in this.formData.tableDataCache[index]) {
             row[item] = this.formData.tableDataCache[index][item]
           }
           row.editable = false
         },
-        /* 表格列合并方法 */
+        // 表格列合并方法
         objectSpanMethod ({ row, column, rowIndex, columnIndex }) {
           if (columnIndex === 0 || columnIndex === 1 || columnIndex === 2 || columnIndex === 3) {
             if (rowIndex % 2 === 0) {
@@ -600,12 +599,12 @@
                         avaiableWorkTime: 0,
                         isConference: item.sendParams.isConference,
                         defaultAssignWorkTime: item.sendParams.defaultAssignWorkTime,
-                        apdID: item.sendParams.aPDID,
                         projectStage: item.sendParams.projectStage,
                         applyMonthProcess: applyMonthProcess,
                         lastMonthProcess: lastMonthProcess,
                         processDiff: applyMonthProcess - lastMonthProcess,
-                        applyProcess: applyMonthProcess
+                        applyProcess: applyMonthProcess,
+                        apdID: item.sendParams.aPDID
                       }
                       obj.avaiableWorkTime = obj.baseWorkTime * obj.defaultKValue * obj.defaultCofficient *
                         (applyMonthProcess - lastMonthProcess) * 0.01
@@ -638,7 +637,7 @@
             })
           })
         },
-        /* 申报月份变化处理 */
+        // 申报月份变化处理
         handleApplyDateChange () {
           this.genWorkTimeApply()
         },

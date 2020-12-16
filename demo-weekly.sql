@@ -11,7 +11,7 @@
  Target Server Version : 80020
  File Encoding         : 65001
 
- Date: 15/12/2020 17:14:39
+ Date: 16/12/2020 16:26:54
 */
 
 SET NAMES utf8mb4;
@@ -33,94 +33,12 @@ CREATE TABLE `assignprojectdetail`  (
   `obsoleteStatus` tinyint NOT NULL DEFAULT 0 COMMENT '废弃状态',
   `isFinish` tinyint NOT NULL DEFAULT 0 COMMENT '是否已完成',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 80 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 84 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of assignprojectdetail
 -- ----------------------------
-INSERT INTO `assignprojectdetail` VALUES (1, 1, '10', 5.0, 1.0, 1, 5.0, 50.0, 1, 0);
-INSERT INTO `assignprojectdetail` VALUES (2, 1, '11', 10.0, 1.0, 1, 10.0, 0.0, 1, 0);
-INSERT INTO `assignprojectdetail` VALUES (3, 1, '12', 10.0, 1.0, 1, 10.0, 0.0, 1, 0);
-INSERT INTO `assignprojectdetail` VALUES (4, 1, '13', 4.0, 1.0, 1, 4.0, 0.0, 1, 0);
-INSERT INTO `assignprojectdetail` VALUES (5, 1, '14', 4.0, 1.0, 1, 4.0, 0.0, 1, 0);
-INSERT INTO `assignprojectdetail` VALUES (6, 1, '15', 4.0, 1.0, 1, 4.0, 0.0, 1, 0);
-INSERT INTO `assignprojectdetail` VALUES (7, 1, '16', 8.0, 1.0, 1, 8.0, 0.0, 1, 0);
-INSERT INTO `assignprojectdetail` VALUES (8, 1, '17', 12.0, 1.0, 1, 12.0, 0.0, 1, 0);
-INSERT INTO `assignprojectdetail` VALUES (9, 1, '18', 5.0, 1.0, 1, 5.0, 0.0, 1, 0);
-INSERT INTO `assignprojectdetail` VALUES (10, 2, '10', 5.0, 1.0, 1, 5.0, 70.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (11, 2, '11', 10.0, 1.0, 1, 10.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (12, 2, '12', 10.0, 1.0, 1, 10.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (13, 2, '13', 4.0, 1.0, 1, 4.0, 90.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (14, 2, '14', 4.0, 1.0, 1, 4.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (15, 2, '15', 4.0, 1.0, 1, 4.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (16, 2, '16', 8.0, 1.0, 1, 8.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (17, 2, '17', 12.0, 1.0, 1, 12.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (18, 2, '18', 5.0, 1.0, 1, 5.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (19, 3, '10', 5.0, 1.0, 1, 5.0, 0.0, 1, 0);
-INSERT INTO `assignprojectdetail` VALUES (20, 3, '11', 10.0, 1.0, 1, 10.0, 0.0, 1, 0);
-INSERT INTO `assignprojectdetail` VALUES (21, 3, '12', 10.0, 1.0, 1, 10.0, 0.0, 1, 0);
-INSERT INTO `assignprojectdetail` VALUES (22, 3, '13', 4.0, 1.0, 1, 4.0, 0.0, 1, 0);
-INSERT INTO `assignprojectdetail` VALUES (23, 3, '14', 4.0, 1.0, 1, 4.0, 0.0, 1, 0);
-INSERT INTO `assignprojectdetail` VALUES (24, 3, '15', 4.0, 1.0, 1, 4.0, 0.0, 1, 0);
-INSERT INTO `assignprojectdetail` VALUES (25, 3, '16', 8.0, 1.0, 1, 8.0, 0.0, 1, 0);
-INSERT INTO `assignprojectdetail` VALUES (26, 3, '17', 12.0, 1.0, 1, 12.0, 0.0, 1, 0);
-INSERT INTO `assignprojectdetail` VALUES (27, 3, '18', 5.0, 1.0, 1, 5.0, 0.0, 1, 0);
-INSERT INTO `assignprojectdetail` VALUES (28, 4, '10', 5.0, 1.0, 1, 7.0, 100.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (29, 4, '11', 10.0, 1.0, 1, 10.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (30, 4, '12', 10.0, 1.0, 1, 10.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (31, 4, '13', 4.0, 1.0, 1, 4.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (32, 4, '14', 4.0, 1.0, 1, 4.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (33, 4, '15', 4.0, 1.0, 1, 4.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (34, 4, '16', 8.0, 1.0, 1, 8.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (35, 4, '17', 12.0, 1.0, 1, 12.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (36, 4, '18', 5.0, 1.0, 1, 5.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (37, 5, '10', 5.0, 1.0, 1, 5.0, 0.0, 1, 0);
-INSERT INTO `assignprojectdetail` VALUES (38, 5, '11', 10.0, 1.0, 1, 10.0, 0.0, 1, 0);
-INSERT INTO `assignprojectdetail` VALUES (39, 5, '12', 10.0, 1.0, 1, 10.0, 0.0, 1, 0);
-INSERT INTO `assignprojectdetail` VALUES (40, 5, '13', 4.0, 1.0, 1, 4.0, 0.0, 1, 0);
-INSERT INTO `assignprojectdetail` VALUES (41, 5, '14', 4.0, 1.0, 1, 4.0, 0.0, 1, 0);
-INSERT INTO `assignprojectdetail` VALUES (42, 5, '15', 4.0, 1.0, 1, 4.0, 0.0, 1, 0);
-INSERT INTO `assignprojectdetail` VALUES (43, 5, '16', 8.0, 1.0, 1, 8.0, 0.0, 1, 0);
-INSERT INTO `assignprojectdetail` VALUES (44, 5, '17', 12.0, 1.0, 1, 12.0, 0.0, 1, 0);
-INSERT INTO `assignprojectdetail` VALUES (45, 5, '18', 5.0, 1.0, 1, 5.0, 0.0, 1, 0);
-INSERT INTO `assignprojectdetail` VALUES (46, 6, '10', 5.0, 1.0, 1, 5.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (47, 6, '11', 10.0, 1.0, 1, 10.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (48, 6, '12', 10.0, 1.0, 1, 10.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (49, 6, '13', 4.0, 1.0, 1, 4.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (50, 6, '14', 4.0, 1.0, 1, 4.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (51, 6, '15', 4.0, 1.0, 1, 4.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (52, 6, '16', 8.0, 1.0, 1, 8.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (53, 6, '17', 12.0, 1.0, 1, 12.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (54, 6, '18', 5.0, 1.0, 1, 5.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (55, 7, '26', 5.0, 1.0, 1, 5.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (56, 8, '26', 5.0, 1.0, 1, 5.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (57, 8, '27', 10.0, 1.0, 1, 10.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (58, 9, '26', 5.0, 1.0, 1, 5.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (59, 9, '27', 10.0, 1.0, 1, 10.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (60, 10, '26', 5.0, 1.0, 1, 5.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (61, 10, '27', 10.0, 1.0, 1, 10.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (62, 11, '26', 5.0, 1.0, 1, 5.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (63, 11, '27', 10.0, 1.0, 1, 10.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (64, 12, '26', 5.0, 1.0, 1, 5.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (65, 13, '26', 5.0, 1.0, 1, 5.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (66, 14, '26', 5.0, 1.0, 1, 5.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (67, 15, '26', 5.0, 1.0, 1, 5.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (68, 16, '26', 5.0, 1.0, 1, 5.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (69, 16, '27', 10.0, 1.0, 1, 10.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (70, 16, '28', 5.0, 1.0, 1, 5.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (71, 16, '29', 20.0, 1.0, 1, 20.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (72, 17, '26', 5.0, 1.0, 1, 5.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (73, 17, '27', 10.0, 1.0, 1, 10.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (74, 17, '28', 5.0, 1.0, 1, 5.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (75, 17, '29', 20.0, 1.0, 1, 20.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (76, 18, '26', 5.0, 1.0, 1, 5.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (77, 18, '27', 10.0, 1.0, 1, 10.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (78, 18, '28', 5.0, 1.0, 1, 5.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (79, 18, '29', 20.0, 1.0, 1, 20.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (80, 19, '26', 5.0, 1.0, 1, 5.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (81, 20, '26', 5.0, 1.0, 1, 5.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (82, 21, '27', 10.0, 1.0, 1, 10.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (83, 22, '28', 5.0, 1.0, 1, 5.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1, 1, '26', 5.0, 1.0, 1, 5.0, 0.0, 0, 0);
 
 -- ----------------------------
 -- Table structure for assignprojectlist
@@ -145,28 +63,7 @@ CREATE TABLE `assignprojectlist`  (
 -- ----------------------------
 -- Records of assignprojectlist
 -- ----------------------------
-INSERT INTO `assignprojectlist` VALUES (1, 8, '2020-12-08 18:08:06', '172', '测试项目', 5.6, 15, 62.0, 0.0, 0, 1, 3);
-INSERT INTO `assignprojectlist` VALUES (2, 8, '2020-12-10 08:43:14', '172', '综合布线选型', 17.8, 15, 62.0, 0.0, 1, 0, 2);
-INSERT INTO `assignprojectlist` VALUES (3, 8, '2020-12-10 16:40:41', '172', '111', 0.0, 15, 62.0, 0.0, 0, 1, 1);
-INSERT INTO `assignprojectlist` VALUES (4, 8, '2020-12-14 08:13:28', '172', 'BA系统选型', 11.1, 15, 62.0, 0.0, 0, 0, 1);
-INSERT INTO `assignprojectlist` VALUES (5, 8, '2020-12-14 16:04:51', '172', '111', 0.0, 15, 62.0, 0.0, 0, 1, 1);
-INSERT INTO `assignprojectlist` VALUES (6, 8, '2020-12-14 16:09:04', '172', '12', 0.0, 15, 62.0, 0.0, 0, 0, 1);
-INSERT INTO `assignprojectlist` VALUES (7, 15, '2020-12-15 10:35:15', '4', '2', 0.0, 15, 5.0, 0.0, 0, 0, 1);
-INSERT INTO `assignprojectlist` VALUES (8, 15, '2020-12-15 11:32:36', '4', '1', 0.0, 15, 15.0, 0.0, 0, 0, 1);
-INSERT INTO `assignprojectlist` VALUES (9, 15, '2020-12-15 11:36:39', '4', '1', 0.0, 15, 15.0, 0.0, 0, 0, 1);
-INSERT INTO `assignprojectlist` VALUES (10, 15, '2020-12-15 11:37:47', '4', '1', 0.0, 15, 15.0, 0.0, 0, 0, 1);
-INSERT INTO `assignprojectlist` VALUES (11, 15, '2020-12-15 11:37:59', '4', '1', 0.0, 15, 15.0, 0.0, 0, 0, 1);
-INSERT INTO `assignprojectlist` VALUES (12, 15, '2020-12-15 11:39:21', '4', '1', 0.0, 15, 5.0, 0.0, 0, 0, 1);
-INSERT INTO `assignprojectlist` VALUES (13, 15, '2020-12-15 11:41:27', '4', '1', 0.0, 15, 5.0, 0.0, 0, 0, 1);
-INSERT INTO `assignprojectlist` VALUES (14, 15, '2020-12-15 11:42:35', '4', '1', 0.0, 15, 5.0, 0.0, 0, 0, 1);
-INSERT INTO `assignprojectlist` VALUES (15, 15, '2020-12-15 13:39:40', '4', '1', 0.0, 15, 5.0, 0.0, 0, 0, 1);
-INSERT INTO `assignprojectlist` VALUES (16, 15, '2020-12-15 13:43:29', '4', '1', 0.0, 15, 40.0, 0.0, 0, 0, 1);
-INSERT INTO `assignprojectlist` VALUES (17, 15, '2020-12-15 13:51:18', '4', '1', 0.0, 15, 40.0, 0.0, 0, 0, 1);
-INSERT INTO `assignprojectlist` VALUES (18, 15, '2020-12-15 13:51:52', '4', '1', 0.0, 15, 40.0, 0.0, 0, 0, 1);
-INSERT INTO `assignprojectlist` VALUES (19, 15, '2020-12-15 17:01:06', '4', '测试123', 0.0, 15, 5.0, 0.0, 0, 0, 1);
-INSERT INTO `assignprojectlist` VALUES (20, 15, '2020-12-15 17:03:24', '4', '测试333', 0.0, 15, 5.0, 0.0, 0, 0, 1);
-INSERT INTO `assignprojectlist` VALUES (21, 15, '2020-12-15 17:04:35', '4', '1233', 0.0, 15, 10.0, 0.0, 0, 0, 1);
-INSERT INTO `assignprojectlist` VALUES (22, 15, '2020-12-15 17:10:23', '4', '修订资产配置标准', 0.0, 15, 5.0, 0.0, 0, 0, 1);
+INSERT INTO `assignprojectlist` VALUES (1, 15, '2020-12-16 15:31:20', '4', '112211', 0.0, 15, 5.0, 0.0, 0, 0, 1);
 
 -- ----------------------------
 -- Table structure for monthprocess
@@ -197,14 +94,6 @@ CREATE TABLE `monthprocess`  (
 -- ----------------------------
 -- Records of monthprocess
 -- ----------------------------
-INSERT INTO `monthprocess` VALUES (1, 1, 2020, 'plan', NULL, NULL, 30, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 1);
-INSERT INTO `monthprocess` VALUES (2, 1, 2020, 'fact', NULL, NULL, 50, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 1);
-INSERT INTO `monthprocess` VALUES (3, 10, 2020, 'fact', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 50, 70, 0, 0);
-INSERT INTO `monthprocess` VALUES (4, 12, 2020, 'fact', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0);
-INSERT INTO `monthprocess` VALUES (5, 13, 2020, 'plan', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 90, 0, 0);
-INSERT INTO `monthprocess` VALUES (6, 13, 2020, 'fact', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 90, 0, 0);
-INSERT INTO `monthprocess` VALUES (7, 10, 2020, 'plan', NULL, NULL, NULL, 20, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0);
-INSERT INTO `monthprocess` VALUES (8, 28, 2020, 'fact', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 100, 0, 0);
 
 -- ----------------------------
 -- Table structure for monthprocess_new
@@ -287,8 +176,8 @@ CREATE TABLE `projecttypenew`  (
   `projectName` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '项目名称',
   `projectParentID` int NOT NULL COMMENT '项目父ID',
   `projectLevel` int NOT NULL COMMENT '项目所属级别',
-  `workTime` double(255, 1) NOT NULL COMMENT '工时数',
-  `dynamicKValue` tinyint NOT NULL COMMENT 'K值是否可变',
+  `workTime` double(255, 1) NOT NULL DEFAULT 0.0 COMMENT '工时数',
+  `dynamicKValue` tinyint NOT NULL DEFAULT 0 COMMENT 'K值是否可变',
   `isConference` tinyint NOT NULL DEFAULT 0 COMMENT '是否为会议类型',
   `defaultAssignWorkTime` double(255, 1) NOT NULL DEFAULT 0.0 COMMENT '默认协助工时',
   `obsoleteStatus` tinyint NOT NULL DEFAULT 0 COMMENT '是否废弃',
@@ -470,6 +359,37 @@ INSERT INTO `projecttypenew` VALUES (169, '阶段四，完成100%，组织会议
 INSERT INTO `projecttypenew` VALUES (170, '编写创新课题阶段评审报告，完成课题阶段评审/次', 157, 5, 10.0, 0, 0, 0.0, 0);
 INSERT INTO `projecttypenew` VALUES (171, '编写创新课题结题评审报告，完成课题结题评审', 157, 5, 20.0, 0, 0, 0.0, 0);
 INSERT INTO `projecttypenew` VALUES (172, '选型类', 0, 2, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (173, '基建类', 0, 2, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (174, '前期策划', 173, 3, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (175, '项目立项', 174, 4, 20.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (176, '初步需求调研', 174, 4, 20.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (177, '初步设计任务书编审', 174, 4, 20.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (178, '项目启动评审', 174, 4, 30.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (179, '设计', 173, 3, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (180, '深化设计任务书编审', 179, 4, 30.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (181, '设计招标代理单位选择及审批', 179, 4, 30.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (182, '深化设计单位选择及设计合同签订', 179, 4, 50.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (183, '组织编审智能化初步设计方案', 179, 4, 100.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (184, '组织编审智能化深化设计方案', 179, 4, 200.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (185, '项目三重一大汇报', 179, 4, 50.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (186, '项目深化设计技术评审及公司审批', 179, 4, 50.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (187, '发包', 173, 3, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (188, '造价咨询及招标代理单位选择及审批', 187, 4, 30.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (189, '造价咨询及清单审核', 187, 4, 100.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (190, '预算审批', 187, 4, 20.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (191, '招标文件编制及审批', 187, 4, 50.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (192, '工程发包程序', 187, 4, 50.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (193, '施工合同签订', 187, 4, 50.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (194, '结构施工', 173, 3, 30.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (195, '配合施工开工会审及各专业接口交底', 194, 4, 30.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (196, '主体施工阶段现场管理', 194, 4, 50.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (197, '配合主体施工验收', 194, 4, 50.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (198, '智能化工程实施方案二次评审', 194, 4, 50.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (199, '智能化施工', 173, 3, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (200, '组织智能化专业进场交底', 199, 4, 60.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (201, '手机信号室分覆盖建设', 199, 4, 50.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (202, '运营商接入', 199, 4, 60.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (203, '机房装修、综合布线阶段现场管理', 199, 4, 150.0, 1, 0, 0.0, 0);
 
 -- ----------------------------
 -- Table structure for projecttypenew_copy1
@@ -665,6 +585,199 @@ INSERT INTO `projecttypenew_copy1` VALUES (171, '编写创新课题结题评审�
 INSERT INTO `projecttypenew_copy1` VALUES (172, '选型类工时', 0, 2, 0.0, 0, 0, 0.0, 0);
 
 -- ----------------------------
+-- Table structure for projecttypenew_copy2
+-- ----------------------------
+DROP TABLE IF EXISTS `projecttypenew_copy2`;
+CREATE TABLE `projecttypenew_copy2`  (
+  `projectTypeID` int NOT NULL AUTO_INCREMENT,
+  `projectName` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '项目名称',
+  `projectParentID` int NOT NULL COMMENT '项目父ID',
+  `projectLevel` int NOT NULL COMMENT '项目所属级别',
+  `workTime` double(255, 1) NOT NULL COMMENT '工时数',
+  `dynamicKValue` tinyint NOT NULL COMMENT 'K值是否可变',
+  `isConference` tinyint NOT NULL DEFAULT 0 COMMENT '是否为会议类型',
+  `defaultAssignWorkTime` double(255, 1) NOT NULL DEFAULT 0.0 COMMENT '默认协助工时',
+  `obsoleteStatus` tinyint NOT NULL DEFAULT 0 COMMENT '是否废弃',
+  PRIMARY KEY (`projectTypeID`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 173 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of projecttypenew_copy2
+-- ----------------------------
+INSERT INTO `projecttypenew_copy2` VALUES (1, '技术标准组工时', -1, 1, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (2, '工程组工时', -1, 1, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (3, '通信组工时', -1, 1, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (4, '规划类工时', 1, 2, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (5, '事务类工时', 0, 2, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (6, '产品选型', 4, 3, 0.0, 0, 0, 0.0, 1);
+INSERT INTO `projecttypenew_copy2` VALUES (7, '前期调研', 172, 4, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (8, '考察对比', 172, 4, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (9, '选型评审', 172, 4, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (10, '选型需求调研', 7, 5, 5.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (11, '选型产品在公司现有应用及行业市场考察', 7, 5, 10.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (12, '选型产品的系统结构及技术参数调研', 7, 5, 10.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (13, '供应商实力及应用案例等考察（网站电话邮件形式沟通，考察供应商数目*4h）', 8, 5, 4.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (14, '技术参数对比（考察产品种数*4h）', 8, 5, 4.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (15, '产品测试（测试产品个数*4h）', 8, 5, 4.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (16, '编写产品测试报告', 8, 5, 8.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (17, '编写选型报告', 9, 5, 12.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (18, '选型缺陷跟踪修正 ', 9, 5, 5.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (19, '系统建设标准制定', 4, 3, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (20, '前期调研', 19, 4, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (21, '资产配置标准', 19, 4, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (22, '系统设计标准', 19, 4, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (23, '系统施工规范', 19, 4, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (24, '审图检查单', 19, 4, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (25, '工作流程标准', 19, 4, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (26, '沟通用户和运维单位，汇总问题和意见/系统', 20, 5, 5.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (27, '制定资产配置标准/系统', 21, 5, 10.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (28, '修订资产配置标准/系统', 21, 5, 5.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (29, '牵头修订资产配置标准（包括过程组织、文档整合、外部沟通、流程审批）', 21, 5, 20.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (30, '制定系统设计标准/系统', 22, 5, 20.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (31, '修订系统设计标准/系统', 22, 5, 10.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (32, '牵头修订系统配置标准(包括过程组织、文档整合、外部沟通、流程审批)', 22, 5, 20.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (33, '制定系统施工规范/系统', 23, 5, 20.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (34, '修订系统施工规范/系统', 23, 5, 5.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (35, '牵头修订系统施工规范(包括过程组织、文档整合、外部沟通、流程审批)', 23, 5, 20.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (36, '制定审图检查单/系统', 24, 5, 15.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (37, '修订审图检查单/系统', 24, 5, 2.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (38, '制定工作流程标准/流程', 25, 5, 20.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (39, '修订工作流程标准/流程', 25, 5, 2.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (40, '党团工作', 5, 3, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (41, '培训学习', 5, 3, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (42, '文档总结', 5, 3, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (43, '科室信息搜集', 5, 3, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (44, '工作会议', 5, 3, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (45, '工作规范管理', 5, 3, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (46, '出差行程单', 5, 3, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (47, '系统运维管理', 5, 3, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (48, '创新课题评奖', 5, 3, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (49, '组织活动/参赛', 5, 3, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (50, '宣传', 5, 3, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (51, '培训/知识分享', 5, 3, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (52, '工作饱和度', 5, 3, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (53, '评先评优', 5, 3, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (54, '其他', 5, 3, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (55, '党员学习/月', 40, 4, 1.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (56, '团员学习/月', 40, 4, 0.5, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (57, '制作党课教材', 40, 4, 8.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (58, '组织党小组会', 40, 4, 1.0, 0, 1, 1.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (59, '组织党支部大会、线下主题当日活动', 40, 4, 4.0, 0, 1, 1.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (60, '组织线上会议', 40, 4, 0.5, 0, 1, 0.5, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (61, '参加党团线下会议、党团活动', 40, 4, 1.0, 0, 0, 0.0, 1);
+INSERT INTO `projecttypenew_copy2` VALUES (62, '参加党团线上会议', 40, 4, 0.5, 0, 0, 0.0, 1);
+INSERT INTO `projecttypenew_copy2` VALUES (63, '党小组工时录入/组', 40, 4, 2.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (64, '制作培训教材', 41, 4, 10.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (65, '修订培训教材', 41, 4, 4.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (66, '准备培训设备等环境', 41, 4, 4.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (67, '制定考核内容', 41, 4, 4.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (68, '组织培训', 41, 4, 3.0, 0, 1, 2.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (69, '组织考核（含试卷批改）', 41, 4, 5.0, 0, 1, 2.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (70, '参加培训', 41, 4, 2.0, 0, 0, 0.0, 1);
+INSERT INTO `projecttypenew_copy2` VALUES (71, '参加考核', 41, 4, 2.0, 0, 0, 0.0, 1);
+INSERT INTO `projecttypenew_copy2` VALUES (72, '其他', 0, 2, 1.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (73, '优秀培训讲师评价奖励', 41, 4, 10.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (74, '个人月总结', 42, 4, 2.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (75, '行政材料撰写（如处室周总结、月总结、工作报告）', 42, 4, 4.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (76, '科室月报编写及发布', 42, 4, 4.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (77, '搜集相关信息，整理材料', 43, 4, 2.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (78, '参加各类型会议', 44, 4, 1.0, 0, 0, 0.0, 1);
+INSERT INTO `projecttypenew_copy2` VALUES (79, '参加技术交流', 44, 4, 1.0, 0, 0, 0.0, 1);
+INSERT INTO `projecttypenew_copy2` VALUES (80, '组织各类型会议', 44, 4, 2.0, 0, 1, 1.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (81, '组织技术交流', 44, 4, 2.0, 0, 1, 1.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (82, '制定工作手册', 45, 4, 20.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (83, '修订工作手册', 45, 4, 4.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (84, '文档模板制定及发布', 45, 4, 4.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (85, '完成工时标准修订', 45, 4, 5.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (86, '工时审核反馈', 45, 4, 2.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (87, '市内', 46, 4, 2.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (88, '省内', 46, 4, 4.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (89, '国内', 46, 4, 6.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (90, '国际', 46, 4, 10.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (91, '配合进行系统检查、完成信息填报', 47, 4, 4.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (92, '月度巡检', 47, 4, 1.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (93, '季度巡检', 47, 4, 2.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (94, '工单', 47, 4, 1.5, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (95, '流程审核', 47, 4, 1.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (96, '故障处置', 47, 4, 3.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (97, '配置变更测试', 47, 4, 2.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (98, '配置变更流程', 47, 4, 1.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (99, '配置变更通告', 47, 4, 1.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (100, '日常维护', 47, 4, 3.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (101, '航后维护', 47, 4, 6.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (102, '合同续签', 47, 4, 2.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (103, '防台风准备工作', 47, 4, 4.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (104, '重保保障', 47, 4, 8.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (105, '应急响应（AOC集结）', 47, 4, 8.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (106, '基建项目尾款支付', 47, 4, 2.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (107, '一等奖', 48, 4, 90.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (108, '二等奖', 48, 4, 60.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (109, '三等奖', 48, 4, 30.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (110, '组织处室活动', 49, 4, 30.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (111, '代表本处参加部门活动获奖', 49, 4, 30.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (112, '参加公司活动获奖', 49, 4, 50.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (113, '参加民航局、省级活动获奖', 49, 4, 80.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (114, '参加国家级活动获奖', 49, 4, 100.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (115, '国内/国际权威媒体发表', 50, 4, 80.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (116, '航空报发表', 50, 4, 50.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (117, 'IT365发表', 50, 4, 30.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (118, '部门板报、信息门户发表', 50, 4, 10.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (119, '组织培训，根据时长、培训效果评价', 51, 4, 10.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (120, '手册、工卡编制/修订', 51, 4, 10.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (121, '在处室/部门/公司分享个人经验与教训、研究成果、好书推荐、读书心得、工具介绍、新思路、新方案等', 51, 4, 10.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (122, '加班超过30小时/月', 52, 4, 20.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (123, '加班在10-30小时/月', 52, 4, 10.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (124, '当选季度之星', 53, 4, 50.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (125, '因个人原因导致本处绩效减分', 54, 4, -50.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (126, '不服从管理人员工作安排，与管理人员、其他同事发生冲突造成不良影响的', 54, 4, -50.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (127, '因个人原因导致审计问题', 54, 4, -200.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (128, '考勤异常，在部门通报后补办手续的', 54, 4, -10.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (129, '个人原因使得处室绩效加分', 54, 4, 50.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (130, '在工作中及时发现存在的问题，风险点，并被处室/部门/公司采纳', 54, 4, 10.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (131, '个人受用户/部门/公司领导表扬', 54, 4, 10.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (132, '个人受用户投诉或者部门/公司领导批评', 54, 4, -10.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (133, '未在每月第二个工作日前制定月度工作计划', 54, 4, -10.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (134, '未按照要求进行项目/任务完成情况反馈', 54, 4, -10.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (135, '系统建设规划', 4, 3, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (136, '编写智能化系统建设规划，并完成汇报，明确具体规划方案', 135, 4, 40.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (137, '完成特殊任务方案汇报', 135, 4, 40.0, 1, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (138, '系统建设管理', 4, 3, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (139, '需求对接', 138, 4, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (140, '方案审核', 138, 4, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (141, '安装调试答疑', 138, 4, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (142, '验收审核', 138, 4, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (143, '零星智能化项目复杂需求对接', 139, 5, 5.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (144, '基建项目方案审核', 140, 5, 16.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (145, '基建项目设计变更或零星智能化项目方案审核', 140, 5, 2.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (146, '基建项目系统安装调试答疑', 141, 5, 2.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (147, '零星智能化项目系统安装调试答疑', 141, 5, 1.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (148, '基建项目验收审核', 142, 5, 10.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (149, '零星智能化项目验收审核', 142, 5, 2.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (150, '预算编制', 4, 3, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (151, '采购类项目预算编制', 150, 4, 10.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (152, '基建类项目预算编制', 150, 4, 10.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (153, '创新探索', 4, 3, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (154, '前期调研', 153, 4, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (155, '预研&立项', 153, 4, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (156, '课题研究', 153, 4, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (157, '报告&评审', 153, 4, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (158, '调研行业前沿应用和市场发展情况，组织会议进行进度确认', 154, 5, 30.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (159, '调研各部门创新应用场景，完成初步测试，组织会议进行进度确认', 154, 5, 30.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (160, '编写课题需求，完成评审会议和流程', 155, 5, 8.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (161, '编写预研计划，完成审批局流程', 155, 5, 8.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (162, '组织课题预研，考察相关供应商及产品', 155, 5, 10.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (163, '调研创新产品的系统结构及技术参数', 155, 5, 20.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (164, '编写预研结果报告，完成评审会议和流程', 155, 5, 10.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (165, '申报创新课题，编写开题报告，完成课题启动评审', 155, 5, 20.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (166, '阶段一，完成25%，组织会议进行进度确认', 156, 5, 75.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (167, '阶段二，完成50%，组织会议进行进度确认', 156, 5, 75.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (168, '阶段三，完成75%，组织会议进行进度确认', 156, 5, 75.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (169, '阶段四，完成100%，组织会议进行进度确认', 156, 5, 75.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (170, '编写创新课题阶段评审报告，完成课题阶段评审/次', 157, 5, 10.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (171, '编写创新课题结题评审报告，完成课题结题评审', 157, 5, 20.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew_copy2` VALUES (172, '选型类', 0, 2, 0.0, 0, 0, 0.0, 0);
+
+-- ----------------------------
 -- Table structure for user
 -- ----------------------------
 DROP TABLE IF EXISTS `user`;
@@ -846,26 +959,26 @@ CREATE TABLE `worktimeassign`  (
   `assignRole` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '参与人员角色',
   `obsoleteStatus` tinyint NOT NULL DEFAULT 0 COMMENT '废弃状态',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 63 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 70 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of worktimeassign
 -- ----------------------------
-INSERT INTO `worktimeassign` VALUES (1, 15, 1, 2.0, NULL, '组织者', 0);
-INSERT INTO `worktimeassign` VALUES (2, 8, 1, 1.0, NULL, '协作者', 0);
-INSERT INTO `worktimeassign` VALUES (3, 32, 1, 1.0, NULL, '协作者', 0);
-INSERT INTO `worktimeassign` VALUES (4, 15, 2, 2.0, 2.0, '组织者', 0);
-INSERT INTO `worktimeassign` VALUES (5, 11, 2, 1.0, 1.0, '协作者', 0);
-INSERT INTO `worktimeassign` VALUES (6, 16, 2, 1.0, 1.0, '协作者', 0);
-INSERT INTO `worktimeassign` VALUES (7, 17, 2, 1.0, 1.0, '协作者', 0);
-INSERT INTO `worktimeassign` VALUES (8, 19, 2, 1.0, 1.0, '协作者', 0);
-INSERT INTO `worktimeassign` VALUES (9, 20, 2, 1.0, 1.0, '协作者', 0);
-INSERT INTO `worktimeassign` VALUES (10, 22, 2, 1.0, 1.0, '协作者', 0);
-INSERT INTO `worktimeassign` VALUES (11, 24, 2, 1.0, 1.0, '协作者', 0);
-INSERT INTO `worktimeassign` VALUES (12, 25, 2, 1.0, 1.0, '协作者', 0);
-INSERT INTO `worktimeassign` VALUES (13, 28, 2, 1.0, 1.0, '协作者', 0);
-INSERT INTO `worktimeassign` VALUES (14, 30, 2, 1.0, 1.0, '协作者', 0);
-INSERT INTO `worktimeassign` VALUES (15, 32, 2, 1.0, 1.0, '协作者', 0);
+INSERT INTO `worktimeassign` VALUES (1, 15, 1, 2.0, NULL, '组织者', 1);
+INSERT INTO `worktimeassign` VALUES (2, 8, 1, 1.0, NULL, '协作者', 1);
+INSERT INTO `worktimeassign` VALUES (3, 32, 1, 1.0, NULL, '协作者', 1);
+INSERT INTO `worktimeassign` VALUES (4, 15, 2, 2.0, 2.0, '组织者', 1);
+INSERT INTO `worktimeassign` VALUES (5, 11, 2, 1.0, 1.0, '协作者', 1);
+INSERT INTO `worktimeassign` VALUES (6, 16, 2, 1.0, 1.0, '协作者', 1);
+INSERT INTO `worktimeassign` VALUES (7, 17, 2, 1.0, 1.0, '协作者', 1);
+INSERT INTO `worktimeassign` VALUES (8, 19, 2, 1.0, 1.0, '协作者', 1);
+INSERT INTO `worktimeassign` VALUES (9, 20, 2, 1.0, 1.0, '协作者', 1);
+INSERT INTO `worktimeassign` VALUES (10, 22, 2, 1.0, 1.0, '协作者', 1);
+INSERT INTO `worktimeassign` VALUES (11, 24, 2, 1.0, 1.0, '协作者', 1);
+INSERT INTO `worktimeassign` VALUES (12, 25, 2, 1.0, 1.0, '协作者', 1);
+INSERT INTO `worktimeassign` VALUES (13, 28, 2, 1.0, 1.0, '协作者', 1);
+INSERT INTO `worktimeassign` VALUES (14, 30, 2, 1.0, 1.0, '协作者', 1);
+INSERT INTO `worktimeassign` VALUES (15, 32, 2, 1.0, 1.0, '协作者', 1);
 INSERT INTO `worktimeassign` VALUES (16, 8, 3, 5.0, NULL, '组织者', 1);
 INSERT INTO `worktimeassign` VALUES (17, 8, 4, 10.0, NULL, '组织者', 1);
 INSERT INTO `worktimeassign` VALUES (18, 8, 5, 5.0, NULL, '组织者', 1);
@@ -916,7 +1029,10 @@ INSERT INTO `worktimeassign` VALUES (62, 8, 47, 5.0, NULL, '组织者', 1);
 INSERT INTO `worktimeassign` VALUES (63, 8, 48, 5.0, NULL, '组织者', 1);
 INSERT INTO `worktimeassign` VALUES (64, 15, 49, 5.0, NULL, '组织者', 1);
 INSERT INTO `worktimeassign` VALUES (65, 15, 50, 10.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (66, 15, 51, 5.0, NULL, '组织者', 0);
+INSERT INTO `worktimeassign` VALUES (66, 15, 51, 5.0, NULL, '组织者', 1);
+INSERT INTO `worktimeassign` VALUES (67, 8, 52, 1.0, NULL, '组织者', 0);
+INSERT INTO `worktimeassign` VALUES (68, 8, 53, 3.6, NULL, '组织者', 0);
+INSERT INTO `worktimeassign` VALUES (69, 15, 54, 5.0, NULL, '组织者', 0);
 
 -- ----------------------------
 -- Table structure for worktimelist
@@ -946,13 +1062,13 @@ CREATE TABLE `worktimelist`  (
   `applyProcess` float(4, 1) UNSIGNED ZEROFILL NOT NULL DEFAULT 00.0 COMMENT '申报进展',
   `apdID` int NOT NULL DEFAULT 0 COMMENT '对应的项目明细ID',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 49 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 54 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of worktimelist
 -- ----------------------------
-INSERT INTO `worktimelist` VALUES (1, '15', '科华环境监控交流', 80, 1.0, NULL, 1.0, NULL, '2020-12-01 09:27:10', '2020-12-14 11:30:02', '2020-12', '1', '', '0', NULL, '', 0, 0, '', 0.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (2, '15', '答复', 80, 1.0, NULL, 1.0, NULL, '2020-12-01 09:37:40', '2020-12-14 11:31:58', '2020-12', '1', '', '0', NULL, '', 0, 1, '', 0.0, 00.0, 0);
+INSERT INTO `worktimelist` VALUES (1, '15', '科华环境监控交流', 80, 1.0, NULL, 1.0, NULL, '2020-12-01 09:27:10', '2020-12-14 11:30:02', '2020-12', '1', '', '0', NULL, '', 1, 0, '', 0.0, 00.0, 0);
+INSERT INTO `worktimelist` VALUES (2, '15', '答复', 80, 1.0, NULL, 1.0, NULL, '2020-12-01 09:37:40', '2020-12-16 08:07:42', '2020-12', '1', '', '0', NULL, '', 1, 1, '', 0.0, 00.0, 0);
 INSERT INTO `worktimelist` VALUES (3, '8', 'BA系统选型', 1, 1.0, NULL, 1.0, NULL, '2020-12-07 08:37:54', '2020-12-07 08:37:54', '2020-11', '0', '', '0', NULL, '', 1, 0, '', 0.0, 00.0, 0);
 INSERT INTO `worktimelist` VALUES (4, '8', 'BA系统选型', 2, 1.0, NULL, 1.0, NULL, '2020-12-07 08:37:54', '2020-12-07 08:37:54', '2020-11', '0', '', '0', NULL, '', 1, 0, '', 0.0, 00.0, 0);
 INSERT INTO `worktimelist` VALUES (5, '8', 'BA系统选型', 10, 1.0, NULL, 1.0, NULL, '2020-12-07 08:39:51', '2020-12-07 08:39:51', '2020-11', '0', '', '0', NULL, '', 1, 0, '', 0.0, 00.0, 0);
@@ -1001,7 +1117,10 @@ INSERT INTO `worktimelist` VALUES (47, '8', '1', 26, 1.0, NULL, 1.0, NULL, '2020
 INSERT INTO `worktimelist` VALUES (48, '8', '1', 26, 1.0, NULL, 1.0, NULL, '2020-12-14 15:42:20', '2020-12-14 15:42:20', '2020-12', '1', '', '0', NULL, '', 1, 0, '', 5.0, 100.0, 0);
 INSERT INTO `worktimelist` VALUES (49, '15', '测试333', 26, 1.0, NULL, 1.0, NULL, '2020-12-15 17:03:24', '2020-12-15 17:03:24', '2020-12', '1', '', '0', NULL, '', 1, 0, '', 5.0, 100.0, 0);
 INSERT INTO `worktimelist` VALUES (50, '15', '1233', 27, 1.0, NULL, 1.0, NULL, '2020-12-15 17:04:35', '2020-12-15 17:04:35', '2020-12', '1', '', '0', NULL, '', 1, 0, '', 10.0, 100.0, 0);
-INSERT INTO `worktimelist` VALUES (51, '15', '修订资产配置标准', 28, 1.0, NULL, 1.0, NULL, '2020-12-15 17:10:24', '2020-12-15 17:10:24', '2020-12', '0', '', '0', NULL, '', 0, 0, '', 5.0, 100.0, 0);
+INSERT INTO `worktimelist` VALUES (51, '15', '修订资产配置标准', 28, 1.0, NULL, 1.0, NULL, '2020-12-15 17:10:24', '2020-12-16 15:01:58', '2020-12', '0', '', '0', NULL, '', 1, 0, '', 5.0, 100.0, 0);
+INSERT INTO `worktimelist` VALUES (52, '8', '综合布线选型', 10, 1.0, NULL, 1.0, NULL, '2020-12-16 14:24:39', '2020-12-16 15:30:57', '2020-12', '0', '', '0', NULL, '', 0, 0, '', 1.0, 70.0, 10);
+INSERT INTO `worktimelist` VALUES (53, '8', '综合布线选型', 13, 1.0, NULL, 1.0, NULL, '2020-12-16 14:24:39', '2020-12-16 14:25:06', '2020-12', '1', '', '0', NULL, '', 0, 0, '', 3.6, 90.0, 13);
+INSERT INTO `worktimelist` VALUES (54, '15', '112211', 26, 1.0, NULL, 1.0, NULL, '2020-12-16 15:31:21', '2020-12-16 15:31:21', '2020-12', '0', '', '0', NULL, '', 0, 0, '', 5.0, 100.0, 1);
 
 -- ----------------------------
 -- Event structure for update_schedule

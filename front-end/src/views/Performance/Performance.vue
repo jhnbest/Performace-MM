@@ -28,7 +28,7 @@
         <span style="font-size: 17px;font-weight: bold">本月总工时:
           <span style="color: #F56C6C;margin-left: 10px">{{formData.totalWorkTime}}</span></span>
       </el-form-item>
-    </el-form>
+    </el-form>n
     <!-- 分割线 start -->
     <div class="hr-10"></div>
     <!-- 分割线 end -->
@@ -71,7 +71,7 @@
           </el-table-column>
           <el-table-column label="申报月份" align="center" prop="applyMonth"></el-table-column>
           <el-table-column label="申报项目" align="center" prop="projectName"></el-table-column>
-          <el-table-column label="项目阶段" align="center" prop="projectStage"></el-table-column>
+          <el-table-column label="项目阶段" align="center" prop="projectStage" width="200%"></el-table-column>
           <el-table-column label="工时详情" align="center">
             <template slot-scope="scope">
               <span class="link-type" @click="handleCoopInfo(scope.row)">点击查看</span>
