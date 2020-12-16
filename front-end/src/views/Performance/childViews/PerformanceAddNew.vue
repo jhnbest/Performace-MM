@@ -26,7 +26,7 @@
           <el-button type="danger" size="medium" @click="onCancel('formData')">取 消</el-button>
         </el-form-item>
         <br>
-        <el-form-item label="项目类型" prop="projectType">
+        <el-form-item label="项目阶段" prop="projectType">
           <el-cascader
             v-model="formData.projectType"
             :options="projectTypeOptions"
@@ -67,7 +67,7 @@
               </el-form-item>
             </template>
           </el-table-column>
-          <el-table-column label="项目类型" prop="workType" align="center"></el-table-column>
+          <el-table-column label="项目阶段" prop="workType" align="center"></el-table-column>
           <el-table-column label="基本工时" prop="baseWorkTime" align="center" width="80%"></el-table-column>
           <el-table-column label="K值" prop="defaultKValue" align="center" width="150%">
             <template slot-scope="scope">

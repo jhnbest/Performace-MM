@@ -40,7 +40,7 @@
         </el-form-item>
         <br>
         <el-form-item label="项目级别" prop="projectLevel">
-          <el-select v-model="formData.projectLevel" placeholder="请选择" v-if="formData.isShowProjectLevel">
+          <el-select v-model="formData.projectLevel" placeholder="请选择" v-if="formData.isShowProjectLevel" :disabled="true">
             <el-option v-for="item in projectLevels"
                        :key="item.value"
                        :label="item.text"
@@ -142,7 +142,7 @@
 
 <script>
   import { workTimeSubmit, getProjectInfo, getUsersName, getProjectType, getWorkTimeNew, workTimeTemporary,
-    updateAssignWorkDetail, getAssignWorkDetail } from '@/config/interface'
+    updateAssignWork, getAssignWorkDetail } from '@/config/interface'
   import Assign from '@/components/Cop/workTimeAssign'
     export default {
       data () {
@@ -272,9 +272,6 @@
             text: '公司重点任务'
           }]
         }
-      },
-      components: {
-        Assign
       },
       methods: {
         // 初始化
@@ -419,7 +416,7 @@
         },
         // 提交至项目明细列表
         onSubmitProjectList () {
-          const url = updateAssignWorkDetail
+          const url = updateAssignWork
           let params = {
             apdID: this.apdID,
             aplID: this.aplID,
@@ -437,7 +434,8 @@
               projectName2: item.projectName,
               projectTypeID: item.projectTypeID,
               workTime: item.avaiableWorkTime,
-              applyProcess: item.applyProcess
+              applyProcess: item.applyProcess,
+              coefficient: item.coefficient
             }
             params.tableData.push(obj)
           }
@@ -456,6 +454,7 @@
         onSubmitWorkTime (formData) {
           this.$refs[formData].validate(valid => {
             if (valid) {
+              this.onSubmitProjectList()
             }
           })
         },
@@ -495,7 +494,7 @@
           this.$router.push({ path: '/home/Performance' })
           this.$refs[formName].resetFields()
         },
-        /* 获取申报类型 */
+        // 获取申报类型
         getProjectType () {
           const url = getProjectType
           if (this.reqFlag.getProjectType) {
@@ -514,7 +513,7 @@
               })
           }
         },
-        /* 获取用户姓名 */
+        // 获取用户姓名
         getUsersName () {
           console.log('===PerformanceEdit.vue getUsersName')
           console.log(this.userListOptions)
@@ -547,7 +546,7 @@
               })
           }
         },
-        /* 获取项目类型 */
+        // 获取项目类型
         handleProjectTypeChange (selectItem) {
           console.log('PerformanceAddNew.vue handleProjectTypeChange')
           console.log(selectItem)
@@ -624,7 +623,7 @@
             }
           }
         },
-        /* 删除工时明细记录 */
+        // 删除工时明细记录
         handleDeleteWorkDetail (row, index) {
           console.log('===PerformanceAddNew.vue handleDeleteWorkDetail')
           console.log(row)
@@ -643,7 +642,7 @@
             this.formData.projectType.splice(deleteIndex, 1)
           })
         },
-        /* 工时分配点击 */
+        // 工时分配点击
         handleWorkTimeAssign (row, index) {
           this.showFlag.workTimeAssign = true
           let rowCop = JSON.parse(JSON.stringify(row))
@@ -655,7 +654,7 @@
             this.$refs.workTimeAssign.init(params)
           })
         },
-        /* 工时分配子组件回调 */
+        // 工时分配子组件回调
         handleAssign (params) {
           console.log('===PerformanceAddNew.vue handleAssign')
           console.log(params)
@@ -664,7 +663,7 @@
           this.formData.workTypeTimeDetail[params.index].multipleSelect = params.multipleSelect
           console.log(this.formData.workTypeTimeDetail)
         },
-        /* 删除工时明细数据 */
+        // 删除工时明细数据
         participantDelete (account) {
           console.log(account)
           console.log(this.formData.partTableData[account.$index])
@@ -676,11 +675,14 @@
             }
           } */
         },
-        /* 工时明细表K值和系数变化处理函数 */
+        // 工时明细表K值和系数变化处理函数
         handleKValueCoffChange (row) {
           row.avaiableWorkTime = row.baseWorkTime * row.defaultKValue * row.defaultCofficient
           row.workTimeAssign[0].assignWorkTime = row.baseWorkTime * row.defaultKValue * row.defaultCofficient
         }
+      },
+      components: {
+        Assign
       },
       created () {
         console.log('===PerformanceEdit.vue created')

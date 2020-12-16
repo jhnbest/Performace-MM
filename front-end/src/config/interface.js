@@ -44,5 +44,5 @@ export const getAssignedProject = '/workStation/getAssignedProject' // 获取已
 export const updateAssignProjectList = '/workStation/updateAssignProjectList' // 获取已指派项目列表
 export const deleteAssignProject = '/workStation/deleteAssignProject' // 删除已指派项目列表
 export const updateAssignProjectFilled = '/workStation/updateAssignProjectFilled' // 删除已指派项目列表
-export const updateAssignWorkDetail = '/workStation/updateAssignWorkDetail' // 更新项目明细
+export const updateAssignWork = '/workStation/updateAssignWork' // 更新项目
 export const getAssignWorkDetail = '/workStation/getAssignWorkDetail' // 获取项目明细

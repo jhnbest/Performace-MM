@@ -147,7 +147,9 @@ const sqlMap = {
     updateMonthProcessObsoleteStatus: 'update monthprocess set obsoleteStatus = 1 where aPDID in (?)',
     updateAssignProjectFilled: 'update assignprojectlist set isFilled = 1 where id = ?',
     getAssignWorkDetail: 'select apd.id as apdID, apd.aPLID as aplID, apl.projectLevel from assignprojectdetail apd left join' +
-        ' assignprojectlist apl on apd.aPLID = apl.id where apd.id = ?'
+        ' assignprojectlist apl on apd.aPLID = apl.id where apd.id = ?',
+    UpdateAssignWorkDetail: 'update assignprojectdetail set kValue = ?, coefficient = ?, avaiableWorkTime = ?, process = ? where id = ?',
+    UpdateAssignWorkList: 'update assignprojectlist set assignDate = ?, projectName = ?, process = ?, totalWorkTime = ?, projectLevel = ? where id = ?'
   }
 }
 module.exports = sqlMap;

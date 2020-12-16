@@ -460,6 +460,18 @@ function updateMonthProcessObsoleteStatus(data) {
     })
 }
 
+function updateAssignWorkDetail(sql, arrayParams) {
+    return new Promise(function (resolve, reject) {
+        $http.connPool(sql, arrayParams, (err, result) => {
+            if (err) {
+                reject(err)
+            } else {
+                resolve(result)
+            }
+        })
+    })
+}
+
 const workStation = {
     // 获取未完成的指派任务列表
     getAssignProjectList (req, res) {
@@ -653,10 +665,30 @@ const workStation = {
             })
         })
     },
-    // 更新项目明细
-    updateAssignWorkDetail (req, res) {
+    // 更新项目阶段
+    updateAssignWork (req, res) {
         let data = req.body
         console.log(data)
+        let sqlUpdateAssignWorkDetail = $sql.workStation.UpdateAssignWorkDetail
+        let sqlUpdateAssignWorkList = $sql.workStation.UpdateAssignWorkList
+        let sql = sqlUpdateAssignWorkDetail
+        let kValue = data.tableData.kValue
+        let coefficient = data.tableData.coefficient
+        let avaiableWorkTime = data.tableData.avaiableWorkTime
+        let process = data.tableData.applyProcess
+        let projectName = data.tableData.projectName2
+        let arrayParams = [kValue, coefficient, avaiableWorkTime, process, data.apdID]
+        let curTime = $time.formatTime()
+        updateAssignWorkDetail(sql, arrayParams).then(() => { // 更新项目明细
+            let params = {
+                aPLID: data.aplID
+            }
+            projectProcessCal(params).then(res2 => { // 计算项目总进展
+                sql = sqlUpdateAssignWorkList
+                arrayParams = [curTime, ]
+                updateAssignWorkList()
+            })
+        })
     },
     // 获取项目明细
     getAssignWorkDetail (req, res) {

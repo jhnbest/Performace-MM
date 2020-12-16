@@ -28,7 +28,7 @@
         <span style="font-size: 17px;font-weight: bold">本月总工时:
           <span style="color: #F56C6C;margin-left: 10px">{{formData.totalWorkTime}}</span></span>
       </el-form-item>
-    </el-form>n
+    </el-form>
     <!-- 分割线 start -->
     <div class="hr-10"></div>
     <!-- 分割线 end -->
