@@ -55,6 +55,7 @@
     <h2>暂无权限</h2>
   </div>
 </template>
+
 <script>
   import ReviewedPerson from './childViews/ReviewedPerson'
   import { getGroupUserName, getUnReviewProjectCount } from '@/config/interface'
@@ -220,7 +221,7 @@
             this.formData.refreshTabs = true
           }, this.$store.state.refreshInterval)
         },
-        /* 子组件回调 */
+        // 子组件回调
         handleReviewPass () {
           this.getUnReviewProjectCount(this.groupUsers).then(res => {
             this.groupUsers = res

@@ -70,8 +70,9 @@ const sqlMap = {
     updateWorkAssign: 'update worktimeassign set userID = ?, projectID = ?, workTime = ?, assignRole = ?, reviewWorkTime = ? where id = ?',
     deleteWorkAssign: 'update worktimeassign set obsoleteStatus = 1 where id = ?',
     // getProjectList: 'SELECT * from worktimelist WHERE submitID = ? and applyMonth = ? and obsoleteStatus != 1', //查找项目列表
-    getProjectList: 'SELECT wl.*, pjn.projectName as projectStage from worktimelist wl left join projecttypenew pjn on ' +
-        'wl.projectTypeID = pjn.projectTypeID WHERE wl.submitID = ? and wl.applyMonth = ? and wl.obsoleteStatus != 1',
+    getProjectList: 'SELECT wl.*, pjn.projectName as projectStage, apl.projectName from worktimelist wl left join projecttypenew pjn on ' +
+        'wl.projectTypeID = pjn.projectTypeID left join assignprojectlist apl on wl.aplID = apl.id WHERE wl.submitID = ? ' +
+        'and wl.applyMonth = ? and wl.obsoleteStatus != 1',
     // getProjectListNew: 'SELECT * FROM worktimelist WHERE id IN (SELECT projectID FROM worktimeassign WHERE userID = ? and obsoleteStatus != 1) and applyMonth = ? and obsoleteStatus != 1',
     getProjectListNew: 'select wl.*, pjn.projectName as projectStage, apl.projectName from worktimelist wl left join ' +
         'projecttypenew pjn on wl.projectTypeID = pjn.projectTypeID left join assignprojectlist apl on wl.aplID = apl.id ' +
