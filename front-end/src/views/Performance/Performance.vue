@@ -70,7 +70,7 @@
             </template>
           </el-table-column>
           <el-table-column label="申报月份" align="center" prop="applyMonth"></el-table-column>
-          <el-table-column label="申报项目" align="center" prop="projectName"></el-table-column>
+          <el-table-column label="项目名称" align="center" prop="projectName"></el-table-column>
           <el-table-column label="项目阶段" align="center" prop="projectStage" width="200%"></el-table-column>
           <el-table-column label="工时详情" align="center">
             <template slot-scope="scope">
@@ -162,6 +162,7 @@ import { getProjectType, getProjectList, changeSubmitStatus, deleteProject, getA
         }
       },
       methods: {
+        // 初始化
         init () {
           // this.getProjectType()
           this.getProjectList().then(res => {
@@ -185,6 +186,7 @@ import { getProjectType, getProjectList, changeSubmitStatus, deleteProject, getA
               })
           }
         },
+        // 获取工时申报列表
         getProjectList () {
           let it = this
           return new Promise(function (resolve, reject) {

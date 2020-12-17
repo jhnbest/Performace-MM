@@ -26,7 +26,7 @@
           <el-button type="danger" size="medium" @click="onCancel('formData')">取 消</el-button>
         </el-form-item>
         <br>
-        <el-form-item label="项目阶段" prop="projectType">
+        <el-form-item label="项目类型" prop="projectType">
           <el-cascader
             v-model="formData.projectType"
             :options="projectTypeOptions"
@@ -36,6 +36,10 @@
             @change="handleProjectTypeChange"
             clearable
             style="width: 350%"></el-cascader>
+        </el-form-item>
+        <br>
+        <el-form-item label="项目名称" prop="projectName">
+          <el-input v-model="formData.projectName" placeholder="请输入"></el-input>
         </el-form-item>
         <br>
         <el-form-item label="项目级别" prop="projectLevel">
@@ -57,16 +61,16 @@
           stripe
           style="width: 97%;margin: auto">
           <el-table-column type="index" align="center" label="序号"></el-table-column>
-          <el-table-column align="center" label="项目名称" width="150%">
-            <template slot-scope="scope">
-              <el-form-item
-                :prop="'workTypeTimeDetail.' + scope.$index + '.projectName'"
-                :rules="formRules.projectName"
-                style="margin: auto">
-                <el-input type="textarea" v-model="scope.row.projectName" autosize></el-input>
-              </el-form-item>
-            </template>
-          </el-table-column>
+<!--          <el-table-column align="center" label="项目名称" width="150%">-->
+<!--            <template slot-scope="scope">-->
+<!--              <el-form-item-->
+<!--                :prop="'workTypeTimeDetail.' + scope.$index + '.projectName'"-->
+<!--                :rules="formRules.projectName"-->
+<!--                style="margin: auto">-->
+<!--                <el-input type="textarea" v-model="scope.row.projectName" autosize></el-input>-->
+<!--              </el-form-item>-->
+<!--            </template>-->
+<!--          </el-table-column>-->
           <el-table-column label="项目阶段" prop="workType" align="center"></el-table-column>
           <el-table-column label="基本工时" prop="baseWorkTime" align="center" width="80%"></el-table-column>
           <el-table-column label="K值" prop="defaultKValue" align="center" width="150%">
@@ -101,7 +105,7 @@
               </el-form-item>
             </template>
           </el-table-column>
-          <el-table-column label="进展" align="center" width="100%">
+          <el-table-column label="本月进展" align="center" width="100%">
             <template slot-scope="scope">
               <el-form-item
                 :prop="'workTypeTimeDetail.' + scope.$index + '.applyProcess'"
@@ -134,14 +138,17 @@
             </template>
           </el-table-column>
         </el-table>
+        <br>
+        <br>
+        <br>
       </el-form>
       <Assign v-if="showFlag.workTimeAssign" ref="workTimeAssign" @assignDetail="handleAssign"/>
     </div>
 </template>
 
 <script>
-  import { workTypeList, workTimeSubmit, getWorkTime, submitAssignWorkDetail,
-    getUsersName, getProjectType, getWorkTimeNew, workTimeTemporary } from '@/config/interface'
+  import { workTypeList, workTimeSubmit, getWorkTime, submitAssignWorkDetail, submitPlanProcess,
+    getUsersName, getProjectType, getWorkTimeNew, workTimeTemporary, submitPersonalProject } from '@/config/interface'
   import Assign from '@/components/Cop/workTimeAssign'
     export default {
       data () {
@@ -193,7 +200,8 @@
             partWorkTime: 0,
             partTableData: [],
             workTypeTimeDetail: [],
-            projectLevel: 1
+            projectLevel: 1,
+            projectName: null
           },
           formRules: {
             title: [
@@ -293,13 +301,39 @@
                   this.$common.toast('添加成功', 'success', false)
                   this.onCancel(formData)
                 } else {
-                  console.log(res.code)
-                  this.$common.toast('添加失败', 'success', false)
+                  this.$common.toast('添加失败', 'error', false)
                   this.onCancel(formData)
                 }
                 this.reqFlag.add = true
               })
           }
+        },
+        // 提交项目进展
+        onSubmitProjectProcess (param) {
+          const url = submitPersonalProject
+          let year = this.$moment(this.formData.title).year()
+          let month = this.$moment(this.formData.title).month() + 1
+          console.log(year)
+          console.log(month)
+          let params = {
+            id: null,
+            type: 'fact',
+            year: year,
+            month: month,
+            monthString: this.$common.MonthToString(String(month)),
+            tableData: this.formData.workTypeTimeDetail,
+            aplID: param.aplID
+          }
+          let it = this
+          return new Promise(function (resolve, reject) {
+            it.$http(url, params)
+              .then(res => {
+                if (res.code === 1) {
+                  console.log(res.data)
+                  resolve(res.data)
+                }
+              })
+          })
         },
         // 提交至项目明细列表
         onSubmitProjectList () {
@@ -307,6 +341,7 @@
           let params = {
             parentID: this.formData.projectType[0][0],
             projectLevel: this.formData.projectLevel,
+            projectName: this.formData.projectName,
             tableData: []
           }
           for (let item of this.formData.workTypeTimeDetail) {
@@ -317,9 +352,8 @@
               isConference: item.isConference,
               kValue: item.defaultKValue,
               projectManagerID: this.$store.state.userInfo.id,
-              projectName2: item.projectName,
               projectTypeID: item.projectTypeID,
-              workTime: item.avaiableWorkTime
+              workTime: item.baseWorkTime
             }
             params.tableData.push(obj)
           }
@@ -331,6 +365,7 @@
                   console.log(res.data)
                   for (let i = 0; i < res.data.length; i++) { // 插入项目明细ID
                     it.formData.workTypeTimeDetail[i].apdID = res.data[i].insertID
+                    it.formData.workTypeTimeDetail[i].aplID = res.data[i].aplID
                   }
                   resolve(res.data)
                 }
@@ -341,39 +376,64 @@
         onSubmitWorkTime (formData) {
           this.$refs[formData].validate(valid => {
             if (valid) {
-              this.onSubmitProjectList().then(res => {
-                console.log(res)
-                this.onSubmitWorkTimeList(formData)
-              })
+              let projectParentArray = []
+              for (let item of this.formData.projectType) {
+                if (projectParentArray.indexOf(item[0]) === -1) {
+                  projectParentArray.push(item[0])
+                }
+              }
+              if (projectParentArray.length > 1) {
+                this.$common.toast('一级活动限选一种', 'error', 'false')
+              } else {
+                this.onSubmitProjectList().then(() => { // 提交至项目明细表
+                  this.onSubmitWorkTimeList(formData) // 提交至工时明细表
+                })
+              }
             }
           })
+        },
+        // 暂存至工时明细列表
+        onTemporaryWorkTimeList (formData) {
+          const url = workTimeTemporary
+          if (this.reqFlag.add) {
+            this.reqFlag.add = false
+            let title = this.formData.title
+            let params = {
+              submitType: 'insert',
+              submitDate: title,
+              data: this.formData.workTypeTimeDetail
+            }
+            this.$http(url, params)
+              .then(res => {
+                if (res.code === 1) {
+                  this.$common.toast('暂存成功', 'success', false)
+                  this.onCancel(formData)
+                } else {
+                  console.log(res.code)
+                  this.$common.toast('添加失败', 'error', false)
+                  this.onCancel(formData)
+                }
+                this.reqFlag.add = true
+              })
+          }
         },
         // 暂存工时申报
         onTemporaryWorkTime (formData) {
           this.$refs[formData].validate(valid => {
             if (valid) {
-              const url = workTimeTemporary
-              if (this.reqFlag.add) {
-                this.reqFlag.add = false
+              let projectParentArray = []
+              for (let item of this.formData.projectType) {
+                if (projectParentArray.indexOf(item[0]) === -1) {
+                  projectParentArray.push(item[0])
+                }
               }
-              let title = this.formData.title
-              let params = {
-                submitType: 'insert',
-                submitDate: title,
-                data: this.formData.workTypeTimeDetail
-              }
-              this.$http(url, params)
-                .then(res => {
-                  if (res.code === 1) {
-                    this.$common.toast('添加成功', 'success', false)
-                    this.onCancel(formData)
-                  } else {
-                    console.log(res.code)
-                    this.$common.toast('添加失败', 'success', false)
-                    this.onCancel(formData)
-                  }
-                  this.reqFlag.add = true
+              if (projectParentArray.length > 1) {
+                this.$common.toast('一级活动限选一种', 'error', 'false')
+              } else {
+                this.onSubmitProjectList().then(() => { // 提交至项目明细表
+                  this.onTemporaryWorkTimeList(formData) // 暂存至工时明细表
                 })
+              }
             }
           })
         },
@@ -475,7 +535,6 @@
                     for (let item of data) {
                       let obj = {
                         projectTypeID: item.projectTypeID,
-                        projectName: '',
                         workType: item.projectName,
                         baseWorkTime: item.workTime,
                         defaultKValue: 1.0,

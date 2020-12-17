@@ -11,7 +11,7 @@
  Target Server Version : 80020
  File Encoding         : 65001
 
- Date: 16/12/2020 16:26:54
+ Date: 17/12/2020 17:40:05
 */
 
 SET NAMES utf8mb4;
@@ -33,12 +33,21 @@ CREATE TABLE `assignprojectdetail`  (
   `obsoleteStatus` tinyint NOT NULL DEFAULT 0 COMMENT '废弃状态',
   `isFinish` tinyint NOT NULL DEFAULT 0 COMMENT '是否已完成',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 84 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 84 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of assignprojectdetail
 -- ----------------------------
 INSERT INTO `assignprojectdetail` VALUES (1, 1, '26', 5.0, 1.0, 1, 5.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (2, 2, '10', 5.0, 1.0, 1, 5.0, 20.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (3, 2, '11', 10.0, 1.0, 1, 10.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (4, 2, '12', 10.0, 1.0, 1, 10.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (5, 2, '13', 4.0, 1.0, 1, 4.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (6, 2, '14', 4.0, 1.0, 1, 4.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (7, 2, '15', 4.0, 1.0, 1, 4.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (8, 2, '16', 8.0, 1.0, 1, 8.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (9, 2, '17', 12.0, 1.0, 1, 12.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (10, 2, '18', 5.0, 1.0, 1, 5.0, 0.0, 0, 0);
 
 -- ----------------------------
 -- Table structure for assignprojectlist
@@ -58,12 +67,13 @@ CREATE TABLE `assignprojectlist`  (
   `obsoleteStatus` tinyint NOT NULL DEFAULT 0 COMMENT '是否废弃',
   `projectLevel` tinyint NOT NULL DEFAULT 1 COMMENT '项目级别',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 22 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 22 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of assignprojectlist
 -- ----------------------------
-INSERT INTO `assignprojectlist` VALUES (1, 15, '2020-12-16 15:31:20', '4', '112211', 0.0, 15, 5.0, 0.0, 0, 0, 1);
+INSERT INTO `assignprojectlist` VALUES (1, 15, '2020-12-17 17:08:41', '4', '123', 0.0, 15, 5.0, 0.0, 0, 0, 1);
+INSERT INTO `assignprojectlist` VALUES (2, 8, '2020-12-17 17:24:11', '172', '111', 2.2, 15, 62.0, 0.0, 1, 0, 1);
 
 -- ----------------------------
 -- Table structure for monthprocess
@@ -89,11 +99,12 @@ CREATE TABLE `monthprocess`  (
   `PreMonth` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '上一月份进展',
   `obsoleteStatus` tinyint NOT NULL DEFAULT 0 COMMENT '废弃状态 ',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of monthprocess
 -- ----------------------------
+INSERT INTO `monthprocess` VALUES (1, 2, 2020, 'fact', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 20, 0, 0);
 
 -- ----------------------------
 -- Table structure for monthprocess_new
@@ -107,7 +118,7 @@ CREATE TABLE `monthprocess_new`  (
   `months` tinyint UNSIGNED NULL DEFAULT 0 COMMENT '月份',
   `process` float(4, 1) UNSIGNED NOT NULL DEFAULT 0.0 COMMENT '进展',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of monthprocess_new
@@ -125,7 +136,7 @@ CREATE TABLE `projectlist`  (
   `workTime` int NOT NULL COMMENT '工时数',
   `participants` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '参与人员',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of projectlist
@@ -147,7 +158,7 @@ CREATE TABLE `projecttype`  (
   `defaultKValue` double(255, 1) NOT NULL COMMENT '默认K值',
   `defaultCofficient` double(255, 1) NOT NULL COMMENT '默认系数',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 18 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 18 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of projecttype
@@ -182,7 +193,7 @@ CREATE TABLE `projecttypenew`  (
   `defaultAssignWorkTime` double(255, 1) NOT NULL DEFAULT 0.0 COMMENT '默认协助工时',
   `obsoleteStatus` tinyint NOT NULL DEFAULT 0 COMMENT '是否废弃',
   PRIMARY KEY (`projectTypeID`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 173 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 204 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of projecttypenew
@@ -215,13 +226,13 @@ INSERT INTO `projecttypenew` VALUES (25, '工作流程标准', 19, 4, 0.0, 0, 0,
 INSERT INTO `projecttypenew` VALUES (26, '沟通用户和运维单位，汇总问题和意见/系统', 20, 5, 5.0, 0, 0, 0.0, 0);
 INSERT INTO `projecttypenew` VALUES (27, '制定资产配置标准/系统', 21, 5, 10.0, 1, 0, 0.0, 0);
 INSERT INTO `projecttypenew` VALUES (28, '修订资产配置标准/系统', 21, 5, 5.0, 1, 0, 0.0, 0);
-INSERT INTO `projecttypenew` VALUES (29, '牵头修订资产配置标准（包括过程组织、文档整合、外部沟通、流程审批）', 21, 5, 20.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (29, '牵头修订资产配置标准', 21, 5, 20.0, 0, 0, 0.0, 0);
 INSERT INTO `projecttypenew` VALUES (30, '制定系统设计标准/系统', 22, 5, 20.0, 1, 0, 0.0, 0);
 INSERT INTO `projecttypenew` VALUES (31, '修订系统设计标准/系统', 22, 5, 10.0, 1, 0, 0.0, 0);
-INSERT INTO `projecttypenew` VALUES (32, '牵头修订系统配置标准(包括过程组织、文档整合、外部沟通、流程审批)', 22, 5, 20.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (32, '牵头修订系统配置标准', 22, 5, 20.0, 0, 0, 0.0, 0);
 INSERT INTO `projecttypenew` VALUES (33, '制定系统施工规范/系统', 23, 5, 20.0, 1, 0, 0.0, 0);
 INSERT INTO `projecttypenew` VALUES (34, '修订系统施工规范/系统', 23, 5, 5.0, 1, 0, 0.0, 0);
-INSERT INTO `projecttypenew` VALUES (35, '牵头修订系统施工规范(包括过程组织、文档整合、外部沟通、流程审批)', 23, 5, 20.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (35, '牵头修订系统施工规范', 23, 5, 20.0, 0, 0, 0.0, 0);
 INSERT INTO `projecttypenew` VALUES (36, '制定审图检查单/系统', 24, 5, 15.0, 0, 0, 0.0, 0);
 INSERT INTO `projecttypenew` VALUES (37, '修订审图检查单/系统', 24, 5, 2.0, 0, 0, 0.0, 0);
 INSERT INTO `projecttypenew` VALUES (38, '制定工作流程标准/流程', 25, 5, 20.0, 0, 0, 0.0, 0);
@@ -406,7 +417,7 @@ CREATE TABLE `projecttypenew_copy1`  (
   `defaultAssignWorkTime` double(255, 1) NOT NULL DEFAULT 0.0 COMMENT '默认协助工时',
   `obsoleteStatus` tinyint NOT NULL DEFAULT 0 COMMENT '是否废弃',
   PRIMARY KEY (`projectTypeID`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 173 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 173 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of projecttypenew_copy1
@@ -599,7 +610,7 @@ CREATE TABLE `projecttypenew_copy2`  (
   `defaultAssignWorkTime` double(255, 1) NOT NULL DEFAULT 0.0 COMMENT '默认协助工时',
   `obsoleteStatus` tinyint NOT NULL DEFAULT 0 COMMENT '是否废弃',
   PRIMARY KEY (`projectTypeID`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 173 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 173 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of projecttypenew_copy2
@@ -792,7 +803,7 @@ CREATE TABLE `user`  (
   `status` char(1) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '1' COMMENT '状态',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `name`(`name`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 39 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 39 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of user
@@ -827,7 +838,7 @@ CREATE TABLE `users`  (
   `status` char(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `partyMember` tinyint NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 34 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 34 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of users
@@ -875,7 +886,7 @@ CREATE TABLE `users_copy1`  (
   `state` char(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `partyMember` tinyint NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 30 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 30 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of users_copy1
@@ -925,7 +936,7 @@ CREATE TABLE `weekly`  (
   `update_time` datetime(0) NOT NULL COMMENT '更新时间',
   `state` char(1) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '1' COMMENT '状态',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 27 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci COMMENT = '周报表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 27 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci COMMENT = '周报表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of weekly
@@ -959,80 +970,13 @@ CREATE TABLE `worktimeassign`  (
   `assignRole` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '参与人员角色',
   `obsoleteStatus` tinyint NOT NULL DEFAULT 0 COMMENT '废弃状态',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 70 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 71 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of worktimeassign
 -- ----------------------------
-INSERT INTO `worktimeassign` VALUES (1, 15, 1, 2.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (2, 8, 1, 1.0, NULL, '协作者', 1);
-INSERT INTO `worktimeassign` VALUES (3, 32, 1, 1.0, NULL, '协作者', 1);
-INSERT INTO `worktimeassign` VALUES (4, 15, 2, 2.0, 2.0, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (5, 11, 2, 1.0, 1.0, '协作者', 1);
-INSERT INTO `worktimeassign` VALUES (6, 16, 2, 1.0, 1.0, '协作者', 1);
-INSERT INTO `worktimeassign` VALUES (7, 17, 2, 1.0, 1.0, '协作者', 1);
-INSERT INTO `worktimeassign` VALUES (8, 19, 2, 1.0, 1.0, '协作者', 1);
-INSERT INTO `worktimeassign` VALUES (9, 20, 2, 1.0, 1.0, '协作者', 1);
-INSERT INTO `worktimeassign` VALUES (10, 22, 2, 1.0, 1.0, '协作者', 1);
-INSERT INTO `worktimeassign` VALUES (11, 24, 2, 1.0, 1.0, '协作者', 1);
-INSERT INTO `worktimeassign` VALUES (12, 25, 2, 1.0, 1.0, '协作者', 1);
-INSERT INTO `worktimeassign` VALUES (13, 28, 2, 1.0, 1.0, '协作者', 1);
-INSERT INTO `worktimeassign` VALUES (14, 30, 2, 1.0, 1.0, '协作者', 1);
-INSERT INTO `worktimeassign` VALUES (15, 32, 2, 1.0, 1.0, '协作者', 1);
-INSERT INTO `worktimeassign` VALUES (16, 8, 3, 5.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (17, 8, 4, 10.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (18, 8, 5, 5.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (19, 8, 6, 10.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (20, 8, 7, 5.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (21, 8, 8, 10.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (22, 8, 9, 5.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (23, 8, 10, 10.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (24, 8, 11, 5.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (25, 8, 12, 10.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (26, 8, 13, 5.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (27, 8, 14, 20.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (28, 8, 15, 5.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (29, 8, 16, 10.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (30, 8, 17, 5.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (31, 8, 18, 10.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (32, 8, 19, 5.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (33, 8, 20, 10.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (34, 8, 21, 5.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (35, 8, 22, 10.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (36, 8, 24, 0.5, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (37, 8, 25, 1.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (38, 8, 26, 0.4, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (39, 8, 27, 1.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (40, 15, 26, 0.1, NULL, '协作者', 1);
-INSERT INTO `worktimeassign` VALUES (41, 8, 28, 0.5, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (42, 8, 29, 1.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (43, 8, 30, 0.5, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (44, 8, 31, 1.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (45, 8, 32, 0.5, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (46, 8, 33, 2.5, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (47, 8, 34, 5.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (48, 8, 35, 0.5, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (49, 8, 36, 4.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (50, 8, 37, 0.5, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (51, 8, 38, 4.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (52, 8, 39, 2.5, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (53, 8, 40, 2.5, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (54, 8, 41, 1.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (55, 8, 42, 3.1, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (56, 15, 42, 0.5, NULL, '协作者', 1);
-INSERT INTO `worktimeassign` VALUES (57, 8, 43, 1.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (58, 8, 44, 3.1, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (59, 15, 44, 0.5, NULL, '协作者', 1);
-INSERT INTO `worktimeassign` VALUES (60, 8, 45, 1.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (61, 8, 46, 3.6, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (62, 8, 47, 5.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (63, 8, 48, 5.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (64, 15, 49, 5.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (65, 15, 50, 10.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (66, 15, 51, 5.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (67, 8, 52, 1.0, NULL, '组织者', 0);
-INSERT INTO `worktimeassign` VALUES (68, 8, 53, 3.6, NULL, '组织者', 0);
-INSERT INTO `worktimeassign` VALUES (69, 15, 54, 5.0, NULL, '组织者', 0);
+INSERT INTO `worktimeassign` VALUES (1, 15, 1, 5.0, NULL, '组织者', 0);
+INSERT INTO `worktimeassign` VALUES (2, 8, 2, 1.0, NULL, '组织者', 0);
 
 -- ----------------------------
 -- Table structure for worktimelist
@@ -1040,8 +984,9 @@ INSERT INTO `worktimeassign` VALUES (69, 15, 54, 5.0, NULL, '组织者', 0);
 DROP TABLE IF EXISTS `worktimelist`;
 CREATE TABLE `worktimelist`  (
   `id` int NOT NULL AUTO_INCREMENT,
+  `apdID` int NOT NULL DEFAULT 0 COMMENT '对应的项目明细ID',
+  `aplID` int NOT NULL DEFAULT 0 COMMENT '对应的项目列表ID',
   `submitID` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '申报人ID',
-  `projectName` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '项目名称',
   `projectTypeID` int NOT NULL COMMENT '项目类型ID',
   `applyKValue` double(255, 1) NOT NULL COMMENT '申报K值',
   `reviewKValue` double(255, 1) NULL DEFAULT NULL COMMENT '审核K值',
@@ -1060,67 +1005,14 @@ CREATE TABLE `worktimelist`  (
   `reviewer` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '' COMMENT '审核人',
   `avaiableWorkTime` double(255, 1) UNSIGNED NOT NULL DEFAULT 0.0 COMMENT '可用工时',
   `applyProcess` float(4, 1) UNSIGNED ZEROFILL NOT NULL DEFAULT 00.0 COMMENT '申报进展',
-  `apdID` int NOT NULL DEFAULT 0 COMMENT '对应的项目明细ID',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 54 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 55 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of worktimelist
 -- ----------------------------
-INSERT INTO `worktimelist` VALUES (1, '15', '科华环境监控交流', 80, 1.0, NULL, 1.0, NULL, '2020-12-01 09:27:10', '2020-12-14 11:30:02', '2020-12', '1', '', '0', NULL, '', 1, 0, '', 0.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (2, '15', '答复', 80, 1.0, NULL, 1.0, NULL, '2020-12-01 09:37:40', '2020-12-16 08:07:42', '2020-12', '1', '', '0', NULL, '', 1, 1, '', 0.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (3, '8', 'BA系统选型', 1, 1.0, NULL, 1.0, NULL, '2020-12-07 08:37:54', '2020-12-07 08:37:54', '2020-11', '0', '', '0', NULL, '', 1, 0, '', 0.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (4, '8', 'BA系统选型', 2, 1.0, NULL, 1.0, NULL, '2020-12-07 08:37:54', '2020-12-07 08:37:54', '2020-11', '0', '', '0', NULL, '', 1, 0, '', 0.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (5, '8', 'BA系统选型', 10, 1.0, NULL, 1.0, NULL, '2020-12-07 08:39:51', '2020-12-07 08:39:51', '2020-11', '0', '', '0', NULL, '', 1, 0, '', 0.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (6, '8', 'BA系统选型', 11, 1.0, NULL, 1.0, NULL, '2020-12-07 08:39:51', '2020-12-07 08:39:51', '2020-11', '0', '', '0', NULL, '', 1, 0, '', 0.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (7, '8', 'BA系统选型', 10, 1.0, NULL, 1.0, NULL, '2020-12-07 08:57:17', '2020-12-07 08:59:08', '2020-11', '0', '', '0', NULL, '', 1, 0, '', 0.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (8, '8', 'BA系统选型', 11, 1.0, NULL, 1.0, NULL, '2020-12-07 08:57:17', '2020-12-07 08:57:17', '2020-11', '0', '', '0', NULL, '', 1, 0, '', 0.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (9, '8', 'BA系统选型', 10, 1.0, NULL, 1.0, NULL, '2020-12-07 08:58:46', '2020-12-07 08:58:46', '2020-11', '0', '', '0', NULL, '', 1, 0, '', 0.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (10, '8', 'BA系统选型', 11, 1.0, NULL, 1.0, NULL, '2020-12-07 08:58:46', '2020-12-07 08:58:46', '2020-11', '0', '', '0', NULL, '', 1, 0, '', 0.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (11, '8', '1', 26, 1.0, NULL, 1.0, NULL, '2020-12-07 08:59:36', '2020-12-07 08:59:36', '2020-12', '1', '', '0', NULL, '', 1, 0, '', 0.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (12, '8', '2', 27, 1.0, NULL, 1.0, NULL, '2020-12-07 08:59:36', '2020-12-07 08:59:36', '2020-12', '1', '', '0', NULL, '', 1, 0, '', 0.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (13, '8', '3', 28, 1.0, NULL, 1.0, NULL, '2020-12-07 08:59:36', '2020-12-07 08:59:36', '2020-12', '1', '', '0', NULL, '', 1, 0, '', 0.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (14, '8', '4', 29, 1.0, NULL, 1.0, NULL, '2020-12-07 08:59:36', '2020-12-07 08:59:36', '2020-12', '1', '', '0', NULL, '', 1, 0, '', 0.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (15, '8', 'BA系统选型', 10, 1.0, NULL, 1.0, NULL, '2020-12-07 09:46:09', '2020-12-07 09:46:09', '2020-11', '0', '', '0', NULL, '', 1, 0, '', 0.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (16, '8', 'BA系统选型', 11, 1.0, NULL, 1.0, NULL, '2020-12-07 09:46:09', '2020-12-07 09:46:09', '2020-11', '0', '', '0', NULL, '', 1, 0, '', 0.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (17, '8', 'BA系统选型', 10, 1.0, NULL, 1.0, NULL, '2020-12-07 09:49:18', '2020-12-07 09:49:18', '2020-11', '0', '', '0', NULL, '', 1, 0, '', 0.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (18, '8', 'BA系统选型', 11, 1.0, NULL, 1.0, NULL, '2020-12-07 09:49:18', '2020-12-07 09:49:18', '2020-11', '0', '', '0', NULL, '', 1, 0, '', 0.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (19, '8', 'BA系统选型', 10, 1.0, NULL, 1.0, NULL, '2020-12-07 10:22:23', '2020-12-07 10:22:23', '2020-11', '0', '', '0', NULL, '', 1, 0, '', 0.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (20, '8', 'BA系统选型', 11, 1.0, NULL, 1.0, NULL, '2020-12-07 10:22:23', '2020-12-07 10:22:23', '2020-11', '0', '', '0', NULL, '', 1, 0, '', 0.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (21, '8', 'BA系统选型', 10, 1.0, NULL, 1.0, NULL, '2020-12-07 10:34:32', '2020-12-07 10:34:32', '2020-11', '0', '', '0', NULL, '', 1, 0, '', 0.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (22, '8', 'BA系统选型', 11, 1.0, NULL, 1.0, NULL, '2020-12-07 10:34:32', '2020-12-07 10:34:32', '2020-11', '0', '', '0', NULL, '', 1, 0, '', 0.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (23, '8', 'BA系统选型', 10, 1.0, NULL, 1.0, NULL, '2020-12-07 10:47:46', '2020-12-07 10:47:46', '2020-11', '0', '', '0', NULL, '', 0, 0, '', 0.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (24, '8', 'BA系统选型', 10, 1.0, NULL, 1.0, NULL, '2020-12-07 10:51:50', '2020-12-07 10:51:50', '2020-11', '0', '', '0', NULL, '', 1, 0, '', 0.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (25, '8', 'BA系统选型', 11, 1.0, NULL, 1.0, NULL, '2020-12-07 10:51:50', '2020-12-07 10:51:50', '2020-11', '0', '', '0', NULL, '', 1, 0, '', 0.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (26, '8', 'BA系统选型', 10, 1.0, NULL, 1.0, NULL, '2020-12-07 11:14:37', '2020-12-07 11:31:12', '2020-11', '1', '', '0', NULL, '', 1, 0, '', 0.5, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (27, '8', 'BA系统选型', 11, 1.0, NULL, 1.0, NULL, '2020-12-07 11:14:37', '2020-12-07 11:14:37', '2020-11', '0', '', '0', NULL, '', 1, 0, '', 1.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (28, '8', 'BA系统选型', 10, 1.0, NULL, 1.0, NULL, '2020-12-07 13:58:16', '2020-12-07 13:58:16', '2020-11', '0', '', '0', NULL, '', 1, 0, '', 0.5, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (29, '8', 'BA系统选型', 11, 1.0, NULL, 1.0, NULL, '2020-12-07 13:58:16', '2020-12-07 13:58:16', '2020-11', '0', '', '0', NULL, '', 1, 0, '', 1.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (30, '8', 'BA系统选型', 10, 1.0, NULL, 1.0, NULL, '2020-12-07 14:23:44', '2020-12-07 14:23:44', '2020-11', '0', '', '0', NULL, '', 1, 0, '', 0.5, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (31, '8', 'BA系统选型', 11, 1.0, NULL, 1.0, NULL, '2020-12-07 14:23:44', '2020-12-07 14:23:44', '2020-11', '0', '', '0', NULL, '', 1, 0, '', 1.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (32, '8', '综合布线选型', 10, 1.0, NULL, 1.0, NULL, '2020-12-07 14:45:41', '2020-12-07 14:46:04', '2020-12', '1', '', '0', NULL, '', 1, 0, '', 0.5, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (33, '8', '综合布线选型', 10, 1.0, NULL, 1.0, NULL, '2020-12-10 14:41:51', '2020-12-10 14:41:51', '2020-11', '0', '', '0', NULL, '', 1, 0, '', 2.5, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (34, '8', '综合布线选型', 12, 1.0, NULL, 1.0, NULL, '2020-12-10 14:41:51', '2020-12-10 14:41:51', '2020-11', '0', '', '0', NULL, '', 1, 0, '', 5.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (35, '8', '综合布线选型', 10, 1.0, NULL, 1.0, NULL, '2020-12-10 14:43:57', '2020-12-10 14:43:57', '2020-12', '0', '', '0', NULL, '', 1, 0, '', 0.5, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (36, '8', '综合布线选型', 12, 1.0, NULL, 1.0, NULL, '2020-12-10 14:43:57', '2020-12-10 14:43:57', '2020-12', '0', '', '0', NULL, '', 1, 0, '', 4.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (37, '8', '综合布线选型', 10, 1.0, NULL, 1.0, NULL, '2020-12-10 15:01:28', '2020-12-10 15:24:49', '2020-12', '0', '', '0', NULL, '', 1, 0, '', 0.5, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (38, '8', '综合布线选型', 12, 1.0, NULL, 1.0, NULL, '2020-12-10 15:01:28', '2020-12-10 15:24:47', '2020-12', '0', '', '0', NULL, '', 1, 0, '', 4.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (39, '8', '综合布线选型', 10, 1.0, NULL, 1.0, NULL, '2020-12-14 10:32:30', '2020-12-14 10:32:30', '2020-11', '0', '', '0', NULL, '', 1, 0, '', 2.5, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (40, '8', '综合布线选型', 10, 1.0, NULL, 1.0, NULL, '2020-12-14 10:33:34', '2020-12-14 10:33:34', '2020-11', '0', '', '0', NULL, '', 1, 0, '', 2.5, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (41, '8', '综合布线选型', 10, 1.0, NULL, 1.0, NULL, '2020-12-14 10:48:23', '2020-12-14 10:50:32', '2020-12', '0', '', '0', NULL, '', 1, 0, '', 1.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (42, '8', '综合布线选型', 13, 1.0, NULL, 1.0, NULL, '2020-12-14 10:48:23', '2020-12-14 10:50:30', '2020-12', '0', '', '0', NULL, '', 1, 0, '', 3.6, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (43, '8', '综合布线选型', 10, 1.0, NULL, 1.0, NULL, '2020-12-14 14:03:34', '2020-12-14 14:03:34', '2020-12', '0', '', '0', NULL, '', 1, 0, '', 1.0, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (44, '8', '综合布线选型', 13, 1.0, NULL, 1.0, NULL, '2020-12-14 14:03:34', '2020-12-14 14:03:44', '2020-12', '1', '测试备注', '0', NULL, '', 1, 0, '', 3.6, 00.0, 0);
-INSERT INTO `worktimelist` VALUES (45, '8', '综合布线选型', 10, 1.0, NULL, 1.0, NULL, '2020-12-14 14:16:26', '2020-12-14 14:16:26', '2020-12', '0', '', '0', NULL, '', 1, 0, '', 1.0, 70.0, 0);
-INSERT INTO `worktimelist` VALUES (46, '8', '综合布线选型', 13, 1.0, NULL, 1.0, NULL, '2020-12-14 14:16:26', '2020-12-14 14:16:26', '2020-12', '0', '', '0', NULL, '', 1, 0, '', 3.6, 90.0, 0);
-INSERT INTO `worktimelist` VALUES (47, '8', '1', 26, 1.0, NULL, 1.0, NULL, '2020-12-14 15:39:35', '2020-12-14 15:39:35', '2020-12', '1', '', '0', NULL, '', 1, 0, '', 5.0, 100.1, 0);
-INSERT INTO `worktimelist` VALUES (48, '8', '1', 26, 1.0, NULL, 1.0, NULL, '2020-12-14 15:42:20', '2020-12-14 15:42:20', '2020-12', '1', '', '0', NULL, '', 1, 0, '', 5.0, 100.0, 0);
-INSERT INTO `worktimelist` VALUES (49, '15', '测试333', 26, 1.0, NULL, 1.0, NULL, '2020-12-15 17:03:24', '2020-12-15 17:03:24', '2020-12', '1', '', '0', NULL, '', 1, 0, '', 5.0, 100.0, 0);
-INSERT INTO `worktimelist` VALUES (50, '15', '1233', 27, 1.0, NULL, 1.0, NULL, '2020-12-15 17:04:35', '2020-12-15 17:04:35', '2020-12', '1', '', '0', NULL, '', 1, 0, '', 10.0, 100.0, 0);
-INSERT INTO `worktimelist` VALUES (51, '15', '修订资产配置标准', 28, 1.0, NULL, 1.0, NULL, '2020-12-15 17:10:24', '2020-12-16 15:01:58', '2020-12', '0', '', '0', NULL, '', 1, 0, '', 5.0, 100.0, 0);
-INSERT INTO `worktimelist` VALUES (52, '8', '综合布线选型', 10, 1.0, NULL, 1.0, NULL, '2020-12-16 14:24:39', '2020-12-16 15:30:57', '2020-12', '0', '', '0', NULL, '', 0, 0, '', 1.0, 70.0, 10);
-INSERT INTO `worktimelist` VALUES (53, '8', '综合布线选型', 13, 1.0, NULL, 1.0, NULL, '2020-12-16 14:24:39', '2020-12-16 14:25:06', '2020-12', '1', '', '0', NULL, '', 0, 0, '', 3.6, 90.0, 13);
-INSERT INTO `worktimelist` VALUES (54, '15', '112211', 26, 1.0, NULL, 1.0, NULL, '2020-12-16 15:31:21', '2020-12-16 15:31:21', '2020-12', '0', '', '0', NULL, '', 0, 0, '', 5.0, 100.0, 1);
+INSERT INTO `worktimelist` VALUES (1, 1, 1, '15', 26, 1.0, NULL, 1.0, NULL, '2020-12-17 17:08:42', '2020-12-17 17:08:42', '2020-12', '1', '', '0', NULL, '', 0, 0, '', 5.0, 100.0);
+INSERT INTO `worktimelist` VALUES (2, 2, 2, '8', 10, 1.0, NULL, 1.0, NULL, '2020-12-17 17:32:04', '2020-12-17 17:32:04', '2020-12', '0', '', '0', NULL, '', 0, 0, '', 1.0, 20.0);
 
 -- ----------------------------
 -- Event structure for update_schedule
@@ -1131,6 +1023,7 @@ CREATE EVENT `update_schedule`
 ON SCHEDULE
 EVERY '1' MONTH STARTS '2020-12-01 00:01:00'
 DO update assignprojectlist set isFilled = 0 where obsoleteStatus != 1
+;
 ;;
 delimiter ;
 

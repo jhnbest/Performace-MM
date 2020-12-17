@@ -139,7 +139,6 @@ function workTimeInsertOP(params, i, operate) {
         let arrayParams = []
         let submitID = params.userId
         let applyMonth = params.submitDate
-        let projectName = params.data[i].projectName
         let projectTypeID = params.data[i].projectTypeID
         let applyKValue = params.data[i].defaultKValue
         let reviewKValue = params.data[i].reviewKValue
@@ -148,6 +147,7 @@ function workTimeInsertOP(params, i, operate) {
         let avaiableWorkTime = params.data[i].avaiableWorkTime
         let applyProcess = params.data[i].applyProcess
         let apdID = params.data[i].apdID
+        let aplID = params.data[i].aplID
         let updateTime = $time.formatTime()
         let submitStatus = null
         let reviewStatus = '0'
@@ -159,17 +159,17 @@ function workTimeInsertOP(params, i, operate) {
         let submitComments = params.data[i].submitComments
         if (params.submitType === 'insert') {  //新增
             sql = $sql.performance.addProject
-            arrayParams = [submitID, projectName, projectTypeID, applyKValue, reviewKValue, applyCofficient, reviewCofficient, submitTime,
-                updateTime, applyMonth, submitStatus, submitComments, avaiableWorkTime, applyProcess, apdID]
+            arrayParams = [submitID, projectTypeID, applyKValue, reviewKValue, applyCofficient, reviewCofficient, submitTime,
+                updateTime, applyMonth, submitStatus, submitComments, avaiableWorkTime, applyProcess, apdID, aplID]
         } else if (params.submitType === 'update') { //更新
             if (operate === '1') { // 提交
                 sql = $sql.performance.updateRejectProject
-                arrayParams = [submitID, projectName, projectTypeID, applyKValue, reviewKValue, applyCofficient, reviewCofficient, updateTime, applyMonth,
-                    submitStatus, reviewStatus, submitComments, avaiableWorkTime, params.projectID]
+                arrayParams = [submitID, projectTypeID, applyKValue, reviewKValue, applyCofficient, reviewCofficient, updateTime, applyMonth,
+                    submitStatus, reviewStatus, submitComments, applyProcess, avaiableWorkTime, params.projectID]
             } else { // 暂存
                 sql = $sql.performance.updateProject
-                arrayParams = [submitID, projectName, projectTypeID, applyKValue, reviewKValue, applyCofficient, reviewCofficient, updateTime, applyMonth,
-                    submitStatus, submitComments, avaiableWorkTime, params.projectID]
+                arrayParams = [submitID, projectTypeID, applyKValue, reviewKValue, applyCofficient, reviewCofficient, updateTime, applyMonth,
+                    submitStatus, submitComments, applyProcess, avaiableWorkTime, params.projectID]
             }
         }
         $http.connPool(sql, arrayParams, (err, result) => {

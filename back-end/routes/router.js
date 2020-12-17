@@ -59,5 +59,6 @@ router.post(api.deleteAssignProject, workStation.deleteAssignProject)
 router.post(api.updateAssignProjectFilled, workStation.updateAssignProjectFilled)
 router.post(api.updateAssignWork, workStation.updateAssignWork)
 router.post(api.getAssignWorkDetail, workStation.getAssignWorkDetail)
+router.post(api.submitPersonalProject, workStation.submitPersonalProject)
 
 module.exports = router;

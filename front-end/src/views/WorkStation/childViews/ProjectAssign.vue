@@ -38,7 +38,7 @@
         </el-col>
       </el-row>
       <el-form ref="formData" :model="formData" :rules="formRules" :inline="true">
-        <el-form-item label="项目名称" prop="projectName" style="margin-left: 30px">
+        <el-form-item label="项目名称" style="margin-left: 30px" prop="projectName">
           <el-input placeholder="请输入" v-model.trim="formData.projectName" clearable></el-input>
         </el-form-item>
         <br>
@@ -90,7 +90,6 @@
         <br>
         <el-table :data="tableData" style="width: 95%;margin: auto">
           <el-table-column label="序号" align="center" type="index"></el-table-column>
-          <el-table-column label="项目名称" align="center" prop="projectName2"></el-table-column>
           <el-table-column label="项目类型" align="center" prop="projectType"></el-table-column>
           <el-table-column label="项目阶段" align="center" prop="projectName" show-overflow-tooltip></el-table-column>
           <el-table-column label="基本工时" align="center" prop="workTime"></el-table-column>
@@ -493,7 +492,6 @@
                       })
                       console.log(assignTo)
                       for (let item of data) {
-                        item.projectName2 = it.formData.projectName
                         item.projectType = parentType
                         item.projectManager = assignTo
                         item.projectManagerID = this.formData.projectManager
@@ -526,7 +524,8 @@
             let params = {
               tableData: this.tableData,
               parentID: this.formData.projectType[0][0],
-              projectLevel: this.formData.projectLevel
+              projectLevel: this.formData.projectLevel,
+              projectName: this.formData.projectName
             }
             this.$http(url, params)
               .then(res => {

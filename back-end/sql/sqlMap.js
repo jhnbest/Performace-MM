@@ -58,21 +58,25 @@ const sqlMap = {
     selectProjectTypeFirst: 'select projectTypeID, projectName from projecttypenew where projectParentID = ? or projectParentID = 0',
     selectProjectType: 'select projectTypeID, projectName from projecttypenew where projectParentID = ? and obsoleteStatus != 1',
     selectProjectTime: 'select projectTypeID, projectName, workTime, dynamicKValue, isConference, defaultAssignWorkTime from projecttypenew where projectTypeID = ?',
-    addProject: 'insert into worktimelist (submitID, projectName, projectTypeID, applyKValue, reviewKValue, applyCofficient, reviewCofficient, submitTime, ' +
-        'updateTime, applyMonth, submitStatus, submitComments, avaiableWorkTime, applyProcess, apdID) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    addProject: 'insert into worktimelist (submitID, projectTypeID, applyKValue, reviewKValue, applyCofficient, reviewCofficient, submitTime, ' +
+        'updateTime, applyMonth, submitStatus, submitComments, avaiableWorkTime, applyProcess, apdID, aplID) values ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
     addWorkAssign: 'insert into worktimeassign (userID, projectID, workTime, assignRole) values (?, ?, ?, ?)',
-    updateProject: 'update worktimelist set submitID = ?, projectName = ?, projectTypeID = ?, applyKValue = ?, reviewKValue = ?, applyCofficient = ?, ' +
-        'reviewCofficient = ?, updateTime = ?, applyMonth = ?, submitStatus = ?, submitComments = ?, avaiableWorkTime = ? where id = ?',
-    updateRejectProject: 'update worktimelist set submitID = ?, projectName = ?, projectTypeID = ?, applyKValue = ?, reviewKValue = ?, applyCofficient = ?, ' +
-        'reviewCofficient = ?, updateTime = ?, applyMonth = ?, submitStatus = ?, reviewStatus = ?, submitComments = ?, avaiableWorkTime = ? where id = ?',
+    updateProject: 'update worktimelist set submitID = ?, projectTypeID = ?, applyKValue = ?, reviewKValue = ?, applyCofficient = ?, ' +
+        'reviewCofficient = ?, updateTime = ?, applyMonth = ?, submitStatus = ?, submitComments = ?, applyProcess = ?, ' +
+        'avaiableWorkTime = ? where id = ?',
+    updateRejectProject: 'update worktimelist set submitID = ?, projectTypeID = ?, applyKValue = ?, reviewKValue = ?, applyCofficient = ?, ' +
+        'reviewCofficient = ?, updateTime = ?, applyMonth = ?, submitStatus = ?, reviewStatus = ?, submitComments = ?, ' +
+        'applyProcess = ?, avaiableWorkTime = ? where id = ?',
     updateWorkAssign: 'update worktimeassign set userID = ?, projectID = ?, workTime = ?, assignRole = ?, reviewWorkTime = ? where id = ?',
     deleteWorkAssign: 'update worktimeassign set obsoleteStatus = 1 where id = ?',
     // getProjectList: 'SELECT * from worktimelist WHERE submitID = ? and applyMonth = ? and obsoleteStatus != 1', //查找项目列表
-    getProjectList: 'SELECT wl.*, pjn.projectName as projectStage from worktimelist wl left join projecttypenew pjn on wl.projectTypeID = pjn.projectTypeID' +
-        ' WHERE wl.submitID = ? and wl.applyMonth = ? and wl.obsoleteStatus != 1', //查找项目列表
+    getProjectList: 'SELECT wl.*, pjn.projectName as projectStage from worktimelist wl left join projecttypenew pjn on ' +
+        'wl.projectTypeID = pjn.projectTypeID WHERE wl.submitID = ? and wl.applyMonth = ? and wl.obsoleteStatus != 1',
     // getProjectListNew: 'SELECT * FROM worktimelist WHERE id IN (SELECT projectID FROM worktimeassign WHERE userID = ? and obsoleteStatus != 1) and applyMonth = ? and obsoleteStatus != 1',
-    getProjectListNew: 'select wl.*, pjn.projectName as projectStage from worktimelist wl left join projecttypenew pjn on wl.projectTypeID = pjn.projectTypeID ' +
-        'where wl.id in (select projectID from worktimeassign where userID = ? and obsoleteStatus != 1) and wl.applyMonth = ? and wl.obsoleteStatus != 1',
+    getProjectListNew: 'select wl.*, pjn.projectName as projectStage, apl.projectName from worktimelist wl left join ' +
+        'projecttypenew pjn on wl.projectTypeID = pjn.projectTypeID left join assignprojectlist apl on wl.aplID = apl.id ' +
+        'where wl.id in (select projectID from worktimeassign where userID = ? ' +
+        'and obsoleteStatus != 1) and wl.applyMonth = ? and wl.obsoleteStatus != 1',
     getProjectListTotal: 'SELECT count(*) as totalCount from worktimelist WHERE submitID = ? and applyMonth = ? and obsoleteStatus != 1',
     getProjectListTotalNew: 'SELECT count(*) as totalCount from worktimelist where id IN (SELECT projectID FROM worktimeassign WHERE userID = ? and obsoleteStatus != 1) ' +
         'and applyMonth = ? and obsoleteStatus != 1',
@@ -148,8 +152,9 @@ const sqlMap = {
     updateAssignProjectFilled: 'update assignprojectlist set isFilled = 1 where id = ?',
     getAssignWorkDetail: 'select apd.id as apdID, apd.aPLID as aplID, apl.projectLevel from assignprojectdetail apd left join' +
         ' assignprojectlist apl on apd.aPLID = apl.id where apd.id = ?',
-    UpdateAssignWorkDetail: 'update assignprojectdetail set kValue = ?, coefficient = ?, avaiableWorkTime = ?, process = ? where id = ?',
-    UpdateAssignWorkList: 'update assignprojectlist set assignDate = ?, projectName = ?, process = ?, totalWorkTime = ?, projectLevel = ? where id = ?'
+    UpdateAssignWorkDetail: 'update assignprojectdetail set kValue = ?, coefficient = ?, avaiableWorkTime = ? where id = ?',
+    UpdateAssignWorkList: 'update assignprojectlist set totalWorkTime = ? where id = ?',
+    GetProjectTotalWorkTime: 'select sum(avaiableWorkTime)totalWorkTime from assignprojectdetail where aPLID = ?'
   }
 }
 module.exports = sqlMap;

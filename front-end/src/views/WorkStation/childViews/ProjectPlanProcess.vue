@@ -604,7 +604,8 @@
                         lastMonthProcess: lastMonthProcess,
                         processDiff: applyMonthProcess - lastMonthProcess,
                         applyProcess: applyMonthProcess,
-                        apdID: item.sendParams.aPDID
+                        apdID: item.sendParams.aPDID,
+                        aplID: item.aplID
                       }
                       obj.avaiableWorkTime = obj.baseWorkTime * obj.defaultKValue * obj.defaultCofficient *
                         (applyMonthProcess - lastMonthProcess) * 0.01

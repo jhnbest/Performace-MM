@@ -46,3 +46,4 @@ export const deleteAssignProject = '/workStation/deleteAssignProject' // 删除�
 export const updateAssignProjectFilled = '/workStation/updateAssignProjectFilled' // 删除已指派项目列表
 export const updateAssignWork = '/workStation/updateAssignWork' // 更新项目
 export const getAssignWorkDetail = '/workStation/getAssignWorkDetail' // 获取项目明细
+export const submitPersonalProject = '/workStation/submitPersonalProject' // 提交个人申报项目
