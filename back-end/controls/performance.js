@@ -1,6 +1,7 @@
 const $sql = require('../sql/sqlMap')
 const $http = require('../sql/http')
 const $time = require('../utils/time')
+const $workStation = require('./workStation')
 
 function formatData(rows) {
     return rows.map(row => {
@@ -148,6 +149,7 @@ function workTimeInsertOP(params, i, operate) {
         let applyProcess = params.data[i].applyProcess
         let apdID = params.data[i].apdID
         let aplID = params.data[i].aplID
+        let monthID = params.data[i].monthID
         let updateTime = $time.formatTime()
         let submitStatus = null
         let reviewStatus = '0'
@@ -160,7 +162,7 @@ function workTimeInsertOP(params, i, operate) {
         if (params.submitType === 'insert') {  //新增
             sql = $sql.performance.addProject
             arrayParams = [submitID, projectTypeID, applyKValue, reviewKValue, applyCofficient, reviewCofficient, submitTime,
-                updateTime, applyMonth, submitStatus, submitComments, avaiableWorkTime, applyProcess, apdID, aplID]
+                updateTime, applyMonth, submitStatus, submitComments, avaiableWorkTime, applyProcess, apdID, aplID, monthID]
         } else if (params.submitType === 'update') { //更新
             if (operate === '1') { // 提交
                 sql = $sql.performance.updateRejectProject
@@ -489,6 +491,55 @@ async function fGetUnReviewProject(data, res) {
     return $http.writeJson(res, {code: 1, data: resultData, message: '成功'})
 }
 
+function setWorkTimeListPass(sql, arrayParams) {
+    return new Promise(function (resolve, reject) {
+        $http.connPool(sql, arrayParams, (err, result) => {
+            if (err) {
+                reject(err)
+            } else {
+                resolve(result)
+            }
+        })
+    })
+}
+
+function updateProjectProcess(data) {
+    return new Promise(function (resolve, reject) {
+        let param = {
+            id: data.monthID,
+            kValue: data.reviewKValue,
+            coefficient: data.reviewCofficient,
+            aPDID: data.apdID,
+            year: data.applyYear,
+            type: 'fact',
+            January: null,
+            February: null,
+            March: null,
+            April: null,
+            May: null,
+            June: null,
+            July: null,
+            August: null,
+            September: null,
+            October: null,
+            November: null,
+            December: null,
+        }
+        param[data.applyMonthString] = data.applyProcess
+        $workStation.saveProcess(param).then(res0 => {
+            $workStation.projectStageProcessCal(data.apdID, data.applyYear).then(res1 => { //计算该阶段进展
+                $workStation.projectStageProcessUpdate(data.apdID, res1).then(res2 => { //更新该阶段进展
+                    $workStation.projectProcessCal(res2).then(res3 => { //计算项目总进展
+                        $workStation.projectProcessUpdate(res2, res3).then(() => { //更新项目总进展
+                            resolve(1)
+                        })
+                    })
+                })
+            })
+        })
+    })
+}
+
 const performance = {
     /*添加周报 start*/
     add (req, res) {
@@ -661,7 +712,7 @@ const performance = {
         console.log(data)
         workTimeInsert(data, res, '0')
     },
-    /* 获取工时申报详情 */
+    // 获取工时申报详情
     getProjectList (req, res) {
         console.log('===performance.js getProjectList')
         let data = req.body
@@ -708,7 +759,7 @@ const performance = {
             })
         })
     },
-    /*获取工时分配信息*/
+    // 取工时分配信息
     getWorkAssign (req, res) {
         console.log('===performance.js getWorkAssign')
         let data = req.body
@@ -763,7 +814,7 @@ const performance = {
             })
         })
     },
-    /* 改变提交状态 */
+    // 改变提交状态
     changeSubmitStatus (req, res) {
         let data = req.body
         let sql = $sql.performance.changeSubmitStatus
@@ -784,7 +835,7 @@ const performance = {
             })
         })
     },
-    /* 删除项目 */
+    // 删除项目
     deleteProject (req, res) {
         $http.userVerify(req, res, () => {
             let data = req.body
@@ -801,7 +852,7 @@ const performance = {
             })
         })
     },
-    /* 提交工时分配审核结果 */
+    // 提交工时分配审核结果
     updateWorkTimeAssignReview (req, res) {
         $http.userVerify(req, res, () => {
             let data = req.body
@@ -810,7 +861,7 @@ const performance = {
             workTimeAssignReview(data.reviewResult, data.projectID, res)
         })
     },
-    /* 获取待审数量 */
+    // 获取待审数量
     getUnReviewProjectCount (req, res) {
         $http.userVerify(req, res, () => {
             let data = req.body
@@ -819,7 +870,7 @@ const performance = {
             fGetUnReviewProject(data, res)
         })
     },
-    /* 审核通过 */
+    // 审核通过
     submitReviewPass (req, res) {
         $http.userVerify(req, res, () => {
             let curTime = $time.formatTime()
@@ -828,16 +879,18 @@ const performance = {
             let sql = $sql.performance.submitReviewPass
             let arrayParams = [data.reviewKValue, data.reviewCofficient, data.reviewStatus, curTime, data.reviewComments, data.reviewer,
                 data.id]
-            $http.connPool(sql, arrayParams, (err, result) => {
-                if (err) {
-                    return $http.writeJson(res, {code: -2, message: '失败', errMsg: err})
+            setWorkTimeListPass(sql, arrayParams).then(() => {
+                if (data.reviewStatus === '1') {
+                    updateProjectProcess(data).then(() => {
+                        return $http.writeJson(res, { code: 1, message: '成功' })
+                    })
                 } else {
-                    return $http.writeJson(res, {code: 1, message: '成功'})
+                    return $http.writeJson(res, { code: 1, message: '成功' })
                 }
             })
         })
     },
-    /* 获取分配的工时 */
+    // 获取分配的工时
     getAssignWorkTime (req, res) {
         $http.userVerify(req, res, () => {
             let data = req.body

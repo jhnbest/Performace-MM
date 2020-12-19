@@ -24,7 +24,6 @@
       </el-table-column>
       <el-table-column label="指派人" align="center" prop="assigner"></el-table-column>
       <el-table-column label="总工时" align="center" prop="totalWorkTime"></el-table-column>
-      <el-table-column label="已获工时" align="center" prop="gettedWorkTime"></el-table-column>
       <el-table-column label="计划&进度" prop="planCompletion" align="center" v-if="this.fatherParams.searchType === 'unFilled'">
         <template slot-scope="scope">
           <span class="link-type" @click="handleFillIn(scope.row)">点击填报</span>
@@ -36,12 +35,10 @@
         </template>
       </el-table-column>
     </el-table>
-    <JJProjectPlanProcess v-if="showFlag.projectPlanProcess" ref="JJProjectPlanProcess"/>
   </div>
 </template>
 
 <script>
-    import JJProjectPlanProcess from './PlanProcessTable/JJProjectPlanProcess'
     import { getAssignProjectList } from '@/config/interface'
     export default {
       data () {
@@ -58,7 +55,7 @@
         }
       },
       methods: {
-        /* 初始化 */
+        // 初始化
         init () {
           if (this.reqFlag.getAssignProjectList) {
             this.reqFlag.getAssignProjectList = false
@@ -86,7 +83,7 @@
             return 'success-row'
           }
         },
-        /* 点击填报按钮事件 */
+        // 点击填报按钮事件
         handleFillIn (row) {
           console.log(this.fatherParams)
           this.$router.push({
@@ -138,7 +135,6 @@
         console.log('test.vue destroyed')
       },
       components: {
-        JJProjectPlanProcess
       },
       props: {
         fatherParams: {

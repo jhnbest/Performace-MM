@@ -49,11 +49,13 @@
     </div>
     <div>
       <el-row>
-        <el-col :span="3">
-          <h3 class="v-line-icon-yellow">其他项目</h3>
+        <el-col :xs="24" :sm="24" :lg="24" :xl="12">
+          <h3 class="v-line-icon-yellow">其他标准项目</h3>
+          <TEST :fatherParams="OtherStandData" @countFeedback="handleCountFeedbackOtherStand"/>
         </el-col>
-        <el-col :span="3">
-          <el-button size="mini" style="margin-top: 18px" type="primary">点击新增</el-button>
+        <el-col :xs="24" :sm="24" :lg="24" :xl="12">
+          <h3 class="v-line-icon-purple">其他非标项目</h3>
+          <TEST :fatherParams="OtherUnStandData" @countFeedback="handleCountFeedbackOtherUnStand"/>
         </el-col>
       </el-row>
     </div>
@@ -75,7 +77,7 @@
             }
           },
           JJData: {
-            projectTypeID: '基建类',
+            projectTypeID: 173,
             searchType: 'unFilled'
           },
           XXData: {
@@ -83,11 +85,19 @@
             searchType: 'unFilled'
           },
           JCPTData: {
-            projectTypeID: '基础平台类',
+            projectTypeID: 213,
             searchType: 'unFilled'
           },
           XSData: {
-            projectTypeID: '修缮类',
+            projectTypeID: 249,
+            searchType: 'unFilled'
+          },
+          OtherStandData: {
+            projectTypeID: 4,
+            searchType: 'unFilled'
+          },
+          OtherUnStandData: {
+            projectTypeID: 5,
             searchType: 'unFilled'
           },
           showFlag: true,
@@ -103,16 +113,22 @@
             this.XXData.searchType = 'unFilled'
             this.JCPTData.searchType = 'unFilled'
             this.XSData.searchType = 'unFilled'
+            this.OtherStandData.searchType = 'unFilled'
+            this.OtherUnStandData.searchType = 'unFilled'
           } else if (this.formData.selectType === '已填报') {
             this.JJData.searchType = 'Filled'
             this.XXData.searchType = 'Filled'
             this.JCPTData.searchType = 'Filled'
             this.XSData.searchType = 'Filled'
+            this.OtherStandData.searchType = 'Filled'
+            this.OtherUnStandData.searchType = 'Filled'
           } else if (this.formData.selectType === '已完成') {
             this.JJData.searchType = 'completed'
             this.XXData.searchType = 'completed'
             this.JCPTData.searchType = 'completed'
             this.XSData.searchType = 'completed'
+            this.OtherStandData.searchType = 'completed'
+            this.OtherUnStandData.searchType = 'completed'
           }
           this.$nextTick(() => {
             this.showFlag = true
@@ -137,6 +153,16 @@
           }
         },
         handleCountFeedbackJCPT (params) {
+          if (this.formData.selectType === '未填报') {
+            this.unFilledTotalCount += params
+          }
+        },
+        handleCountFeedbackOtherStand (params) {
+          if (this.formData.selectType === '未填报') {
+            this.unFilledTotalCount += params
+          }
+        },
+        handleCountFeedbackOtherUnStand (params) {
           if (this.formData.selectType === '未填报') {
             this.unFilledTotalCount += params
           }

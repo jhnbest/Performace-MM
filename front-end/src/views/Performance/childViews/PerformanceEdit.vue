@@ -310,7 +310,7 @@
                   setTimeout(() => {
                     it.formData.isShowProjectType = true
                   }, it.$store.state.refreshInterval)
-                  /* 遍历工时分配信息 */
+                  // 遍历工时分配信息
                   for (let item of data.workTimeAssign) {
                     if (item.userID !== it.$store.state.userInfo.id) {
                       multipleSelect.push(item.userID)
@@ -363,8 +363,6 @@
                     applyProcess: data.workTimeList[0].applyProcess,
                     apdID: data.workTimeList[0].apdID
                   }
-                  console.log('====')
-                  console.log(obj)
                   // obj.avaiableWorkTime = obj.baseWorkTime * obj.defaultKValue * obj.defaultCofficient
                   obj.workTimeAssign = defaultCurrentUserWorkTime
                   it.formData.workTypeTimeDetail.push(obj)
@@ -591,8 +589,9 @@
         },
         // 工时明细表K值和系数变化处理函数
         handleKValueCoffChange (row) {
-          row.avaiableWorkTime = row.baseWorkTime * row.defaultKValue * row.defaultCofficient
-          row.workTimeAssign[0].assignWorkTime = row.baseWorkTime * row.defaultKValue * row.defaultCofficient
+          row.avaiableWorkTime = row.baseWorkTime * row.defaultKValue * row.defaultCofficient * row.applyProcess * 0.01
+          row.avaiableWorkTime = Number(row.avaiableWorkTime.toFixed(1))
+          row.workTimeAssign[0].assignWorkTime = row.baseWorkTime * row.defaultKValue * row.defaultCofficient * row.applyProcess * 0.01
         }
       },
       components: {

@@ -59,7 +59,7 @@ const sqlMap = {
     selectProjectType: 'select projectTypeID, projectName from projecttypenew where projectParentID = ? and obsoleteStatus != 1',
     selectProjectTime: 'select projectTypeID, projectName, workTime, dynamicKValue, isConference, defaultAssignWorkTime from projecttypenew where projectTypeID = ?',
     addProject: 'insert into worktimelist (submitID, projectTypeID, applyKValue, reviewKValue, applyCofficient, reviewCofficient, submitTime, ' +
-        'updateTime, applyMonth, submitStatus, submitComments, avaiableWorkTime, applyProcess, apdID, aplID) values ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        'updateTime, applyMonth, submitStatus, submitComments, avaiableWorkTime, applyProcess, apdID, aplID, monthID) values ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
     addWorkAssign: 'insert into worktimeassign (userID, projectID, workTime, assignRole) values (?, ?, ?, ?)',
     updateProject: 'update worktimelist set submitID = ?, projectTypeID = ?, applyKValue = ?, reviewKValue = ?, applyCofficient = ?, ' +
         'reviewCofficient = ?, updateTime = ?, applyMonth = ?, submitStatus = ?, submitComments = ?, applyProcess = ?, ' +
@@ -121,10 +121,10 @@ const sqlMap = {
     getMonthProcess: 'select id, aPDID, year, type, January, February, March, April, May, June, July, August, September, ' +
         'October, November, December from monthprocess where aPDID = ? and year = ? and obsoleteStatus != 1',
     // getProjectDetailProcess: 'select id, aPDID, year, type, months, process from monthprocess where aPDID = ? and year = ?',
-    submitPlanProcessE: 'update assignprojectdetail set kValue = ?, coefficient = ?, avaiableWorkTime = ? where id = ?;' +
+    submitPlanProcessE: 'update assignprojectdetail set kValue = ?, coefficient = ? where id = ?;' +
         'update monthprocess set January = ?, February = ?, March = ?, April = ?, May = ?, June = ?, July = ?, August = ?, ' +
         'September = ?, October = ?, November = ?, December = ? where id = ?',
-    submitPlanProcessU: 'update assignprojectdetail set kValue = ?, coefficient = ?, avaiableWorkTime = ? where id = ?;' +
+    submitPlanProcessU: 'update assignprojectdetail set kValue = ?, coefficient = ? where id = ?;' +
         'insert into monthprocess (aPDID, year, type, January, February, March, April, May, June, July, August, September, ' +
         'October, November, December) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
     getAssignProjectStageByID: 'select January, February, March, April, May, June, July, August, September, October, November, December from monthprocess where ' +

@@ -182,12 +182,23 @@
               })
           }
         },
+        // 审核通过
         handleReviewPass (row, index) {
           if (row.workTimeAssignReviewStatus) {
             const url = submitReviewPass
             console.log(this.formData.workDetailTable)
+            let applyYear = this.$moment(row.applyMonth).year()
+            let applyMonth = this.$moment(row.applyMonth).month()
+            let applyMonthString = this.$common.MonthToString(String(applyMonth + 1))
             let params = {
               id: row.id,
+              apdID: row.apdID,
+              aplID: row.aplID,
+              monthID: row.monthID,
+              applyMonthString: applyMonthString,
+              applyProcess: row.applyProcess,
+              applyYear: applyYear,
+              applyMonth: applyMonth,
               reviewCofficient: row.reviewCofficient,
               reviewComments: row.reviewComments,
               reviewKValue: row.reviewKValue,
@@ -208,9 +219,9 @@
             this.$common.toast('请先审核工时分配', 'error', true)
           }
         },
+        // 驳回
         handleReviewReject (row) {
           const url = submitReviewPass
-          console.log(this.formData.workDetailTable)
           let params = {
             id: row.id,
             reviewCofficient: row.reviewCofficient,
@@ -230,9 +241,9 @@
               }
             })
         },
+        // 撤回
         handleWithdrawReject (row) {
           const url = submitReviewPass
-          console.log(this.formData.workDetailTable)
           let params = {
             id: row.id,
             reviewCofficient: null,

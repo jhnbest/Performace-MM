@@ -150,6 +150,14 @@ input[type="number"]{
 }
 /* 黄色短竖线 end */
 
+/* 紫色短竖线 start */
+.v-line-icon-purple{position: relative; padding-left: 20px;
+  &:before{
+    position: absolute; content: ""; width: 6px; height: 18px; left:10px; top: 50%; margin-top: -8px; border-radius: 2px; background: #f832de;
+  }
+}
+/* 黄色短竖线 end */
+
 /* 适配 start */
 @media screen and (max-width: 1440px){
   .main-search{

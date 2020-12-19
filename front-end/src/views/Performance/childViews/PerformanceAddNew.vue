@@ -28,6 +28,7 @@
         <br>
         <el-form-item label="项目类型" prop="projectType">
           <el-cascader
+            v-if="showFlag.projectType"
             v-model="formData.projectType"
             :options="projectTypeOptions"
             :props="props"
@@ -71,7 +72,14 @@
 <!--              </el-form-item>-->
 <!--            </template>-->
 <!--          </el-table-column>-->
-          <el-table-column label="项目阶段" prop="workType" align="center"></el-table-column>
+          <el-table-column label="项目阶段" prop="workType" align="center" v-if="formData.projectType[0][0] === 5">
+            <template slot-scope="scope">
+              <div>
+                <el-input v-model="scope.row.workType" size="mini"></el-input>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column label="项目阶段" prop="workType" align="center" v-else></el-table-column>
           <el-table-column label="基本工时" prop="baseWorkTime" align="center" width="80%"></el-table-column>
           <el-table-column label="K值" prop="defaultKValue" align="center" width="150%">
             <template slot-scope="scope">
@@ -137,7 +145,18 @@
               </el-input>
             </template>
           </el-table-column>
+          <el-table-column label="操作" align="center">
+            <template slot-scope="scope">
+              <div>
+                <el-button size="mini" type="danger" @click="handleDelete(scope.row, scope.$index)">删除</el-button>
+              </div>
+            </template>
+          </el-table-column>
         </el-table>
+        <br>
+        <div style="text-align: center" v-if="formData.projectType[0][0] === 5">
+          <el-button type="primary" size="mini" plain @click="addNewLine">新增一行</el-button>
+        </div>
         <br>
         <br>
         <br>
@@ -194,7 +213,7 @@
           formData: {
             title: this.$moment().format('YYYY-MM'),
             workTypeList: [],
-            projectType: [],
+            projectType: [[0]],
             participant: [],
             usersList: [],
             partWorkTime: 0,
@@ -256,7 +275,8 @@
             getWorkTimeNew: true
           },
           showFlag: {
-            workTimeAssign: false
+            workTimeAssign: false,
+            projectType: true
           },
           pickerOptions: {
             disabledDate (time) {
@@ -794,11 +814,30 @@
         },
         // 工时明细表K值和系数变化处理函数
         handleKValueCoffChange (row, index) {
-          console.log('=====')
           row.avaiableWorkTime = row.baseWorkTime * row.defaultKValue * row.defaultCofficient * row.applyProcess * 0.01
+          row.avaiableWorkTime = Number(row.avaiableWorkTime.toFixed(1))
           row.workTimeAssign[0].assignWorkTime = row.baseWorkTime * row.defaultKValue * row.defaultCofficient * row.applyProcess * 0.01
+        },
+        // 新增一行
+        addNewLine () {
+          let length = this.formData.workTypeTimeDetail.length
+          let obj = this.formData.workTypeTimeDetail[length - 1]
+          this.formData.workTypeTimeDetail.push(obj)
+        },
+        // 表格删除按钮
+        handleDelete (row, index) {
+          this.formData.workTypeTimeDetail.splice(index, 1)
+          this.formData.projectType.splice(index, 1)
+          console.log(this.formData.projectType)
+          console.log(this.formData.workTypeTimeDetail)
+          this.showFlag.projectType = false
+          let it = this
+          setTimeout(() => {
+            it.showFlag.projectType = true
+          }, it.$store.state.refreshInterval)
         }
       },
+
       components: {
         Assign
       },

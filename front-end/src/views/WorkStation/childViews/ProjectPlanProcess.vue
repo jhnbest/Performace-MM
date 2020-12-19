@@ -309,10 +309,16 @@
 </template>
 
 <script>
-  import { getAssignProjectDetail, submitPlanProcess, getMonthProcessDiff, workTimeSubmit, workTimeTemporary,
-    updateAssignProjectFilled } from '@/config/interface'
+  import {
+    getAssignProjectDetail,
+    getMonthProcessDiff,
+    submitPlanProcess,
+    updateAssignProjectFilled,
+    workTimeTemporary
+  } from '@/config/interface'
   import Assign from '@/components/Cop/workTimeAssign'
-    export default {
+
+  export default {
       data () {
         return {
           formData: {
@@ -508,6 +514,8 @@
             this.$http(url, params)
               .then(res => {
                 if (res.code === 1) {
+                  let data = res.data
+                  row.monthID = data.monthID
                   this.getAssignProjectDetail(this.$route.query.projectID)
                   this.reqFlag.savePlanProcess = true
                   this.$common.toast('保存成功', 'success', 'false')
@@ -557,7 +565,7 @@
             console.log('applyMonthPlanProcess')
             console.log(it.applyMonthPlanProcess)
             for (let item of it.applyMonthPlanProcess) {
-              if (item.process !== 100.0 && item.process !== 0.0 && item.type === 'fact' && item[applyMonthString] !== null) {
+              if (item.process !== 100.0 && item.type === 'fact' && item[applyMonthString] !== null) {
                 searchData.push(item)
               }
             }
@@ -605,10 +613,16 @@
                         processDiff: applyMonthProcess - lastMonthProcess,
                         applyProcess: applyMonthProcess,
                         apdID: item.sendParams.aPDID,
-                        aplID: item.aplID
+                        aplID: item.aplID,
+                        monthID: item.sendParams.id
                       }
                       obj.avaiableWorkTime = obj.baseWorkTime * obj.defaultKValue * obj.defaultCofficient *
                         (applyMonthProcess - lastMonthProcess) * 0.01
+                      // let avaiableWorkTimeTmp = obj.avaiableWorkTime.toString()
+                      // let index = avaiableWorkTimeTmp.indexOf('.')
+                      // let result = avaiableWorkTimeTmp.slice(0, index + 2)
+                      // obj.avaiableWorkTime = Number(result)
+                      obj.avaiableWorkTime = Number(obj.avaiableWorkTime.toFixed(1))
                       let defaultCurrentUserWorkTime = {
                         id: it.$store.state.userInfo.id,
                         groupName: it.$store.state.userInfo.groupName,
