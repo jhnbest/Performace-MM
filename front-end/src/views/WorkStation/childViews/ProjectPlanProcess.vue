@@ -23,10 +23,9 @@
                 resizable
                 :span-method="objectSpanMethod"
                 :height="tableMaxHeight">
-        <el-table-column label="项目阶段" align="center" prop="projectStage" fixed></el-table-column>
+        <el-table-column label="项目阶段" align="center" prop="projectStageName" fixed></el-table-column>
         <el-table-column label="标准工时" align="center" prop="baseWorkTime" width="50%"></el-table-column>
         <el-table-column label="K值" align="center" prop="kValue" width="50%"></el-table-column>
-        <el-table-column label="系数" align="center" prop="coefficient" width="60%"></el-table-column>
         <el-table-column label="类型" align="center" prop="type" width="50%">
           <template slot-scope="scope">
             <span>{{scope.row.type | processTypeFilter}}</span>
@@ -274,7 +273,7 @@
       <div>
         <el-table :data="submitParams.data" height="250">
           <el-table-column label="序号" align="center" type="index"></el-table-column>
-          <el-table-column label="工时项目" align="center" prop="projectStage"></el-table-column>
+          <el-table-column label="工时项目" align="center" prop="projectStageName"></el-table-column>
           <el-table-column label="上月进展" align="center" prop="lastMonthProcess">
             <template slot-scope="scope">
               <span>{{scope.row.lastMonthProcess + '%'}}</span>
@@ -536,7 +535,7 @@
         },
         // 表格列合并方法
         objectSpanMethod ({ row, column, rowIndex, columnIndex }) {
-          if (columnIndex === 0 || columnIndex === 1 || columnIndex === 2 || columnIndex === 3) {
+          if (columnIndex === 0 || columnIndex === 1 || columnIndex === 2) {
             if (rowIndex % 2 === 0) {
               return {
                 rowspan: 2,
@@ -565,7 +564,7 @@
             console.log('applyMonthPlanProcess')
             console.log(it.applyMonthPlanProcess)
             for (let item of it.applyMonthPlanProcess) {
-              if (item.process !== 100.0 && item.type === 'fact' && item[applyMonthString] !== null) {
+              if (item.isFinish !== 1 && item.type === 'fact' && item[applyMonthString] !== null) {
                 searchData.push(item)
               }
             }
@@ -614,7 +613,8 @@
                         applyProcess: applyMonthProcess,
                         apdID: item.sendParams.aPDID,
                         aplID: item.aplID,
-                        monthID: item.sendParams.id
+                        monthID: item.sendParams.id,
+                        projectStageName: item.projectStageName
                       }
                       obj.avaiableWorkTime = obj.baseWorkTime * obj.defaultKValue * obj.defaultCofficient *
                         (applyMonthProcess - lastMonthProcess) * 0.01

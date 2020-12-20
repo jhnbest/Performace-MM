@@ -288,7 +288,8 @@ async function insertAssignProjectDetail(sql, arrayParams, data, insertID, res) 
         let baseWorkTime = item.workTime
         let kValue = item.kValue
         let avaiableWorkTime = item.avaiableWorkTime
-        arrayParams = [aplID, projectStage, baseWorkTime, kValue, avaiableWorkTime]
+        let projectStageName = item.workType
+        arrayParams = [aplID, projectStage, projectStageName, baseWorkTime, kValue, avaiableWorkTime]
         await insertAssignProjectDetailOP(sql, arrayParams).then(res1 => {
             let obj = {
                 projectStage: projectStage,
@@ -364,7 +365,31 @@ function updateMonthProcessObsoleteStatus(data) {
     let arrayParams = []
     for (let item of data) {
         arrayParams.push(item.id)
+        sql += '?,'
     }
+    sql = sql.substr(0, sql.length - 1)
+    sql += ')'
+    return new Promise(function (resolve, reject) {
+        $http.connPool(sql, arrayParams, (err, result) => {
+            if (err) {
+                reject(-1)
+            } else {
+                result = JSON.parse(JSON.stringify(result))
+                resolve(result)
+            }
+        })
+    })
+}
+
+function updateWorkTimeAssignObsoleteStatus(data) {
+    let sql = $sql.workStation.updateWorkTimeAssignObsoleteStatus
+    let arrayParams = []
+    for (let item of data) {
+        arrayParams.push(item.id)
+        sql += '?,'
+    }
+    sql = sql.substr(0, sql.length - 1)
+    sql += ')'
     return new Promise(function (resolve, reject) {
         $http.connPool(sql, arrayParams, (err, result) => {
             if (err) {
@@ -404,7 +429,7 @@ function updateProjectTotalWorkTime(sql, arrayParams) {
 }
 
 const workStation = {
-    // 获取未完成的指派任务列表
+    // 获取指派任务列表
     getAssignProjectList (req, res) {
         $http.userVerify(req, res, () => {
             let data = req.body
@@ -503,14 +528,18 @@ const workStation = {
         return new Promise(function (resolve, reject) {
             let sql = null
             let arrayParams = null
+            let isFinish = 0
+            if (data.applyProcess === 100) {
+                isFinish = 1
+            }
             if (data.id !== null) {
                 sql = $sql.workStation.submitPlanProcessE
-                arrayParams = [data.kValue, data.coefficient, data.aPDID, data.January, data.February, data.March,
+                arrayParams = [data.kValue, data.coefficient, isFinish, data.aPDID, data.January, data.February, data.March,
                     data.April, data.May, data.June, data.July, data.August, data.September, data.October, data.November, data.December,
                     data.id]
             } else {
                 sql = $sql.workStation.submitPlanProcessU
-                arrayParams = [data.kValue, data.coefficient, data.aPDID, data.aPDID, data.year, data.type,
+                arrayParams = [data.kValue, data.coefficient, isFinish, data.aPDID, data.aPDID, data.year, data.type,
                     data.January, data.February, data.March, data.April, data.May, data.June, data.July, data.August, data.September,
                     data.October, data.November, data.December]
             }
@@ -575,20 +604,21 @@ const workStation = {
     submitPlanProcess (req, res) {
         let data = req.body
         console.log(data)
-        this.saveProcess(data).then(res0 => { //保存进展
-            if (data.type === 'fact') { //填写的是实际进展
-                this.projectStageProcessCal(data.aPDID, data.year).then(res1 => { //计算该阶段进展
-                    this.projectStageProcessUpdate(data.aPDID, res1).then(res2 => { //更新该阶段进展
-                        this.projectProcessCal(res2).then(res3 => { //计算项目总进展
-                            this.projectProcessUpdate(res2, res3).then(() => { //更新项目总进展
-                                return $http.writeJson(res, {code: 1, data: res0, message: '成功'})
-                            })
-                        })
-                    })
-                })
-            } else if (data.type === 'plan') {
-                return $http.writeJson(res, {code: 1, message: '成功'})
-            }
+        workStation.saveProcess(data).then((res0) => { //保存进展
+            // if (data.type === 'fact') { //填写的是实际进展
+            //     this.projectStageProcessCal(data.aPDID, data.year).then(res1 => { //计算该阶段进展
+            //         this.projectStageProcessUpdate(data.aPDID, res1).then(res2 => { //更新该阶段进展
+            //             this.projectProcessCal(res2).then(res3 => { //计算项目总进展
+            //                 this.projectProcessUpdate(res2, res3).then(() => { //更新项目总进展
+            //                     return $http.writeJson(res, {code: 1, data: res0, message: '成功'})
+            //                 })
+            //             })
+            //         })
+            //     })
+            // } else if (data.type === 'plan') {
+            //     return $http.writeJson(res, {code: 1, message: '成功'})
+            // }
+            return $http.writeJson(res, {code: 1, data: res0, message: '成功'})
         })
     },
     // 保存指派项目
@@ -603,12 +633,16 @@ const workStation = {
         let assignerID = data.userId
         let totalWorkTime = 0
         let projectLevel = data.projectLevel
+        let reviewStatus = 1
+        if (projectTypeID === 5) { //非标项目
+            reviewStatus = 0
+        }
         for (let item of data.tableData) {
             totalWorkTime += item.workTime
         }
         let curTime = $time.formatTime()
         sql = $sql.workStation.insertAssignProjectList
-        arrayParams = [userID, curTime, projectTypeID, projectName, assignerID, totalWorkTime, projectLevel]
+        arrayParams = [userID, curTime, projectTypeID, projectName, assignerID, totalWorkTime, projectLevel, reviewStatus]
         insertAssignProjectList(sql, arrayParams).then( res1 => {
             console.log(res1)
             let insertID = res1.insertId
@@ -714,8 +748,10 @@ const workStation = {
         console.log(data)
         let sql = $sql.workStation.deleteAssignProjectList + ';'
             + $sql.workStation.deleteAssignProjectDetail + ';'
-            + $sql.workStation.getAssignProjectDetailID
-        let arrayParams = [data.id, data.id, data.id]
+            + $sql.workStation.getAssignProjectDetailID + ';'
+            + $sql.workStation.deleteWorkTimeList + ';'
+            + $sql.workStation.getWorkTimeAssignItem
+        let arrayParams = [data.id, data.id, data.id, data.id, data.id]
         $http.userVerify(req, res, () =>{
             $http.connPool(sql, arrayParams, (err, result) => {
                 if (err) {
@@ -724,9 +760,13 @@ const workStation = {
                     result[0] = JSON.parse(JSON.stringify(result[0]))
                     result[1] = JSON.parse(JSON.stringify(result[1]))
                     result[2] = JSON.parse(JSON.stringify(result[2]))
+                    result[3] = JSON.parse(JSON.stringify(result[3]))
+                    result[4] = JSON.parse(JSON.stringify(result[4]))
                     console.log(result)
                     updateMonthProcessObsoleteStatus(result[2]).then(res1 => {
-                        return $http.writeJson(res, { code: 1, message: '成功' })
+                        updateWorkTimeAssignObsoleteStatus(result[4]).then(res2 => {
+                            return $http.writeJson(res, { code: 1, message: '成功' })
+                        })
                     })
                 }
             })
@@ -743,7 +783,8 @@ const workStation = {
         let kValue = data.tableData[0].kValue
         let coefficient = data.tableData[0].coefficient
         let avaiableWorkTime = data.tableData[0].avaiableWorkTime
-        let arrayParams = [kValue, coefficient, avaiableWorkTime, data.apdID, data.aplID]
+        let projectStageName = data.tableData[0].workType
+        let arrayParams = [projectStageName, kValue, coefficient, avaiableWorkTime, data.apdID, data.aplID]
         let curTime = $time.formatTime()
         updateAssignWorkDetail(sql, arrayParams).then((res1) => { // 更新项目明细
             console.log(res1)

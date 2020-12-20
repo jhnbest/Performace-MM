@@ -71,7 +71,7 @@
           </el-table-column>
           <el-table-column label="申报月份" align="center" prop="applyMonth"></el-table-column>
           <el-table-column label="项目名称" align="center" prop="projectName"></el-table-column>
-          <el-table-column label="项目阶段" align="center" prop="projectStage" width="200%"></el-table-column>
+          <el-table-column label="项目阶段" align="center" prop="projectStageName" width="200%"></el-table-column>
           <el-table-column label="工时详情" align="center">
             <template slot-scope="scope">
               <span class="link-type" @click="handleCoopInfo(scope.row)">点击查看</span>
@@ -169,6 +169,7 @@ import { getProjectType, getProjectList, changeSubmitStatus, deleteProject, getA
             this.getAssignWorkTimes(res)
           })
         },
+        // 获取项目类型
         getProjectType () {
           const url = getProjectType
           if (this.reqFlag.getProjectType) {
@@ -279,7 +280,7 @@ import { getProjectType, getProjectList, changeSubmitStatus, deleteProject, getA
                   if (res.code === 1) {
                     this.$common.toast('操作成功', 'success', false)
                   } else {
-                    this.$common.toast('操作失败', 'warning', false)
+                    this.$common.toast('操作失败', 'danger', false)
                   }
                   this.reqFlag.deleteProject = true
                 })

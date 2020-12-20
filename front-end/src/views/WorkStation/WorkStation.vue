@@ -47,7 +47,7 @@
         </el-col>
       </el-row>
     </div>
-    <div>
+    <div v-if="showFlag">
       <el-row>
         <el-col :xs="24" :sm="24" :lg="24" :xl="12">
           <h3 class="v-line-icon-yellow">其他标准项目</h3>

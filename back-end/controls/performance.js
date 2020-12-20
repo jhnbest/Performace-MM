@@ -203,6 +203,7 @@ async function workTimeInsert(data, res, operate) {
     console.log('====performance.js workTimeInsert')
     let workTimeInsertResult = null
     let workTimeAssignResult = null
+    console.log(data)
     for (let i = 0; i < data.data.length; i++) { // 逐条插入工时项目
         workTimeInsertResult = await workTimeInsertOP(data, i, operate)
         if (workTimeInsertResult.err) {
@@ -512,6 +513,7 @@ function updateProjectProcess(data) {
             aPDID: data.apdID,
             year: data.applyYear,
             type: 'fact',
+            applyProcess: data.applyProcess,
             January: null,
             February: null,
             March: null,
@@ -541,7 +543,7 @@ function updateProjectProcess(data) {
 }
 
 const performance = {
-    /*添加周报 start*/
+    // 加周报 start
     add (req, res) {
         let params = req.body
         $http.userVerify(req, res, () => {
@@ -563,7 +565,7 @@ const performance = {
             }
         })
     },
-    /*查找申报工时类型*/
+    // 找申报工时类型
     workTypeList (req, res) {
         let params = req.body
         let sql = ''
@@ -615,7 +617,7 @@ const performance = {
             }
         })
     },
-    /* 计算工时数 */
+    // 计算工时数
     getWorkTime (req, res) {
         let params = req.body
         let sql = ''
@@ -654,7 +656,7 @@ const performance = {
             }
         })
     },
-    /* 获取项目类型 */
+    // 获取项目类型
     getProjectType (req, res) {
         let params = req.body
         let sql = ''
@@ -672,9 +674,7 @@ const performance = {
                 } else {
                     result = JSON.stringify(result)
                     result = JSON.parse(result)
-                    console.log(result)
                     setTimeout(function () {
-                        console.log(result)
                         return $http.writeJson(res, {code: 1, data: result, message: '获取列表成功'})
                     }, 1000)
                     projectTypeRecursion(result)
@@ -732,10 +732,10 @@ const performance = {
             if (data.searchType === 'review') {  //审核页面请求
                 if (data.reviewType === 'unReview') {
                     sql= sqlGetProjectTotal + ' and reviewStatus = 0' + '; ' +
-                        sqlGetProjectList + ' and submitStatus = 1' + ' and reviewStatus = 0'
+                        sqlGetProjectList + ' and wl.submitStatus = 1' + ' and wl.reviewStatus = 0'
                 } else if (data.reviewType === 'reviewed') {
                     sql= sqlGetProjectTotal + ' and reviewStatus != 0' + '; ' +
-                        sqlGetProjectList + ' and submitStatus = 1' + ' and reviewStatus != 0'
+                        sqlGetProjectList + ' and wl.submitStatus = 1' + ' and wl.reviewStatus != 0'
                 }
             } else {  //申报页面请求
                 sqlGetProjectTotal = $sql.performance.getProjectListTotalNew

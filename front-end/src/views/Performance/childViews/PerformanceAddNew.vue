@@ -72,15 +72,20 @@
 <!--              </el-form-item>-->
 <!--            </template>-->
 <!--          </el-table-column>-->
-          <el-table-column label="项目阶段" prop="workType" align="center" v-if="formData.projectType[0][0] === 5">
+          <el-table-column label="项目阶段" align="center">
             <template slot-scope="scope">
               <div>
-                <el-input v-model="scope.row.workType" size="mini"></el-input>
+                <el-input v-if="projectStageEditable"  v-model="scope.row.workType" size="mini"></el-input>
+                <span v-else>{{scope.row.workType}}</span>
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="项目阶段" prop="workType" align="center" v-else></el-table-column>
-          <el-table-column label="基本工时" prop="baseWorkTime" align="center" width="80%"></el-table-column>
+          <el-table-column label="基本工时" prop="baseWorkTime" align="center" width="80%">
+            <template slot-scope="scope">
+              <el-input v-if="projectStageEditable"  v-model.number="scope.row.baseWorkTime" size="mini"></el-input>
+              <span v-else>{{scope.row.baseWorkTime}}</span>
+            </template>
+          </el-table-column>
           <el-table-column label="K值" prop="defaultKValue" align="center" width="150%">
             <template slot-scope="scope">
               <el-form-item
@@ -99,7 +104,7 @@
               </el-form-item>
             </template>
           </el-table-column>
-          <el-table-column label="系数" align="center" width="150%">
+          <el-table-column label="次数" align="center" width="150%">
             <template slot-scope="scope">
               <el-form-item :prop="'workTypeTimeDetail.' + scope.$index + '.defaultCofficient'"
                             :rules="formRules.Cofficient"
@@ -145,7 +150,7 @@
               </el-input>
             </template>
           </el-table-column>
-          <el-table-column label="操作" align="center">
+          <el-table-column label="操作" align="center" width="100%">
             <template slot-scope="scope">
               <div>
                 <el-button size="mini" type="danger" @click="handleDelete(scope.row, scope.$index)">删除</el-button>
@@ -154,7 +159,7 @@
           </el-table-column>
         </el-table>
         <br>
-        <div style="text-align: center" v-if="formData.projectType[0][0] === 5">
+        <div style="text-align: center" v-if="projectStageEditable">
           <el-button type="primary" size="mini" plain @click="addNewLine">新增一行</el-button>
         </div>
         <br>
@@ -310,22 +315,33 @@
           if (this.reqFlag.add) {
             this.reqFlag.add = false
             let title = this.formData.title
-            let params = {
-              submitType: 'insert',
-              submitDate: title,
-              data: this.formData.workTypeTimeDetail
+            let tableDataCopy = []
+            for (let item of this.formData.workTypeTimeDetail) {
+              if (item.avaiableWorkTime !== 0) {
+                tableDataCopy.push(item)
+              }
             }
-            this.$http(url, params)
-              .then(res => {
-                if (res.code === 1) {
-                  this.$common.toast('添加成功', 'success', false)
-                  this.onCancel(formData)
-                } else {
-                  this.$common.toast('添加失败', 'error', false)
-                  this.onCancel(formData)
-                }
-                this.reqFlag.add = true
-              })
+            if (tableDataCopy.length !== 0) {
+              let params = {
+                submitType: 'insert',
+                submitDate: title,
+                data: tableDataCopy
+              }
+              this.$http(url, params)
+                .then(res => {
+                  if (res.code === 1) {
+                    this.$common.toast('添加成功', 'success', false)
+                    this.onCancel(formData)
+                  } else {
+                    this.$common.toast('添加失败', 'error', false)
+                    this.onCancel(formData)
+                  }
+                  this.reqFlag.add = true
+                })
+            } else {
+              this.$common.toast('添加成功', 'success', false)
+              this.onCancel(formData)
+            }
           }
         },
         // 提交项目进展
@@ -373,7 +389,8 @@
               kValue: item.defaultKValue,
               projectManagerID: this.$store.state.userInfo.id,
               projectTypeID: item.projectTypeID,
-              workTime: item.baseWorkTime
+              workTime: item.baseWorkTime,
+              workType: item.workType
             }
             params.tableData.push(obj)
           }
@@ -418,23 +435,34 @@
           if (this.reqFlag.add) {
             this.reqFlag.add = false
             let title = this.formData.title
-            let params = {
-              submitType: 'insert',
-              submitDate: title,
-              data: this.formData.workTypeTimeDetail
+            let tableDataCopy = []
+            for (let item of this.formData.workTypeTimeDetail) {
+              if (item.avaiableWorkTime !== 0) {
+                tableDataCopy.push(item)
+              }
             }
-            this.$http(url, params)
-              .then(res => {
-                if (res.code === 1) {
-                  this.$common.toast('暂存成功', 'success', false)
-                  this.onCancel(formData)
-                } else {
-                  console.log(res.code)
-                  this.$common.toast('添加失败', 'error', false)
-                  this.onCancel(formData)
-                }
-                this.reqFlag.add = true
-              })
+            if (tableDataCopy.length !== 0) {
+              let params = {
+                submitType: 'insert',
+                submitDate: title,
+                data: this.formData.workTypeTimeDetail
+              }
+              this.$http(url, params)
+                .then(res => {
+                  if (res.code === 1) {
+                    this.$common.toast('暂存成功', 'success', false)
+                    this.onCancel(formData)
+                  } else {
+                    console.log(res.code)
+                    this.$common.toast('添加失败', 'error', false)
+                    this.onCancel(formData)
+                  }
+                  this.reqFlag.add = true
+                })
+            } else {
+              this.$common.toast('暂存成功', 'success', false)
+              this.onCancel(formData)
+            }
           }
         },
         // 暂存工时申报
@@ -540,7 +568,7 @@
           console.log(difference)
           let tableLen = tableItems.length
           params.checkID = difference
-          if (selectItem.length !== 0) {
+          if (selectLen !== 0) {
             params.parentID = selectItem[0][0]
           }
           if (selectLen > tableLen) { // 选中的数目大于列表中的数目
@@ -590,6 +618,7 @@
             let deleteIndex = null
             console.log(difference)
             for (let diff of difference) {
+              console.log(this.formData.workTypeTimeDetail)
               for (let i = 0; i < this.formData.workTypeTimeDetail.length; i++) {
                 if (this.formData.workTypeTimeDetail[i].projectTypeID === diff) {
                   deleteIndex = i
@@ -818,26 +847,42 @@
           row.avaiableWorkTime = Number(row.avaiableWorkTime.toFixed(1))
           row.workTimeAssign[0].assignWorkTime = row.baseWorkTime * row.defaultKValue * row.defaultCofficient * row.applyProcess * 0.01
         },
-        // 新增一行
-        addNewLine () {
-          let length = this.formData.workTypeTimeDetail.length
-          let obj = this.formData.workTypeTimeDetail[length - 1]
-          this.formData.workTypeTimeDetail.push(obj)
-        },
-        // 表格删除按钮
-        handleDelete (row, index) {
-          this.formData.workTypeTimeDetail.splice(index, 1)
-          this.formData.projectType.splice(index, 1)
-          console.log(this.formData.projectType)
-          console.log(this.formData.workTypeTimeDetail)
+        // 手动刷新项目类型
+        refreshSelectProjectType () {
           this.showFlag.projectType = false
           let it = this
           setTimeout(() => {
             it.showFlag.projectType = true
           }, it.$store.state.refreshInterval)
+        },
+        // 新增一行
+        addNewLine () {
+          let tableLength = this.formData.workTypeTimeDetail.length
+          let obj = JSON.parse(JSON.stringify(this.formData.workTypeTimeDetail[tableLength - 1]))
+          let selectLength = this.formData.projectType.length
+          this.formData.workTypeTimeDetail.push(obj)
+          obj = JSON.parse(JSON.stringify(this.formData.projectType[selectLength - 1]))
+          this.formData.projectType.push(obj)
+          this.refreshSelectProjectType()
+          console.log(this.formData.workTypeTimeDetail)
+        },
+        // 表格删除按钮
+        handleDelete (row, index) {
+          this.formData.workTypeTimeDetail.splice(index, 1)
+          this.formData.projectType.splice(index, 1)
+          this.showFlag.projectType = false
+          this.refreshSelectProjectType()
         }
       },
-
+      computed: {
+        projectStageEditable () {
+          if (this.formData.projectType.length === 0) {
+            return false
+          } else {
+            return this.formData.projectType[0][0] === 5
+          }
+        }
+      },
       components: {
         Assign
       },

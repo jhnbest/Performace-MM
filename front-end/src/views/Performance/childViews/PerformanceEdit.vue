@@ -57,7 +57,14 @@
           stripe
           style="width: 97%;margin: auto">
           <el-table-column type="index" align="center" label="序号"></el-table-column>
-          <el-table-column label="项目类型" prop="workType" align="center"></el-table-column>
+          <el-table-column label="项目阶段" align="center">
+            <template slot-scope="scope">
+              <div>
+                <el-input v-if="projectStageEditable"  v-model="scope.row.workType" size="mini"></el-input>
+                <span v-else>{{scope.row.workType}}</span>
+              </div>
+            </template>
+          </el-table-column>
           <el-table-column label="基本工时" prop="baseWorkTime" align="center" width="80%"></el-table-column>
           <el-table-column label="K值" prop="defaultKValue" align="center" width="150%">
             <template slot-scope="scope">
@@ -77,7 +84,7 @@
               </el-form-item>
             </template>
           </el-table-column>
-          <el-table-column label="系数" align="center" width="150%">
+          <el-table-column label="次数" align="center" width="150%">
             <template slot-scope="scope">
               <el-form-item :prop="'workTypeTimeDetail.' + scope.$index + '.defaultCofficient'"
                             :rules="formRules.Cofficient"
@@ -123,7 +130,18 @@
               </el-input>
             </template>
           </el-table-column>
+          <el-table-column label="操作" align="center" width="100%">
+            <template slot-scope="scope">
+              <div>
+                <el-button size="mini" type="danger" @click="handleDelete(scope.row, scope.$index)">删除</el-button>
+              </div>
+            </template>
+          </el-table-column>
         </el-table>
+        <br>
+        <div style="text-align: center" v-if="projectStageEditable">
+          <el-button type="primary" size="mini" plain @click="addNewLine">新增一行</el-button>
+        </div>
       </el-form>
       <Assign v-if="showFlag.workTimeAssign" ref="workTimeAssign" @assignDetail="handleAssign"/>
     </div>
@@ -316,7 +334,7 @@
                       multipleSelect.push(item.userID)
                     }
                     workTimeAssignInsertID.push(item.id)
-                    /* 插入填报人信息 */
+                    // 插入填报人信息
                     if (item.userID === it.$store.state.userInfo.id) {
                       let obj = {
                         id: item.userID,
@@ -328,7 +346,7 @@
                       }
                       defaultCurrentUserWorkTime.push(obj)
                     }
-                    /* 插入协作者信息 */
+                    // 插入协作者信息
                     tmp = it.formData.usersList[1].options.find((iItem) => {
                       if (iItem.id === item.userID) {
                         let obj = {
@@ -347,7 +365,6 @@
                   let obj = {
                     projectTypeID: data.workTimeList[0].projectTypeID,
                     projectName: data.workTimeList[0].projectName,
-                    workType: data.projectName,
                     baseWorkTime: data.workTime,
                     defaultKValue: data.workTimeList[0].applyKValue,
                     dynamicKValue: data.dynamicKValue,
@@ -361,7 +378,8 @@
                     isConference: data.isConference,
                     defaultAssignWorkTime: data.defaultAssignWorkTime,
                     applyProcess: data.workTimeList[0].applyProcess,
-                    apdID: data.workTimeList[0].apdID
+                    apdID: data.workTimeList[0].apdID,
+                    workType: data.workTimeList[0].projectStageName
                   }
                   // obj.avaiableWorkTime = obj.baseWorkTime * obj.defaultKValue * obj.defaultCofficient
                   obj.workTimeAssign = defaultCurrentUserWorkTime
@@ -377,23 +395,34 @@
           if (this.reqFlag.edit) {
             this.reqFlag.edit = false
             let title = this.formData.title
-            let params = {
-              projectID: this.id,
-              submitType: 'update',
-              submitDate: title,
-              data: this.formData.workTypeTimeDetail
+            let tableDataCopy = []
+            for (let item of this.formData.workTypeTimeDetail) {
+              if (item.avaiableWorkTime !== 0) {
+                tableDataCopy.push(item)
+              }
             }
-            this.$http(url, params)
-              .then(res => {
-                if (res.code === 1) {
-                  this.$common.toast('提交成功', 'success', false)
-                  this.onCancel(formData)
-                } else {
-                  this.$common.toast('提交失败', 'success', false)
-                  this.onCancel(formData)
-                }
-                this.reqFlag.edit = true
-              })
+            if (tableDataCopy.length !== 0) {
+              let params = {
+                projectID: this.id,
+                submitType: 'update',
+                submitDate: title,
+                data: tableDataCopy
+              }
+              this.$http(url, params)
+                .then(res => {
+                  if (res.code === 1) {
+                    this.$common.toast('提交成功', 'success', false)
+                    this.onCancel(formData)
+                  } else {
+                    this.$common.toast('提交失败', 'success', false)
+                    this.onCancel(formData)
+                  }
+                  this.reqFlag.edit = true
+                })
+            } else {
+              this.$common.toast('提交成功', 'success', false)
+              this.onCancel(formData)
+            }
           }
         },
         // 提交至项目明细列表
@@ -416,7 +445,8 @@
               projectTypeID: item.projectTypeID,
               workTime: item.avaiableWorkTime,
               applyProcess: item.applyProcess,
-              coefficient: item.defaultCofficient
+              coefficient: item.defaultCofficient,
+              workType: item.workType
             }
             params.tableData.push(obj)
           }
@@ -448,25 +478,35 @@
             this.reqFlag.add = false
           }
           let title = this.formData.title
-
-          let params = {
-            projectID: this.id,
-            submitType: 'update',
-            submitDate: title,
-            data: this.formData.workTypeTimeDetail
+          let tableDataCopy = []
+          for (let item of this.formData.workTypeTimeDetail) {
+            if (item.avaiableWorkTime !== 0) {
+              tableDataCopy.push(item)
+            }
           }
-          this.$http(url, params)
-            .then(res => {
-              if (res.code === 1) {
-                this.$common.toast('暂存成功', 'success', false)
-                this.onCancel(formData)
-              } else {
-                console.log(res.code)
-                this.$common.toast('暂存失败', 'success', false)
-                this.onCancel(formData)
-              }
-              this.reqFlag.add = true
-            })
+          if (tableDataCopy.length !== 0) {
+            let params = {
+              projectID: this.id,
+              submitType: 'update',
+              submitDate: title,
+              data: this.formData.workTypeTimeDetail
+            }
+            this.$http(url, params)
+              .then(res => {
+                if (res.code === 1) {
+                  this.$common.toast('暂存成功', 'success', false)
+                  this.onCancel(formData)
+                } else {
+                  console.log(res.code)
+                  this.$common.toast('暂存失败', 'success', false)
+                  this.onCancel(formData)
+                }
+                this.reqFlag.add = true
+              })
+          } else {
+            this.$common.toast('暂存成功', 'success', false)
+            this.onCancel(formData)
+          }
         },
         // 暂存工时申报
         onTemporaryWorkTime (formData) {
@@ -495,7 +535,6 @@
               .then(res => {
                 if (res.code === 1) {
                   let data = res.data
-                  console.log(data)
                   this.projectTypeOptions = data
                 }
                 this.reqFlag.getProjectType = true
@@ -592,6 +631,33 @@
           row.avaiableWorkTime = row.baseWorkTime * row.defaultKValue * row.defaultCofficient * row.applyProcess * 0.01
           row.avaiableWorkTime = Number(row.avaiableWorkTime.toFixed(1))
           row.workTimeAssign[0].assignWorkTime = row.baseWorkTime * row.defaultKValue * row.defaultCofficient * row.applyProcess * 0.01
+        },
+        // 新增一行
+        addNewLine () {
+          let tableLength = this.formData.workTypeTimeDetail.length
+          let obj = JSON.parse(JSON.stringify(this.formData.workTypeTimeDetail[tableLength - 1]))
+          let selectLength = this.formData.projectType.length
+          this.formData.workTypeTimeDetail.push(obj)
+          obj = JSON.parse(JSON.stringify(this.formData.projectType[selectLength - 1]))
+          this.formData.projectType.push(obj)
+          this.refreshSelectProjectType()
+          console.log(this.formData.workTypeTimeDetail)
+        },
+        // 表格删除按钮
+        handleDelete (row, index) {
+          this.formData.workTypeTimeDetail.splice(index, 1)
+          this.formData.projectType.splice(index, 1)
+          this.showFlag.projectType = false
+          this.refreshSelectProjectType()
+        }
+      },
+      computed: {
+        projectStageEditable () {
+          if (this.formData.projectType.length === 0) {
+            return false
+          } else {
+            return this.formData.projectType[0][0] === 5
+          }
         }
       },
       components: {

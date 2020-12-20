@@ -1,5 +1,5 @@
 <template>
-  <div class="main-content">
+  <div class="main-content" v-if="showFlag.isFresh">
     <el-table
       row-key="id"
       :tree-props="{children: 'children'}"
@@ -22,7 +22,14 @@
           <el-progress :text-inside="true" :stroke-width="26" :percentage="scope.row.process"></el-progress>
         </template>
       </el-table-column>
-      <el-table-column label="指派人" align="center" prop="assigner"></el-table-column>
+      <el-table-column v-if="this.fatherParams.projectTypeID !== 5" label="指派人" align="center" prop="assigner"></el-table-column>
+      <el-table-column v-else label="审核状态" align="center">
+        <template slot-scope="scope">
+          <el-tag :type="scope.row.reviewStatus | reviewStatusTypeFilter">
+            {{scope.row.reviewStatus | reviewStatusStringFilter}}
+          </el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="总工时" align="center" prop="totalWorkTime"></el-table-column>
       <el-table-column label="计划&进度" prop="planCompletion" align="center" v-if="this.fatherParams.searchType === 'unFilled'">
         <template slot-scope="scope">
@@ -34,12 +41,17 @@
           <span class="link-type" @click="handleFillIn(scope.row)">重新填报</span>
         </template>
       </el-table-column>
+      <el-table-column v-if="this.fatherParams.projectTypeID === 5" label="操作" align="center">
+        <template slot-scope="scope">
+          <el-button type="danger" size="mini" @click="handleDelete(scope.row)">删除</el-button>
+        </template>
+      </el-table-column>
     </el-table>
   </div>
 </template>
 
 <script>
-    import { getAssignProjectList } from '@/config/interface'
+    import { getAssignProjectList, deleteAssignProject } from '@/config/interface'
     export default {
       data () {
         return {
@@ -47,10 +59,12 @@
             tableData: []
           },
           showFlag: {
-            projectPlanProcess: false
+            projectPlanProcess: false,
+            isFresh: true
           },
           reqFlag: {
-            getAssignProjectList: true
+            getAssignProjectList: true,
+            deleteProject: true
           }
         }
       },
@@ -95,6 +109,33 @@
               process: row.process
             }
           })
+        },
+        // 删除按钮
+        handleDelete (row) {
+          console.log(row)
+          this.$common.msgBox('confirm', '操作提示', '此操作将删除所有与该项目相关的工时申报（包括已获得工时），确定删除？', () => {
+            if (this.reqFlag.deleteProject) {
+              this.reqFlag.deleteProject = false
+              const url = deleteAssignProject
+              let params = {
+                id: row.id
+              }
+              this.$http(url, params)
+                .then(res => {
+                  if (res.code === 1) {
+                    this.$common.toast('操作成功', 'success', false)
+                  } else {
+                    this.$common.toast('操作失败', 'danger', false)
+                  }
+                  this.showFlag.isFresh = false
+                  this.init()
+                  setTimeout(() => {
+                    this.showFlag.isFresh = true
+                  }, this.$store.state.refreshInterval)
+                  this.reqFlag.deleteProject = true
+                })
+            }
+          })
         }
       },
       filters: {
@@ -125,6 +166,30 @@
             default:
               return '错误'
           }
+        },
+        reviewStatusTypeFilter (reviewStatus) {
+          switch (reviewStatus) {
+            case 0:
+              return 'info'
+            case 1:
+              return 'success'
+            case 2:
+              return 'danger'
+            default:
+              return 'danger'
+          }
+        },
+        reviewStatusStringFilter (reviewStatus) {
+            switch (reviewStatus) {
+              case 0:
+                return '未审核'
+              case 1:
+                return '通过'
+              case 2:
+                return '驳回'
+              default:
+                return '错误'
+            }
         }
       },
       created () {

@@ -8,7 +8,7 @@
         style="width: 100%;margin: auto">
         <el-table-column label="序号" type="index" align="center"></el-table-column>
         <el-table-column label="项目名称" align="center" prop="projectName"></el-table-column>
-        <el-table-column label="类型/阶段" align="center" prop="projectStage"></el-table-column>
+        <el-table-column label="类型/阶段" align="center" prop="projectStageName"></el-table-column>
         <el-table-column label="申报K值" align="center" prop="applyKValue" width="80%"></el-table-column>
         <el-table-column label="审核K值" align="center">
           <template slot-scope="scope">
@@ -20,8 +20,8 @@
             </el-form-item>
           </template>
         </el-table-column>
-        <el-table-column label="申报系数" align="center" prop="applyCofficient"></el-table-column>
-        <el-table-column label="审核系数" align="center">
+        <el-table-column label="申报次数" align="center" prop="applyCofficient"></el-table-column>
+        <el-table-column label="审核次数" align="center">
           <template slot-scope="scope">
             <el-form-item
               :prop="'workDetailTable.' + scope.$index + '.reviewCofficient'"

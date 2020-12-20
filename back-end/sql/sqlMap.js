@@ -70,13 +70,13 @@ const sqlMap = {
     updateWorkAssign: 'update worktimeassign set userID = ?, projectID = ?, workTime = ?, assignRole = ?, reviewWorkTime = ? where id = ?',
     deleteWorkAssign: 'update worktimeassign set obsoleteStatus = 1 where id = ?',
     // getProjectList: 'SELECT * from worktimelist WHERE submitID = ? and applyMonth = ? and obsoleteStatus != 1', //查找项目列表
-    getProjectList: 'SELECT wl.*, pjn.projectName as projectStage, apl.projectName from worktimelist wl left join projecttypenew pjn on ' +
-        'wl.projectTypeID = pjn.projectTypeID left join assignprojectlist apl on wl.aplID = apl.id WHERE wl.submitID = ? ' +
-        'and wl.applyMonth = ? and wl.obsoleteStatus != 1',
+    getProjectList: 'SELECT wl.*, apl.projectName, apd.projectStageName from worktimelist wl left join projecttypenew pjn on ' +
+        'wl.projectTypeID = pjn.projectTypeID left join assignprojectlist apl on wl.aplID = apl.id left join assignprojectdetail apd' +
+        ' on wl.apdID = apd.id WHERE wl.submitID = ? and wl.applyMonth = ? and wl.obsoleteStatus != 1',
     // getProjectListNew: 'SELECT * FROM worktimelist WHERE id IN (SELECT projectID FROM worktimeassign WHERE userID = ? and obsoleteStatus != 1) and applyMonth = ? and obsoleteStatus != 1',
-    getProjectListNew: 'select wl.*, pjn.projectName as projectStage, apl.projectName from worktimelist wl left join ' +
-        'projecttypenew pjn on wl.projectTypeID = pjn.projectTypeID left join assignprojectlist apl on wl.aplID = apl.id ' +
-        'where wl.id in (select projectID from worktimeassign where userID = ? ' +
+    getProjectListNew: 'select wl.*, apl.projectName, apd.projectStageName from worktimelist wl left join ' +
+        'projecttypenew pjn on wl.projectTypeID = pjn.projectTypeID left join assignprojectlist apl on wl.aplID = apl.id left join assignprojectdetail apd ' +
+        'on wl.apdID = apd.id where wl.id in (select projectID from worktimeassign where userID = ? ' +
         'and obsoleteStatus != 1) and wl.applyMonth = ? and wl.obsoleteStatus != 1',
     getProjectListTotal: 'SELECT count(*) as totalCount from worktimelist WHERE submitID = ? and applyMonth = ? and obsoleteStatus != 1',
     getProjectListTotalNew: 'SELECT count(*) as totalCount from worktimelist where id IN (SELECT projectID FROM worktimeassign WHERE userID = ? and obsoleteStatus != 1) ' +
@@ -87,7 +87,8 @@ const sqlMap = {
         'and obsoleteStatus != 1 and reviewStatus = 0 and submitStatus = 1',
     getWorkAssign: 'SELECT u.name, u.groupName, u.id as userID, wa.id, wa.workTime, wa.reviewWorkTime, wa.projectID, wa.assignRole from worktimeassign ' +
         'wa INNER JOIN users u ON wa.userID = u.id WHERE wa.projectID = ? and wa.obsoleteStatus != 1',
-    getProjectInfo: 'select * from worktimelist where id = ? and obsoleteStatus != 1',
+    getProjectInfo: 'select wl.*, apd.projectStageName from worktimelist wl left join assignprojectdetail apd on ' +
+        'wl.apdID = apd.id where wl.id = ? and wl.obsoleteStatus != 1',
     getWorkAssignInfo: 'select * from worktimeassign where projectID = ? and obsoleteStatus != 1',
     getFullProjectType: 'select projectParentID, projectName, workTime, dynamicKValue, isConference, defaultAssignWorkTime from projecttypenew ' +
         'where projectTypeID = ? and obsoleteStatus != 1',
@@ -116,15 +117,15 @@ const sqlMap = {
         'apl.userID = ? and apl.projectType = ? and apl.process != 100.0 and apl.isFilled = 1 and apl.obsoleteStatus != 1',
     // getAssignProjectDetail: 'select id, projectStage, baseWorkTime, kValue, coefficient, avaiableWorkTime, process from assignprojectdetail where aPLID = ?',
     getAssignProjectDetail: 'select apd.id as apdID, apd.projectStage as projectStageID, apd.kValue, apd.coefficient, apd.avaiableWorkTime, ' +
-        'apd.process, pjn.projectName as projectStage, pjn.workTime as baseWorkTime, pjn.dynamicKValue, pjn.isConference, pjn.defaultAssignWorkTime ' +
+        'apd.process, apd.projectStageName, apd.isFinish, pjn.workTime as baseWorkTime, pjn.dynamicKValue, pjn.isConference, pjn.defaultAssignWorkTime ' +
         'from assignprojectdetail apd left join projecttypenew pjn on apd.projectStage = pjn.projectTypeID where apd.aPLID = ? and apd.obsoleteStatus != 1',
     getMonthProcess: 'select id, aPDID, year, type, January, February, March, April, May, June, July, August, September, ' +
         'October, November, December from monthprocess where aPDID = ? and year = ? and obsoleteStatus != 1',
     // getProjectDetailProcess: 'select id, aPDID, year, type, months, process from monthprocess where aPDID = ? and year = ?',
-    submitPlanProcessE: 'update assignprojectdetail set kValue = ?, coefficient = ? where id = ?;' +
+    submitPlanProcessE: 'update assignprojectdetail set kValue = ?, coefficient = ?, isFinish = ? where id = ?;' +
         'update monthprocess set January = ?, February = ?, March = ?, April = ?, May = ?, June = ?, July = ?, August = ?, ' +
         'September = ?, October = ?, November = ?, December = ? where id = ?',
-    submitPlanProcessU: 'update assignprojectdetail set kValue = ?, coefficient = ? where id = ?;' +
+    submitPlanProcessU: 'update assignprojectdetail set kValue = ?, coefficient = ?, isFinish = ? where id = ?;' +
         'insert into monthprocess (aPDID, year, type, January, February, March, April, May, June, July, August, September, ' +
         'October, November, December) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
     getAssignProjectStageByID: 'select January, February, March, April, May, June, July, August, September, October, November, December from monthprocess where ' +
@@ -132,13 +133,13 @@ const sqlMap = {
     projectStageProcessInsert: 'update assignprojectdetail set process = ? where id = ?;select aPLID from assignprojectdetail where id = ?',
     getProjectStageProcess: 'select count(*) as totalCount from assignprojectdetail where aPLID = ?;select process from assignprojectdetail where aPLID = ? and obsoleteStatus != 1',
     projectProcessUpdate: 'update assignprojectlist set process = ? where id = ?',
-    insertAssignProjectList: 'insert into assignprojectlist (userID, assignDate, projectType, projectName, assignerID, totalWorkTime, projectLevel) values ' +
-        '(?, ?, ?, ?, ?, ?, ?)',
-    insertAssignProjectDetail: 'insert into assignprojectdetail (aPLID, projectStage, baseWorkTime, kValue, avaiableWorkTime) value ' +
-        '(?, ?, ?, ?, ?)',
+    insertAssignProjectList: 'insert into assignprojectlist (userID, assignDate, projectType, projectName, assignerID, totalWorkTime, projectLevel, ' +
+        'reviewStatus) values (?, ?, ?, ?, ?, ?, ?, ?)',
+    insertAssignProjectDetail: 'insert into assignprojectdetail (aPLID, projectStage, projectStageName, baseWorkTime, kValue, avaiableWorkTime) value ' +
+        '(?, ?, ?, ?, ?, ?)',
     getMonthProcessDiffOP: 'select * from monthprocess where aPDID = ? and type = "fact" and obsoleteStatus != 1',
     selectAssignProjectDetial: 'select * from assignprojectdetail where id = ? and obsoleteStatus != 1',
-    getAssignProject: 'select apd.id as apdID, apd.aPLID, apd.projectStage, apd.baseWorkTime, apd.kValue, apd.coefficient, ' +
+    getAssignProject: 'select apd.id as apdID, apd.aPLID, apd.projectStage, apd.projectStageName, apd.baseWorkTime, apd.kValue, apd.coefficient, ' +
         'apd.process as apdProcess, apl.id as aplID, apl.userID, apl.assignDate, apl.projectType, apl.projectName, apl.process as aplProcess, ' +
         'apl.assignerID, apl.totalWorkTime, apl.gettedWorkTime, apl.isFilled from assignprojectdetail apd left join assignprojectlist apl on ' +
         'apd.aPLID = apl.id where apd.id = ? and apd.obsoleteStatus != 1',
@@ -149,13 +150,16 @@ const sqlMap = {
     deleteAssignProjectList: 'update assignprojectlist set obsoleteStatus = 1 where id = ?',
     deleteAssignProjectDetail: 'update assignprojectdetail set obsoleteStatus = 1 where aPLID = ?',
     getAssignProjectDetailID: 'select id from assignprojectdetail where aPLID = ?',
-    updateMonthProcessObsoleteStatus: 'update monthprocess set obsoleteStatus = 1 where aPDID in (?)',
+    updateMonthProcessObsoleteStatus: 'update monthprocess set obsoleteStatus = 1 where aPDID in (',
     updateAssignProjectFilled: 'update assignprojectlist set isFilled = 1 where id = ?',
     getAssignWorkDetail: 'select apd.id as apdID, apd.aPLID as aplID, apl.projectLevel from assignprojectdetail apd left join' +
         ' assignprojectlist apl on apd.aPLID = apl.id where apd.id = ?',
-    UpdateAssignWorkDetail: 'update assignprojectdetail set kValue = ?, coefficient = ?, avaiableWorkTime = ? where id = ?',
+    UpdateAssignWorkDetail: 'update assignprojectdetail set projectStageName = ?, kValue = ?, coefficient = ?, avaiableWorkTime = ? where id = ?',
     UpdateAssignWorkList: 'update assignprojectlist set totalWorkTime = ? where id = ?',
-    GetProjectTotalWorkTime: 'select sum(avaiableWorkTime)totalWorkTime from assignprojectdetail where aPLID = ?'
+    GetProjectTotalWorkTime: 'select sum(avaiableWorkTime)totalWorkTime from assignprojectdetail where aPLID = ?',
+    deleteWorkTimeList: 'update worktimelist set obsoleteStatus = 1 where aplID = ?',
+    getWorkTimeAssignItem: 'select id from worktimelist where aplID = ?',
+    updateWorkTimeAssignObsoleteStatus: 'update worktimeassign set obsoleteStatus = 1 where projectID in ('
   }
 }
 module.exports = sqlMap;

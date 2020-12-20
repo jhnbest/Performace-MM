@@ -134,7 +134,7 @@
               <el-input v-model="scope.row.projectName"></el-input>
             </div>
             <div v-else>
-              <span class="link-type" @click="handleProjectDetailClick(scope.row)">{{scope.row.projectName}}</span>
+              <span class="link-type" @click="handleProjectDetailClick(scope.row)">{{ scope.row.projectName }}</span>
             </div>
           </template>
         </el-table-column>
@@ -203,123 +203,125 @@
     </div>
     <!---------------------------------------------------------对话框页面---------------------------------------------------->
     <el-dialog :visible.sync="showFlag.projectDetail" :title="formData.yearNum + '年 ' + assignProjectName + ' 计划&进展'" width="90%">
-      <el-table v-loading="!reqFlag.getAssignProjectDetail"
-                :data="formData.tableData"
-                stripe
-                border
-                size="mini"
-                resizable
-                :span-method="objectSpanMethod"
-                :height="tableMaxHeight" style="margin-top: -20px">
-        <el-table-column label="项目阶段" align="center" prop="projectStage" fixed></el-table-column>
-        <el-table-column label="标准工时" align="center" prop="baseWorkTime" width="50%"></el-table-column>
-        <el-table-column label="K值" align="center" prop="kValue" width="50%"></el-table-column>
-        <el-table-column label="系数" align="center" prop="coefficient" width="60%"></el-table-column>
-        <el-table-column label="剩余可分配工时" align="center" prop="avaiableWorkTime" width="70%"></el-table-column>
-        <el-table-column label="类型" align="center" prop="type" width="50%">
-          <template slot-scope="scope">
-            <span>{{scope.row.type | processTypeFilter}}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="项目进度" align="center">
-          <el-table-column align="center" width="40%">
-            <template slot="header">
-              <span class="link-type" @click="handleDecYear">&lt;&lt;</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="1月" align="center" width="73%">
+      <el-form>
+        <el-table v-loading="!reqFlag.getAssignProjectDetail"
+                  :data="formData.tableData"
+                  stripe
+                  border
+                  size="mini"
+                  resizable
+                  :span-method="objectSpanMethod"
+                  :height="tableMaxHeight" style="margin-top: -20px">
+          <el-table-column label="项目阶段" align="center" prop="projectStage" fixed></el-table-column>
+          <el-table-column label="标准工时" align="center" prop="baseWorkTime" width="50%"></el-table-column>
+          <el-table-column label="K值" align="center" prop="kValue" width="50%"></el-table-column>
+          <el-table-column label="系数" align="center" prop="coefficient" width="60%"></el-table-column>
+          <el-table-column label="剩余可分配工时" align="center" prop="avaiableWorkTime" width="70%"></el-table-column>
+          <el-table-column label="类型" align="center" prop="type" width="50%">
             <template slot-scope="scope">
-              <el-form-item :prop="'tableData.' + scope.$index + '.January'" :rules="formRules.January">
-                <el-input v-if="scope.row.editable" v-model.number="scope.row.January" size="mini" type="number"></el-input>
-                <span v-else>{{scope.row.January}}</span>
-                <span v-if="!scope.row.editable && scope.row.January !== null && scope.row.January !== ''">%</span>
-              </el-form-item>
+              <span>{{scope.row.type | processTypeFilter}}</span>
             </template>
           </el-table-column>
-          <el-table-column label="2月" align="center" prop="February" width="73%">
-            <template slot-scope="scope">
-              <el-input v-if="scope.row.editable" v-model="scope.row.February" size="mini"></el-input>
-              <span v-else>{{scope.row.February}}</span>
-              <span v-if="!scope.row.editable && scope.row.February !== null && scope.row.February !== ''">%</span>
-            </template>
+          <el-table-column label="项目进度" align="center">
+            <el-table-column align="center" width="40%">
+              <template slot="header">
+                <span class="link-type" @click="handleDecYear">&lt;&lt;</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="1月" align="center" width="73%">
+              <template slot-scope="scope">
+                <el-form-item :prop="'tableData.' + scope.$index + '.January'" :rules="formRules.January">
+                  <el-input v-if="scope.row.editable" v-model.number="scope.row.January" size="mini" type="number"></el-input>
+                  <span v-else>{{scope.row.January}}</span>
+                  <span v-if="!scope.row.editable && scope.row.January !== null && scope.row.January !== ''">%</span>
+                </el-form-item>
+              </template>
+            </el-table-column>
+            <el-table-column label="2月" align="center" prop="February" width="73%">
+              <template slot-scope="scope">
+                <el-input v-if="scope.row.editable" v-model="scope.row.February" size="mini"></el-input>
+                <span v-else>{{scope.row.February}}</span>
+                <span v-if="!scope.row.editable && scope.row.February !== null && scope.row.February !== ''">%</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="3月" align="center" prop="March" width="73%">
+              <template slot-scope="scope">
+                <el-input v-if="scope.row.editable" v-model="scope.row.March" size="mini"></el-input>
+                <span v-else>{{scope.row.March}}</span>
+                <span v-if="!scope.row.editable && scope.row.March !== null && scope.row.March !== ''">%</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="4月" align="center" prop="April" width="73%">
+              <template slot-scope="scope">
+                <el-input v-if="scope.row.editable" v-model="scope.row.April" size="mini"></el-input>
+                <span v-else>{{scope.row.April}}</span>
+                <span v-if="!scope.row.editable && scope.row.April !== null && scope.row.April !== ''">%</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="5月" align="center" prop="May" width="73%">
+              <template slot-scope="scope">
+                <el-input v-if="scope.row.editable" v-model="scope.row.May" size="mini"></el-input>
+                <span v-else>{{scope.row.May}}</span>
+                <span v-if="!scope.row.editable && scope.row.May !== null && scope.row.May !== ''">%</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="6月" align="center" prop="June" width="73%">
+              <template slot-scope="scope">
+                <el-input v-if="scope.row.editable" v-model="scope.row.June" size="mini"></el-input>
+                <span v-else>{{scope.row.June}}</span>
+                <span v-if="!scope.row.editable && scope.row.June !== null && scope.row.June !== ''">%</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="7月" align="center" prop="July" width="73%">
+              <template slot-scope="scope">
+                <el-input v-if="scope.row.editable" v-model="scope.row.July" size="mini"></el-input>
+                <span v-else>{{scope.row.July}}</span>
+                <span v-if="!scope.row.editable && scope.row.July !== null && scope.row.July !== ''">%</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="8月" align="center" prop="August" width="73%">
+              <template slot-scope="scope">
+                <el-input v-if="scope.row.editable" v-model="scope.row.August" size="mini"></el-input>
+                <span v-else>{{scope.row.August}}</span>
+                <span v-if="!scope.row.editable && scope.row.August !== null && scope.row.August !== ''">%</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="9月" align="center" prop="September" width="73%">
+              <template slot-scope="scope">
+                <el-input v-if="scope.row.editable" v-model="scope.row.September" size="mini"></el-input>
+                <span v-else>{{scope.row.September}}</span>
+                <span v-if="!scope.row.editable && scope.row.September !== null && scope.row.September !== ''">%</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="10月" align="center" prop="October" width="73%">
+              <template slot-scope="scope">
+                <el-input v-if="scope.row.editable" v-model="scope.row.October" size="mini"></el-input>
+                <span v-else>{{scope.row.October}}</span>
+                <span v-if="!scope.row.editable && scope.row.October !== null && scope.row.October !== ''">%</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="11月" align="center" prop="November" width="73%">
+              <template slot-scope="scope">
+                <el-input v-if="scope.row.editable" v-model="scope.row.November" size="mini"></el-input>
+                <span v-else>{{scope.row.November}}</span>
+                <span v-if="!scope.row.editable && scope.row.November !== null && scope.row.November !== ''">%</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="12月" align="center" prop="December" width="73%">
+              <template slot-scope="scope">
+                <el-input v-if="scope.row.editable" v-model="scope.row.December" size="mini"></el-input>
+                <span v-else>{{scope.row.December}}</span>
+                <span v-if="!scope.row.editable && scope.row.December !== null && scope.row.December !== ''">%</span>
+              </template>
+            </el-table-column>
+            <el-table-column align="center" width="40%">
+              <template slot="header">
+                <span class="link-type" @click="handleAddYear">&gt;&gt;</span>
+              </template>
+            </el-table-column>
           </el-table-column>
-          <el-table-column label="3月" align="center" prop="March" width="73%">
-            <template slot-scope="scope">
-              <el-input v-if="scope.row.editable" v-model="scope.row.March" size="mini"></el-input>
-              <span v-else>{{scope.row.March}}</span>
-              <span v-if="!scope.row.editable && scope.row.March !== null && scope.row.March !== ''">%</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="4月" align="center" prop="April" width="73%">
-            <template slot-scope="scope">
-              <el-input v-if="scope.row.editable" v-model="scope.row.April" size="mini"></el-input>
-              <span v-else>{{scope.row.April}}</span>
-              <span v-if="!scope.row.editable && scope.row.April !== null && scope.row.April !== ''">%</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="5月" align="center" prop="May" width="73%">
-            <template slot-scope="scope">
-              <el-input v-if="scope.row.editable" v-model="scope.row.May" size="mini"></el-input>
-              <span v-else>{{scope.row.May}}</span>
-              <span v-if="!scope.row.editable && scope.row.May !== null && scope.row.May !== ''">%</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="6月" align="center" prop="June" width="73%">
-            <template slot-scope="scope">
-              <el-input v-if="scope.row.editable" v-model="scope.row.June" size="mini"></el-input>
-              <span v-else>{{scope.row.June}}</span>
-              <span v-if="!scope.row.editable && scope.row.June !== null && scope.row.June !== ''">%</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="7月" align="center" prop="July" width="73%">
-            <template slot-scope="scope">
-              <el-input v-if="scope.row.editable" v-model="scope.row.July" size="mini"></el-input>
-              <span v-else>{{scope.row.July}}</span>
-              <span v-if="!scope.row.editable && scope.row.July !== null && scope.row.July !== ''">%</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="8月" align="center" prop="August" width="73%">
-            <template slot-scope="scope">
-              <el-input v-if="scope.row.editable" v-model="scope.row.August" size="mini"></el-input>
-              <span v-else>{{scope.row.August}}</span>
-              <span v-if="!scope.row.editable && scope.row.August !== null && scope.row.August !== ''">%</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="9月" align="center" prop="September" width="73%">
-            <template slot-scope="scope">
-              <el-input v-if="scope.row.editable" v-model="scope.row.September" size="mini"></el-input>
-              <span v-else>{{scope.row.September}}</span>
-              <span v-if="!scope.row.editable && scope.row.September !== null && scope.row.September !== ''">%</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="10月" align="center" prop="October" width="73%">
-            <template slot-scope="scope">
-              <el-input v-if="scope.row.editable" v-model="scope.row.October" size="mini"></el-input>
-              <span v-else>{{scope.row.October}}</span>
-              <span v-if="!scope.row.editable && scope.row.October !== null && scope.row.October !== ''">%</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="11月" align="center" prop="November" width="73%">
-            <template slot-scope="scope">
-              <el-input v-if="scope.row.editable" v-model="scope.row.November" size="mini"></el-input>
-              <span v-else>{{scope.row.November}}</span>
-              <span v-if="!scope.row.editable && scope.row.November !== null && scope.row.November !== ''">%</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="12月" align="center" prop="December" width="73%">
-            <template slot-scope="scope">
-              <el-input v-if="scope.row.editable" v-model="scope.row.December" size="mini"></el-input>
-              <span v-else>{{scope.row.December}}</span>
-              <span v-if="!scope.row.editable && scope.row.December !== null && scope.row.December !== ''">%</span>
-            </template>
-          </el-table-column>
-          <el-table-column align="center" width="40%">
-            <template slot="header">
-              <span class="link-type" @click="handleAddYear">&gt;&gt;</span>
-            </template>
-          </el-table-column>
-        </el-table-column>
-      </el-table>
+        </el-table>
+      </el-form>
     </el-dialog>
   </div>
 </template>
@@ -497,6 +499,7 @@
                         item.projectManagerID = this.formData.projectManager
                         item.avaiableWorkTime = item.workTime
                         item.kValue = 1.0
+                        item.workType = item.projectName
                       }
                       it.tableData = data
                       console.log('tableData')
@@ -544,11 +547,11 @@
             this.$common.toast('请指派任务', 'error', 'false')
           }
         },
-        /* 返回按钮 */
+        // 返回按钮
         goBack () {
           this.$router.push({ path: '/home/workStation' })
         },
-        /* 获取已指派项目列表 */
+        // 获取已指派项目列表
         getAssignedProject () {
           const url = getAssignedProject
           let params = {
@@ -566,7 +569,7 @@
               }
             })
         },
-        /* 手动重置表单数据 */
+        // 手动重置表单数据
         resetFormData () {
           this.formData.title = this.$moment().format('YYYY-MM')
           this.formData.projectType = ''
@@ -575,7 +578,7 @@
           this.formData.projectLevel = 1
           this.formData.yearNum = this.$moment().format('YYYY')
         },
-        /* 标签切换 */
+        // 标签切换
         handleSelectTypeChange (selectType) {
           if (selectType === '项目指派') {
             this.showFlag.projectAssign = false
@@ -593,7 +596,7 @@
             })
           }
         },
-        /* 转办 */
+        // 转办
         handleTurnTo (row) {
           console.log(row)
           row.editable = !row.editable
