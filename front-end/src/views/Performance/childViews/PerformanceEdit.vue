@@ -4,6 +4,7 @@
       <el-form :label-position="labelPosition" label-width="110px" ref="formData" :model="formData" :rules="formRules" :inline="true">
         <el-form-item label="申报月份" prop="title">
           <el-date-picker
+            :disabled="true"
             v-model="formData.title"
             type="month"
             format="yyyy 第 MM 月"
@@ -96,6 +97,11 @@
                                  style="width: 70%">
                 </el-input-number>
               </el-form-item>
+            </template>
+          </el-table-column>
+          <el-table-column label="上月进展" align="center" width="100%">
+            <template slot-scope="scope">
+              <span>{{scope.row.lastProcess + '%'}}</span>
             </template>
           </el-table-column>
           <el-table-column label="本月进展" align="center" width="100%">
@@ -379,7 +385,8 @@
                     defaultAssignWorkTime: data.defaultAssignWorkTime,
                     applyProcess: data.workTimeList[0].applyProcess,
                     apdID: data.workTimeList[0].apdID,
-                    workType: data.workTimeList[0].projectStageName
+                    workType: data.workTimeList[0].projectStageName,
+                    lastProcess: data.workTimeList[0].lastProcess
                   }
                   // obj.avaiableWorkTime = obj.baseWorkTime * obj.defaultKValue * obj.defaultCofficient
                   obj.workTimeAssign = defaultCurrentUserWorkTime
@@ -628,9 +635,9 @@
         },
         // 工时明细表K值和系数变化处理函数
         handleKValueCoffChange (row) {
-          row.avaiableWorkTime = row.baseWorkTime * row.defaultKValue * row.defaultCofficient * row.applyProcess * 0.01
+          row.avaiableWorkTime = row.baseWorkTime * row.defaultKValue * row.defaultCofficient * (row.applyProcess - row.lastProcess) * 0.01
           row.avaiableWorkTime = Number(row.avaiableWorkTime.toFixed(1))
-          row.workTimeAssign[0].assignWorkTime = row.baseWorkTime * row.defaultKValue * row.defaultCofficient * row.applyProcess * 0.01
+          row.workTimeAssign[0].assignWorkTime = row.baseWorkTime * row.defaultKValue * row.defaultCofficient * (row.applyProcess - row.lastProcess) * 0.01
         },
         // 新增一行
         addNewLine () {

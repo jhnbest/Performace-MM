@@ -304,9 +304,9 @@ async function insertAssignProjectDetail(sql, arrayParams, data, insertID, res) 
     }
 }
 
-function getMonthProcessDiffOP(applyMonth, applyYear, lastMonth, lastYear, data) {
+function getMonthProcessDiffOP(applyMonth, applyYear, lastMonth, lastYear, data, type) {
     let sql = $sql.workStation.getMonthProcessDiffOP
-    let arrayParams = [data.aPDID]
+    let arrayParams = [data.aPDID, type]
     return new Promise(function (resolve, reject) {
         $http.connPool(sql, arrayParams, (err, result) => {
             if (err) {
@@ -698,10 +698,11 @@ const workStation = {
         let applyYear = params.applyYear
         let lastMonth = params.lastMonth
         let lastYear = params.lastYear
+        let type = params.type
         let resultData = []
         for (let i = 0;i < params.data.length;i++) {
-            await getMonthProcessDiffOP(applyMonth, applyYear, lastMonth, lastYear, params.data[i]).then( res1 => { // 查询申报月份进展
-                processWorkTimeCal(res1, params.data[i], params.userId, resultData).then(res2 => {
+            await getMonthProcessDiffOP(applyMonth, applyYear, lastMonth, lastYear, params.data[i], type).then( res1 => { // 查询申报月份进展
+                processWorkTimeCal(res1, params.data[i]).then(res2 => {
                     res2.sendParams = params.data[i]
                     res2.processDiff = res1
                     resultData.push(res2)

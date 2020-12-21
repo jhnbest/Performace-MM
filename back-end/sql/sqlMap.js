@@ -59,7 +59,8 @@ const sqlMap = {
     selectProjectType: 'select projectTypeID, projectName from projecttypenew where projectParentID = ? and obsoleteStatus != 1',
     selectProjectTime: 'select projectTypeID, projectName, workTime, dynamicKValue, isConference, defaultAssignWorkTime from projecttypenew where projectTypeID = ?',
     addProject: 'insert into worktimelist (submitID, projectTypeID, applyKValue, reviewKValue, applyCofficient, reviewCofficient, submitTime, ' +
-        'updateTime, applyMonth, submitStatus, submitComments, avaiableWorkTime, applyProcess, apdID, aplID, monthID, applyType) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        'updateTime, applyMonth, submitStatus, submitComments, avaiableWorkTime, applyProcess, apdID, aplID, monthID, applyType, lastProcess) ' +
+        'values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
     addWorkAssign: 'insert into worktimeassign (userID, projectID, workTime, assignRole) values (?, ?, ?, ?)',
     updateProject: 'update worktimelist set submitID = ?, projectTypeID = ?, applyKValue = ?, reviewKValue = ?, applyCofficient = ?, ' +
         'reviewCofficient = ?, updateTime = ?, applyMonth = ?, submitStatus = ?, submitComments = ?, applyProcess = ?, ' +
@@ -82,9 +83,9 @@ const sqlMap = {
     getProjectListTotalNew: 'SELECT count(*) as totalCount from worktimelist where id IN (SELECT projectID FROM worktimeassign WHERE userID = ? and obsoleteStatus != 1) ' +
         'and applyMonth = ? and obsoleteStatus != 1',
     getReviewedProjecTotal: 'SELECT count(*) as totalCount from worktimelist WHERE submitID = ? and applyMonth = ? ' +
-        'and obsoleteStatus != 1 and reviewStatus != 0 and submitStatus = 1',
+        'and obsoleteStatus != 1 and reviewStatus != 0 and submitStatus = 1 and applyType = "fact"',
     getUnReviewProjecTotal: 'SELECT count(*) as totalCount from worktimelist WHERE submitID = ? and applyMonth = ? ' +
-        'and obsoleteStatus != 1 and reviewStatus = 0 and submitStatus = 1',
+        'and obsoleteStatus != 1 and reviewStatus = 0 and submitStatus = 1 and applyType = "fact"',
     getWorkAssign: 'SELECT u.name, u.groupName, u.id as userID, wa.id, wa.workTime, wa.reviewWorkTime, wa.projectID, wa.assignRole from worktimeassign ' +
         'wa INNER JOIN users u ON wa.userID = u.id WHERE wa.projectID = ? and wa.obsoleteStatus != 1',
     getProjectInfo: 'select wl.*, apd.projectStageName from worktimelist wl left join assignprojectdetail apd on ' +
@@ -137,7 +138,7 @@ const sqlMap = {
         'reviewStatus) values (?, ?, ?, ?, ?, ?, ?, ?)',
     insertAssignProjectDetail: 'insert into assignprojectdetail (aPLID, projectStage, projectStageName, baseWorkTime, kValue, avaiableWorkTime) value ' +
         '(?, ?, ?, ?, ?, ?)',
-    getMonthProcessDiffOP: 'select * from monthprocess where aPDID = ? and type = "fact" and obsoleteStatus != 1',
+    getMonthProcessDiffOP: 'select * from monthprocess where aPDID = ? and type = ? and obsoleteStatus != 1',
     selectAssignProjectDetial: 'select * from assignprojectdetail where id = ? and obsoleteStatus != 1',
     getAssignProject: 'select apd.id as apdID, apd.aPLID, apd.projectStage, apd.projectStageName, apd.baseWorkTime, apd.kValue, apd.coefficient, ' +
         'apd.process as apdProcess, apl.id as aplID, apl.userID, apl.assignDate, apl.projectType, apl.projectName, apl.process as aplProcess, ' +

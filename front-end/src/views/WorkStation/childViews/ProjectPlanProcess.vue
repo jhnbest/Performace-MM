@@ -5,7 +5,10 @@
         <el-col :span="8" :offset="7">
           <h3>{{formData.yearNum + '年 ' + formData.projectName  + '计划&实际进展填报'}}</h3>
         </el-col>
-        <el-col :span="1" :offset="4">
+        <el-col :span="1" :offset="2">
+          <el-button style="margin-top: 17px" size="medium" type="warning" @click="genWorkTimePlanApply">生成项目计划</el-button>
+        </el-col>
+        <el-col :span="1" :offset="2">
           <el-button style="margin-top: 17px" size="medium" type="success" @click="genWorkTimeApply">生成工时申报</el-button>
         </el-col>
         <el-col :span="1" :offset="2">
@@ -303,7 +306,50 @@
       </div>
       <Assign v-if="showFlag.workTimeAssign" ref="workTimeAssign" @assignDetail="handleAssign"/>
     </el-dialog>
-
+    <!-----------------------------------------------生成项目计划对话框---------------------------------------------------->
+    <el-dialog :visible.sync="dialogPlanFormVisible" width="65%" :title="formData.projectName + '项目计划'">
+      <div>
+        <el-form ref="dialogForm" :model="dialogForm" :rules="formRules" style="margin-top: -20px" :inline="true">
+          <el-form-item label="申报月份" prop="title">
+            <el-date-picker
+              v-model="dialogForm.title"
+              type="month"
+              format="yyyy 第 MM 月"
+              value-format="yyyy-MM"
+              placeholder="选择月"
+              :picker-options="pickerOptions"
+              style="width: 150px" @change="handleApplyPlanDateChange">
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item>
+            <span style="margin-left: 20px;font-size: 15px">总工时：</span>
+            <span style="color: red;font-weight: bolder;font-size: 20px">{{totalGetWorkTime}}</span>
+          </el-form-item>
+        </el-form>
+      </div>
+      <div>
+        <el-table :data="submitParams.data" height="250">
+          <el-table-column label="序号" align="center" type="index"></el-table-column>
+          <el-table-column label="工时项目" align="center" prop="projectStageName"></el-table-column>
+          <el-table-column label="计划进展" align="center">
+            <template slot-scope="scope">
+              <span>{{scope.row.applyMonthProcess + '%'}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="预计可获得工时" align="center" prop="avaiableWorkTime"></el-table-column>
+          <el-table-column label="备注" align="center">
+            <template slot-scope="scope">
+              <el-input size="mini" v-model="scope.row.submitComments"></el-input>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleWorkTimePlanApply('dialogForm')">提交计划</el-button>
+      </div>
+      <Assign v-if="showFlag.workTimeAssign" ref="workTimeAssign" @assignDetail="handleAssign"/>
+    </el-dialog>
   </div>
 </template>
 
@@ -397,10 +443,11 @@
             savePlanProcess: true
           },
           dialogFormVisible: false,
+          dialogPlanFormVisible: false,
           pickerOptions: {
-            disabledDate (time) {
-              return time.getTime() > Date.now()
-            }
+            // disabledDate (time) {
+            //   return time.getTime() > Date.now()
+            // }
           },
           applyMonthPlanProcess: [],
           applyMonthPlanProcessTableData: [],
@@ -418,6 +465,111 @@
           this.formData.projectType = this.$route.query.projectType
           this.formData.projectName = this.$route.query.projectName
           this.getAssignProjectDetail(this.$route.query.projectID)
+        },
+        // 获取申报月份进展数据
+        getMonthProcess (type) {
+          let it = this
+          return new Promise(function (resolve, reject) {
+            let applyMonth = it.$moment(it.dialogForm.title).toObject()
+            let lastMonth = it.$moment(it.dialogForm.title).subtract(1, 'months').toObject()
+            let applyYear = it.$moment(it.dialogForm.title).toObject().years
+            let lastYear = it.$moment(it.dialogForm.title).subtract(1, 'months').toObject().years
+            let applyMonthString = it.$common.MonthToString(String(applyMonth.months + 1))
+            let lastMonthString = it.$common.MonthToString(String(lastMonth.months + 1))
+            let url = getMonthProcessDiff
+            let searchData = []
+            console.log('applyMonthPlanProcess')
+            console.log(it.applyMonthPlanProcess)
+            for (let item of it.applyMonthPlanProcess) {
+              if (type === 'fact') {
+                if (item.isFinish !== 1 && item.type === 'fact' && item[applyMonthString] !== null) {
+                  searchData.push(item)
+                }
+              } else if (type === 'plan') {
+                if (item.isFinish !== 1 && item.type === 'plan' && item[applyMonthString] !== null) {
+                  searchData.push(item)
+                }
+              }
+            }
+            it.applyMonthPlanProcessTableData = []
+            if (searchData.length === 0) {
+              it.$common.toast('该月份项目无计划/实际进展', 'error', 'true')
+              resolve([])
+            } else {
+              let params = {
+                applyMonth: applyMonthString,
+                applyYear: applyYear,
+                lastMonth: lastMonthString,
+                lastYear: lastYear,
+                data: searchData,
+                type: type
+              }
+              it.$http(url, params)
+                .then(res => {
+                  if (res.code === 1) {
+                    params = {
+                      submitType: 'insert',
+                      submitDate: it.dialogForm.title,
+                      applyType: '',
+                      data: []
+                    }
+                    if (type === 'fact') {
+                      params.applyType = 'fact'
+                    } else if (type === 'plan') {
+                      params.applyType = 'plan'
+                    }
+                    console.log(res.data)
+                    for (let item of res.data) {
+                      let applyMonthProcess = item.processDiff.applyMonthProcess
+                      let lastMonthProcess = item.processDiff.lastMonthProcess
+                      let obj = {
+                        projectTypeID: item.projectStage,
+                        projectName: item.projectName,
+                        workType: item.projectStage,
+                        baseWorkTime: item.baseWorkTime,
+                        defaultKValue: item.kValue,
+                        dynamicKValue: item.sendParams.dynamicKValue,
+                        defaultCofficient: item.coefficient,
+                        workTimeAssign: [],
+                        submitComments: '',
+                        multipleAssign: false,
+                        multipleSelect: [],
+                        avaiableWorkTime: 0,
+                        isConference: item.sendParams.isConference,
+                        defaultAssignWorkTime: item.sendParams.defaultAssignWorkTime,
+                        projectStage: item.sendParams.projectStage,
+                        applyMonthProcess: applyMonthProcess,
+                        lastMonthProcess: lastMonthProcess,
+                        processDiff: applyMonthProcess - lastMonthProcess,
+                        applyProcess: applyMonthProcess,
+                        lastProcess: lastMonthProcess,
+                        apdID: item.sendParams.aPDID,
+                        aplID: item.aplID,
+                        monthID: item.sendParams.id,
+                        projectStageName: item.projectStageName
+                      }
+                      obj.avaiableWorkTime = obj.baseWorkTime * obj.defaultKValue * obj.defaultCofficient *
+                        (applyMonthProcess - lastMonthProcess) * 0.01
+                      obj.avaiableWorkTime = Number(obj.avaiableWorkTime.toFixed(1))
+                      let defaultCurrentUserWorkTime = {
+                        id: it.$store.state.userInfo.id,
+                        groupName: it.$store.state.userInfo.groupName,
+                        name: it.$store.state.userInfo.name,
+                        applyRole: '组织者',
+                        assignWorkTime: obj.avaiableWorkTime,
+                        deleteAble: false
+                      }
+                      obj.workTimeAssign.push(defaultCurrentUserWorkTime)
+                      params.data.push(obj)
+                      it.applyMonthPlanProcessTableData.push(obj)
+                    }
+                    console.log('====')
+                    console.log(params)
+                    resolve(params)
+                  }
+                })
+            }
+          })
         },
         // 提交工时申报
         handleWorkTimeApply (formData) {
@@ -440,6 +592,51 @@
                   }
                 })
             }
+          })
+        },
+        // 提交项目计划申报
+        handleWorkTimePlanApply (formData) {
+          this.$refs[formData].validate((valid) => {
+            if (valid) {
+              let url = workTimeTemporary
+              this.$http(url, this.submitParams)
+                .then(res => {
+                  if (res.code === 1) {
+                    url = updateAssignProjectFilled
+                    let params = {
+                      assignProjectID: this.$route.query.projectID
+                    }
+                    this.$http(url, params)
+                      .then(() => {
+                        this.$common.toast('生成成功', 'success', 'false')
+                        this.$router.push({ path: '/home/workStation' })
+                        this.dialogFormVisible = false
+                      })
+                  }
+                })
+            }
+          })
+        },
+        // 生成工时申报
+        genWorkTimeApply () {
+          let year = this.$moment(this.dialogForm.title).format('YYYY')
+          this.httpGetAssignProjectDetail(this.$route.query.projectID, year).then(res => {
+            this.dialogFormVisible = true
+            this.applyMonthPlanProcess = res
+            this.getMonthProcess('fact').then(res1 => {
+              this.submitParams = res1
+            })
+          })
+        },
+        // 生成项目计划
+        genWorkTimePlanApply () {
+          let year = this.$moment(this.dialogForm.title).format('YYYY')
+          this.httpGetAssignProjectDetail(this.$route.query.projectID, year).then(res => {
+            this.dialogPlanFormVisible = true
+            this.applyMonthPlanProcess = res
+            this.getMonthProcess('plan').then(res1 => {
+              this.submitParams = res1
+            })
           })
         },
         // 返回上一级
@@ -549,114 +746,13 @@
             }
           }
         },
-        // 获取申报月份进展数据
-        getMonthProcess () {
-          let it = this
-          return new Promise(function (resolve, reject) {
-            let applyMonth = it.$moment(it.dialogForm.title).toObject()
-            let lastMonth = it.$moment(it.dialogForm.title).subtract(1, 'months').toObject()
-            let applyYear = it.$moment(it.dialogForm.title).toObject().years
-            let lastYear = it.$moment(it.dialogForm.title).subtract(1, 'months').toObject().years
-            let applyMonthString = it.$common.MonthToString(String(applyMonth.months + 1))
-            let lastMonthString = it.$common.MonthToString(String(lastMonth.months + 1))
-            let url = getMonthProcessDiff
-            let searchData = []
-            console.log('applyMonthPlanProcess')
-            console.log(it.applyMonthPlanProcess)
-            for (let item of it.applyMonthPlanProcess) {
-              if (item.isFinish !== 1 && item.type === 'fact' && item[applyMonthString] !== null) {
-                searchData.push(item)
-              }
-            }
-            it.applyMonthPlanProcessTableData = []
-            if (searchData.length === 0) {
-              it.$common.toast('该月份项目无实际进展', 'error', 'true')
-              resolve([])
-            } else {
-              let params = {
-                applyMonth: applyMonthString,
-                applyYear: applyYear,
-                lastMonth: lastMonthString,
-                lastYear: lastYear,
-                data: searchData
-              }
-              it.$http(url, params)
-                .then(res => {
-                  if (res.code === 1) {
-                    params = {
-                      submitType: 'insert',
-                      submitDate: it.dialogForm.title,
-                      applyType: 'fact',
-                      data: []
-                    }
-                    console.log(res.data)
-                    for (let item of res.data) {
-                      let applyMonthProcess = item.processDiff.applyMonthProcess
-                      let lastMonthProcess = item.processDiff.lastMonthProcess
-                      let obj = {
-                        projectTypeID: item.projectStage,
-                        projectName: item.projectName,
-                        workType: item.projectStage,
-                        baseWorkTime: item.baseWorkTime,
-                        defaultKValue: item.kValue,
-                        dynamicKValue: item.sendParams.dynamicKValue,
-                        defaultCofficient: item.coefficient,
-                        workTimeAssign: [],
-                        submitComments: '',
-                        multipleAssign: false,
-                        multipleSelect: [],
-                        avaiableWorkTime: 0,
-                        isConference: item.sendParams.isConference,
-                        defaultAssignWorkTime: item.sendParams.defaultAssignWorkTime,
-                        projectStage: item.sendParams.projectStage,
-                        applyMonthProcess: applyMonthProcess,
-                        lastMonthProcess: lastMonthProcess,
-                        processDiff: applyMonthProcess - lastMonthProcess,
-                        applyProcess: applyMonthProcess,
-                        apdID: item.sendParams.aPDID,
-                        aplID: item.aplID,
-                        monthID: item.sendParams.id,
-                        projectStageName: item.projectStageName
-                      }
-                      obj.avaiableWorkTime = obj.baseWorkTime * obj.defaultKValue * obj.defaultCofficient *
-                        (applyMonthProcess - lastMonthProcess) * 0.01
-                      // let avaiableWorkTimeTmp = obj.avaiableWorkTime.toString()
-                      // let index = avaiableWorkTimeTmp.indexOf('.')
-                      // let result = avaiableWorkTimeTmp.slice(0, index + 2)
-                      // obj.avaiableWorkTime = Number(result)
-                      obj.avaiableWorkTime = Number(obj.avaiableWorkTime.toFixed(1))
-                      let defaultCurrentUserWorkTime = {
-                        id: it.$store.state.userInfo.id,
-                        groupName: it.$store.state.userInfo.groupName,
-                        name: it.$store.state.userInfo.name,
-                        applyRole: '组织者',
-                        assignWorkTime: obj.avaiableWorkTime,
-                        deleteAble: false
-                      }
-                      obj.workTimeAssign.push(defaultCurrentUserWorkTime)
-                      params.data.push(obj)
-                      it.applyMonthPlanProcessTableData.push(obj)
-                    }
-                    resolve(params)
-                  }
-                })
-            }
-          })
-        },
-        // 生成工时申报
-        genWorkTimeApply () {
-          let year = this.$moment(this.dialogForm.title).format('YYYY')
-          this.httpGetAssignProjectDetail(this.$route.query.projectID, year).then(res => {
-            this.dialogFormVisible = true
-            this.applyMonthPlanProcess = res
-            this.getMonthProcess().then(res1 => {
-              this.submitParams = res1
-            })
-          })
-        },
         // 申报月份变化处理
         handleApplyDateChange () {
           this.genWorkTimeApply()
+        },
+        // 生成计划月份变化处理
+        handleApplyPlanDateChange () {
+          this.genWorkTimePlanApply()
         },
         // 工时分配点击
         handleWorkTimeAssign (row, index) {

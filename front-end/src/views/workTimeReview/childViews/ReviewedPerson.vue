@@ -165,6 +165,7 @@
               .then(res => {
                 if (res.code === 1) {
                   let data = res.data
+                  let reviewTable = []
                   for (let item of data.list) {
                     if (item.reviewKValue === null) {
                       item.reviewKValue = item.applyKValue
@@ -172,9 +173,13 @@
                     if (item.reviewCofficient === null) {
                       item.reviewCofficient = item.applyCofficient
                     }
+                    if (item.applyType === 'fact') {
+                      data.totalCount -= 1
+                      reviewTable.push(item)
+                    }
                   }
                   console.log(data)
-                  this.formData.workDetailTable = data.list
+                  this.formData.workDetailTable = reviewTable
                   this.totalCount = data.totalCount
                   this.currentPage = this.pageNum
                   this.reqFlag.getProjectList = true

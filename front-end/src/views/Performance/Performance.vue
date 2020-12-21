@@ -131,29 +131,20 @@
         <el-table-column label="申报月份" align="center" prop="applyMonth"></el-table-column>
         <el-table-column label="项目名称" align="center" prop="projectName"></el-table-column>
         <el-table-column label="项目阶段" align="center" prop="projectStageName" width="200%"></el-table-column>
-        <el-table-column label="计划进展" align="center">
+        <el-table-column label="计划进展" align="center" prop="applyProcess">
           <template slot-scope="scope">
-            <div v-if="!scope.row.processEditable">
-              <span>{{scope.row.applyProcess + '%'}}</span>
-            </div>
-            <div v-else>
-              <el-input size="mini" v-model.number="scope.row.applyProcess"></el-input>
-            </div>
+            <span>{{scope.row.applyProcess + '%'}}</span>
           </template>
         </el-table-column>
         <el-table-column label="预计获得工时" align="center" prop="avaiableWorkTime"></el-table-column>
-        <el-table-column label="操作" align="center" width="250">
+        <el-table-column label="操作" align="center" width="200">
           <template slot-scope="scope">
             <div v-if="!scope.row.processEditable">
               <el-button type="primary"
                          :disabled="!reqFlag.complete"
                          size="mini"
-                         @click="handleComplete(scope.row)">已完成</el-button>
-              <el-button type="warning" size="mini" @click="handleAdjust(scope.row)">调整</el-button>
+                         @click="handleComplete(scope.row)">完成</el-button>
               <el-button type="danger" size="mini" @click="handleDeletePlanItem(scope.row)">删除</el-button>
-            </div>
-            <div v-else>
-              <el-button type="primary" size="mini" @click="handleSave(scope.row)">保存</el-button>
             </div>
           </template>
         </el-table-column>
@@ -201,9 +192,9 @@ import { getProjectType, getProjectList, changeSubmitStatus, deleteProject,
           pageSize: this.$store.state.pageSize, // 每页请求多少条
           currentPage: 1, // 初始时在第几页
           pickerOptions: {
-            disabledDate (time) {
-              return time.getTime() > Date.now()
-            }
+            // disabledDate (time) {
+            //   return time.getTime() > Date.now()
+            // }
           },
           workDetailTable: [],
           workPlanTableData: [],
@@ -262,7 +253,6 @@ import { getProjectType, getProjectList, changeSubmitStatus, deleteProject,
                       } else if (item.applyType === 'plan') { // 计划进展表格数据
                         it.planGetWorkTime = 0
                         it.planGetWorkTime += item.avaiableWorkTime
-                        item.processEditable = false
                         planWorkTimeList.push(item)
                       }
                     }
@@ -429,11 +419,6 @@ import { getProjectType, getProjectList, changeSubmitStatus, deleteProject,
                 this.reqFlag.complete = true
               })
           }
-        },
-        // 调整按钮
-        handleAdjust (row) {
-          console.log(row)
-          row.processEditable = true
         },
         // 保存按钮
         handleSave (row) {

@@ -147,6 +147,7 @@ function workTimeInsertOP(params, i, operate) {
         let reviewCofficient = params.data[i].reviewCofficient
         let avaiableWorkTime = params.data[i].avaiableWorkTime
         let applyProcess = params.data[i].applyProcess
+        let lastProcess = params.data[i].lastProcess
         let apdID = params.data[i].apdID
         let aplID = params.data[i].aplID
         let monthID = params.data[i].monthID
@@ -164,7 +165,7 @@ function workTimeInsertOP(params, i, operate) {
             sql = $sql.performance.addProject
             arrayParams = [submitID, projectTypeID, applyKValue, reviewKValue, applyCofficient, reviewCofficient, submitTime,
                 updateTime, applyMonth, submitStatus, submitComments, avaiableWorkTime, applyProcess, apdID, aplID, monthID,
-                applyType]
+                applyType, lastProcess]
         } else if (params.submitType === 'update') { //更新
             if (operate === '1') { // 提交
                 sql = $sql.performance.updateRejectProject
@@ -761,7 +762,7 @@ const performance = {
             })
         })
     },
-    // 取工时分配信息
+    // 获取工时分配信息
     getWorkAssign (req, res) {
         console.log('===performance.js getWorkAssign')
         let data = req.body

@@ -370,6 +370,7 @@
             let tableDataCopy = []
             for (let item of this.formData.workTypeTimeDetail) {
               if (item.avaiableWorkTime !== 0) {
+                item.lastProcess = 0
                 tableDataCopy.push(item)
               }
             }
