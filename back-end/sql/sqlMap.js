@@ -59,7 +59,7 @@ const sqlMap = {
     selectProjectType: 'select projectTypeID, projectName from projecttypenew where projectParentID = ? and obsoleteStatus != 1',
     selectProjectTime: 'select projectTypeID, projectName, workTime, dynamicKValue, isConference, defaultAssignWorkTime from projecttypenew where projectTypeID = ?',
     addProject: 'insert into worktimelist (submitID, projectTypeID, applyKValue, reviewKValue, applyCofficient, reviewCofficient, submitTime, ' +
-        'updateTime, applyMonth, submitStatus, submitComments, avaiableWorkTime, applyProcess, apdID, aplID, monthID) values ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        'updateTime, applyMonth, submitStatus, submitComments, avaiableWorkTime, applyProcess, apdID, aplID, monthID, applyType) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
     addWorkAssign: 'insert into worktimeassign (userID, projectID, workTime, assignRole) values (?, ?, ?, ?)',
     updateProject: 'update worktimelist set submitID = ?, projectTypeID = ?, applyKValue = ?, reviewKValue = ?, applyCofficient = ?, ' +
         'reviewCofficient = ?, updateTime = ?, applyMonth = ?, submitStatus = ?, submitComments = ?, applyProcess = ?, ' +

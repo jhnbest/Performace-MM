@@ -11,12 +11,14 @@
             </el-badge>
           </el-radio-group>
         </el-col>
-        <el-col :span="1" style="margin-top: 3px">
-          <el-button style="margin-left: 50px"
-                     v-if="this.$store.state.userInfo.role !== '普通成员'"
-                     type="danger"
+        <el-col :span="1" :offset="1" v-if="this.$store.state.userInfo.role !== '普通成员'">
+          <el-button type="danger"
                      @click="handleProjectAssign"
                      size="medium">项目指派</el-button>
+        </el-col>
+        <el-col :span="1" :offset="2">
+          <el-button type="primary"
+                     size="medium" @click="handleAddNew">项目申报</el-button>
         </el-col>
       </el-row>
     </div>
@@ -166,6 +168,10 @@
           if (this.formData.selectType === '未填报') {
             this.unFilledTotalCount += params
           }
+        },
+        // 项目申报
+        handleAddNew () {
+          this.$router.push({ path: '/home/PerformanceAddNew' })
         }
       },
       components: {

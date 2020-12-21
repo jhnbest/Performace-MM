@@ -1,3 +1,4 @@
+/* eslint-disable */
 import Vue from 'vue'
 import Router from 'vue-router'
 
@@ -94,13 +95,13 @@ export default new Router({
           path: 'performanceAdd',
           name: 'performanceAdd',
           component: () => import('./views/Performance/childViews/PerformanceAdd.vue'),
-          meta: { pagePath: '/home/performance' }
+          meta: { pagePath: '/home/workStation' }
         },
         {
           path: 'performanceAddNew',
           name: 'performanceAddNew',
           component: () => import('./views/Performance/childViews/PerformanceAddNew.vue'),
-          meta: { pagePath: '/home/performance' }
+          meta: { pagePath: '/home/workStation' }
         },
         {
           path: 'performanceEdit',

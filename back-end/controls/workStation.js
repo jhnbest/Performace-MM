@@ -529,7 +529,7 @@ const workStation = {
             let sql = null
             let arrayParams = null
             let isFinish = 0
-            if (data.applyProcess === 100) {
+            if (data.applyProcess === 100 && data.type === 'fact') {
                 isFinish = 1
             }
             if (data.id !== null) {
@@ -826,6 +826,18 @@ const workStation = {
                 }
             })
         })
+    },
+    // 提交计划至计划进展表
+    async submitMonthPlanProcess (req, res) {
+        let data = req.body
+        console.log(data)
+        let i = 0
+        for (let item of data.paramsData) {
+            await workStation.saveProcess(item)
+            if (i++ === data.paramsData.length - 1) {
+                return $http.writeJson(res, {code: 1, message: '成功'})
+            }
+        }
     }
 }
 

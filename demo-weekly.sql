@@ -1,17 +1,17 @@
 /*
  Navicat Premium Data Transfer
 
- Source Server         : jhn
+ Source Server         : jhn_MySQL
  Source Server Type    : MySQL
- Source Server Version : 80022
+ Source Server Version : 80020
  Source Host           : localhost:3306
  Source Schema         : demo-weekly
 
  Target Server Type    : MySQL
- Target Server Version : 80022
+ Target Server Version : 80020
  File Encoding         : 65001
 
- Date: 21/12/2020 00:33:05
+ Date: 21/12/2020 16:53:07
 */
 
 SET NAMES utf8mb4;
@@ -24,7 +24,7 @@ DROP TABLE IF EXISTS `assignprojectdetail`;
 CREATE TABLE `assignprojectdetail`  (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
   `aPLID` int UNSIGNED NOT NULL COMMENT '项目列表外键',
-  `projectStage` int UNSIGNED NOT NULL DEFAULT '' COMMENT '项目阶段',
+  `projectStage` int UNSIGNED NOT NULL DEFAULT 0 COMMENT '项目阶段',
   `projectStageName` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '非标项目阶段名称',
   `baseWorkTime` float(5, 1) UNSIGNED NOT NULL COMMENT '标准工时',
   `kValue` float(5, 1) UNSIGNED NOT NULL DEFAULT 1.0 COMMENT 'K值',
@@ -39,19 +39,8 @@ CREATE TABLE `assignprojectdetail`  (
 -- ----------------------------
 -- Records of assignprojectdetail
 -- ----------------------------
-INSERT INTO `assignprojectdetail` VALUES (1, 1, 72, '自定义项目阶段1', 1.0, 1.0, 1, 1.0, 0.0, 1, 0);
-INSERT INTO `assignprojectdetail` VALUES (2, 1, 72, '自定义项目阶段2', 1.0, 1.0, 1, 0.0, 0.0, 1, 0);
-INSERT INTO `assignprojectdetail` VALUES (3, 1, 72, '自定义项目阶段3', 1.0, 1.0, 1, 1.0, 0.0, 1, 0);
-INSERT INTO `assignprojectdetail` VALUES (4, 2, 80, '组织各类型会议', 2.0, 1.0, 1, 2.0, 100.0, 0, 1);
-INSERT INTO `assignprojectdetail` VALUES (5, 3, 10, '选型需求调研', 5.0, 1.0, 1, 5.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (6, 3, 11, '选型产品在公司现有应用及行业市场考察', 10.0, 1.0, 1, 10.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (7, 3, 12, '选型产品的系统结构及技术参数调研', 10.0, 1.0, 1, 10.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (8, 3, 13, '供应商实力及应用案例等考察（网站电话邮件形式沟通，考察供应商数目*4h）', 4.0, 1.0, 1, 4.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (9, 3, 14, '技术参数对比（考察产品种数*4h）', 4.0, 1.0, 1, 4.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (10, 3, 15, '产品测试（测试产品个数*4h）', 4.0, 1.0, 1, 4.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (11, 3, 16, '编写产品测试报告', 8.0, 1.0, 1, 8.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (12, 3, 17, '编写选型报告', 12.0, 1.0, 1, 12.0, 0.0, 0, 0);
-INSERT INTO `assignprojectdetail` VALUES (13, 3, 18, '选型缺陷跟踪修正 ', 5.0, 1.0, 1, 5.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1, 1, 27, '制定资产配置标准/系统', 10.0, 1.0, 1, 9.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (2, 2, 26, '沟通用户和运维单位，汇总问题和意见/系统', 5.0, 1.0, 1, 5.0, 0.0, 0, 0);
 
 -- ----------------------------
 -- Table structure for assignprojectlist
@@ -72,14 +61,13 @@ CREATE TABLE `assignprojectlist`  (
   `projectLevel` tinyint NOT NULL DEFAULT 1 COMMENT '项目级别',
   `reviewStatus` tinyint NOT NULL DEFAULT 1 COMMENT '审核状态',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of assignprojectlist
 -- ----------------------------
-INSERT INTO `assignprojectlist` VALUES (1, 15, '2020-12-20 22:46:16', '5', '123', 0.0, 15, 3.0, 0.0, 0, 1, 1, 0);
-INSERT INTO `assignprojectlist` VALUES (2, 15, '2020-12-20 23:27:55', '4', '组织霍尼韦尔广播技术交流会', 100.0, 15, 2.0, 0.0, 0, 0, 1, 1);
-INSERT INTO `assignprojectlist` VALUES (3, 8, '2020-12-20 23:41:37', '172', '1', 0.0, 15, 62.0, 0.0, 0, 0, 1, 1);
+INSERT INTO `assignprojectlist` VALUES (1, 15, '2020-12-21 15:26:07', '4', '12', 0.0, 15, 10.0, 0.0, 1, 0, 1, 1);
+INSERT INTO `assignprojectlist` VALUES (2, 15, '2020-12-21 15:40:38', '4', '12', 0.0, 15, 5.0, 0.0, 1, 0, 1, 1);
 
 -- ----------------------------
 -- Table structure for monthprocess
@@ -110,7 +98,9 @@ CREATE TABLE `monthprocess`  (
 -- ----------------------------
 -- Records of monthprocess
 -- ----------------------------
-INSERT INTO `monthprocess` VALUES (1, 4, 2020, 'fact', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 100, 0, 0);
+INSERT INTO `monthprocess` VALUES (1, 1, 2020, 'plan', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 90, 0, 0);
+INSERT INTO `monthprocess` VALUES (2, 1, 2020, 'fact', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 50, 80, 0, 0);
+INSERT INTO `monthprocess` VALUES (3, 2, 2020, 'fact', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 80, 90, 0, 0);
 
 -- ----------------------------
 -- Table structure for monthprocess_new
@@ -1047,20 +1037,16 @@ CREATE TABLE `worktimeassign`  (
   `assignRole` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '参与人员角色',
   `obsoleteStatus` tinyint NOT NULL DEFAULT 0 COMMENT '废弃状态',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of worktimeassign
 -- ----------------------------
-INSERT INTO `worktimeassign` VALUES (1, 15, 1, 1.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (2, 15, 2, 1.0, NULL, '组织者', 1);
-INSERT INTO `worktimeassign` VALUES (3, 15, 3, 2.0, 2.0, '组织者', 0);
-INSERT INTO `worktimeassign` VALUES (4, 7, 3, 1.0, 1.0, '协作者', 0);
-INSERT INTO `worktimeassign` VALUES (5, 8, 3, 1.0, 1.0, '协作者', 0);
-INSERT INTO `worktimeassign` VALUES (6, 13, 3, 1.0, 1.0, '协作者', 0);
-INSERT INTO `worktimeassign` VALUES (7, 14, 3, 1.0, 1.0, '协作者', 0);
-INSERT INTO `worktimeassign` VALUES (8, 23, 3, 1.0, 1.0, '协作者', 0);
-INSERT INTO `worktimeassign` VALUES (9, 27, 3, 1.0, 1.0, '协作者', 0);
+INSERT INTO `worktimeassign` VALUES (1, 15, 1, 9.0, NULL, '组织者', 0);
+INSERT INTO `worktimeassign` VALUES (2, 15, 2, 5.0, NULL, '组织者', 0);
+INSERT INTO `worktimeassign` VALUES (3, 15, 4, 9.0, NULL, '组织者', 0);
+INSERT INTO `worktimeassign` VALUES (4, 15, 5, 8.0, NULL, '组织者', 0);
+INSERT INTO `worktimeassign` VALUES (5, 15, 6, 0.5, NULL, '组织者', 0);
 
 -- ----------------------------
 -- Table structure for worktimelist
@@ -1090,15 +1076,19 @@ CREATE TABLE `worktimelist`  (
   `reviewer` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '' COMMENT '审核人',
   `avaiableWorkTime` double(255, 1) UNSIGNED NOT NULL DEFAULT 0.0 COMMENT '可用工时',
   `applyProcess` float(4, 1) UNSIGNED ZEROFILL NOT NULL DEFAULT 00.0 COMMENT '申报进展',
+  `applyType` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '申报类型',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of worktimelist
 -- ----------------------------
-INSERT INTO `worktimelist` VALUES (1, 1, 1, NULL, '15', 72, 1.0, NULL, 1.0, NULL, '2020-12-20 22:46:16', '2020-12-20 22:46:16', '2020-12', '1', '', '0', NULL, '', 1, 0, '', 1.0, 100.0);
-INSERT INTO `worktimelist` VALUES (2, 3, 1, NULL, '15', 72, 1.0, NULL, 1.0, NULL, '2020-12-20 22:46:16', '2020-12-20 22:46:16', '2020-12', '1', '', '0', NULL, '', 1, 0, '', 1.0, 100.0);
-INSERT INTO `worktimelist` VALUES (3, 4, 2, NULL, '15', 80, 1.0, 1.0, 1.0, 1.0, '2020-12-20 23:27:55', '2020-12-20 23:27:55', '2020-12', '1', '', '1', '2020-12-20 23:28:55', '', 0, 1, '江黄能', 2.0, 100.0);
+INSERT INTO `worktimelist` VALUES (1, 1, 1, NULL, '15', 27, 1.0, NULL, 1.0, NULL, '2020-12-21 15:26:07', '2020-12-21 15:26:07', '2020-12', '1', '', '0', NULL, '', 0, 0, '', 9.0, 90.0, 'plan');
+INSERT INTO `worktimelist` VALUES (2, 2, 2, NULL, '15', 26, 1.0, NULL, 1.0, NULL, '2020-12-21 15:40:38', '2020-12-21 15:40:38', '2020-12', '1', '', '0', NULL, '', 0, 0, '', 5.0, 100.0, 'fact');
+INSERT INTO `worktimelist` VALUES (3, 1, 1, NULL, '15', 27, 1.0, NULL, 1.0, NULL, '2020-12-21 15:50:03', '2020-12-21 15:50:03', '2020-12', '1', '', '0', NULL, '', 0, 0, '', 9.0, 90.0, 'fact');
+INSERT INTO `worktimelist` VALUES (4, 1, 1, NULL, '15', 27, 1.0, NULL, 1.0, NULL, '2020-12-21 15:55:07', '2020-12-21 15:55:07', '2020-12', '0', '', '0', NULL, '', 0, 0, '', 9.0, 90.0, 'fact');
+INSERT INTO `worktimelist` VALUES (5, 1, 1, 2, '15', 27, 1.0, NULL, 1.0, NULL, '2020-12-21 16:45:47', '2020-12-21 16:45:47', '2020-12', '0', '', '0', NULL, '', 0, 0, '', 8.0, 80.0, 'fact');
+INSERT INTO `worktimelist` VALUES (6, 2, 2, 3, '15', 26, 1.0, NULL, 1.0, NULL, '2020-12-21 16:46:56', '2020-12-21 16:46:56', '2020-12', '0', '', '0', NULL, '', 0, 0, '', 0.5, 90.0, 'fact');
 
 -- ----------------------------
 -- Event structure for update_schedule

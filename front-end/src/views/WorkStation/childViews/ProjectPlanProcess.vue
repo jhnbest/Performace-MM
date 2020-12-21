@@ -571,6 +571,7 @@
             it.applyMonthPlanProcessTableData = []
             if (searchData.length === 0) {
               it.$common.toast('该月份项目无实际进展', 'error', 'true')
+              resolve([])
             } else {
               let params = {
                 applyMonth: applyMonthString,
@@ -585,6 +586,7 @@
                     params = {
                       submitType: 'insert',
                       submitDate: it.dialogForm.title,
+                      applyType: 'fact',
                       data: []
                     }
                     console.log(res.data)

@@ -150,6 +150,7 @@ function workTimeInsertOP(params, i, operate) {
         let apdID = params.data[i].apdID
         let aplID = params.data[i].aplID
         let monthID = params.data[i].monthID
+        let applyType = params.applyType
         let updateTime = $time.formatTime()
         let submitStatus = null
         let reviewStatus = '0'
@@ -162,7 +163,8 @@ function workTimeInsertOP(params, i, operate) {
         if (params.submitType === 'insert') {  //新增
             sql = $sql.performance.addProject
             arrayParams = [submitID, projectTypeID, applyKValue, reviewKValue, applyCofficient, reviewCofficient, submitTime,
-                updateTime, applyMonth, submitStatus, submitComments, avaiableWorkTime, applyProcess, apdID, aplID, monthID]
+                updateTime, applyMonth, submitStatus, submitComments, avaiableWorkTime, applyProcess, apdID, aplID, monthID,
+                applyType]
         } else if (params.submitType === 'update') { //更新
             if (operate === '1') { // 提交
                 sql = $sql.performance.updateRejectProject

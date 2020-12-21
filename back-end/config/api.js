@@ -53,5 +53,6 @@ module.exports = {
     updateAssignProjectFilled: path + '/workStation/updateAssignProjectFilled', // 更新指派项目是否填报字段
     updateAssignWork: path + '/workStation/updateAssignWork', // 更新项目明细
     getAssignWorkDetail: path + '/workStation/getAssignWorkDetail', // 获取项目明细
-    submitPersonalProject: path + '/workStation/submitPersonalProject' // 提交个人申报项目
+    submitPersonalProject: path + '/workStation/submitPersonalProject', // 提交个人申报项目
+    submitMonthPlanProcess: path + '/workStation/submitMonthPlanProcess' // 提交计划至计划进展表
 };

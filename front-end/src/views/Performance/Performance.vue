@@ -25,20 +25,27 @@
 <!--        <el-button type="primary" size="medium" @click="handleSearchClick">查询</el-button>-->
 <!--      </el-form-item>-->
       <el-form-item style="margin-left: 30px">
-        <span style="font-size: 17px;font-weight: bold">本月总工时:
+        <span v-if="formData.selectType === '工时查询'" style="font-size: 17px;font-weight: bold">本月实际获得工时:
           <span style="color: #F56C6C;margin-left: 10px">{{formData.totalWorkTime}}</span></span>
+        <span v-if="formData.selectType === '计划查询'" style="font-size: 17px;font-weight: bold">本月预计获得工时:
+          <span style="color: #F56C6C;margin-left: 10px">{{planGetWorkTime}}</span></span>
       </el-form-item>
+      <br>
+      <el-radio-group v-model="formData.selectType" @change="handleSelectTypeChange">
+        <el-radio-button label="计划查询"></el-radio-button>
+        <el-radio-button label="工时查询"></el-radio-button>
+      </el-radio-group>
     </el-form>
+    <br>
     <!-- 分割线 start -->
     <div class="hr-10"></div>
     <!-- 分割线 end -->
-    <div class="main-content">
-      <div class="content-header">
-        <el-button type="primary" size="medium" @click="handleAddNew">新增工时申报</el-button>
-      </div>
+    <div v-if="showFlag.factTableShow" class="main-content">
+<!--      <div class="content-header">-->
+<!--        <el-button type="primary" size="medium" @click="handleAddNew">新增工时申报</el-button>-->
+<!--      </div>-->
       <div>
         <el-table
-          v-if="formData.isShowTable"
           :data="workDetailTable"
           style="width: 99%;margin: auto"
           v-loading="!this.reqFlag.getProjectList">
@@ -57,7 +64,6 @@
                 <el-form-item label="审核时间">
                   <span>{{ scope.row.reviewTime }}</span>
                 </el-form-item>
-
               </el-form>
             </template>
           </el-table-column>
@@ -117,13 +123,50 @@
         </el-table>
       </div>
     </div>
+    <!--计划表格-->
+    <div v-if="showFlag.planTableShow" class="main-content">
+      <el-table :data="workPlanTableData"
+                style="width: 99%;margin: auto">
+        <el-table-column label="序号" align="center" type="index"></el-table-column>
+        <el-table-column label="申报月份" align="center" prop="applyMonth"></el-table-column>
+        <el-table-column label="项目名称" align="center" prop="projectName"></el-table-column>
+        <el-table-column label="项目阶段" align="center" prop="projectStageName" width="200%"></el-table-column>
+        <el-table-column label="计划进展" align="center">
+          <template slot-scope="scope">
+            <div v-if="!scope.row.processEditable">
+              <span>{{scope.row.applyProcess + '%'}}</span>
+            </div>
+            <div v-else>
+              <el-input size="mini" v-model.number="scope.row.applyProcess"></el-input>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="预计获得工时" align="center" prop="avaiableWorkTime"></el-table-column>
+        <el-table-column label="操作" align="center" width="250">
+          <template slot-scope="scope">
+            <div v-if="!scope.row.processEditable">
+              <el-button type="primary"
+                         :disabled="!reqFlag.complete"
+                         size="mini"
+                         @click="handleComplete(scope.row)">已完成</el-button>
+              <el-button type="warning" size="mini" @click="handleAdjust(scope.row)">调整</el-button>
+              <el-button type="danger" size="mini" @click="handleDeletePlanItem(scope.row)">删除</el-button>
+            </div>
+            <div v-else>
+              <el-button type="primary" size="mini" @click="handleSave(scope.row)">保存</el-button>
+            </div>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
     <Cop v-if="showFlag.cop" ref="cop"/>
   </div>
 </template>
 
 <script>
 import Cop from '@/components/Cop/Cop'
-import { getProjectType, getProjectList, changeSubmitStatus, deleteProject, getAssignWorkTime } from '@/config/interface'
+import { getProjectType, getProjectList, changeSubmitStatus, deleteProject,
+  getAssignWorkTime, workTimeSubmit } from '@/config/interface'
     export default {
       data () {
         return {
@@ -139,16 +182,20 @@ import { getProjectType, getProjectList, changeSubmitStatus, deleteProject, getA
             title: this.$moment().format('YYYY-MM'),
             projectType: [],
             isShowTable: true,
-            totalWorkTime: 0
+            totalWorkTime: 0,
+            selectType: '工时查询'
           },
           showFlag: {
-            cop: false
+            cop: false,
+            factTableShow: true,
+            planTableShow: false
           },
           reqFlag: {
             getProjectType: true,
             getProjectList: true,
             changeSubmitStatus: true,
-            deleteProject: true
+            deleteProject: true,
+            complete: true
           },
           pageNum: 1, // 请求第几页
           pageSize: this.$store.state.pageSize, // 每页请求多少条
@@ -158,7 +205,9 @@ import { getProjectType, getProjectList, changeSubmitStatus, deleteProject, getA
               return time.getTime() > Date.now()
             }
           },
-          workDetailTable: []
+          workDetailTable: [],
+          workPlanTableData: [],
+          planGetWorkTime: 0
         }
       },
       methods: {
@@ -204,16 +253,31 @@ import { getProjectType, getProjectList, changeSubmitStatus, deleteProject, getA
                 .then(res => {
                   if (res.code == 1) {
                     let data = res.data
+                    let factWorkTimeList = []
+                    let planWorkTimeList = []
                     for (let item of data.list) {
                       item.assignWorkTime = null
+                      if (item.applyType === 'fact') { // 实际进展表格数据
+                        factWorkTimeList.push(item)
+                      } else if (item.applyType === 'plan') { // 计划进展表格数据
+                        it.planGetWorkTime = 0
+                        it.planGetWorkTime += item.avaiableWorkTime
+                        item.processEditable = false
+                        planWorkTimeList.push(item)
+                      }
                     }
-                    it.workDetailTable = data.list
-                    console.log(it.workDetailTable)
+                    it.workPlanTableData = JSON.parse(JSON.stringify(planWorkTimeList))
+                    it.workDetailTable = JSON.parse(JSON.stringify(factWorkTimeList))
+
                     it.totalCount = data.totalCount
                     it.currentPage = it.pageNum
-                    resolve(data.list)
+                    it.reqFlag.getProjectList = true
+                    if (it.formData.selectType === '工时查询') {
+                      resolve(factWorkTimeList)
+                    } else if (it.formData.selectType === '计划查询') {
+                      resolve(planWorkTimeList)
+                    }
                   }
-                  it.reqFlag.getProjectList = true
                 })
             }
           })
@@ -293,27 +357,91 @@ import { getProjectType, getProjectList, changeSubmitStatus, deleteProject, getA
           const url = getAssignWorkTime
           let i = 0
           this.formData.totalWorkTime = 0
-          for (let item of data) {
-            if (item.reviewStatus === '1') {
-              let params = {
-                index: i,
-                projectID: item.id,
-                userID: this.$store.state.userInfo.id
+          if (data.length !== 0) {
+            for (let item of data) {
+              if (item.reviewStatus === '1') {
+                let params = {
+                  index: i,
+                  projectID: item.id,
+                  userID: this.$store.state.userInfo.id
+                }
+                this.$http(url, params)
+                  .then(res => {
+                    if (res.code === 1) {
+                      let data = res.data
+                      console.log(data)
+                      this.workDetailTable[data.index].assignWorkTime = data.reviewWorkTime
+                      console.log(this.workDetailTable)
+                      this.formData.totalWorkTime += data.reviewWorkTime
+                    }
+                  })
               }
-              console.log(params)
-              this.$http(url, params)
-                .then(res => {
-                  if (res.code === 1) {
-                    let data = res.data
-                    console.log(data)
-                    this.workDetailTable[data.index].assignWorkTime = data.reviewWorkTime
-                    console.log(this.workDetailTable)
-                    this.formData.totalWorkTime += data.reviewWorkTime
-                  }
-                })
+              i++
             }
-            i++
           }
+        },
+        // 切换标签事件
+        handleSelectTypeChange (selectType) {
+          this.getProjectList().then(res => {
+            this.getAssignWorkTimes(res)
+            if (selectType === '工时查询') {
+              this.showFlag.factTableShow = true
+              this.showFlag.planTableShow = false
+            } else if (selectType === '计划查询') {
+              this.showFlag.factTableShow = false
+              this.showFlag.planTableShow = true
+            }
+          })
+        },
+        // 已完成按钮
+        handleComplete (row) {
+          console.log(row)
+          const url = workTimeSubmit
+          if (this.reqFlag.complete) {
+            this.reqFlag.complete = false
+            let title = this.formData.title
+            let params = {
+              submitType: 'insert',
+              submitDate: title,
+              data: [],
+              applyType: 'fact'
+            }
+            let defaultCurrentUserWorkTime = {
+              id: this.$store.state.userInfo.id,
+              groupName: this.$store.state.userInfo.groupName,
+              name: this.$store.state.userInfo.name,
+              applyRole: '组织者',
+              assignWorkTime: row.avaiableWorkTime,
+              deleteAble: false
+            }
+            row.defaultCofficient = row.applyCofficient
+            row.defaultKValue = row.applyKValue
+            row.workTimeAssign = []
+            row.workTimeAssign.push(defaultCurrentUserWorkTime)
+            params.data.push(row)
+            this.$http(url, params)
+              .then(res => {
+                if (res.code === 1) {
+                  this.$common.toast('已提交审核', 'success', false)
+                } else {
+                  this.$common.toast('提交失败', 'error', false)
+                }
+                this.reqFlag.complete = true
+              })
+          }
+        },
+        // 调整按钮
+        handleAdjust (row) {
+          console.log(row)
+          row.processEditable = true
+        },
+        // 保存按钮
+        handleSave (row) {
+          row.processEditable = false
+          row.avaiableWorkTime = row
+        },
+        // 删除按钮
+        handleDeletePlanItem (row) {
         }
       },
       computed: {

@@ -1,6 +1,6 @@
 <template>
     <div>
-      <h3 class="v-line-icon">新增工时申报</h3>
+      <h3 class="v-line-icon">新增项目申报</h3>
       <el-form :label-position="labelPosition" label-width="110px" ref="formData" :model="formData" :rules="formRules" :inline="true">
         <el-form-item label="申报月份" prop="title">
           <el-date-picker
@@ -22,8 +22,18 @@
         </el-form-item>
         <el-form-item>
           <el-button type="primary" size="medium" @click="onSubmitWorkTime('formData')">提交</el-button>
-          <el-button type="info" size="medium" @click="onTemporaryWorkTime('formData')">暂存</el-button>
+          <el-button v-if="formData.applyType === 'fact'" type="info" size="medium" @click="onTemporaryWorkTime('formData')">暂存</el-button>
           <el-button type="danger" size="medium" @click="onCancel('formData')">取 消</el-button>
+        </el-form-item>
+        <br>
+        <el-form-item label="申报类型" prop="applyType">
+          <el-select v-model="formData.applyType" placeholder="请选择" @change="handleApplyTypeChange">
+            <el-option v-for="item in applyTypes"
+                       :key="item.value"
+                       :label="item.text"
+                       :value="item.value">
+            </el-option>
+          </el-select>
         </el-form-item>
         <br>
         <el-form-item label="项目类型" prop="projectType">
@@ -58,6 +68,7 @@
         <br>
         <!--申报工时项目明细-->
         <el-table
+          v-if="showFlag.freshTable"
           :data="formData.workTypeTimeDetail"
           stripe
           style="width: 97%;margin: auto">
@@ -75,14 +86,19 @@
           <el-table-column label="项目阶段" align="center">
             <template slot-scope="scope">
               <div>
-                <el-input v-if="projectStageEditable"  v-model="scope.row.workType" size="mini"></el-input>
+                <el-input v-if="projectStageEditable"
+                          v-model="scope.row.workType"
+                          size="mini"></el-input>
                 <span v-else>{{scope.row.workType}}</span>
               </div>
             </template>
           </el-table-column>
           <el-table-column label="基本工时" prop="baseWorkTime" align="center" width="80%">
             <template slot-scope="scope">
-              <el-input v-if="projectStageEditable"  v-model.number="scope.row.baseWorkTime" size="mini"></el-input>
+              <el-input v-if="projectStageEditable"
+                        v-model.number="scope.row.baseWorkTime"
+                        size="mini"
+                        @change="handleKValueCoffChange(scope.row, scope.$index)"></el-input>
               <span v-else>{{scope.row.baseWorkTime}}</span>
             </template>
           </el-table-column>
@@ -118,7 +134,7 @@
               </el-form-item>
             </template>
           </el-table-column>
-          <el-table-column label="本月进展" align="center" width="100%">
+          <el-table-column label="本月进展" align="center" width="100%" v-if="formData.applyType === 'fact'">
             <template slot-scope="scope">
               <el-form-item
                 :prop="'workTypeTimeDetail.' + scope.$index + '.applyProcess'"
@@ -136,7 +152,27 @@
               </el-form-item>
             </template>
           </el-table-column>
-          <el-table-column label="工时分配" align="center" width="100%">
+          <el-table-column label="计划进展" align="center" width="100%" v-if="formData.applyType === 'plan'">
+            <template slot-scope="scope">
+              <el-form-item
+                :prop="'workTypeTimeDetail.' + scope.$index + '.applyProcess'"
+                :rules="formRules.applyProcess"
+                style="margin: auto">
+                <div>
+                  <el-input v-model.number="scope.row.applyProcess"
+                            type="number"
+                            size="mini"
+                            style="width: 70%"
+                            :max="100"
+                            @change="handleKValueCoffChange(scope.row, scope.$index)"></el-input>
+                  <span> %</span>
+                </div>
+              </el-form-item>
+            </template>
+          </el-table-column>
+          <el-table-column label="预计工时" align="center" width="100%" v-if="formData.applyType === 'plan'"
+                           prop="avaiableWorkTime"></el-table-column>
+          <el-table-column label="工时分配" align="center" width="100%" v-if="formData.applyType === 'fact'">
             <template slot-scope="scope">
               <span class="link-type" @click="handleWorkTimeAssign(scope.row, scope.$index)">点击分配</span>
             </template>
@@ -171,7 +207,7 @@
 </template>
 
 <script>
-  import { workTypeList, workTimeSubmit, getWorkTime, submitAssignWorkDetail, submitPlanProcess,
+  import { workTypeList, workTimeSubmit, getWorkTime, submitAssignWorkDetail, submitMonthPlanProcess,
     getUsersName, getProjectType, getWorkTimeNew, workTimeTemporary, submitPersonalProject } from '@/config/interface'
   import Assign from '@/components/Cop/workTimeAssign'
     export default {
@@ -225,7 +261,8 @@
             partTableData: [],
             workTypeTimeDetail: [],
             projectLevel: 1,
-            projectName: null
+            projectName: null,
+            applyType: 'fact'
           },
           formRules: {
             title: [
@@ -268,8 +305,15 @@
               { required: true, message: '请填写进展', trigger: 'change' },
               { type: 'number', max: 100 }
             ],
+            planProcess: [
+              { required: true, message: '请填写进展', trigger: 'change' },
+              { type: 'number', max: 100 }
+            ],
             projectLevel: [
               { required: true, message: '请选择项目级别', trigger: 'change' }
+            ],
+            applyType: [
+              { required: true, message: '请选择申报类型', trigger: 'change' }
             ]
           },
           reqFlag: {
@@ -281,12 +325,13 @@
           },
           showFlag: {
             workTimeAssign: false,
-            projectType: true
+            projectType: true,
+            freshTable: true
           },
           pickerOptions: {
-            disabledDate (time) {
-              return time.getTime() > Date.now()
-            }
+            // disabledDate (time) {
+            //   return time.getTime() > Date.now()
+            // }
           },
           workTime: 0,
           projectLevels: [{
@@ -301,6 +346,13 @@
           }, {
             value: 4,
             text: '公司重点任务'
+          }],
+          applyTypes: [{
+            value: 'plan',
+            text: '计划'
+          }, {
+            value: 'fact',
+            text: '实际'
           }]
         }
       },
@@ -325,7 +377,8 @@
               let params = {
                 submitType: 'insert',
                 submitDate: title,
-                data: tableDataCopy
+                data: tableDataCopy,
+                applyType: this.formData.applyType
               }
               this.$http(url, params)
                 .then(res => {
@@ -409,6 +462,59 @@
               })
           })
         },
+        // 提交计划至计划进展表
+        onSubmitMonthPlanProcess () {
+          const url = submitMonthPlanProcess
+          let applyYear = this.$moment(this.formData.title).year()
+          let applyMonth = this.$moment(this.formData.title).month()
+          let applyMonthString = this.$common.MonthToString(String(applyMonth + 1))
+          let params = {
+            paramsData: []
+          }
+          for (let item of this.formData.workTypeTimeDetail) {
+            if (item.applyProcess !== 0) {
+              let obj = {
+                id: null,
+                kValue: item.defaultKValue,
+                coefficient: item.defaultCofficient,
+                applyProcess: item.applyProcess,
+                type: 'plan',
+                year: applyYear,
+                applyMonthString: applyMonthString,
+                aPDID: item.apdID,
+                January: null,
+                February: null,
+                March: null,
+                April: null,
+                May: null,
+                June: null,
+                July: null,
+                August: null,
+                September: null,
+                October: null,
+                November: null,
+                December: null
+              }
+              obj[applyMonthString] = item.applyProcess
+              params.paramsData.push(obj)
+            }
+          }
+          console.log(params)
+          let it = this
+          return new Promise(function (resolve, reject) {
+            if (params.paramsData.length !== 0) {
+              it.$http(url, params)
+                .then(res => {
+                  if (res.code === 1) {
+                    console.log(res.data)
+                    resolve(res.data)
+                  }
+                })
+            } else {
+              resolve(0)
+            }
+          })
+        },
         // 提交工时申报
         onSubmitWorkTime (formData) {
           this.$refs[formData].validate(valid => {
@@ -423,7 +529,13 @@
                 this.$common.toast('一级活动限选一种', 'error', 'false')
               } else {
                 this.onSubmitProjectList().then(() => { // 提交至项目明细表
-                  this.onSubmitWorkTimeList(formData) // 提交至工时明细表
+                  if (this.formData.applyType === 'plan') { // 如果是计划项目，则更新计划进展表
+                    this.onSubmitMonthPlanProcess().then(() => {
+                      this.onSubmitWorkTimeList(formData) // 提交至工时明细表
+                    })
+                  } else {
+                    this.onSubmitWorkTimeList(formData) // 提交至工时明细表
+                  }
                 })
               }
             }
@@ -445,7 +557,8 @@
               let params = {
                 submitType: 'insert',
                 submitDate: title,
-                data: this.formData.workTypeTimeDetail
+                data: this.formData.workTypeTimeDetail,
+                applyType: this.formData.applyType
               }
               this.$http(url, params)
                 .then(res => {
@@ -487,7 +600,7 @@
         },
         // 取消
         onCancel (formName) {
-          this.$router.push({ path: '/home/Performance' })
+          this.$router.push({ path: '/home/workStation' })
           this.$refs[formName].resetFields()
         },
         // 获取申报类型
@@ -595,9 +708,12 @@
                         avaiableWorkTime: 0,
                         isConference: item.isConference,
                         defaultAssignWorkTime: item.defaultAssignWorkTime,
-                        applyProcess: 100
+                        applyProcess: 100,
+                        planProcess: 100,
+                        planWorkTime: 0
                       }
                       obj.avaiableWorkTime = obj.baseWorkTime * obj.defaultKValue * obj.defaultCofficient * obj.applyProcess * 0.01
+                      obj.planWorkTime = obj.avaiableWorkTime
                       let defaultCurrentUserWorkTime = {
                         id: this.$store.state.userInfo.id,
                         groupName: this.$store.state.userInfo.groupName,
@@ -872,6 +988,14 @@
           this.formData.projectType.splice(index, 1)
           this.showFlag.projectType = false
           this.refreshSelectProjectType()
+        },
+        // 申报类型变化
+        handleApplyTypeChange (applyType) {
+          console.log(applyType)
+          this.showFlag.freshTable = false
+          setTimeout(() => {
+            this.showFlag.freshTable = true
+          }, this.$store.state.refreshInterval)
         }
       },
       computed: {
