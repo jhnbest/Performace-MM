@@ -11,7 +11,7 @@
  Target Server Version : 80020
  File Encoding         : 65001
 
- Date: 22/12/2020 17:05:48
+ Date: 23/12/2020 16:38:26
 */
 
 SET NAMES utf8mb4;
@@ -26,15 +26,15 @@ CREATE TABLE `assignprojectdetail`  (
   `aPLID` int UNSIGNED NOT NULL COMMENT '项目列表外键',
   `projectStage` int UNSIGNED NOT NULL DEFAULT 0 COMMENT '项目阶段',
   `projectStageName` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '非标项目阶段名称',
-  `baseWorkTime` float(5, 1) UNSIGNED NOT NULL COMMENT '标准工时',
-  `kValue` float(5, 1) UNSIGNED NOT NULL DEFAULT 1.0 COMMENT 'K值',
-  `coefficient` smallint UNSIGNED NOT NULL DEFAULT 1 COMMENT '系数',
-  `avaiableWorkTime` float(5, 1) UNSIGNED NOT NULL DEFAULT 0.0 COMMENT '可用工时',
+  `baseWorkTime` float(5, 1) NOT NULL COMMENT '标准工时',
+  `kValue` float(5, 1) NOT NULL DEFAULT 1.0 COMMENT 'K值',
+  `coefficient` smallint NOT NULL DEFAULT 1 COMMENT '系数',
+  `avaiableWorkTime` float(5, 1) NOT NULL DEFAULT 0.0 COMMENT '可用工时',
   `process` float(4, 1) UNSIGNED NOT NULL DEFAULT 0.0 COMMENT '进展',
   `obsoleteStatus` tinyint NOT NULL DEFAULT 0 COMMENT '废弃状态',
   `isFinish` tinyint NOT NULL DEFAULT 0 COMMENT '是否已完成',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of assignprojectdetail
@@ -52,14 +52,14 @@ CREATE TABLE `assignprojectlist`  (
   `projectName` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '项目名称',
   `process` double(4, 1) UNSIGNED NOT NULL DEFAULT 0.0 COMMENT '完成度',
   `assignerID` int UNSIGNED NOT NULL DEFAULT 0 COMMENT '分配人',
-  `totalWorkTime` double(10, 1) UNSIGNED NOT NULL DEFAULT 0.0 COMMENT '总工时数',
-  `gettedWorkTime` double(10, 1) UNSIGNED NOT NULL DEFAULT 0.0 COMMENT '已获得工时数',
+  `totalWorkTime` double(10, 1) NOT NULL DEFAULT 0.0 COMMENT '总工时数',
+  `gettedWorkTime` double(10, 1) NOT NULL DEFAULT 0.0 COMMENT '已获得工时数',
   `isFilled` tinyint NOT NULL DEFAULT 0 COMMENT '当月是否已填报',
   `obsoleteStatus` tinyint NOT NULL DEFAULT 0 COMMENT '是否废弃',
   `projectLevel` tinyint NOT NULL DEFAULT 1 COMMENT '项目级别',
   `reviewStatus` tinyint NOT NULL DEFAULT 1 COMMENT '审核状态',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of assignprojectlist
@@ -182,7 +182,7 @@ CREATE TABLE `projecttypenew`  (
   `defaultAssignWorkTime` double(255, 1) NOT NULL DEFAULT 0.0 COMMENT '默认协助工时',
   `obsoleteStatus` tinyint NOT NULL DEFAULT 0 COMMENT '是否废弃',
   PRIMARY KEY (`projectTypeID`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 275 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 379 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of projecttypenew
@@ -240,7 +240,7 @@ INSERT INTO `projecttypenew` VALUES (50, '宣传', 267, 3, 0.0, 0, 0, 0.0, 0);
 INSERT INTO `projecttypenew` VALUES (51, '培训/知识分享', 267, 3, 0.0, 0, 0, 0.0, 0);
 INSERT INTO `projecttypenew` VALUES (52, '工作饱和度', 267, 3, 0.0, 0, 0, 0.0, 0);
 INSERT INTO `projecttypenew` VALUES (53, '评先评优', 267, 3, 0.0, 0, 0, 0.0, 0);
-INSERT INTO `projecttypenew` VALUES (54, '其他', 267, 3, 0.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (54, '工时扣罚', 4, 3, 0.0, 0, 0, 0.0, 0);
 INSERT INTO `projecttypenew` VALUES (55, '党员学习/月', 40, 4, 1.0, 0, 0, 0.0, 0);
 INSERT INTO `projecttypenew` VALUES (56, '团员学习/月', 40, 4, 0.5, 0, 0, 0.0, 0);
 INSERT INTO `projecttypenew` VALUES (57, '制作党课教材', 40, 4, 8.0, 0, 0, 0.0, 0);
@@ -311,16 +311,16 @@ INSERT INTO `projecttypenew` VALUES (121, '在处室/部门/公司分享个人�
 INSERT INTO `projecttypenew` VALUES (122, '加班超过30小时/月', 52, 4, 20.0, 0, 0, 0.0, 0);
 INSERT INTO `projecttypenew` VALUES (123, '加班在10-30小时/月', 52, 4, 10.0, 0, 0, 0.0, 0);
 INSERT INTO `projecttypenew` VALUES (124, '当选季度之星', 53, 4, 50.0, 0, 0, 0.0, 0);
-INSERT INTO `projecttypenew` VALUES (125, '因个人原因导致本处绩效减分', 54, 4, -50.0, 1, 0, 0.0, 0);
-INSERT INTO `projecttypenew` VALUES (126, '不服从管理人员工作安排，与管理人员、其他同事发生冲突造成不良影响的', 54, 4, -50.0, 1, 0, 0.0, 0);
-INSERT INTO `projecttypenew` VALUES (127, '因个人原因导致审计问题', 54, 4, -200.0, 0, 0, 0.0, 0);
-INSERT INTO `projecttypenew` VALUES (128, '考勤异常，在部门通报后补办手续的', 54, 4, -10.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (125, '因个人原因导致本处绩效减分', 54, 4, -50.0, 1, 1, -50.0, 0);
+INSERT INTO `projecttypenew` VALUES (126, '不服从管理人员工作安排，与管理人员、其他同事发生冲突造成不良影响的', 54, 4, -50.0, 1, 1, -50.0, 0);
+INSERT INTO `projecttypenew` VALUES (127, '因个人原因导致审计问题', 54, 4, -200.0, 0, 1, -200.0, 0);
+INSERT INTO `projecttypenew` VALUES (128, '考勤异常，在部门通报后补办手续的', 54, 4, -10.0, 0, 1, -10.0, 0);
 INSERT INTO `projecttypenew` VALUES (129, '个人原因使得处室绩效加分', 54, 4, 50.0, 1, 0, 0.0, 0);
 INSERT INTO `projecttypenew` VALUES (130, '在工作中及时发现存在的问题，风险点，并被处室/部门/公司采纳', 54, 4, 10.0, 1, 0, 0.0, 0);
 INSERT INTO `projecttypenew` VALUES (131, '个人受用户/部门/公司领导表扬', 54, 4, 10.0, 1, 0, 0.0, 0);
-INSERT INTO `projecttypenew` VALUES (132, '个人受用户投诉或者部门/公司领导批评', 54, 4, -10.0, 1, 0, 0.0, 0);
-INSERT INTO `projecttypenew` VALUES (133, '未在每月第二个工作日前制定月度工作计划', 54, 4, -10.0, 0, 0, 0.0, 0);
-INSERT INTO `projecttypenew` VALUES (134, '未按照要求进行项目/任务完成情况反馈', 54, 4, -10.0, 0, 0, 0.0, 0);
+INSERT INTO `projecttypenew` VALUES (132, '个人受用户投诉或者部门/公司领导批评', 54, 4, -10.0, 1, 1, -10.0, 0);
+INSERT INTO `projecttypenew` VALUES (133, '未在每月第二个工作日前制定月度工作计划', 54, 4, -10.0, 0, 1, -10.0, 0);
+INSERT INTO `projecttypenew` VALUES (134, '未按照要求进行项目/任务完成情况反馈', 54, 4, -10.0, 0, 1, -10.0, 0);
 INSERT INTO `projecttypenew` VALUES (135, '系统建设规划', 6, 3, 0.0, 0, 0, 0.0, 0);
 INSERT INTO `projecttypenew` VALUES (136, '编写智能化系统建设规划，并完成汇报，明确具体规划方案', 135, 4, 40.0, 1, 0, 0.0, 0);
 INSERT INTO `projecttypenew` VALUES (137, '完成特殊任务方案汇报', 135, 4, 40.0, 1, 0, 0.0, 0);
@@ -1130,12 +1130,12 @@ CREATE TABLE `worktimeassign`  (
   `id` int NOT NULL AUTO_INCREMENT,
   `userID` int NOT NULL COMMENT '参与人员外键',
   `projectID` int NOT NULL COMMENT '参与项目外键',
-  `workTime` double(255, 1) NOT NULL COMMENT '分配的工时数',
-  `reviewWorkTime` double(255, 1) NULL DEFAULT NULL COMMENT '审核的工时数',
-  `assignRole` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '参与人员角色',
+  `workTime` float(6, 1) NOT NULL COMMENT '分配的工时数',
+  `reviewWorkTime` float(6, 1) NULL DEFAULT NULL COMMENT '审核的工时数',
+  `assignRole` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '参与人员角色',
   `obsoleteStatus` tinyint NOT NULL DEFAULT 0 COMMENT '废弃状态',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of worktimeassign
@@ -1167,13 +1167,13 @@ CREATE TABLE `worktimelist`  (
   `obsoleteStatus` tinyint NOT NULL DEFAULT 0 COMMENT '废弃状态',
   `workTimeAssignReviewStatus` tinyint NOT NULL DEFAULT 0 COMMENT '工时分配审核状态',
   `reviewer` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '' COMMENT '审核人',
-  `avaiableWorkTime` double(255, 1) UNSIGNED NOT NULL DEFAULT 0.0 COMMENT '可用工时',
-  `applyProcess` float(4, 1) UNSIGNED ZEROFILL NOT NULL DEFAULT 00.0 COMMENT '申报进展',
+  `avaiableWorkTime` double(255, 1) NOT NULL DEFAULT 0.0 COMMENT '可用工时',
+  `applyProcess` float(4, 1) UNSIGNED NOT NULL DEFAULT 0.0 COMMENT '申报进展',
   `lastProcess` float(4, 1) UNSIGNED NOT NULL DEFAULT 0.0 COMMENT '上月进展',
   `applyType` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '申报类型',
   `applyBaseWorkTime` float(6, 1) NOT NULL COMMENT '申报的基本工时（非标项目使用）',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of worktimelist

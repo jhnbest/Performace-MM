@@ -120,7 +120,7 @@
               </el-form-item>
             </template>
           </el-table-column>
-          <el-table-column label="次数" align="center" width="150%">
+          <el-table-column label="完成次数" align="center" width="150%">
             <template slot-scope="scope">
               <el-form-item :prop="'workTypeTimeDetail.' + scope.$index + '.defaultCofficient'"
                             :rules="formRules.Cofficient"
@@ -720,7 +720,7 @@
                         groupName: this.$store.state.userInfo.groupName,
                         name: this.$store.state.userInfo.name,
                         applyRole: '组织者',
-                        assignWorkTime: obj.baseWorkTime * obj.defaultKValue * obj.defaultCofficient,
+                        assignWorkTime: obj.avaiableWorkTime,
                         deleteAble: false
                       }
                       obj.workTimeAssign.push(defaultCurrentUserWorkTime)

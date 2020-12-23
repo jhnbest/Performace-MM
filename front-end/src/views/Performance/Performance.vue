@@ -515,6 +515,7 @@ import { getProjectType, getProjectList, changeSubmitStatus, deleteProject,
       },
       created () {
         console.log('===Performance.vue create')
+        console.log(this.$store.state.userInfo)
         this.init()
       },
       mounted () {

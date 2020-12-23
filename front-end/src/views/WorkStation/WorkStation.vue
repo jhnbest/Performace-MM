@@ -31,7 +31,11 @@
           <h3 class="v-line-icon-red">基建类项目</h3>
           <TEST :fatherParams="JJData" @countFeedback="handleCountFeedbackJJ"/>
         </el-col>
-        <el-col :xs="24" :sm="24" :lg="24" :xl="12">
+        <el-col v-if="$store.state.userInfo.groupName === '通信组'" :xs="24" :sm="24" :lg="24" :xl="12">
+          <h3 class="v-line-icon-green">基础平台类项目</h3>
+          <TEST :fatherParams="JCPTTXData" @countFeedback="handleCountFeedbackTXJCPT"/>
+        </el-col>
+        <el-col v-else :xs="24" :sm="24" :lg="24" :xl="12">
           <h3 class="v-line-icon-green">基础平台类项目</h3>
           <TEST :fatherParams="JCPTData" @countFeedback="handleCountFeedbackJCPT"/>
         </el-col>
@@ -90,6 +94,10 @@
             projectTypeID: 213,
             searchType: 'unFilled'
           },
+          JCPTTXData: {
+            projectTypeID: 275,
+            searchType: 'unFilled'
+          },
           XSData: {
             projectTypeID: 249,
             searchType: 'unFilled'
@@ -117,6 +125,7 @@
             this.XSData.searchType = 'unFilled'
             this.OtherStandData.searchType = 'unFilled'
             this.OtherUnStandData.searchType = 'unFilled'
+            this.JCPTTXData.searchType = 'unFilled'
           } else if (this.formData.selectType === '已填报') {
             this.JJData.searchType = 'Filled'
             this.XXData.searchType = 'Filled'
@@ -124,6 +133,7 @@
             this.XSData.searchType = 'Filled'
             this.OtherStandData.searchType = 'Filled'
             this.OtherUnStandData.searchType = 'Filled'
+            this.JCPTTXData.searchType = 'Filled'
           } else if (this.formData.selectType === '已完成') {
             this.JJData.searchType = 'completed'
             this.XXData.searchType = 'completed'
@@ -131,6 +141,7 @@
             this.XSData.searchType = 'completed'
             this.OtherStandData.searchType = 'completed'
             this.OtherUnStandData.searchType = 'completed'
+            this.JCPTTXData.searchType = 'completed'
           }
           this.$nextTick(() => {
             this.showFlag = true
@@ -155,6 +166,11 @@
           }
         },
         handleCountFeedbackJCPT (params) {
+          if (this.formData.selectType === '未填报') {
+            this.unFilledTotalCount += params
+          }
+        },
+        handleCountFeedbackTXJCPT (params) {
           if (this.formData.selectType === '未填报') {
             this.unFilledTotalCount += params
           }

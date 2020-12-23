@@ -5,7 +5,7 @@
         <el-col :span="8" :offset="7">
           <h3>{{formData.yearNum + '年 ' + formData.projectName  + '计划&实际进展填报'}}</h3>
         </el-col>
-        <el-col :span="1" :offset="2">
+        <el-col :span="1" :offset="1">
           <el-button style="margin-top: 17px" size="medium" type="warning" @click="genWorkTimePlanApply">生成项目计划</el-button>
         </el-col>
         <el-col :span="1" :offset="2">

@@ -89,6 +89,8 @@ function workTimeAssignDelete(id) {
 
 function workTimeAssign(projectInsertID, data, i, j) {
     return new Promise(function(resolve, reject) {
+        console.log('workTimeAssign')
+        console.log(data.data[i].workTimeAssign[j])
         let sql = null
         let userID = data.data[i].workTimeAssign[j].id
         let projectID = projectInsertID
@@ -135,6 +137,8 @@ function workTimeAssign(projectInsertID, data, i, j) {
 
 function workTimeInsertOP(params, i, operate) {
     return new Promise(function(resolve, reject) {
+        console.log('-=-=-=-=-=-=')
+        console.log(params)
         let submitTime = $time.formatTime()
         let sql = null
         let arrayParams = []
@@ -152,6 +156,7 @@ function workTimeInsertOP(params, i, operate) {
         let aplID = params.data[i].aplID
         let monthID = params.data[i].monthID
         let applyType = params.applyType
+        let applyBaseWorkTime = params.data[i].baseWorkTime
         let updateTime = $time.formatTime()
         let submitStatus = null
         let reviewStatus = '0'
@@ -165,7 +170,7 @@ function workTimeInsertOP(params, i, operate) {
             sql = $sql.performance.addProject
             arrayParams = [submitID, projectTypeID, applyKValue, reviewKValue, applyCofficient, reviewCofficient, submitTime,
                 updateTime, applyMonth, submitStatus, submitComments, avaiableWorkTime, applyProcess, apdID, aplID, monthID,
-                applyType, lastProcess]
+                applyType, lastProcess, applyBaseWorkTime]
         } else if (params.submitType === 'update') { //更新
             if (operate === '1') { // 提交
                 sql = $sql.performance.updateRejectProject

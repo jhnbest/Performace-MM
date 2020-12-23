@@ -5,8 +5,8 @@ function resolve(dir) {
     return path.join(__dirname, dir)
 }
 module.exports = {
-    // publicPath: './workTimeMM/',
-    publicPath: '/workTimeMM/',
+    // publicPath: './workTimeMM/', // 线上
+    publicPath: '/workTimeMM/', // 线下
     assetsDir: 'static',
     lintOnSave: true,
     productionSourceMap: false,

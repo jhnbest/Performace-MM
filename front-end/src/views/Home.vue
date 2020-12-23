@@ -27,9 +27,21 @@
           :collapse="iscollapse">
           <el-menu-item v-for="item in menuList" :key="item.url" :index="item.url"
           @click="handleSelect(item.url)">
-            <i :class="item.icon" style="font-size: 20px"></i>
-            <span slot="title">{{item.name}}</span>
+            <template slot="title">
+              <i :class="item.icon" style="font-size: 20px"></i>
+              <span>{{item.name}}</span>
+            </template>
           </el-menu-item>
+          <el-submenu index="1" v-if="$store.state.userInfo.role !== '普通成员'">
+            <template slot="title">
+              <i class="el-icon-s-custom" style="font-size: 20px"></i>
+              <span style="font-size: 16px">工时管理</span>
+            </template>
+            <el-menu-item v-for="item in workTimeManagerList" :key="item.url" :index="item.url"
+                          @click="handleSelect(item.url)">
+              <span slot="title">{{item.name}}</span>
+            </el-menu-item>
+          </el-submenu>
         </el-menu>
       </div>
       <!-- aside-nav end -->
@@ -49,6 +61,7 @@ export default {
     return {
       iscollapse: false,
       menuList: this.$store.state.menuList,
+      workTimeManagerList: this.$store.state.workTimeManagerList,
       activePath: null,
       reqFlag: {
         logout: true

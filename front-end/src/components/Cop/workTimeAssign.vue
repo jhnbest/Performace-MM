@@ -72,7 +72,6 @@
                 <el-input-number size="mini"
                                  v-model="scope.row.assignWorkTime"
                                  :step="0.5"
-                                 :min="0.0"
                                  :precision="1"
                                  @change="handleAssignWorkTimeChange(scope.row)">
                 </el-input-number>

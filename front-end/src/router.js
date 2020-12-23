@@ -74,6 +74,12 @@ export default new Router({
           meta: { pagePath: '/home/performance' }
         },
         {
+          path: 'workPlanCheck',
+          name: 'workPlanCheck',
+          component: () => import(/* webpackChunkName: "weekly" */ './views/workPlanCheck/workPlanCheck.vue'),
+          meta: { pagePath: '/home/workPlanCheck' }
+        },
+        {
           path: 'weeklyadd',
           name: 'weeklyadd',
           component: () => import(/* webpackChunkName: "weekly" */ './views/Weekly/childViews/WeeklyAdd.vue'),

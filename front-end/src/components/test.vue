@@ -41,7 +41,9 @@
           <span class="link-type" @click="handleFillIn(scope.row)">重新填报</span>
         </template>
       </el-table-column>
-      <el-table-column v-if="this.fatherParams.projectTypeID === 5" label="操作" align="center">
+      <el-table-column v-if="this.fatherParams.projectTypeID === 4 || this.fatherParams.projectTypeID === 5"
+                       label="操作"
+                       align="center">
         <template slot-scope="scope">
           <el-button type="danger" size="mini" @click="handleDelete(scope.row)">删除</el-button>
         </template>

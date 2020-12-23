@@ -13,7 +13,7 @@
       <el-table-column prop="dept" label="处室" align="center"></el-table-column>
       <el-table-column prop="groupName" label="小组" align="center"></el-table-column>
       <el-table-column prop="name" label="姓名" align="center"></el-table-column>
-      <el-table-column prop="role" label="身份" align="center"></el-table-column>
+      <el-table-column prop="role" label="权限" align="center"></el-table-column>
       <el-table-column prop="status" label="状态" align="center"></el-table-column>
     </el-table>
   </div>

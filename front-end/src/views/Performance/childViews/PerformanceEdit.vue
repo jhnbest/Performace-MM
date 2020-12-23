@@ -61,12 +61,12 @@
           <el-table-column label="项目阶段" align="center">
             <template slot-scope="scope">
               <div>
-                <el-input v-if="projectStageEditable"  v-model="scope.row.workType" size="mini"></el-input>
+                <el-input v-if="projectStageEditable"  v-model="scope.row.workType" size="mini" :disabled="true"></el-input>
                 <span v-else>{{scope.row.workType}}</span>
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="基本工时" prop="baseWorkTime" align="center" width="80%"></el-table-column>
+          <el-table-column label="基本工时" prop="applyBaseWorkTime" align="center" width="80%"></el-table-column>
           <el-table-column label="K值" prop="defaultKValue" align="center" width="150%">
             <template slot-scope="scope">
               <el-form-item
@@ -85,7 +85,7 @@
               </el-form-item>
             </template>
           </el-table-column>
-          <el-table-column label="次数" align="center" width="150%">
+          <el-table-column label="完成次数" align="center" width="150%">
             <template slot-scope="scope">
               <el-form-item :prop="'workTypeTimeDetail.' + scope.$index + '.defaultCofficient'"
                             :rules="formRules.Cofficient"
@@ -136,18 +136,15 @@
               </el-input>
             </template>
           </el-table-column>
-          <el-table-column label="操作" align="center" width="100%">
-            <template slot-scope="scope">
-              <div>
-                <el-button size="mini" type="danger" @click="handleDelete(scope.row, scope.$index)">删除</el-button>
-              </div>
-            </template>
-          </el-table-column>
+<!--          <el-table-column label="操作" align="center" width="100%">-->
+<!--            <template slot-scope="scope">-->
+<!--              <div>-->
+<!--                <el-button size="mini" type="danger" @click="handleDelete(scope.row, scope.$index)">删除</el-button>-->
+<!--              </div>-->
+<!--            </template>-->
+<!--          </el-table-column>-->
         </el-table>
         <br>
-        <div style="text-align: center" v-if="projectStageEditable">
-          <el-button type="primary" size="mini" plain @click="addNewLine">新增一行</el-button>
-        </div>
       </el-form>
       <Assign v-if="showFlag.workTimeAssign" ref="workTimeAssign" @assignDetail="handleAssign"/>
     </div>
@@ -386,7 +383,8 @@
                     applyProcess: data.workTimeList[0].applyProcess,
                     apdID: data.workTimeList[0].apdID,
                     workType: data.workTimeList[0].projectStageName,
-                    lastProcess: data.workTimeList[0].lastProcess
+                    lastProcess: data.workTimeList[0].lastProcess,
+                    applyBaseWorkTime: data.workTimeList[0].applyBaseWorkTime
                   }
                   // obj.avaiableWorkTime = obj.baseWorkTime * obj.defaultKValue * obj.defaultCofficient
                   obj.workTimeAssign = defaultCurrentUserWorkTime

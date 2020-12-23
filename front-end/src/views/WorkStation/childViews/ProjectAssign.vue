@@ -212,11 +212,10 @@
                   resizable
                   :span-method="objectSpanMethod"
                   :height="tableMaxHeight" style="margin-top: -20px">
-          <el-table-column label="项目阶段" align="center" prop="projectStage" fixed></el-table-column>
+          <el-table-column label="项目阶段" align="center" prop="projectStageName" fixed></el-table-column>
           <el-table-column label="标准工时" align="center" prop="baseWorkTime" width="50%"></el-table-column>
           <el-table-column label="K值" align="center" prop="kValue" width="50%"></el-table-column>
-          <el-table-column label="系数" align="center" prop="coefficient" width="60%"></el-table-column>
-          <el-table-column label="剩余可分配工时" align="center" prop="avaiableWorkTime" width="70%"></el-table-column>
+          <el-table-column label="完成次数" align="center" prop="coefficient" width="60%"></el-table-column>
           <el-table-column label="类型" align="center" prop="type" width="50%">
             <template slot-scope="scope">
               <span>{{scope.row.type | processTypeFilter}}</span>
@@ -524,6 +523,11 @@
         submit () {
           if (this.tableData.length !== 0) {
             const url = submitAssignWorkDetail
+            for (let item of this.tableData) { // 可用工时替换基本工时（针对目前已经进行到一半的项目）
+              item.workTime = item.avaiableWorkTime
+            }
+            console.log('-=-=-=-')
+            console.log(this.tableData)
             let params = {
               tableData: this.tableData,
               parentID: this.formData.projectType[0][0],
@@ -684,7 +688,7 @@
         },
         // 表格列合并方法
         objectSpanMethod ({ row, column, rowIndex, columnIndex }) {
-          if (columnIndex === 0 || columnIndex === 1 || columnIndex === 2 || columnIndex === 3 || columnIndex === 4) {
+          if (columnIndex === 0 || columnIndex === 1 || columnIndex === 2 || columnIndex === 3) {
             if (rowIndex % 2 === 0) {
               return {
                 rowspan: 2,

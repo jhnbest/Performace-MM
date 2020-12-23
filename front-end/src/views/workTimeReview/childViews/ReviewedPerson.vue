@@ -20,8 +20,8 @@
             </el-form-item>
           </template>
         </el-table-column>
-        <el-table-column label="申报次数" align="center" prop="applyCofficient"></el-table-column>
-        <el-table-column label="审核次数" align="center">
+        <el-table-column label="申报完成次数" align="center" prop="applyCofficient"></el-table-column>
+        <el-table-column label="审核完成次数" align="center">
           <template slot-scope="scope">
             <el-form-item
               :prop="'workDetailTable.' + scope.$index + '.reviewCofficient'"
@@ -56,6 +56,11 @@
         <el-table-column label="提交时间" align="center" prop="updateTime" width="100%"></el-table-column>
         <el-table-column v-if="info.reviewType === 'reviewed'"
                          label="审核时间"
+                         align="center"
+                         prop="reviewTime"
+                         width="100%"></el-table-column>
+        <el-table-column v-if="info.reviewType === 'reviewed'"
+                         label="审核人"
                          align="center"
                          prop="reviewTime"
                          width="100%"></el-table-column>
