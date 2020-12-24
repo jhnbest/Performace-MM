@@ -351,7 +351,6 @@ const user = {
   /* 获取组员名称 */
   getGroupUserName (req, res) {
     $http.userVerify(req, res, () => {
-      console.log(req.body)
       let data = req.body
       let sql = $sql.user.getGroupUserName
       if (data.role === '管理员') {
@@ -363,7 +362,6 @@ const user = {
           return $http.writeJson(res, {code: -2, message: '失败'})
         } else {
           result = formatData(result)
-          console.log(result)
           return $http.writeJson(res, {code: 1, data: result, message: '获取组员信息成功'})
         }
       })

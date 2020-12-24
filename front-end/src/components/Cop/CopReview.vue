@@ -1,6 +1,15 @@
 <template>
   <el-dialog title="工时详情" :visible.sync="showFlag" custom-class="dialog-small" @close="closeDialog" width="50%">
     <div>
+      <div v-if="!formData.isConference">
+          <span style="font-weight: bold;font-size: 120%">
+            总可用工时：<span style="color: #ff0000;font-size: 130%">{{formData.totalWorkTime}}</span>
+          </span>
+        <span style="margin-left: 50px;font-weight: bold;font-size: 120%">
+            已分配工时：<span style="color: red;font-size: 130%">{{totalReviewWorkTime}}</span>
+          </span>
+      </div>
+      <br>
       <el-form ref="formData" :model="formData" :rules="formRules">
         <el-table
           height="300"
@@ -25,8 +34,7 @@
                             style="margin: auto">
                 <el-input :disabled="!(formData.reviewStatus === '0')"
                           size="medium"
-                          v-model="scope.row.reviewWorkTime"
-                          @change="test(scope.$index)"></el-input>
+                          v-model="scope.row.reviewWorkTime"></el-input>
               </el-form-item>
             </template>
           </el-table-column>
@@ -54,7 +62,9 @@ export default {
         selectIndex: null,
         reviewStatus: null,
         reviewType: null,
-        projectID: null
+        projectID: null,
+        isConference: false,
+        totalWorkTime: 0
       },
       reqFlag: {
         edit: true,
@@ -72,21 +82,21 @@ export default {
   created () {
   },
   methods: {
-    test (index) {
-    },
     // 初始化
     init (row, index, reviewType) {
       this.$nextTick(() => {
         console.log(row)
         this.changeShowFlag()
-        this.getWorkTimeAssign(row.id)
+        this.getWorkTimeAssign(row.id, row.scale, row.reviewStatus)
         this.formData.selectIndex = index
         this.formData.reviewStatus = row.reviewStatus
         this.formData.reviewType = reviewType
         this.formData.projectID = row.id
+        this.formData.isConference = row.isConference
+        this.formData.totalWorkTime = row.avaiableWorkTime
       })
     },
-    getWorkTimeAssign (id) {
+    getWorkTimeAssign (id, scale, reviewStatus) {
       const url = getWorkAssign
       let params = {
         projectID: id
@@ -99,9 +109,11 @@ export default {
               let data = res.data
               console.log('===CopReview.vue getWorkTimeAssign')
               console.log(data)
+              this.formData.totalReviewWorkTime = 0
               for (let item of data) {
-                if (item.reviewWorkTime === null) {
-                  item.reviewWorkTime = item.workTime
+                if (reviewStatus === '0') {
+                  item.reviewWorkTime = item.workTime * (1 + scale)
+                  item.reviewWorkTime = Number(item.reviewWorkTime.toFixed(1))
                 }
               }
               this.formData.copInfoTable = data
@@ -141,10 +153,18 @@ export default {
     // 取消
     onCancel (formName) {
       this.changeShowFlag()
-      this.$refs[formName].resetFields()
     },
     // 关闭弹出框
     closeDialog () {
+    }
+  },
+  computed: {
+    totalReviewWorkTime () {
+      let total = 0
+      for (let item of this.formData.copInfoTable) {
+        total += item.reviewWorkTime
+      }
+      return Number(total.toFixed(1))
     }
   },
   filters: {

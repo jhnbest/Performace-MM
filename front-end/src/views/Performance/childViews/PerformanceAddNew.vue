@@ -433,6 +433,7 @@
             parentID: this.formData.projectType[0][0],
             projectLevel: this.formData.projectLevel,
             projectName: this.formData.projectName,
+            isFilled: 1,
             tableData: []
           }
           for (let item of this.formData.workTypeTimeDetail) {
@@ -501,7 +502,6 @@
               params.paramsData.push(obj)
             }
           }
-          console.log(params)
           let it = this
           return new Promise(function (resolve, reject) {
             if (params.paramsData.length !== 0) {

@@ -84,13 +84,11 @@
       },
       methods: {
         init () {
-          console.log(this.$store.state.userInfo)
           if (this.$store.state.userInfo.role === '组长' || this.$store.state.userInfo.role === '管理员') {
             this.getGroupUsers().then(res => {
               this.getUnReviewProjectCount(res).then(res => {
                 this.groupUsers = res
                 for (let item of this.groupUsers) {
-                  console.log(item)
                   if (item.unReviewProjectCount !== 0) {
                     this.formData.reviewPerson = String(item.id)
                     break
@@ -114,8 +112,6 @@
                 .then(res => {
                   if (res.code === 1) {
                     let data = res.data
-                    console.log('getUnReviewProjectList')
-                    console.log(data)
                     resolve(data)
                   }
                   it.reqFlag.getGroupUsers = true
@@ -137,8 +133,6 @@
               it.$http(url, params)
                 .then(res => {
                   if (res.code === 1) {
-                    console.log('getUnReviewProjectCount')
-                    console.log(res.data)
                     let data = res.data
                     resolve(data)
                   }
@@ -161,8 +155,6 @@
               it.$http(url, params)
                 .then(res => {
                   if (res.code === 1) {
-                    console.log('getUnReviewProjectCount')
-                    console.log(res.data)
                     let data = res.data
                     resolve(data)
                   }
@@ -178,7 +170,6 @@
                 this.getReviewedProjectCount(res).then(res => {
                   this.groupUsers = res
                   for (let item of this.groupUsers) {
-                    console.log(item)
                     if (item.reviewedProjectCount !== 0) {
                       this.formData.reviewPerson = String(item.id)
                       break
@@ -235,7 +226,6 @@
                 this.getReviewedProjectCount(res).then(res => {
                   this.groupUsers = res
                   for (let item of this.groupUsers) {
-                    console.log(item)
                     if (item.reviewedProjectCount !== 0) {
                       this.formData.reviewPerson = String(item.id)
                       break
@@ -262,7 +252,6 @@
         unReviewProjectCount () {
           let totalNum = 0
           for (let item of this.groupUsers) {
-            console.log(item)
             totalNum += item.unReviewProjectCount
           }
           return totalNum
@@ -270,7 +259,6 @@
         reviewedProjectCount () {
           let totalNum = 0
           for (let item of this.groupUsers) {
-            console.log(item)
             totalNum += item.reviewedProjectCount
           }
           return totalNum

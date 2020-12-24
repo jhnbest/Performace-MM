@@ -626,6 +626,7 @@ const workStation = {
         let data = req.body
         let sql = null
         let arrayParams = []
+        console.log('====submitAssignWorkDetail')
         console.log(data)
         let projectTypeID = data.parentID
         let projectName = data.projectName
@@ -634,6 +635,10 @@ const workStation = {
         let totalWorkTime = 0
         let projectLevel = data.projectLevel
         let reviewStatus = 1
+        let isFilled = 0
+        if (data.isFilled === 1) {
+            isFilled = 1
+        }
         if (projectTypeID === 5) { //非标项目
             reviewStatus = 0
         }
@@ -642,7 +647,7 @@ const workStation = {
         }
         let curTime = $time.formatTime()
         sql = $sql.workStation.insertAssignProjectList
-        arrayParams = [userID, curTime, projectTypeID, projectName, assignerID, totalWorkTime, projectLevel, reviewStatus]
+        arrayParams = [userID, curTime, projectTypeID, projectName, assignerID, totalWorkTime, projectLevel, reviewStatus, isFilled]
         insertAssignProjectList(sql, arrayParams).then( res1 => {
             console.log(res1)
             let insertID = res1.insertId

@@ -30,7 +30,7 @@
 <!--          </el-tag>-->
 <!--        </template>-->
 <!--      </el-table-column>-->
-      <el-table-column label="总工时" align="center" prop="totalWorkTime"></el-table-column>
+<!--      <el-table-column label="总工时" align="center" prop="totalWorkTime"></el-table-column>-->
       <el-table-column label="计划/实际进展" prop="planCompletion" align="center" v-if="this.fatherParams.searchType === 'unFilled'">
         <template slot-scope="scope">
           <span class="link-type" @click="handleFillIn(scope.row)">点击填报</span>

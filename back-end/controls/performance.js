@@ -493,7 +493,6 @@ async function fGetUnReviewProject(data, res) {
                 unReviewProjectCount: workTimeInsertResult.result[0][0].totalCount,
                 reviewedProjectCount: workTimeInsertResult.result[1][0].totalCount
             }
-            console.log(obj)
             resultData.push(obj)
         }
     }
@@ -541,7 +540,7 @@ function updateProjectProcess(data) {
                 $workStation.projectStageProcessUpdate(data.apdID, res1).then(res2 => { //更新该阶段进展
                     $workStation.projectProcessCal(res2).then(res3 => { //计算项目总进展
                         $workStation.projectProcessUpdate(res2, res3).then(() => { //更新项目总进展
-                            resolve(1)
+                            resolve(res0)
                         })
                     })
                 })
@@ -724,7 +723,6 @@ const performance = {
     getProjectList (req, res) {
         console.log('===performance.js getProjectList')
         let data = req.body
-        console.log(data)
         $http.userVerify(req, res, () => {
             let searchID = data.searchID
             let searchMon = data.searchMon
@@ -756,11 +754,9 @@ const performance = {
                 if (err) {
                     return $http.writeJson(res, {code:-2, message:'失败'})
                 } else {
-                    console.log(result)
                     let resultData = {}
                     resultData.totalCount = result[0][0]['totalCount']
                     resultData.list = formatData(result[1])
-                    console.log('===performance.js getProjectList')
                     console.log(resultData)
                     return $http.writeJson(res, {code: 1, data: resultData, message: '获取工时申报成功'})
                 }
@@ -866,7 +862,7 @@ const performance = {
             let data = req.body
             console.log('===performance.js updateWorkTimeAssignReview')
             console.log(data)
-            workTimeAssignReview(data.reviewResult, data.projectID, res)
+            workTimeAssignReview(data.reviewResult, data.projectID, res).then()
         })
     },
     // 获取待审数量
@@ -874,8 +870,7 @@ const performance = {
         $http.userVerify(req, res, () => {
             let data = req.body
             console.log('====performance.js getUnReviewProjectCount')
-            console.log(data)
-            fGetUnReviewProject(data, res)
+            fGetUnReviewProject(data, res).then()
         })
     },
     // 审核通过
@@ -884,18 +879,25 @@ const performance = {
             let curTime = $time.formatTime()
             let data = req.body
             console.log(data)
-            let sql = $sql.performance.submitReviewPass
-            let arrayParams = [data.reviewKValue, data.reviewCofficient, data.reviewStatus, curTime, data.reviewComments, data.reviewer,
-                data.id]
-            setWorkTimeListPass(sql, arrayParams).then(() => {
-                if (data.reviewStatus === '1') {
-                    updateProjectProcess(data).then(() => {
+            let sql = null
+            let arrayParams = []
+            if (data.reviewStatus === '1') {
+                updateProjectProcess(data).then(res0 => {
+                    sql = $sql.performance.submitReviewPass
+                    arrayParams = [data.reviewKValue, data.reviewCofficient, data.reviewStatus, curTime, data.reviewComments,
+                        data.reviewer, res0.monthID, data.id]
+                    setWorkTimeListPass(sql, arrayParams).then(() => {
                         return $http.writeJson(res, { code: 1, message: '成功' })
                     })
-                } else {
+                })
+            } else {
+                sql = $sql.performance.submitReviewRejectOrWithdraw
+                arrayParams = [data.reviewKValue, data.reviewCofficient, data.reviewStatus, curTime, data.reviewComments, data.reviewer,
+                    data.id]
+                setWorkTimeListPass(sql, arrayParams).then(() => {
                     return $http.writeJson(res, { code: 1, message: '成功' })
-                }
-            })
+                })
+            }
         })
     },
     // 获取分配的工时

@@ -7,31 +7,46 @@
         stripe
         style="width: 100%;margin: auto">
         <el-table-column label="序号" type="index" align="center"></el-table-column>
+        <el-table-column label="项目类型" align="center" width="100%">
+          <template slot-scope="scope">
+            <el-tag :type="scope.row.parentTypeID | parentTypeIDColorFilter">
+              {{scope.row.parentTypeID | parentTypeIDStringFilter}}
+            </el-tag>
+          </template>
+        </el-table-column>
         <el-table-column label="项目名称" align="center" prop="projectName"></el-table-column>
-        <el-table-column label="类型/阶段" align="center" prop="projectStageName"></el-table-column>
+        <el-table-column label="项目阶段" align="center" prop="projectStageName"></el-table-column>
+        <el-table-column label="基本工时" align="center" prop="applyBaseWorkTime" width="80%"></el-table-column>
         <el-table-column label="申报K值" align="center" prop="applyKValue" width="80%"></el-table-column>
-        <el-table-column label="审核K值" align="center">
+        <el-table-column label="审核K值" align="center" width="100%">
           <template slot-scope="scope">
             <el-form-item
               :prop="'workDetailTable.' + scope.$index + '.reviewKValue'"
               :rules="formRules.reviewKValue"
               style="margin: auto">
-              <el-input :disabled="!(scope.row.reviewStatus === '0')" size="medium" v-model="scope.row.reviewKValue"></el-input>
+              <el-input :disabled="!(scope.row.reviewStatus === '0')"
+                        size="medium"
+                        v-model="scope.row.reviewKValue" @change="handleReviewKValueChange(scope.row)"></el-input>
             </el-form-item>
           </template>
         </el-table-column>
-        <el-table-column label="申报完成次数" align="center" prop="applyCofficient"></el-table-column>
-        <el-table-column label="审核完成次数" align="center">
+        <el-table-column label="完成次数" align="center" prop="applyCofficient" width="110%"></el-table-column>
+<!--        <el-table-column label="审核完成次数" align="center" width="110%">-->
+<!--          <template slot-scope="scope">-->
+<!--            <el-form-item-->
+<!--              :prop="'workDetailTable.' + scope.$index + '.reviewCofficient'"-->
+<!--              :rules="formRules.reviewCofficient"-->
+<!--              style="margin: auto">-->
+<!--              <el-input :disabled="!(scope.row.reviewStatus === '0')" size="medium" v-model="scope.row.reviewCofficient"></el-input>-->
+<!--            </el-form-item>-->
+<!--          </template>-->
+<!--        </el-table-column>-->
+        <el-table-column label="申报进展" align="center" width="80%">
           <template slot-scope="scope">
-            <el-form-item
-              :prop="'workDetailTable.' + scope.$index + '.reviewCofficient'"
-              :rules="formRules.reviewCofficient"
-              style="margin: auto">
-              <el-input :disabled="!(scope.row.reviewStatus === '0')" size="medium" v-model="scope.row.reviewCofficient"></el-input>
-            </el-form-item>
+            <span>{{scope.row.applyProcess + '%'}}</span>
           </template>
         </el-table-column>
-        <el-table-column label="工时分配" align="center">
+        <el-table-column label="工时分配" align="center" width="100%">
           <template slot-scope="scope">
             <span v-if="info.reviewType === 'reviewed'"
                   class="link-type"
@@ -44,7 +59,7 @@
                   @click="handleCoopInfo(scope.row, scope.$index)">已审核</span>
           </template>
         </el-table-column>
-        <el-table-column label="申报备注" align="center">
+        <el-table-column label="申报备注" align="center" width="100%">
           <template slot-scope="scope">
             <el-popover v-if="!(scope.row.submitComments === '')" placement="bottom" trigger="hover" width="200">
               <span>{{scope.row.submitComments}}</span>
@@ -54,6 +69,11 @@
           </template>
         </el-table-column>
         <el-table-column label="提交时间" align="center" prop="updateTime" width="100%"></el-table-column>
+        <el-table-column label="审核备注" align="center">
+          <template slot-scope="scope">
+            <el-input size="mini" autosize type="textarea" v-model="scope.row.reviewComments"></el-input>
+          </template>
+        </el-table-column>
         <el-table-column v-if="info.reviewType === 'reviewed'"
                          label="审核时间"
                          align="center"
@@ -64,13 +84,13 @@
                          align="center"
                          prop="reviewerName"
                          width="100%"></el-table-column>
-        <el-table-column label="审核状态" align="center">
-          <template slot-scope="scope">
-            <el-tag :type="scope.row.reviewStatus | reviewStatusFilter">
-              {{ scope.row.reviewStatus | reviewStatusTextFilter}}
-            </el-tag>
-          </template>
-        </el-table-column>
+<!--        <el-table-column label="审核状态" align="center">-->
+<!--          <template slot-scope="scope">-->
+<!--            <el-tag :type="scope.row.reviewStatus | reviewStatusFilter">-->
+<!--              {{ scope.row.reviewStatus | reviewStatusTextFilter}}-->
+<!--            </el-tag>-->
+<!--          </template>-->
+<!--        </el-table-column>-->
         <el-table-column label="操作" align="center" width="200%">
           <template slot-scope="scope">
             <el-popconfirm
@@ -144,6 +164,7 @@
           pageNum: 1, // 请求第几页
           pageSize: this.$store.state.pageSize, // 每页请求多少条
           totalCount: null,
+          scale: 1,
           currentPage: 1 // 初始时在第几页
         }
       },
@@ -182,6 +203,8 @@
                       data.totalCount -= 1
                       reviewTable.push(item)
                     }
+                    item.scale = 0
+                    item.avaiableWorkTimeTmp = item.avaiableWorkTime
                   }
                   console.log(data)
                   this.formData.workDetailTable = reviewTable
@@ -272,6 +295,15 @@
         },
         handleWorkTimeAssignReview (index) {
           this.formData.workDetailTable[index].workTimeAssignReviewStatus = 1
+        },
+        // 审核K值修改
+        handleReviewKValueChange (row) {
+          console.log(row)
+          row.scale = (row.reviewKValue - row.applyKValue) / row.applyKValue
+          row.scale = Number(row.scale.toFixed(5))
+          row.avaiableWorkTime = row.avaiableWorkTimeTmp * (1 + row.scale)
+          row.avaiableWorkTime = Number(row.avaiableWorkTime.toFixed(1))
+          row.workTimeAssignReviewStatus = 0
         }
       },
       props: {
@@ -281,7 +313,6 @@
       },
       created () {
         console.log('===ReviewedPerson.vue created')
-        console.log(this.info)
         this.getProjectList(this.info)
       },
       mounted () {
@@ -316,6 +347,46 @@
               return '已通过'
             case '2':
               return '驳回'
+            default:
+              return '错误'
+          }
+        },
+        parentTypeIDColorFilter (projectLevel) {
+          switch (projectLevel) {
+            case 4: // 标准
+              return 'warning'
+            case 5: // 非标准
+              return 'danger'
+            case 172: // 选型
+              return 'primary'
+            case 173: // 基建
+              return 'success'
+            case 213: // 基础平台（工程）
+              return 'info'
+            case 275: // 基础平台（通信）
+              return 'info'
+            case 249: // 修缮
+              return 'warning'
+            default:
+              return 'danger'
+          }
+        },
+        parentTypeIDStringFilter (projectLevel) {
+          switch (projectLevel) {
+            case 4: // 标准
+              return '其他标准工时'
+            case 5: // 非标准
+              return '其他非标工时'
+            case 172: // 选型
+              return '选型类'
+            case 173: // 基建
+              return '基建类'
+            case 213: // 基础平台（工程）
+              return '基础平台类（工程）'
+            case 275: // 基础平台（通信）
+              return '基础平台类（通信）'
+            case 249: // 修缮
+              return '修缮类'
             default:
               return '错误'
           }
