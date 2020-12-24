@@ -34,6 +34,7 @@ export const updateWorkTimeAssignReview = '/performance/updateWorkTimeAssignRevi
 export const getUnReviewProjectCount = '/performance/getUnReviewProjectCount' // 获取待审数量
 export const submitReviewPass = '/performance/submitReviewPass' // 审核通过
 export const getAssignWorkTime = '/performance/getAssignWorkTime' // 获取分配的工时
+export const getGroupWorkTimeList = '/performance/getGroupWorkTimeList' // 获取小组已申报工时列表
 
 export const getAssignProjectList = '/workStation/getAssignProjectList' // 获取未完成的指派项目列表
 export const getAssignProjectDetail = '/workStation/getAssignProjectDetail' // 获取未完成的指派项目明细

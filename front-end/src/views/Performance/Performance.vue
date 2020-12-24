@@ -26,9 +26,9 @@
 <!--      </el-form-item>-->
       <el-form-item style="margin-left: 30px">
         <span v-if="formData.selectType === '工时查询'" style="font-size: 17px;font-weight: bold">本月实际获得工时:
-          <span style="color: #F56C6C;margin-left: 10px">{{formData.totalWorkTime}}</span></span>
+          <span style="color: #F56C6C;margin-left: 10px;font-size: 25px">{{formData.totalWorkTime}}</span></span>
         <span v-if="formData.selectType === '计划查询'" style="font-size: 17px;font-weight: bold">本月预计获得工时:
-          <span style="color: #F56C6C;margin-left: 10px">{{planGetWorkTime}}</span></span>
+          <span style="color: #F56C6C;margin-left: 10px;font-size: 25px">{{planGetWorkTime}}</span></span>
       </el-form-item>
       <br>
       <el-radio-group v-model="formData.selectType" @change="handleSelectTypeChange">
@@ -246,12 +246,12 @@ import { getProjectType, getProjectList, changeSubmitStatus, deleteProject,
                     let data = res.data
                     let factWorkTimeList = []
                     let planWorkTimeList = []
+                    it.planGetWorkTime = 0
                     for (let item of data.list) {
                       item.assignWorkTime = null
                       if (item.applyType === 'fact') { // 实际进展表格数据
                         factWorkTimeList.push(item)
                       } else if (item.applyType === 'plan') { // 计划进展表格数据
-                        it.planGetWorkTime = 0
                         it.planGetWorkTime += item.avaiableWorkTime
                         planWorkTimeList.push(item)
                       }
@@ -406,6 +406,7 @@ import { getProjectType, getProjectList, changeSubmitStatus, deleteProject,
             }
             row.defaultCofficient = row.applyCofficient
             row.defaultKValue = row.applyKValue
+            row.baseWorkTime = row.applyBaseWorkTime
             row.workTimeAssign = []
             row.workTimeAssign.push(defaultCurrentUserWorkTime)
             params.data.push(row)
@@ -460,8 +461,6 @@ import { getProjectType, getProjectList, changeSubmitStatus, deleteProject,
         },
         isAssginer () {
           return function (id) {
-            console.log('===isAssginer')
-            console.log(id)
             if (Number(id) === Number(this.$store.state.userInfo.id)) {
               return false
             } else {

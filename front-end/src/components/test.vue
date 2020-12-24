@@ -8,7 +8,7 @@
       <el-table-column type="index" label="序号" width="60" align="center"></el-table-column>
       <el-table-column label="指派时间" align="center" prop="assignDate"  width="100"></el-table-column>
       <el-table-column label="项目名称" align="center" prop="projectName"></el-table-column>
-      <el-table-column label="项目级别" align="center" prop="projectName" width="150">
+      <el-table-column label="项目级别" align="center" prop="projectName" width="100">
         <template slot-scope="scope">
           <div>
             <el-tag :type="scope.row.projectLevel | projectLevelColorFilter">
@@ -17,21 +17,21 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="完成度" align="center" width="100">
+      <el-table-column label="完成度" align="center" width="70">
         <template slot-scope="scope">
           <el-progress :text-inside="true" :stroke-width="26" :percentage="scope.row.process"></el-progress>
         </template>
       </el-table-column>
       <el-table-column v-if="this.fatherParams.projectTypeID !== 5" label="指派人" align="center" prop="assigner"></el-table-column>
-      <el-table-column v-else label="审核状态" align="center">
-        <template slot-scope="scope">
-          <el-tag :type="scope.row.reviewStatus | reviewStatusTypeFilter">
-            {{scope.row.reviewStatus | reviewStatusStringFilter}}
-          </el-tag>
-        </template>
-      </el-table-column>
+<!--      <el-table-column v-else label="审核状态" align="center">-->
+<!--        <template slot-scope="scope">-->
+<!--          <el-tag :type="scope.row.reviewStatus | reviewStatusTypeFilter">-->
+<!--            {{scope.row.reviewStatus | reviewStatusStringFilter}}-->
+<!--          </el-tag>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
       <el-table-column label="总工时" align="center" prop="totalWorkTime"></el-table-column>
-      <el-table-column label="计划&进度" prop="planCompletion" align="center" v-if="this.fatherParams.searchType === 'unFilled'">
+      <el-table-column label="计划/实际进展" prop="planCompletion" align="center" v-if="this.fatherParams.searchType === 'unFilled'">
         <template slot-scope="scope">
           <span class="link-type" @click="handleFillIn(scope.row)">点击填报</span>
         </template>

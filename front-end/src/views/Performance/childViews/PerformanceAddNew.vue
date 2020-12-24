@@ -1,6 +1,7 @@
 <template>
     <div>
-      <h3 class="v-line-icon">新增项目申报</h3>
+      <h3 v-if="formData.applyType === 'fact'" class="v-line-icon">新增工时申报</h3>
+      <h3 v-if="formData.applyType === 'plan'" class="v-line-icon">新增计划申报</h3>
       <el-form :label-position="labelPosition" label-width="110px" ref="formData" :model="formData" :rules="formRules" :inline="true">
         <el-form-item label="申报月份" prop="title">
           <el-date-picker
@@ -26,16 +27,16 @@
           <el-button type="danger" size="medium" @click="onCancel('formData')">取 消</el-button>
         </el-form-item>
         <br>
-        <el-form-item label="申报类型" prop="applyType">
-          <el-select v-model="formData.applyType" placeholder="请选择" @change="handleApplyTypeChange">
-            <el-option v-for="item in applyTypes"
-                       :key="item.value"
-                       :label="item.text"
-                       :value="item.value">
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <br>
+<!--        <el-form-item label="申报类型" prop="applyType">-->
+<!--          <el-select v-model="formData.applyType" placeholder="请选择" @change="handleApplyTypeChange">-->
+<!--            <el-option v-for="item in applyTypes"-->
+<!--                       :key="item.value"-->
+<!--                       :label="item.text"-->
+<!--                       :value="item.value">-->
+<!--            </el-option>-->
+<!--          </el-select>-->
+<!--        </el-form-item>-->
+<!--        <br>-->
         <el-form-item label="项目类型" prop="projectType">
           <el-cascader
             v-if="showFlag.projectType"
@@ -262,7 +263,7 @@
             workTypeTimeDetail: [],
             projectLevel: 1,
             projectName: null,
-            applyType: 'fact'
+            applyType: this.$route.query.type
           },
           formRules: {
             title: [
@@ -713,7 +714,9 @@
                         planProcess: 100,
                         planWorkTime: 0
                       }
-                      obj.avaiableWorkTime = obj.baseWorkTime * obj.defaultKValue * obj.defaultCofficient * obj.applyProcess * 0.01
+                      obj.avaiableWorkTime = obj.baseWorkTime * obj.defaultKValue * obj.defaultCofficient *
+                        obj.applyProcess * 0.01
+                      obj.avaiableWorkTime = Number(obj.avaiableWorkTime.toFixed(1))
                       obj.planWorkTime = obj.avaiableWorkTime
                       let defaultCurrentUserWorkTime = {
                         id: this.$store.state.userInfo.id,
@@ -1013,6 +1016,7 @@
       },
       created () {
         console.log('===PerformanceAdd.vue created')
+        // this.formData.applyType = this.$route.query.type
         console.log(this.$store.state.userInfo)
         this.init()
       },

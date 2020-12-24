@@ -40,6 +40,7 @@ module.exports = {
     getUnReviewProjectCount: path + '/performance/getUnReviewProjectCount', // 获取待审数量
     submitReviewPass: path + '/performance/submitReviewPass', // 审核通过,
     getAssignWorkTime: path + '/performance/getAssignWorkTime', // 获取分配的工时数
+    getGroupWorkTimeList: path + '/performance/getGroupWorkTimeList', // 获取小组已审工时列表
 
     // workStation-个人工作台
     getAssignProjectList: path + '/workStation/getAssignProjectList',

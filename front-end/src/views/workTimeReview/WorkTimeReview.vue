@@ -70,9 +70,9 @@
             selectType: '待审'
           },
           pickerOptions: {
-            disabledDate (time) {
-              return time.getTime() > Date.now()
-            }
+            // disabledDate (time) {
+            //   return time.getTime() > Date.now()
+            // }
           },
           reqFlag: {
             getGroupUsers: true,

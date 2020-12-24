@@ -71,9 +71,10 @@ const sqlMap = {
     updateWorkAssign: 'update worktimeassign set userID = ?, projectID = ?, workTime = ?, assignRole = ?, reviewWorkTime = ? where id = ?',
     deleteWorkAssign: 'update worktimeassign set obsoleteStatus = 1 where id = ?',
     // getProjectList: 'SELECT * from worktimelist WHERE submitID = ? and applyMonth = ? and obsoleteStatus != 1', //查找项目列表
-    getProjectList: 'SELECT wl.*, apl.projectName, apd.projectStageName from worktimelist wl left join projecttypenew pjn on ' +
-        'wl.projectTypeID = pjn.projectTypeID left join assignprojectlist apl on wl.aplID = apl.id left join assignprojectdetail apd' +
-        ' on wl.apdID = apd.id WHERE wl.submitID = ? and wl.applyMonth = ? and wl.obsoleteStatus != 1',
+    getProjectList: 'SELECT wl.*, apl.projectName, apd.projectStageName, users.name as reviewerName from worktimelist wl left join ' +
+        'projecttypenew pjn on wl.projectTypeID = pjn.projectTypeID left join assignprojectlist apl on wl.aplID = apl.id left join ' +
+        'assignprojectdetail apd on wl.apdID = apd.id left join users on wl.reviewer = users.id WHERE wl.submitID = ? and wl.applyMonth = ? ' +
+        'and wl.obsoleteStatus != 1',
     // getProjectListNew: 'SELECT * FROM worktimelist WHERE id IN (SELECT projectID FROM worktimeassign WHERE userID = ? and obsoleteStatus != 1) and applyMonth = ? and obsoleteStatus != 1',
     getProjectListNew: 'select wl.*, apl.projectName, apd.projectStageName from worktimelist wl left join ' +
         'projecttypenew pjn on wl.projectTypeID = pjn.projectTypeID left join assignprojectlist apl on wl.aplID = apl.id left join assignprojectdetail apd ' +
@@ -101,7 +102,9 @@ const sqlMap = {
     submitReviewPass: 'update worktimelist set reviewKValue = ?, reviewCofficient = ?, reviewStatus = ?, reviewTime = ?, reviewComments = ?, ' +
         'reviewer = ? where id = ?',
     updateProjectWorkTimeAssignReviewStatus: 'update worktimelist set workTimeAssignReviewStatus = ? where id = ?',
-    getAssignWorkTime: 'select reviewWorkTime from worktimeassign where projectID = ? and userID = ? and obsoleteStatus != 1'
+    getAssignWorkTime: 'select reviewWorkTime from worktimeassign where projectID = ? and userID = ? and obsoleteStatus != 1',
+    getGroupWorkTimeList: 'select wl.*, users.account, users.name, users.groupName from worktimelist wl left join users ' +
+        ''
   },
   workStation: {
     getAssignProjectListUn: 'select apl.*, users.name as assigner from assignprojectlist apl left join users on apl.assignerID = users.id where ' +

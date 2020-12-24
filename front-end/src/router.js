@@ -80,6 +80,12 @@ export default new Router({
           meta: { pagePath: '/home/workPlanCheck' }
         },
         {
+          path: 'workTimeCheck',
+          name: 'workTimeCheck',
+          component: () => import(/* webpackChunkName: "weekly" */ './views/workTimeCheck/workTimeCheck.vue'),
+          meta: { pagePath: '/home/workTimeCheck' }
+        },
+        {
           path: 'weeklyadd',
           name: 'weeklyadd',
           component: () => import(/* webpackChunkName: "weekly" */ './views/Weekly/childViews/WeeklyAdd.vue'),

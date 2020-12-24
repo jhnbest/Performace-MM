@@ -18,7 +18,11 @@
         </el-col>
         <el-col :span="1" :offset="2">
           <el-button type="primary"
-                     size="medium" @click="handleAddNew">项目申报</el-button>
+                     size="medium" @click="handleAddNew">工时申报(新增项目)</el-button>
+        </el-col>
+        <el-col :span="1" :offset="2">
+          <el-button type="warning"
+                     size="medium" @click="handlePlanAdd">计划申报(新增项目)</el-button>
         </el-col>
       </el-row>
     </div>
@@ -187,7 +191,21 @@
         },
         // 项目申报
         handleAddNew () {
-          this.$router.push({ path: '/home/PerformanceAddNew' })
+          this.$router.push({
+            path: '/home/PerformanceAddNew',
+            query: {
+              type: 'fact'
+            }
+          })
+        },
+        // 计划申报
+        handlePlanAdd () {
+          this.$router.push({
+            path: '/home/PerformanceAddNew',
+            query: {
+              type: 'plan'
+            }
+          })
         }
       },
       components: {

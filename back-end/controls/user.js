@@ -47,6 +47,7 @@ function formatData(rows) {
           row.dept = '通信工程处'
       }
     }
+    row.groupID = row.groupName
     let groupName = row.groupName
     if (groupName) {
       switch (groupName) {

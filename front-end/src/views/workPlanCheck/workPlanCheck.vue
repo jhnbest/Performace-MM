@@ -13,6 +13,9 @@
         </el-date-picker>
       </el-form-item>
     </el-form>
+    <!-- 分割线 start -->
+    <div class="hr-10"></div>
+    <!-- 分割线 end -->
   </div>
 </template>
 

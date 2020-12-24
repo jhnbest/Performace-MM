@@ -62,7 +62,7 @@
         <el-table-column v-if="info.reviewType === 'reviewed'"
                          label="审核人"
                          align="center"
-                         prop="reviewTime"
+                         prop="reviewerName"
                          width="100%"></el-table-column>
         <el-table-column label="审核状态" align="center">
           <template slot-scope="scope">
@@ -213,7 +213,7 @@
               reviewComments: row.reviewComments,
               reviewKValue: row.reviewKValue,
               reviewStatus: '1',
-              reviewer: this.$store.state.userInfo.name
+              reviewer: this.$store.state.userInfo.id
             }
             this.$http(url, params)
               .then(res => {

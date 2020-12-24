@@ -731,9 +731,9 @@ const performance = {
             let pageNum = data.pageNum
             let pageSize = data.pageSize
             // 分页查询入参 start
-            let limitFirst = (pageNum - 1) * pageSize;
-            let limitLast = pageSize;
-            let arrayParams = [searchID, searchMon, searchID, searchMon, limitFirst, limitLast]
+            let limitFirst = (pageNum - 1) * pageSize
+            let limitLast = pageSize
+            let arrayParams = [searchID, searchMon, searchID, searchMon]
             let sqlGetProjectList = $sql.performance.getProjectList
             let sqlGetProjectTotal = $sql.performance.getProjectListTotal
             let sql = ''
@@ -749,9 +749,9 @@ const performance = {
                 sqlGetProjectTotal = $sql.performance.getProjectListTotalNew
                 sqlGetProjectList = $sql.performance.getProjectListNew
                 sql= sqlGetProjectTotal + '; ' + sqlGetProjectList
-                arrayParams = [searchID, searchMon, searchID, searchMon, limitFirst, limitLast]
+                arrayParams = [searchID, searchMon, searchID, searchMon]
             }
-            sql = sql + " order by submitTime desc limit ?, ?" // 提交时间倒序排
+            sql = sql + " order by submitTime desc" // 提交时间倒序排
             $http.connPool(sql, arrayParams, (err, result) => {
                 if (err) {
                     return $http.writeJson(res, {code:-2, message:'失败'})
@@ -915,6 +915,12 @@ const performance = {
                 }
             })
         })
+    },
+    // 获取小组申报工时列表
+    getGroupWorkTimeList (req, res) {
+        let data = req.body
+        console.log(data)
+        let sql = $sql.performance.getGroupWorkTimeList
     }
 }
 
