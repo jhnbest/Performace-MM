@@ -64,6 +64,10 @@
                 <el-form-item label="审核时间">
                   <span>{{ scope.row.reviewTime }}</span>
                 </el-form-item>
+                <el-form-item label="审核备注">
+                  <span v-if="scope.row.reviewComments !== ''">{{ scope.row.reviewComments }}</span>
+                  <span v-else>无</span>
+                </el-form-item>
               </el-form>
             </template>
           </el-table-column>
