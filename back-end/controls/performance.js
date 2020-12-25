@@ -219,6 +219,8 @@ async function workTimeInsert(data, res, operate) {
         } else if (workTimeInsertResult.result.affectedRows !== 1 && data.submitType === 'insert') {
             return $http.writeJson(res, {code: 2, message: '添加工时记录失败'})
         }
+        console.log('====workTimeAssign')
+        console.log(data.data[i])
         // 插入/更新工时分配信息
         for (let j = 0;j < data.data[i].workTimeAssign.length; j++) {
             let insertID = null
@@ -711,7 +713,7 @@ const performance = {
         let data = req.body
         console.log('===performace.js workTimeSubmit')
         console.log(data)
-        workTimeInsert(data, res, '1')
+        workTimeInsert(data, res, '1').then()
     },
     // 暂存工时申报
     workTimeTemporary (req, res) {

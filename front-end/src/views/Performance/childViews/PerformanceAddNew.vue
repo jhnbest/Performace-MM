@@ -173,7 +173,7 @@
           </el-table-column>
           <el-table-column label="预计工时" align="center" width="100%" v-if="formData.applyType === 'plan'"
                            prop="avaiableWorkTime"></el-table-column>
-          <el-table-column label="工时分配" align="center" width="100%" v-if="formData.applyType === 'fact'">
+          <el-table-column label="工时分配" align="center" width="100%">
             <template slot-scope="scope">
               <span class="link-type" @click="handleWorkTimeAssign(scope.row, scope.$index)">点击分配</span>
             </template>

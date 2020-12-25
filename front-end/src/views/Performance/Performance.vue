@@ -143,8 +143,8 @@
               <el-button type="primary"
                          :disabled="!reqFlag.complete"
                          size="mini"
-                         @click="handleComplete(scope.row)">完成</el-button>
-              <el-button type="danger" size="mini" @click="handleDeletePlanItem(scope.row)">删除</el-button>
+                         @click="handleComplete(scope.row)">生成工时申报</el-button>
+<!--              <el-button type="danger" size="mini" @click="handleDeletePlanItem(scope.row)">删除</el-button>-->
             </div>
           </template>
         </el-table-column>
@@ -155,9 +155,9 @@
 </template>
 
 <script>
-import Cop from '@/components/Cop/Cop'
-import { getProjectType, getProjectList, changeSubmitStatus, deleteProject,
-  getAssignWorkTime, workTimeSubmit } from '@/config/interface'
+    import Cop from '@/components/Cop/Cop'
+    import { getProjectType, getProjectList, changeSubmitStatus, deleteProject,
+      getAssignWorkTime, workTimeSubmit, workTimeTemporary, getWorkAssign } from '@/config/interface'
     export default {
       data () {
         return {
@@ -186,7 +186,8 @@ import { getProjectType, getProjectList, changeSubmitStatus, deleteProject,
             getProjectList: true,
             changeSubmitStatus: true,
             deleteProject: true,
-            complete: true
+            complete: true,
+            getWorkTimeAssign: true
           },
           pageNum: 1, // 请求第几页
           pageSize: this.$store.state.pageSize, // 每页请求多少条
@@ -383,43 +384,74 @@ import { getProjectType, getProjectList, changeSubmitStatus, deleteProject,
             }
           })
         },
+        // 获取工时分配信息
+        getWorkTimeAssign (id) {
+          const url = getWorkAssign
+          let params = {
+            projectID: id,
+            searchType: 'applyer'
+          }
+          let it = this
+          return new Promise(function (resolve, reject) {
+            if (it.reqFlag.getWorkTimeAssign) {
+              it.reqFlag.getWorkTimeAssign = false
+              it.$http(url, params)
+                .then(res => {
+                  if (res.code === 1) {
+                    let data = res.data[0]
+                    it.reqFlag.getWorkTimeAssign = true
+                    resolve(data)
+                  }
+                })
+            }
+          })
+        },
         // 已完成按钮
         handleComplete (row) {
           console.log(row)
-          const url = workTimeSubmit
-          if (this.reqFlag.complete) {
-            this.reqFlag.complete = false
-            let title = this.formData.title
-            let params = {
-              submitType: 'insert',
-              submitDate: title,
-              data: [],
-              applyType: 'fact'
+          this.getWorkTimeAssign(row.id).then(workTimeAssign => {
+            console.log(workTimeAssign)
+            const url = workTimeTemporary
+            if (this.reqFlag.complete) {
+              this.reqFlag.complete = false
+              let title = this.formData.title
+              let params = {
+                submitType: 'insert',
+                submitDate: title,
+                data: [],
+                applyType: 'fact'
+              }
+              // let defaultCurrentUserWorkTime = {
+              //   id: this.$store.state.userInfo.id,
+              //   groupName: this.$store.state.userInfo.groupName,
+              //   name: this.$store.state.userInfo.name,
+              //   applyRole: '组织者',
+              //   assignWorkTime: row.avaiableWorkTime,
+              //   deleteAble: false
+              // }
+              row.workTimeAssign = []
+              for (let item of workTimeAssign) {
+                item.assignWorkTime = item.workTime
+                item.deleteAble = false
+                item.id = item.userID
+                item.applyRole = item.assignRole
+                row.workTimeAssign.push(item)
+              }
+              row.defaultCofficient = row.applyCofficient
+              row.defaultKValue = row.applyKValue
+              row.baseWorkTime = row.applyBaseWorkTime
+              params.data.push(row)
+              this.$http(url, params)
+                .then(res => {
+                  if (res.code === 1) {
+                    this.$common.toast('生成成功', 'success', false)
+                  } else {
+                    this.$common.toast('提交失败', 'error', false)
+                  }
+                  this.reqFlag.complete = true
+                })
             }
-            let defaultCurrentUserWorkTime = {
-              id: this.$store.state.userInfo.id,
-              groupName: this.$store.state.userInfo.groupName,
-              name: this.$store.state.userInfo.name,
-              applyRole: '组织者',
-              assignWorkTime: row.avaiableWorkTime,
-              deleteAble: false
-            }
-            row.defaultCofficient = row.applyCofficient
-            row.defaultKValue = row.applyKValue
-            row.baseWorkTime = row.applyBaseWorkTime
-            row.workTimeAssign = []
-            row.workTimeAssign.push(defaultCurrentUserWorkTime)
-            params.data.push(row)
-            this.$http(url, params)
-              .then(res => {
-                if (res.code === 1) {
-                  this.$common.toast('已提交审核', 'success', false)
-                } else {
-                  this.$common.toast('提交失败', 'error', false)
-                }
-                this.reqFlag.complete = true
-              })
-          }
+          })
         },
         // 保存按钮
         handleSave (row) {

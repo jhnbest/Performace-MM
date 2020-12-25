@@ -87,7 +87,7 @@ export default {
       this.$nextTick(() => {
         console.log(row)
         this.changeShowFlag()
-        this.getWorkTimeAssign(row.id, row.scale, row.reviewStatus)
+        this.getWorkTimeAssign(row.id, row.scale, row.workTimeAssignReviewStatus)
         this.formData.selectIndex = index
         this.formData.reviewStatus = row.reviewStatus
         this.formData.reviewType = reviewType
@@ -96,7 +96,7 @@ export default {
         this.formData.totalWorkTime = row.avaiableWorkTime
       })
     },
-    getWorkTimeAssign (id, scale, reviewStatus) {
+    getWorkTimeAssign (id, scale, workTimeAssignReviewStatus) {
       const url = getWorkAssign
       let params = {
         projectID: id
@@ -111,7 +111,8 @@ export default {
               console.log(data)
               this.formData.totalReviewWorkTime = 0
               for (let item of data) {
-                if (reviewStatus === '0') {
+                item.reviewWorkTime = item.workTime
+                if (workTimeAssignReviewStatus === '0') {
                   item.reviewWorkTime = item.workTime * (1 + scale)
                   item.reviewWorkTime = Number(item.reviewWorkTime.toFixed(1))
                 }
@@ -125,7 +126,7 @@ export default {
     changeShowFlag () {
       this.showFlag = !this.showFlag
     },
-    /* 保存 */
+    // 保存
     onSave (formData) {
       this.$refs[formData].validate((valid) => {
         if (valid) {
@@ -134,6 +135,7 @@ export default {
             reviewResult: this.formData.copInfoTable,
             projectID: this.formData.projectID
           }
+          console.log(params)
           this.$http(url, params)
           .then(res => {
             if (res.code === 1) {

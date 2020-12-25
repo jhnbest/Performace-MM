@@ -7,7 +7,7 @@
         stripe
         style="width: 100%;margin: auto">
         <el-table-column label="序号" type="index" align="center"></el-table-column>
-        <el-table-column label="项目类型" align="center" width="100%">
+        <el-table-column label="项目类型" align="center" width="120%">
           <template slot-scope="scope">
             <el-tag :type="scope.row.parentTypeID | parentTypeIDColorFilter">
               {{scope.row.parentTypeID | parentTypeIDStringFilter}}
@@ -53,7 +53,7 @@
                   @click="handleCoopInfo(scope.row, scope.$index)">点击查看</span>
             <span v-else-if="!scope.row.workTimeAssignReviewStatus"
                   class="link-type"
-                  @click="handleCoopInfo(scope.row, scope.$index)">点击审核</span>
+                  @click="handleCoopInfo(scope.row, scope.$index)">点击查看</span>
             <span v-else-if="scope.row.workTimeAssignReviewStatus"
                   class="link-type"
                   @click="handleCoopInfo(scope.row, scope.$index)">已审核</span>
