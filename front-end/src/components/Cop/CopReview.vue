@@ -32,7 +32,7 @@
               <el-form-item :prop="'copInfoTable.' + scope.$index + '.reviewWorkTime'"
                             :rules="formRules.reviewWorkTime"
                             style="margin: auto">
-                <el-input :disabled="!(formData.reviewStatus === '0')"
+                <el-input :disabled="!(formData.reviewStatus === 0)"
                           size="medium"
                           v-model="scope.row.reviewWorkTime"></el-input>
               </el-form-item>
@@ -85,9 +85,10 @@ export default {
     // 初始化
     init (row, index, reviewType) {
       this.$nextTick(() => {
+        console.log('====CopReview.vue init')
         console.log(row)
         this.changeShowFlag()
-        this.getWorkTimeAssign(row.id, row.scale, row.workTimeAssignReviewStatus)
+        this.getWorkTimeAssign(row.id, row.scale, row.workTimeAssignReviewStatus, row.reviewStatus)
         this.formData.selectIndex = index
         this.formData.reviewStatus = row.reviewStatus
         this.formData.reviewType = reviewType
@@ -96,7 +97,7 @@ export default {
         this.formData.totalWorkTime = row.avaiableWorkTime
       })
     },
-    getWorkTimeAssign (id, scale, workTimeAssignReviewStatus) {
+    getWorkTimeAssign (id, scale, workTimeAssignReviewStatus, reviewStatus) {
       const url = getWorkAssign
       let params = {
         projectID: id
@@ -111,8 +112,10 @@ export default {
               console.log(data)
               this.formData.totalReviewWorkTime = 0
               for (let item of data) {
-                item.reviewWorkTime = item.workTime
-                if (workTimeAssignReviewStatus === '0') {
+                if (reviewStatus !== 1) {
+                  item.reviewWorkTime = item.workTime
+                }
+                if (workTimeAssignReviewStatus === 0) {
                   item.reviewWorkTime = item.workTime * (1 + scale)
                   item.reviewWorkTime = Number(item.reviewWorkTime.toFixed(1))
                 }

@@ -19,18 +19,6 @@ function formatData(rows) {
         if (row.reviewTime) {
             row.reviewTime = $time.formatTime(row.reviewTime)
         }
-        if (row.submitStatus) {
-            switch (row.submitStatus) {
-                case '0':
-                    row.submitStatus = false
-                    break
-                case '1':
-                    row.submitStatus = true
-                    break
-                default:
-                    row.submitStatus = false
-            }
-        }
         if (row.groupName) {
             switch (row.groupName) {
                 case 1:
@@ -145,9 +133,9 @@ function workTimeInsertOP(params, i, operate) {
         let updateTime = $time.formatTime()
         let submitStatus = null
         if (operate === '1') {
-            submitStatus = '1'
+            submitStatus = 1
         } else {
-            submitStatus = '0'
+            submitStatus = 0
         }
         let submitComments = params.data[i].submitComments
         if (params.submitType === 'insert') {

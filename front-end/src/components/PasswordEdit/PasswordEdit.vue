@@ -188,11 +188,11 @@
         },
         reviewStatusFilter (status) {
           switch (status) {
-            case '0':
+            case 0:
               return 'info'
-            case '1':
+            case 1:
               return 'success'
-            case '2':
+            case 2:
               return 'danger'
             default:
               return 'danger'
@@ -201,11 +201,11 @@
         reviewStatusTextFilter (status) {
           console.log(status)
           switch (status.reviewStatus) {
-            case '0':
+            case 0:
               return '未审核'
-            case '1':
+            case 1:
               return status.reviewWorkTime
-            case '2':
+            case 2:
               return status.reviewWorkTime
             default:
               return '错误'

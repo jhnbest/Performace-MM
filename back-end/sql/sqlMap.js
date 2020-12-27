@@ -77,9 +77,10 @@ const sqlMap = {
         'users.id WHERE wl.submitID = ? and wl.applyMonth = ? ' +
         'and wl.obsoleteStatus != 1',
     // getProjectListNew: 'SELECT * FROM worktimelist WHERE id IN (SELECT projectID FROM worktimeassign WHERE userID = ? and obsoleteStatus != 1) and applyMonth = ? and obsoleteStatus != 1',
-    getProjectListNew: 'select wl.*, apl.projectName, apd.projectStageName from worktimelist wl left join ' +
-        'projecttypenew pjn on wl.projectTypeID = pjn.projectTypeID left join assignprojectlist apl on wl.aplID = apl.id left join assignprojectdetail apd ' +
-        'on wl.apdID = apd.id where wl.id in (select projectID from worktimeassign where userID = ? ' +
+    getProjectListNew: 'select wl.*, apl.projectName, apd.projectStageName, u.name as reviewerName from worktimelist wl left join ' +
+        'projecttypenew pjn on wl.projectTypeID = pjn.projectTypeID left join assignprojectlist apl on wl.aplID ' +
+        '= apl.id left join assignprojectdetail apd on wl.apdID = apd.id left join users u on wl.reviewer = u.id' +
+        ' where wl.id in (select projectID from worktimeassign where userID = ? ' +
         'and obsoleteStatus != 1) and wl.applyMonth = ? and wl.obsoleteStatus != 1',
     getProjectListTotal: 'SELECT count(*) as totalCount from worktimelist WHERE submitID = ? and applyMonth = ? and obsoleteStatus != 1',
     getProjectListTotalNew: 'SELECT count(*) as totalCount from worktimelist where id IN (SELECT projectID FROM worktimeassign WHERE userID = ? and obsoleteStatus != 1) ' +

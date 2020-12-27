@@ -23,18 +23,6 @@ function formatData(rows) {
         if (row.reviewTime) {
             row.reviewTime = $time.formatTime(row.reviewTime)
         }
-        if (row.submitStatus) {
-            switch (row.submitStatus) {
-                case '0':
-                    row.submitStatus = false
-                    break
-                case '1':
-                    row.submitStatus = true
-                    break
-                default:
-                    row.submitStatus = false
-            }
-        }
         if (row.groupName) {
             switch (row.groupName) {
                 case 1:
@@ -361,44 +349,52 @@ function processWorkTimeCal(preRes, data) {
 }
 
 function updateMonthProcessObsoleteStatus(data) {
-    let sql = $sql.workStation.updateMonthProcessObsoleteStatus
-    let arrayParams = []
-    for (let item of data) {
-        arrayParams.push(item.id)
-        sql += '?,'
-    }
-    sql = sql.substr(0, sql.length - 1)
-    sql += ')'
     return new Promise(function (resolve, reject) {
-        $http.connPool(sql, arrayParams, (err, result) => {
-            if (err) {
-                reject(-1)
-            } else {
-                result = JSON.parse(JSON.stringify(result))
-                resolve(result)
+        if (data.length !== 0) {
+            let sql = $sql.workStation.updateMonthProcessObsoleteStatus
+            let arrayParams = []
+            for (let item of data) {
+                arrayParams.push(item.id)
+                sql += '?,'
             }
-        })
+            sql = sql.substr(0, sql.length - 1)
+            sql += ')'
+            $http.connPool(sql, arrayParams, (err, result) => {
+                if (err) {
+                    reject(-1)
+                } else {
+                    result = JSON.parse(JSON.stringify(result))
+                    resolve(result)
+                }
+            })
+        } else {
+            resolve(1)
+        }
     })
 }
 
 function updateWorkTimeAssignObsoleteStatus(data) {
-    let sql = $sql.workStation.updateWorkTimeAssignObsoleteStatus
-    let arrayParams = []
-    for (let item of data) {
-        arrayParams.push(item.id)
-        sql += '?,'
-    }
-    sql = sql.substr(0, sql.length - 1)
-    sql += ')'
     return new Promise(function (resolve, reject) {
-        $http.connPool(sql, arrayParams, (err, result) => {
-            if (err) {
-                reject(-1)
-            } else {
-                result = JSON.parse(JSON.stringify(result))
-                resolve(result)
+        if (data.length !== 0) {
+            let sql = $sql.workStation.updateWorkTimeAssignObsoleteStatus
+            let arrayParams = []
+            for (let item of data) {
+                arrayParams.push(item.id)
+                sql += '?,'
             }
-        })
+            sql = sql.substr(0, sql.length - 1)
+            sql += ')'
+            $http.connPool(sql, arrayParams, (err, result) => {
+                if (err) {
+                    reject(-1)
+                } else {
+                    result = JSON.parse(JSON.stringify(result))
+                    resolve(result)
+                }
+            })
+        } else {
+            resolve(1)
+        }
     })
 }
 

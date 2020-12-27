@@ -20,18 +20,6 @@ function formatData(rows) {
         if (row.reviewTime) {
             row.reviewTime = $time.formatTime(row.reviewTime)
         }
-        if (row.submitStatus) {
-            switch (row.submitStatus) {
-                case '0':
-                    row.submitStatus = false
-                    break
-                case '1':
-                    row.submitStatus = true
-                    break
-                default:
-                    row.submitStatus = false
-            }
-        }
         if (row.groupName) {
             switch (row.groupName) {
                 case 1:
@@ -159,11 +147,11 @@ function workTimeInsertOP(params, i, operate) {
         let applyBaseWorkTime = params.data[i].baseWorkTime
         let updateTime = $time.formatTime()
         let submitStatus = null
-        let reviewStatus = '0'
+        let reviewStatus = 0
         if (operate === '1') { // 提交
-            submitStatus = '1'
+            submitStatus = 1
         } else { // 暂存
-            submitStatus = '0'
+            submitStatus = 0
         }
         let submitComments = params.data[i].submitComments
         if (params.submitType === 'insert') {  //新增
@@ -827,7 +815,7 @@ const performance = {
         let arrayParams = [data.submitStatus, data.id]
         if (data.submitStatus) {
             let updateTime = $time.formatTime()
-            let reviewStatus = '0'
+            let reviewStatus = 0
             sql = $sql.performance.changeRejectProjectSubmitStatus
             arrayParams = [data.submitStatus, updateTime, reviewStatus, data.id]
         }
@@ -883,7 +871,7 @@ const performance = {
             console.log(data)
             let sql = null
             let arrayParams = []
-            if (data.reviewStatus === '1') {
+            if (data.reviewStatus === 1) {
                 updateProjectProcess(data).then(res0 => {
                     sql = $sql.performance.submitReviewPass
                     arrayParams = [data.reviewKValue, data.reviewCofficient, data.reviewStatus, curTime, data.reviewComments,

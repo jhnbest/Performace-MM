@@ -24,7 +24,7 @@
               :prop="'workDetailTable.' + scope.$index + '.reviewKValue'"
               :rules="formRules.reviewKValue"
               style="margin: auto">
-              <el-input :disabled="!(scope.row.reviewStatus === '0')"
+              <el-input :disabled="!(scope.row.reviewStatus === 0)"
                         size="medium"
                         v-model="scope.row.reviewKValue" @change="handleReviewKValueChange(scope.row)"></el-input>
             </el-form-item>
@@ -37,7 +37,7 @@
 <!--              :prop="'workDetailTable.' + scope.$index + '.reviewCofficient'"-->
 <!--              :rules="formRules.reviewCofficient"-->
 <!--              style="margin: auto">-->
-<!--              <el-input :disabled="!(scope.row.reviewStatus === '0')" size="medium" v-model="scope.row.reviewCofficient"></el-input>-->
+<!--              <el-input :disabled="!(scope.row.reviewStatus === 0)" size="medium" v-model="scope.row.reviewCofficient"></el-input>-->
 <!--            </el-form-item>-->
 <!--          </template>-->
 <!--        </el-table-column>-->
@@ -101,7 +101,7 @@
               @confirm="handleReviewPass(scope.row, scope.$index)">
               <el-button
                 slot="reference"
-                v-if="(scope.row.reviewStatus === '0') & !(info.reviewType === 'reviewed')"
+                v-if="(scope.row.reviewStatus === 0) & !(info.reviewType === 'reviewed')"
                 size="small"
                 type="primary" icon="el-icon-check">通过</el-button>
             </el-popconfirm>
@@ -114,7 +114,7 @@
                 style="margin-left: 10px"
                 slot="reference"
                 v-if="!(info.reviewType === 'reviewed')"
-                :disabled="!(scope.row.reviewStatus === '0')"
+                :disabled="!(scope.row.reviewStatus === 0)"
                 size="small"
                 type="danger" icon="el-icon-close">驳回</el-button>
             </el-popconfirm>
@@ -206,7 +206,6 @@
                     item.scale = 0
                     item.avaiableWorkTimeTmp = item.avaiableWorkTime
                   }
-                  console.log(data)
                   this.formData.workDetailTable = reviewTable
                   this.totalCount = data.totalCount
                   this.currentPage = this.pageNum
@@ -235,7 +234,7 @@
               reviewCofficient: row.reviewCofficient,
               reviewComments: row.reviewComments,
               reviewKValue: row.reviewKValue,
-              reviewStatus: '1',
+              reviewStatus: 1,
               reviewer: this.$store.state.userInfo.id
             }
             this.$http(url, params)
@@ -260,7 +259,7 @@
             reviewCofficient: row.reviewCofficient,
             reviewComments: row.reviewComments,
             reviewKValue: row.reviewKValue,
-            reviewStatus: '2',
+            reviewStatus: 2,
             reviewer: this.$store.state.userInfo.name
           }
           this.$http(url, params)
@@ -282,7 +281,7 @@
             reviewCofficient: null,
             reviewComments: row.reviewComments,
             reviewKValue: null,
-            reviewStatus: '0'
+            reviewStatus: 0
           }
           this.$http(url, params)
             .then(res => {
@@ -329,11 +328,11 @@
       filters: {
         reviewStatusFilter (status) {
           switch (status) {
-            case '0':
+            case 0:
               return 'info'
-            case '1':
+            case 1:
               return 'success'
-            case '2':
+            case 2:
               return 'danger'
             default:
               return 'danger'
@@ -341,11 +340,11 @@
         },
         reviewStatusTextFilter (status) {
           switch (status) {
-            case '0':
+            case 0:
               return '未审核'
-            case '1':
+            case 1:
               return '已通过'
-            case '2':
+            case 2:
               return '驳回'
             default:
               return '错误'

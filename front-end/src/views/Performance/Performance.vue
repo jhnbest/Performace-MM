@@ -56,7 +56,7 @@
                   <span>{{ scope.row.submitTime }}</span>
                 </el-form-item>
                 <el-form-item label="审核人">
-                  <span>{{ scope.row.reviewer }}</span>
+                  <span>{{ scope.row.reviewerName }}</span>
                 </el-form-item>
                 <el-form-item label="更新时间">
                   <span>{{ scope.row.updateTime }}</span>
@@ -104,21 +104,21 @@
           <el-table-column label="获得工时" align="center" prop="assignWorkTime"></el-table-column>
           <el-table-column label="操作" align="center" width="250">
             <template slot-scope="scope">
-              <el-button :disabled="scope.row.submitStatus || ((scope.row.reviewStatus === '1')) || isAssginer(scope.row.submitID)"
+              <el-button :disabled="scope.row.submitStatus === 1 || ((scope.row.reviewStatus === 1)) || isAssginer(scope.row.submitID)"
                          type="primary"
                          size="mini"
                          @click="handleEdit(scope.row, scope.$index)">编辑</el-button>
-              <el-button v-if="!scope.row.submitStatus"
-                         :disabled="(scope.row.reviewStatus === '1' || isAssginer(scope.row.submitID))"
+              <el-button v-if="!(scope.row.submitStatus === 1)"
+                         :disabled="(scope.row.reviewStatus === 1 || isAssginer(scope.row.submitID))"
                          size="mini"
                          type="success"
                          @click="handleSubmitStatus(scope.row, scope.$index)">提交</el-button>
-              <el-button v-if="scope.row.submitStatus"
-                         :disabled="(scope.row.reviewStatus === '1' || isAssginer(scope.row.submitID))"
+              <el-button v-if="scope.row.submitStatus === 1"
+                         :disabled="(scope.row.reviewStatus === 1 || isAssginer(scope.row.submitID))"
                          size="mini"
                          type="info"
                          @click="handleSubmitStatus(scope.row,scope.$index)">暂存</el-button>
-              <el-button :disabled="(scope.row.reviewStatus === '1' || isAssginer(scope.row.submitID))"
+              <el-button :disabled="(scope.row.reviewStatus === 1 || isAssginer(scope.row.submitID))"
                          size="mini"
                          type="danger"
                          @click="handleDelete(scope.row, scope.$index)">删除</el-button>
@@ -305,7 +305,11 @@
         handleSubmitStatus (row, index) {
           if (this.reqFlag.changeSubmitStatus) {
             this.reqFlag.changeSubmitStatus = false
-            row.submitStatus = !row.submitStatus
+            if (row.submitStatus === 1) {
+              row.submitStatus = 0
+            } else if (row.submitStatus === 0) {
+              row.submitStatus = 1
+            }
             const url = changeSubmitStatus
             let params = {
               submitStatus: row.submitStatus,
@@ -314,8 +318,8 @@
             this.$http(url, params)
               .then(res => {
                 if (res.code === 1) {
-                  if (row.submitStatus) {
-                    row.reviewStatus = '0'
+                  if (row.submitStatus === 1) {
+                    row.reviewStatus = 0
                   }
                   this.$common.toast('操作成功', 'success', false)
                 } else {
@@ -354,7 +358,7 @@
           this.formData.totalWorkTime = 0
           if (data.length !== 0) {
             for (let item of data) {
-              if (item.reviewStatus === '1') {
+              if (item.reviewStatus === 1) {
                 let params = {
                   index: i,
                   projectID: item.id,
@@ -510,26 +514,26 @@
       },
       filters: {
         submitStatusFilter (status) {
-          if (status) {
+          if (status === 1) {
             return 'success'
-          } else {
+          } else if (status === 0) {
             return 'info'
           }
         },
         submitStatusTextFilter (status) {
-          if (status) {
+          if (status === 1) {
             return '已提交'
-          } else {
+          } else if (status === 0) {
             return '暂存'
           }
         },
         reviewStatusFilter (status) {
           switch (status) {
-            case '0':
+            case 0:
               return 'info'
-            case '1':
+            case 1:
               return 'success'
-            case '2':
+            case 2:
               return 'danger'
             default:
               return 'danger'
@@ -537,11 +541,11 @@
         },
         reviewStatusTextFilter (status) {
           switch (status) {
-            case '0':
+            case 0:
               return '未审核'
-            case '1':
+            case 1:
               return '已通过'
-            case '2':
+            case 2:
               return '驳回'
             default:
               return '错误'
