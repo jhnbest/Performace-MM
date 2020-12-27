@@ -244,7 +244,8 @@
           props: {
             multiple: true,
             value: 'projectTypeID',
-            label: 'projectName'
+            label: 'projectName',
+            expandTrigger: 'hover'
           },
           projectTypeOptions: [],
           labelPosition: 'right',

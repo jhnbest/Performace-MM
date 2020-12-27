@@ -276,7 +276,7 @@
       <div>
         <el-table :data="submitParams.data" height="250">
           <el-table-column label="序号" align="center" type="index"></el-table-column>
-          <el-table-column label="工时项目" align="center" prop="projectStageName"></el-table-column>
+          <el-table-column label="项目阶段" align="center" prop="projectStageName"></el-table-column>
           <el-table-column label="上月进展" align="center" prop="lastMonthProcess">
             <template slot-scope="scope">
               <span>{{scope.row.lastMonthProcess + '%'}}</span>
@@ -322,7 +322,7 @@
             </el-date-picker>
           </el-form-item>
           <el-form-item>
-            <span style="margin-left: 20px;font-size: 15px">总工时：</span>
+            <span style="margin-left: 20px;font-size: 15px">总预计工时：</span>
             <span style="color: red;font-weight: bolder;font-size: 20px">{{totalGetWorkTime}}</span>
           </el-form-item>
         </el-form>
@@ -330,7 +330,7 @@
       <div>
         <el-table :data="submitParams.data" height="250">
           <el-table-column label="序号" align="center" type="index"></el-table-column>
-          <el-table-column label="工时项目" align="center" prop="projectStageName"></el-table-column>
+          <el-table-column label="项目阶段" align="center" prop="projectStageName"></el-table-column>
           <el-table-column label="计划进展" align="center">
             <template slot-scope="scope">
               <span>{{scope.row.applyMonthProcess + '%'}}</span>
