@@ -6,7 +6,10 @@
         <el-input type="text" v-model="formData.name" placeholder="账号" clearable></el-input>
       </el-form-item>
       <el-form-item prop="password">
-        <el-input type="password" v-model="formData.password" placeholder="密码" clearable></el-input>
+        <el-input type="password"
+                  v-model="formData.password"
+                  placeholder="密码"
+                  clearable></el-input>
       </el-form-item>
       <el-form-item class="btn-box">
         <el-button type="primary" @click="submitLogin('formData')">登录</el-button>
@@ -94,6 +97,15 @@ export default {
       this.$nextTick(() => {
         this.$refs.passwordEdit.init()
       })
+    }
+  },
+  created () {
+    let _self = this
+    document.onkeydown = function (e) {
+      let key = window.event.keyCode
+      if (key === 13 || key === 100) {
+        _self.submitLogin('formData')
+      }
     }
   },
   components: {

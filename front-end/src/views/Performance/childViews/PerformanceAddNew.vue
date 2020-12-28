@@ -371,6 +371,7 @@
             let title = this.formData.title
             let tableDataCopy = []
             for (let item of this.formData.workTypeTimeDetail) {
+              item.avaiableWorkTime = Number(item.avaiableWorkTime)
               if (item.avaiableWorkTime !== 0) {
                 item.lastProcess = 0
                 tableDataCopy.push(item)
@@ -552,8 +553,10 @@
             let title = this.formData.title
             let tableDataCopy = []
             for (let item of this.formData.workTypeTimeDetail) {
+              item.avaiableWorkTime = Number(item.avaiableWorkTime)
               if (item.avaiableWorkTime !== 0) {
                 tableDataCopy.push(item)
+                item.lastProcess = 0
               }
             }
             if (tableDataCopy.length !== 0) {
@@ -717,7 +720,7 @@
                       }
                       obj.avaiableWorkTime = obj.baseWorkTime * obj.defaultKValue * obj.defaultCofficient *
                         obj.applyProcess * 0.01
-                      obj.avaiableWorkTime = Number(obj.avaiableWorkTime.toFixed(1))
+                      obj.avaiableWorkTime = Number(Number(obj.avaiableWorkTime).toFixed(1))
                       obj.planWorkTime = obj.avaiableWorkTime
                       let defaultCurrentUserWorkTime = {
                         id: this.$store.state.userInfo.id,
@@ -965,7 +968,7 @@
         // 工时明细表K值和系数变化处理函数
         handleKValueCoffChange (row, index) {
           row.avaiableWorkTime = row.baseWorkTime * row.defaultKValue * row.defaultCofficient * row.applyProcess * 0.01
-          row.avaiableWorkTime = Number(row.avaiableWorkTime.toFixed(1))
+          row.avaiableWorkTime = Number(Number(row.avaiableWorkTime).toFixed(1))
           row.workTimeAssign[0].assignWorkTime = row.baseWorkTime * row.defaultKValue * row.defaultCofficient * row.applyProcess * 0.01
         },
         // 手动刷新项目类型

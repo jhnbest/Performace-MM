@@ -122,6 +122,12 @@ export default new Router({
           meta: { pagePath: '/home/performance' }
         },
         {
+          path: 'mutualEvaluation',
+          name: 'mutualEvaluation',
+          component: () => import('./views/Performance/childViews/PerformanceEdit.vue'),
+          meta: { pagePath: '/home/mutualEvaluation' }
+        },
+        {
           path: 'workTimeReview',
           name: 'workTimeReview',
           component: () => import('./views/workTimeReview/WorkTimeReview.vue'),

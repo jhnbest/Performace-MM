@@ -1,5 +1,10 @@
 <template>
-  <div>
+  <div v-if="$store.state.userInfo.role !== '普通成员'
+  || $store.state.userInfo.id === 32
+  || $store.state.userInfo.id === 7
+  || $store.state.userInfo.id === 11
+  || $store.state.userInfo.id === 12
+  || $store.state.userInfo.id === 8">
     <div class="main-search">
       <el-row>
         <el-col :span="4">
@@ -93,7 +98,7 @@
           <el-table-column label="项目类型" align="center" prop="projectType"></el-table-column>
           <el-table-column label="项目阶段" align="center" prop="projectName" show-overflow-tooltip></el-table-column>
           <el-table-column label="基本工时" align="center" prop="workTime"></el-table-column>
-          <el-table-column label="可用工时" align="center" prop="avaiableWorkTime">
+          <el-table-column label="调整基本工时" align="center" prop="avaiableWorkTime">
             <template slot-scope="scope">
               <el-input-number v-model="scope.row.avaiableWorkTime"
                                size="mini"
@@ -128,6 +133,11 @@
       <h3 class="v-line-icon-red">已指派</h3>
       <el-table :data="assignedTable" style="width: 95%;margin: auto">
         <el-table-column label="序号" align="center" type="index"></el-table-column>
+        <el-table-column label="指派时间" align="center">
+          <template slot-scope="scope">
+            <span>{{scope.row.assignDate}}</span>
+          </template>
+        </el-table-column>
         <el-table-column label="项目名称" align="center" prop="projectName">
           <template slot-scope="scope">
             <div v-if="scope.row.editable">
@@ -375,7 +385,8 @@
           props: {
             multiple: true,
             value: 'projectTypeID',
-            label: 'projectName'
+            label: 'projectName',
+            expandTrigger: 'hover'
           },
           showFlag: {
             projectAssign: true,
@@ -491,7 +502,6 @@
                           }
                         }
                       })
-                      console.log(assignTo)
                       for (let item of data) {
                         item.projectType = parentType
                         item.projectManager = assignTo
@@ -503,7 +513,6 @@
                       it.tableData = data
                       console.log('tableData')
                       console.log(it.tableData)
-                      console.log(res.data)
                     }
                   })
               }

@@ -61,7 +61,7 @@
           <el-table-column label="项目阶段" align="center">
             <template slot-scope="scope">
               <div>
-                <el-input v-if="projectStageEditable"  v-model="scope.row.workType" size="mini" :disabled="true"></el-input>
+                <el-input v-if="projectStageEditable"  v-model="scope.row.workType" size="mini"></el-input>
                 <span v-else>{{scope.row.workType}}</span>
               </div>
             </template>
@@ -402,6 +402,7 @@
             let title = this.formData.title
             let tableDataCopy = []
             for (let item of this.formData.workTypeTimeDetail) {
+              item.avaiableWorkTime = Number(item.avaiableWorkTime)
               if (item.avaiableWorkTime !== 0) {
                 tableDataCopy.push(item)
               }
@@ -485,6 +486,7 @@
           let title = this.formData.title
           let tableDataCopy = []
           for (let item of this.formData.workTypeTimeDetail) {
+            item.avaiableWorkTime = Number(item.avaiableWorkTime)
             if (item.avaiableWorkTime !== 0) {
               tableDataCopy.push(item)
             }
@@ -634,7 +636,7 @@
         // 工时明细表K值和系数变化处理函数
         handleKValueCoffChange (row) {
           row.avaiableWorkTime = row.baseWorkTime * row.defaultKValue * row.defaultCofficient * (row.applyProcess - row.lastProcess) * 0.01
-          row.avaiableWorkTime = Number(row.avaiableWorkTime.toFixed(1))
+          row.avaiableWorkTime = Number(Number(row.avaiableWorkTime).toFixed(1))
           row.workTimeAssign[0].assignWorkTime = row.baseWorkTime * row.defaultKValue * row.defaultCofficient * (row.applyProcess - row.lastProcess) * 0.01
         },
         // 新增一行

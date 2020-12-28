@@ -11,7 +11,12 @@
             </el-badge>
           </el-radio-group>
         </el-col>
-        <el-col :span="1" :offset="1" v-if="this.$store.state.userInfo.role !== '普通成员'">
+        <el-col :span="1" :offset="1" v-if="$store.state.userInfo.role !== '普通成员'
+        || $store.state.userInfo.id === 32
+        || $store.state.userInfo.id === 7
+        || $store.state.userInfo.id === 11
+        || $store.state.userInfo.id === 12
+        || $store.state.userInfo.id === 8">
           <el-button type="danger"
                      @click="handleProjectAssign"
                      size="medium">项目指派</el-button>

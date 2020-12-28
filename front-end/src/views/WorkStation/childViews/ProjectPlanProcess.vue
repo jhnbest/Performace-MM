@@ -550,7 +550,7 @@
                       }
                       obj.avaiableWorkTime = obj.baseWorkTime * obj.defaultKValue * obj.defaultCofficient *
                         (applyMonthProcess - lastMonthProcess) * 0.01
-                      obj.avaiableWorkTime = Number(obj.avaiableWorkTime.toFixed(1))
+                      obj.avaiableWorkTime = Number(Number(obj.avaiableWorkTime).toFixed(1))
                       let defaultCurrentUserWorkTime = {
                         id: it.$store.state.userInfo.id,
                         groupName: it.$store.state.userInfo.groupName,

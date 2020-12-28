@@ -1,5 +1,5 @@
-let path = '/demo-weekly/back-end/api';
-// let path = '/api';
+// let path = '/demo-weekly/back-end/api';
+let path = '/api';
 
 module.exports = {
     // user-用户管理

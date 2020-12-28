@@ -4,8 +4,8 @@ import router from '../router'
 import common from '../assets/js/common.js'
 
 axios.defaults.timeout = 180000
-axios.defaults.baseURL = '/demo-weekly/back-end/api' // 测试接口域名线下
-// axios.defaults.baseURL = '/api' // 测试接口域名线上
+// axios.defaults.baseURL = '/demo-weekly/back-end/api' // 测试接口域名线下
+axios.defaults.baseURL = '/api' // 测试接口域名线上
 export const baseURL = axios.defaults.baseURL
 
 // 配置请求拦截器

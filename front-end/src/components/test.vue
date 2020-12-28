@@ -84,7 +84,6 @@
             this.$http(url, params)
               .then(res => {
                 if (res.code === 1) {
-                  console.log(res.data)
                   this.formData.tableData = res.data[0]
                   this.$emit('countFeedback', res.data[1][0].totalCount)
                 }
@@ -195,11 +194,9 @@
         }
       },
       created () {
-        console.log('test.vue create')
         this.init()
       },
       destroyed () {
-        console.log('test.vue destroyed')
       },
       components: {
       },

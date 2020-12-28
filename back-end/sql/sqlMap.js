@@ -107,8 +107,9 @@ const sqlMap = {
         'reviewer = ? where id = ?',
     updateProjectWorkTimeAssignReviewStatus: 'update worktimelist set workTimeAssignReviewStatus = ? where id = ?',
     getAssignWorkTime: 'select reviewWorkTime from worktimeassign where projectID = ? and userID = ? and obsoleteStatus != 1',
-    getGroupWorkTimeList: 'select wl.*, users.account, users.name, users.groupName from worktimelist wl left join users ' +
-        ''
+    getGroupWorkTimeList: 'select u.id, u.name, wa.reviewWorkTime, wl.applyMonth from worktimeassign wa left join worktimelist ' +
+        'wl on wa.projectID = wl.id left join users u on wa.userID = u.id where wl.applyMonth = ? and u.groupName = ? and ' +
+        ' wl.reviewStatus = 1 and wa.obsoleteStatus != 1'
   },
   workStation: {
     getAssignProjectListUn: 'select apl.*, users.name as assigner from assignprojectlist apl left join users on apl.assignerID = users.id where ' +
@@ -139,7 +140,8 @@ const sqlMap = {
     getAssignProjectStageByID: 'select January, February, March, April, May, June, July, August, September, October, November, December from monthprocess where ' +
         'aPDID = ? and type = "fact" and obsoleteStatus != 1',
     projectStageProcessInsert: 'update assignprojectdetail set process = ? where id = ?;select aPLID from assignprojectdetail where id = ?',
-    getProjectStageProcess: 'select count(*) as totalCount from assignprojectdetail where aPLID = ?;select process from assignprojectdetail where aPLID = ? and obsoleteStatus != 1',
+    getProjectStageProcess: 'select count(*) as totalCount from assignprojectdetail where aPLID = ? and obsoleteStatus != 1;' +
+        'select process from assignprojectdetail where aPLID = ? and obsoleteStatus != 1',
     projectProcessUpdate: 'update assignprojectlist set process = ? where id = ?',
     insertAssignProjectList: 'insert into assignprojectlist (userID, assignDate, projectType, projectName, assignerID, totalWorkTime, projectLevel, ' +
         'reviewStatus, isFilled) values (?, ?, ?, ?, ?, ?, ?, ?, ?)',
@@ -151,7 +153,7 @@ const sqlMap = {
         'apd.process as apdProcess, apl.id as aplID, apl.userID, apl.assignDate, apl.projectType, apl.projectName, apl.process as aplProcess, ' +
         'apl.assignerID, apl.totalWorkTime, apl.gettedWorkTime, apl.isFilled from assignprojectdetail apd left join assignprojectlist apl on ' +
         'apd.aPLID = apl.id where apd.id = ? and apd.obsoleteStatus != 1',
-    getAssignedProject: 'select apl.id, apl.projectName, apl.userID as projectManagerID, apl.process, apl.projectLevel, pjn.projectName ' +
+    getAssignedProject: 'select apl.id, apl.assignDate, apl.projectName, apl.userID as projectManagerID, apl.process, apl.projectLevel, pjn.projectName ' +
         'as projectType, users.name as projectManager from assignprojectlist apl left join projecttypenew pjn on ' +
         'apl.projectType = pjn.projectTypeID left join users on apl.userID = users.id where apl.assignerID = ? and apl.obsoleteStatus != 1',
     updateAssignProjectList: 'update assignprojectlist set userID = ?, projectName = ?, projectLevel = ? where id = ?',

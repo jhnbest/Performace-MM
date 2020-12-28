@@ -910,9 +910,21 @@ const performance = {
     },
     // 获取小组申报工时列表
     getGroupWorkTimeList (req, res) {
-        let data = req.body
-        console.log(data)
-        let sql = $sql.performance.getGroupWorkTimeList
+        $http.userVerify(req, res, () => {
+            let data = req.body
+            console.log(data)
+            let sql = $sql.performance.getGroupWorkTimeList
+            let arrayParams = [data.applyMonth, data.groupID]
+            $http.connPool(sql, arrayParams, (err, result) => {
+                if (err) {
+                    return $http.writeJson(res, {code: -2, message: '失败', errMsg: err})
+                } else {
+                    result = JSON.parse(JSON.stringify(result))
+                    console.log(result)
+                    return $http.writeJson(res, {code: 1, data: result, message: '失败'})
+                }
+            })
+        })
     }
 }
 

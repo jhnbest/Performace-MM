@@ -7,7 +7,7 @@
         stripe
         style="width: 100%;margin: auto">
         <el-table-column label="序号" type="index" align="center"></el-table-column>
-        <el-table-column label="项目类型" align="center" width="120%">
+        <el-table-column label="项目类型" align="center" width="130%">
           <template slot-scope="scope">
             <el-tag :type="scope.row.parentTypeID | parentTypeIDColorFilter">
               {{scope.row.parentTypeID | parentTypeIDStringFilter}}
@@ -84,13 +84,13 @@
                          align="center"
                          prop="reviewerName"
                          width="100%"></el-table-column>
-<!--        <el-table-column label="审核状态" align="center">-->
-<!--          <template slot-scope="scope">-->
-<!--            <el-tag :type="scope.row.reviewStatus | reviewStatusFilter">-->
-<!--              {{ scope.row.reviewStatus | reviewStatusTextFilter}}-->
-<!--            </el-tag>-->
-<!--          </template>-->
-<!--        </el-table-column>-->
+        <el-table-column v-if="info.reviewType === 'reviewed'" label="审核状态" align="center">
+          <template slot-scope="scope">
+            <el-tag :type="scope.row.reviewStatus | reviewStatusFilter">
+              {{ scope.row.reviewStatus | reviewStatusTextFilter}}
+            </el-tag>
+          </template>
+        </el-table-column>
         <el-table-column label="操作" align="center" width="200%">
           <template slot-scope="scope">
             <el-popconfirm
@@ -260,7 +260,7 @@
             reviewComments: row.reviewComments,
             reviewKValue: row.reviewKValue,
             reviewStatus: 2,
-            reviewer: this.$store.state.userInfo.name
+            reviewer: this.$store.state.userInfo.id
           }
           this.$http(url, params)
             .then(res => {
@@ -299,9 +299,9 @@
         handleReviewKValueChange (row) {
           console.log(row)
           row.scale = (row.reviewKValue - row.applyKValue) / row.applyKValue
-          row.scale = Number(row.scale.toFixed(5))
+          row.scale = Number(Number(row.scale).toFixed(5))
           row.avaiableWorkTime = row.avaiableWorkTimeTmp * (1 + row.scale)
-          row.avaiableWorkTime = Number(row.avaiableWorkTime.toFixed(1))
+          row.avaiableWorkTime = Number(Number(row.avaiableWorkTime).toFixed(1))
           row.workTimeAssignReviewStatus = 0
         }
       },

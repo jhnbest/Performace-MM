@@ -112,12 +112,12 @@ export default {
               console.log(data)
               this.formData.totalReviewWorkTime = 0
               for (let item of data) {
-                if (reviewStatus !== 1) {
+                if (reviewStatus !== 1 && item.reviewWorkTime === null) {
                   item.reviewWorkTime = item.workTime
                 }
                 if (workTimeAssignReviewStatus === 0) {
                   item.reviewWorkTime = item.workTime * (1 + scale)
-                  item.reviewWorkTime = Number(item.reviewWorkTime.toFixed(1))
+                  item.reviewWorkTime = Number(Number(item.reviewWorkTime).toFixed(1))
                 }
               }
               this.formData.copInfoTable = data
@@ -167,9 +167,9 @@ export default {
     totalReviewWorkTime () {
       let total = 0
       for (let item of this.formData.copInfoTable) {
-        total += item.reviewWorkTime
+        total += Number(item.reviewWorkTime)
       }
-      return Number(total.toFixed(1))
+      return Number(Number(total).toFixed(1))
     }
   },
   filters: {

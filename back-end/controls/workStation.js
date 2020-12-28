@@ -726,6 +726,7 @@ const workStation = {
                 return $http.writeJson(res, { code: -2, message: '失败', errMsg: err })
             } else {
                 result = JSON.parse(JSON.stringify(result))
+                result = formatData(result)
                 return  $http.writeJson(res, {code: 1, data: result, message: '成功'})
             }
         })
