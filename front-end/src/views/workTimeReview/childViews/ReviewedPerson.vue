@@ -5,7 +5,8 @@
         v-loading="!reqFlag.getProjectList"
         :data="formData.workDetailTable"
         stripe
-        style="width: 100%;margin: auto">
+        :span-method="objectSpanMethod"
+        style="width: 100%;margin: auto" border>
         <el-table-column label="序号" type="index" align="center"></el-table-column>
         <el-table-column label="项目类型" align="center" width="130%">
           <template slot-scope="scope">
@@ -169,12 +170,14 @@
         }
       },
       methods: {
+        // 工时审核点击
         handleCoopInfo (row, index) {
           this.showFlag.CopReview = true
           this.$nextTick(() => {
             this.$refs.copReview.init(row, index, this.info.reviewType)
           })
         },
+        // 获取工时申报列表
         getProjectList (data) {
           const url = getProjectList
           if (this.reqFlag.getProjectList) {
@@ -206,12 +209,34 @@
                     item.scale = 0
                     item.avaiableWorkTimeTmp = item.avaiableWorkTime
                   }
+                  reviewTable.sort(this.compare('aplID'))
+                  this.handleReviewTable(reviewTable)
+                  console.log(reviewTable)
                   this.formData.workDetailTable = reviewTable
                   this.totalCount = data.totalCount
                   this.currentPage = this.pageNum
                   this.reqFlag.getProjectList = true
                 }
               })
+          }
+        },
+        // 审核表格合并前处理
+        handleReviewTable (reviewTable) {
+          let preAplID = 0
+          let count = 0
+          for (let i = 0; i < reviewTable.length; i++) {
+            reviewTable[i].rowSpan = 0
+            if (reviewTable[i].aplID === preAplID) {
+              if (count === 0) {
+                count += 2
+              } else {
+                count++
+              }
+            } else {
+              reviewTable[i - count].rowSpan = count
+              count = 0
+              preAplID = reviewTable[i].aplID
+            }
           }
         },
         // 审核通过
@@ -292,6 +317,7 @@
               }
             })
         },
+        // 工时分配审核回调
         handleWorkTimeAssignReview (index) {
           this.formData.workDetailTable[index].workTimeAssignReviewStatus = 1
         },
@@ -303,6 +329,42 @@
           row.avaiableWorkTime = row.avaiableWorkTimeTmp * (1 + row.scale)
           row.avaiableWorkTime = Number(Number(row.avaiableWorkTime).toFixed(1))
           row.workTimeAssignReviewStatus = 0
+        },
+        // 表格合并方法
+        objectSpanMethod ({ row, column, rowIndex, columnIndex }) {
+          // if (columnIndex === 2) {
+          //   if (row.rowSpan !== 0) {
+          //     return {
+          //       rowspan: row.rowSpan,
+          //       colspan: 1
+          //     }
+          //   } else {
+          //     return {
+          //       rowspan: 1,
+          //       colspan: 1
+          //     }
+          //   }
+          // }
+        },
+        // 表格数据排序
+        compare (aplID) {
+          return function (o, p) {
+            let a, b
+            if (typeof o === 'object' && typeof p === 'object' && o && p) {
+              a = o[aplID]
+              b = p[aplID]
+              if (a === b) {
+                return 0
+              }
+              if (typeof a === typeof b) {
+                return a > b ? -1 : 1
+              }
+              return typeof a > typeof b ? -1 : 1
+            } else {
+              let obj = {}
+              throw (obj)
+            }
+          }
         }
       },
       props: {

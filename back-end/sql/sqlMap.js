@@ -57,7 +57,8 @@ const sqlMap = {
     selectWorkTime: 'select distinct workTime, dynamicKValue, defaultKValue, defaultCofficient from projecttype where projecttype.projectLevel2 = ? and projecttype.projectLevel4 = ?',
     selectProjectTypeFirst: 'select projectTypeID, projectName from projecttypenew where projectParentID = ? or projectParentID = 0',
     selectProjectType: 'select projectTypeID, projectName from projecttypenew where projectParentID = ? and obsoleteStatus != 1',
-    selectProjectTime: 'select projectTypeID, projectName, workTime, dynamicKValue, isConference, defaultAssignWorkTime from projecttypenew where projectTypeID = ?',
+    selectProjectTime: 'select projectTypeID, projectName, workTime, dynamicKValue, isConference, defaultAssignWorkTime ' +
+        'from projecttypenew where projectTypeID = ?',
     addProject: 'insert into worktimelist (submitID, projectTypeID, applyKValue, reviewKValue, applyCofficient, reviewCofficient, submitTime, ' +
         'updateTime, applyMonth, submitStatus, submitComments, avaiableWorkTime, applyProcess, apdID, aplID, monthID, applyType, lastProcess, ' +
         'applyBaseWorkTime) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
@@ -94,8 +95,9 @@ const sqlMap = {
     getProjectInfo: 'select wl.*, apd.projectStageName from worktimelist wl left join assignprojectdetail apd on ' +
         'wl.apdID = apd.id where wl.id = ? and wl.obsoleteStatus != 1',
     getWorkAssignInfo: 'select * from worktimeassign where projectID = ? and obsoleteStatus != 1',
-    getFullProjectType: 'select projectParentID, projectName, workTime, dynamicKValue, isConference, defaultAssignWorkTime from projecttypenew ' +
-        'where projectTypeID = ? and obsoleteStatus != 1',
+    getFullProjectType: 'select projectParentID, projectName, workTime, dynamicKValue, ' +
+        'isConference, defaultAssignWorkTime from projecttypenew ' +
+        'where projectTypeID = ?',
     changeSubmitStatus: 'update worktimelist set submitStatus = ? where id = ?',
     changeRejectProjectSubmitStatus: 'update worktimelist set submitStatus = ?, updateTime = ?, reviewStatus = ? where id = ?',
     deleteProject: 'update worktimelist set obsoleteStatus = 1 where id = ?',

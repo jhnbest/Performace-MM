@@ -47,7 +47,17 @@
             filterable
             @change="handleProjectTypeChange"
             clearable
-            style="width: 350%"></el-cascader>
+            style="width: 350%">
+            <template slot-scope="{ node, data }">
+              <el-tooltip :disabled="data.projectName.length < 11"
+                          class="item"
+                          effect="dark"
+                          :content="data.projectName"
+                          placement="top-start">
+                <span>{{ data.projectName }}</span>
+              </el-tooltip>
+            </template>
+          </el-cascader>
         </el-form-item>
         <br>
         <el-form-item label="项目名称" prop="projectName">
@@ -621,6 +631,7 @@
               .then(res => {
                 if (res.code === 1) {
                   let data = res.data
+                  console.log(data)
                   this.projectTypeOptions = data
                 }
                 this.reqFlag.getProjectType = true

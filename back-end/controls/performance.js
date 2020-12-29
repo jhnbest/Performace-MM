@@ -449,7 +449,6 @@ async function getFullProjectType(res, projectTypeID, resultData) {
         await getFullProjectType(res, checkResult.result[0].projectParentID, resultData)  // 递归查询项目类型结构
     } else {
         resultData.projectTypeCheck.reverse()
-        console.log(resultData)
         return $http.writeJson(res, {code: 1, data: resultData, message: '成功'})
     }
 }
@@ -661,7 +660,7 @@ const performance = {
         let resultData = []
         let groupID = null
         $http.userVerify(req, res, () => {
-            console.log('=== performance.js getWorkTime')
+            console.log('=== performance.js getProjectType')
             groupID = getGroupID(params.projectParentID)
             sql = $sql.performance.selectProjectTypeFirst
             arrayParams = [groupID]
