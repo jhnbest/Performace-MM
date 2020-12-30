@@ -778,7 +778,6 @@ const workStation = {
     // 更新项目阶段
     updateAssignWork (req, res) {
         let data = req.body
-        console.log(data)
         let sqlUpdateAssignWorkDetail = $sql.workStation.UpdateAssignWorkDetail
         let sqlUpdateAssignWorkList = $sql.workStation.UpdateAssignWorkList
         let sqlGetProjectTotalWorkTime = $sql.workStation.GetProjectTotalWorkTime
@@ -787,10 +786,9 @@ const workStation = {
         let coefficient = data.tableData[0].coefficient
         let avaiableWorkTime = data.tableData[0].avaiableWorkTime
         let projectStageName = data.tableData[0].workType
-        let arrayParams = [projectStageName, kValue, coefficient, avaiableWorkTime, data.apdID, data.aplID]
-        let curTime = $time.formatTime()
+        let applyBaseWorkTime = data.tableData[0].applyBaseWorkTime
+        let arrayParams = [projectStageName, kValue, coefficient, avaiableWorkTime, applyBaseWorkTime, data.apdID, data.aplID]
         updateAssignWorkDetail(sql, arrayParams).then((res1) => { // 更新项目明细
-            console.log(res1)
             let totalWorkTime = res1[1][0].totalWorkTime
             sql = sqlUpdateAssignWorkList
             arrayParams = [totalWorkTime, data.aplID]

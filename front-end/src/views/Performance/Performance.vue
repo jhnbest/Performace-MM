@@ -48,7 +48,9 @@
         <el-table
           :data="workDetailTable"
           style="width: 99%;margin: auto"
-          v-loading="!this.reqFlag.getProjectList">
+          v-loading="!this.reqFlag.getProjectList"
+          border
+          :span-method="objectSpanMethod">
           <el-table-column type="expand">
             <template slot-scope="scope">
               <el-form label-position="left" inline class="demo-table-expand">
@@ -79,7 +81,7 @@
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column label="申报月份" align="center" prop="applyMonth"></el-table-column>
+<!--          <el-table-column label="申报月份" align="center" prop="applyMonth"></el-table-column>-->
           <el-table-column label="项目名称" align="center" prop="projectName"></el-table-column>
           <el-table-column label="项目阶段" align="center" prop="projectStageName" width="200%"></el-table-column>
           <el-table-column label="工时详情" align="center">
@@ -130,9 +132,11 @@
     <!--计划表格-->
     <div v-if="showFlag.planTableShow" class="main-content">
       <el-table :data="workPlanTableData"
-                style="width: 99%;margin: auto">
+                style="width: 99%;margin: auto"
+                border
+                :span-method="planTableSpanMethod">
         <el-table-column label="序号" align="center" type="index"></el-table-column>
-        <el-table-column label="申报月份" align="center" prop="applyMonth"></el-table-column>
+<!--        <el-table-column label="申报月份" align="center" prop="applyMonth"></el-table-column>-->
         <el-table-column label="项目名称" align="center" prop="projectName"></el-table-column>
         <el-table-column label="项目阶段" align="center" prop="projectStageName" width="200%"></el-table-column>
         <el-table-column label="计划进展" align="center" prop="applyProcess">
@@ -148,7 +152,7 @@
                          :disabled="!reqFlag.complete"
                          size="mini"
                          @click="handleComplete(scope.row)">生成工时申报</el-button>
-<!--              <el-button type="danger" size="mini" @click="handleDeletePlanItem(scope.row)">删除</el-button>-->
+              <el-button type="danger" size="mini" @click="handleDeletePlanItem(scope.row, scope.$index)">删除</el-button>
             </div>
           </template>
         </el-table-column>
@@ -232,6 +236,32 @@
               })
           }
         },
+        // 审核表格合并前处理
+        handleTable (Table) {
+          let preAplID = 0
+          let count = 0
+          for (let i = 0; i < Table.length; i++) {
+            Table[i].rowSpan = 1
+            Table[i].colSpan = 1
+            if (Table[i].aplID === preAplID) {
+              if (count === 0) {
+                count += 2
+              } else {
+                count++
+              }
+              Table[i].rowSpan = 0
+              Table[i].colSpan = 0
+            } else {
+              if (count > 0) {
+                Table[i - count].rowSpan = count
+              } else {
+                Table[i - count].rowSpan = 1
+              }
+              count = 0
+              preAplID = Table[i].aplID
+            }
+          }
+        },
         // 获取工时申报列表
         getProjectList () {
           let it = this
@@ -247,7 +277,7 @@
               }
               it.$http(url, params)
                 .then(res => {
-                  if (res.code == 1) {
+                  if (res.code === 1) {
                     let data = res.data
                     let factWorkTimeList = []
                     let planWorkTimeList = []
@@ -261,9 +291,13 @@
                         planWorkTimeList.push(item)
                       }
                     }
+                    factWorkTimeList.sort(it.compare('aplID'))
+                    planWorkTimeList.sort(it.compare('aplID'))
+                    it.handleTable(factWorkTimeList)
+                    it.handleTable(planWorkTimeList)
+                    console.log(planWorkTimeList)
                     it.workPlanTableData = JSON.parse(JSON.stringify(planWorkTimeList))
                     it.workDetailTable = JSON.parse(JSON.stringify(factWorkTimeList))
-
                     it.totalCount = data.totalCount
                     it.currentPage = it.pageNum
                     it.reqFlag.getProjectList = true
@@ -276,6 +310,26 @@
                 })
             }
           })
+        },
+        // 表格数据排序
+        compare (params) {
+          return function (o, p) {
+            let a, b
+            if (typeof o === 'object' && typeof p === 'object' && o && p) {
+              a = o[params]
+              b = p[params]
+              if (a === b) {
+                return 0
+              }
+              if (typeof a === typeof b) {
+                return a > b ? -1 : 1
+              }
+              return typeof a > typeof b ? -1 : 1
+            } else {
+              let obj = {}
+              throw (obj)
+            }
+          }
         },
         handelDateChange () {
           this.getProjectList().then(res => {
@@ -368,9 +422,7 @@
                   .then(res => {
                     if (res.code === 1) {
                       let data = res.data
-                      console.log(data)
                       this.workDetailTable[data.index].assignWorkTime = data.reviewWorkTime
-                      console.log(this.workDetailTable)
                       this.formData.totalWorkTime += data.reviewWorkTime
                     }
                   })
@@ -416,9 +468,7 @@
         },
         // 已完成按钮
         handleComplete (row) {
-          console.log(row)
           this.getWorkTimeAssign(row.id).then(workTimeAssign => {
-            console.log(workTimeAssign)
             const url = workTimeTemporary
             if (this.reqFlag.complete) {
               this.reqFlag.complete = false
@@ -467,7 +517,44 @@
           row.avaiableWorkTime = row
         },
         // 删除按钮
-        handleDeletePlanItem (row) {
+        handleDeletePlanItem (row, index) {
+          this.$common.msgBox('confirm', '操作提示', '确定删除？', () => {
+            if (this.reqFlag.deleteProject) {
+              this.reqFlag.deleteProject = false
+              const url = deleteProject
+              this.workPlanTableData.splice(index, 1)
+              let params = {
+                id: row.id
+              }
+              this.$http(url, params)
+                .then(res => {
+                  if (res.code === 1) {
+                    this.$common.toast('操作成功', 'success', false)
+                  } else {
+                    this.$common.toast('操作失败', 'danger', false)
+                  }
+                  this.reqFlag.deleteProject = true
+                })
+            }
+          })
+        },
+        // 表格合并方法
+        objectSpanMethod ({ row, column, rowIndex, columnIndex }) {
+          // if (columnIndex === 2 || columnIndex === 3) {
+          //   return {
+          //     rowspan: row.rowSpan,
+          //     colspan: row.colSpan
+          //   }
+          // }
+        },
+        // 计划表格合并方法
+        planTableSpanMethod ({ row, column, rowIndex, columnIndex }) {
+          // if (columnIndex === 1) {
+          //   return {
+          //     rowspan: row.rowSpan,
+          //     colspan: row.colSpan
+          //   }
+          // }
         }
       },
       computed: {
@@ -553,12 +640,9 @@
         }
       },
       created () {
-        console.log('===Performance.vue create')
-        console.log(this.$store.state.userInfo)
         this.init()
       },
       mounted () {
-        console.log('Performance.vue mounted')
       }
     }
 </script>

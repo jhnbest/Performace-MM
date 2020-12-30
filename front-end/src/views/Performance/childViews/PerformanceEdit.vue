@@ -380,6 +380,7 @@
                     avaiableWorkTime: data.workTimeList[0].avaiableWorkTime,
                     isConference: data.isConference,
                     defaultAssignWorkTime: data.defaultAssignWorkTime,
+                    defaultAssignWorkTimeIni: data.defaultAssignWorkTime,
                     applyProcess: data.workTimeList[0].applyProcess,
                     apdID: data.workTimeList[0].apdID,
                     workType: data.workTimeList[0].projectStageName,
@@ -387,6 +388,7 @@
                     applyBaseWorkTime: data.workTimeList[0].applyBaseWorkTime
                   }
                   // obj.avaiableWorkTime = obj.baseWorkTime * obj.defaultKValue * obj.defaultCofficient
+                  obj.defaultAssignWorkTime = obj.defaultAssignWorkTimeIni * obj.defaultKValue * obj.defaultCofficient * obj.applyProcess * 0.01
                   obj.workTimeAssign = defaultCurrentUserWorkTime
                   it.formData.workTypeTimeDetail.push(obj)
                   resolve(obj)
@@ -452,7 +454,9 @@
               workTime: item.avaiableWorkTime,
               applyProcess: item.applyProcess,
               coefficient: item.defaultCofficient,
-              workType: item.workType
+              workType: item.workType,
+              baseWorkTime: item.applyBaseWorkTime,
+              applyBaseWorkTime: item.applyBaseWorkTime
             }
             params.tableData.push(obj)
           }
@@ -461,7 +465,6 @@
             it.$http(url, params)
               .then(res => {
                 if (res.code === 1) {
-                  console.log(res.data)
                   resolve(res.data)
                 }
               })
@@ -638,6 +641,7 @@
           row.avaiableWorkTime = row.baseWorkTime * row.defaultKValue * row.defaultCofficient * (row.applyProcess - row.lastProcess) * 0.01
           row.avaiableWorkTime = Number(Number(row.avaiableWorkTime).toFixed(1))
           row.workTimeAssign[0].assignWorkTime = row.baseWorkTime * row.defaultKValue * row.defaultCofficient * (row.applyProcess - row.lastProcess) * 0.01
+          row.defaultAssignWorkTime = row.defaultAssignWorkTimeIni * row.defaultKValue * row.defaultCofficient * row.applyProcess * 0.01
         },
         // 新增一行
         addNewLine () {

@@ -209,9 +209,8 @@
                     item.scale = 0
                     item.avaiableWorkTimeTmp = item.avaiableWorkTime
                   }
-                  reviewTable.sort(this.compare('aplID'))
-                  this.handleReviewTable(reviewTable)
-                  console.log(reviewTable)
+                  reviewTable.sort(this.compare('aplID')) // 按照项目名称排序
+                  this.handleReviewTable(reviewTable) // 表格按照项目名称合并前处理
                   this.formData.workDetailTable = reviewTable
                   this.totalCount = data.totalCount
                   this.currentPage = this.pageNum
@@ -225,15 +224,22 @@
           let preAplID = 0
           let count = 0
           for (let i = 0; i < reviewTable.length; i++) {
-            reviewTable[i].rowSpan = 0
+            reviewTable[i].rowSpan = 1
+            reviewTable[i].colSpan = 1
             if (reviewTable[i].aplID === preAplID) {
               if (count === 0) {
                 count += 2
               } else {
                 count++
               }
+              reviewTable[i].rowSpan = 0
+              reviewTable[i].colSpan = 0
             } else {
-              reviewTable[i - count].rowSpan = count
+              if (count > 0) {
+                reviewTable[i - count].rowSpan = count
+              } else {
+                reviewTable[i - count].rowSpan = 1
+              }
               count = 0
               preAplID = reviewTable[i].aplID
             }
@@ -332,19 +338,12 @@
         },
         // 表格合并方法
         objectSpanMethod ({ row, column, rowIndex, columnIndex }) {
-          // if (columnIndex === 2) {
-          //   if (row.rowSpan !== 0) {
-          //     return {
-          //       rowspan: row.rowSpan,
-          //       colspan: 1
-          //     }
-          //   } else {
-          //     return {
-          //       rowspan: 1,
-          //       colspan: 1
-          //     }
-          //   }
-          // }
+          if (columnIndex === 1 || columnIndex === 2) {
+            return {
+              rowspan: row.rowSpan,
+              colspan: row.colSpan
+            }
+          }
         },
         // 表格数据排序
         compare (aplID) {

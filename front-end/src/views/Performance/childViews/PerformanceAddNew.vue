@@ -416,8 +416,6 @@
           const url = submitPersonalProject
           let year = this.$moment(this.formData.title).year()
           let month = this.$moment(this.formData.title).month() + 1
-          console.log(year)
-          console.log(month)
           let params = {
             id: null,
             type: 'fact',
@@ -432,7 +430,6 @@
             it.$http(url, params)
               .then(res => {
                 if (res.code === 1) {
-                  console.log(res.data)
                   resolve(res.data)
                 }
               })
@@ -458,7 +455,8 @@
               projectManagerID: this.$store.state.userInfo.id,
               projectTypeID: item.projectTypeID,
               workTime: item.baseWorkTime,
-              workType: item.workType
+              workType: item.workType,
+              applyBaseWorkTime: item.applyBaseWorkTime
             }
             params.tableData.push(obj)
           }
@@ -467,7 +465,6 @@
             it.$http(url, params)
               .then(res => {
                 if (res.code === 1) {
-                  console.log(res.data)
                   for (let i = 0; i < res.data.length; i++) { // 插入项目明细ID
                     it.formData.workTypeTimeDetail[i].apdID = res.data[i].insertID
                     it.formData.workTypeTimeDetail[i].aplID = res.data[i].aplID
@@ -520,7 +517,6 @@
               it.$http(url, params)
                 .then(res => {
                   if (res.code === 1) {
-                    console.log(res.data)
                     resolve(res.data)
                   }
                 })
@@ -582,7 +578,6 @@
                     this.$common.toast('暂存成功', 'success', false)
                     this.onCancel(formData)
                   } else {
-                    console.log(res.code)
                     this.$common.toast('添加失败', 'error', false)
                     this.onCancel(formData)
                   }
@@ -631,7 +626,6 @@
               .then(res => {
                 if (res.code === 1) {
                   let data = res.data
-                  console.log(data)
                   this.projectTypeOptions = data
                 }
                 this.reqFlag.getProjectType = true
@@ -641,8 +635,6 @@
         // 获取用户姓名
         getUsersName (isOpen) {
           if (isOpen) {
-            console.log('===Performance.vue getUsersName')
-            console.log(this.userListOptions)
             const url = getUsersName
             if (this.reqFlag.usersName) {
               this.reqFlag.usersName = false
@@ -677,9 +669,6 @@
         },
         // 获取项目明细
         handleProjectTypeChange (selectItem) {
-          console.log('PerformanceAddNew.vue handleProjectTypeChange')
-          console.log(selectItem)
-          console.log(selectItem.length)
           let selectLen = selectItem.length
           let selectItems = []
           let tableItems = []
@@ -691,11 +680,8 @@
           for (let item of this.formData.workTypeTimeDetail) {
             tableItems.push(item.projectTypeID)
           }
-          console.log(selectItems)
-          console.log(tableItems)
           let difference = selectItems.filter(x => tableItems.indexOf(x) === -1)
             .concat(tableItems.filter(x => selectItems.indexOf(x) === -1))
-          console.log(difference)
           let tableLen = tableItems.length
           params.checkID = difference
           if (selectLen !== 0) {
@@ -709,7 +695,6 @@
                   if (res.code === 1) {
                     let data = res.data
                     data.pop() // 最后一个父类型删掉
-                    console.log(data)
                     for (let item of data) {
                       let obj = {
                         projectTypeID: item.projectTypeID,
@@ -725,6 +710,7 @@
                         avaiableWorkTime: 0,
                         isConference: item.isConference,
                         defaultAssignWorkTime: item.defaultAssignWorkTime,
+                        defaultAssignWorkTimeIni: item.defaultAssignWorkTime,
                         applyProcess: 100,
                         planProcess: 100,
                         planWorkTime: 0
@@ -743,7 +729,6 @@
                       }
                       obj.workTimeAssign.push(defaultCurrentUserWorkTime)
                       this.formData.workTypeTimeDetail.push(obj)
-                      console.log(this.formData.workTypeTimeDetail)
                     }
                     this.reqFlag.getWorkTimeNew = true
                   }
@@ -751,9 +736,7 @@
             }
           } else { // 选中的数目小于列表中的数目
             let deleteIndex = null
-            console.log(difference)
             for (let diff of difference) {
-              console.log(this.formData.workTypeTimeDetail)
               for (let i = 0; i < this.formData.workTypeTimeDetail.length; i++) {
                 if (this.formData.workTypeTimeDetail[i].projectTypeID === diff) {
                   deleteIndex = i
@@ -766,19 +749,15 @@
         },
         // 删除工时明细记录
         handleDeleteWorkDetail (row, index) {
-          console.log('===PerformanceAddNew.vue handleDeleteWorkDetail')
-          console.log(row)
           let deleteIndex = null
           this.formData.workTypeTimeDetail.splice(index, 1)
           for (let i = 0; i < this.formData.projectType.length; i++) {
             let arrayLen = this.formData.projectType[i].length
-            console.log(this.formData.projectType[i][arrayLen - 1])
             if (this.formData.projectType[i][arrayLen - 1] === row.projectTypeID) {
               deleteIndex = i
               break
             }
           }
-          console.log(deleteIndex)
           this.$nextTick(() => {
             this.formData.projectType.splice(deleteIndex, 1)
           })
@@ -789,13 +768,13 @@
           let tableUsers = []
           let selectUsersLen = 0
           let tmp = []
-          /* 取出现有表格中的数据 */
+          // 取出现有表格中的数据
           for (let item of this.formData.partTableData) {
             if (item.account !== this.$store.state.userInfo.account) {
               tableUsers.push(item.account)
             }
           }
-          /* 是否选了全处室 */
+          // 是否选了全处室
           if (this.formData.participant.indexOf('0') !== -1) {
             for (let user of this.formData.usersList[1].options) {
               selectUsers.push(user.id)
@@ -822,16 +801,11 @@
             }
             if (this.formData.participant.length > 1) {
               for (let item of this.formData.participant) {
-                console.log('===Performance.vue handlePartChange')
-                console.log(item)
-                console.log(tableUsers)
                 if (selectUsers.indexOf(item) === -1 && item !== '1' && item !== '2' && item !== '3' && item !== '0') {
-                  console.log('push')
                   selectUsers.push(item)
                 }
               }
             }
-            console.log(selectUsers)
           } else if (this.formData.participant.indexOf('2') !== -1) { // 是否选了工程组
             for (let user of this.formData.usersList[1].options) {
               if (user.groupName === '工程组') {
@@ -854,16 +828,11 @@
             }
             if (this.formData.participant.length > 1) {
               for (let item of this.formData.participant) {
-                console.log('===Performance.vue handlePartChange')
-                console.log(item)
-                console.log(tableUsers)
                 if (selectUsers.indexOf(item) === -1 && item !== '2') {
-                  console.log('push')
                   selectUsers.push(item)
                 }
               }
             }
-            console.log(selectUsers)
           } else if (this.formData.participant.indexOf('3') !== -1) { // 是否选了通信组
             for (let user of this.formData.usersList[1].options) {
               if (user.groupName === '通信组') {
@@ -886,16 +855,11 @@
             }
             if (this.formData.participant.length > 1) {
               for (let item of this.formData.participant) {
-                console.log('===Performance.vue handlePartChange')
-                console.log(item)
-                console.log(tableUsers)
                 if (selectUsers.indexOf(item) === -1 && item !== '3') {
-                  console.log('push')
                   selectUsers.push(item)
                 }
               }
             }
-            console.log(selectUsers)
           } else {
             selectUsers = this.formData.participant
           }
@@ -903,9 +867,6 @@
           let tableUsersLen = tableUsers.length
           let difference = selectUsers.filter(x => tableUsers.indexOf(x) === -1)
             .concat(tableUsers.filter(x => selectUsers.indexOf(x) === -1))
-          console.log(difference)
-          console.log(selectUsersLen)
-          console.log(tableUsersLen)
           if (selectUsersLen > tableUsersLen) {
             for (let index of difference) {
               tmp = this.formData.usersList[1].options.find((item) => {
@@ -928,7 +889,6 @@
               let index = tableUsers.indexOf(diff)
               let newArr = this.formData.partTableData.splice(index + 1, 1)
               tableUsers.splice(index, 1)
-              console.log(newArr)
             }
           }
         },
@@ -946,16 +906,12 @@
         },
         // 工时分配子组件回调
         handleAssign (params) {
-          console.log('===PerformanceAddNew.vue handleAssign')
-          console.log(params)
           this.formData.workTypeTimeDetail[params.index].workTimeAssign = params.workTimeAssignDetail
           this.formData.workTypeTimeDetail[params.index].multipleAssign = params.multipleAssign
           this.formData.workTypeTimeDetail[params.index].multipleSelect = params.multipleSelect
         },
         // 删除工时明细数据
         participantDelete (account) {
-          console.log(account)
-          console.log(this.formData.partTableData[account.$index])
           this.formData.partTableData.splice(account.$index, 1)
           /* let tableLen = this.formData.partTableData.length
           for (let i = 0; i < tableLen; i++) {
@@ -964,23 +920,12 @@
             }
           } */
         },
-        // 处理移除申报子类型3多选标签时的处理事件
-        handleSub3RemoveTag (param) {
-          let removeTagName = ''
-          let deleteIndex = 0
-          removeTagName = this.formData.subWorkType3List[param].name
-          for (let i = 0; i < this.formData.workTypeTimeDetail.length; i++) {
-            if (this.formData.workTypeTimeDetail[i].workType === removeTagName) {
-              deleteIndex = i
-            }
-          }
-          this.formData.workTypeTimeDetail.splice(deleteIndex, 1)
-        },
         // 工时明细表K值和系数变化处理函数
         handleKValueCoffChange (row, index) {
           row.avaiableWorkTime = row.baseWorkTime * row.defaultKValue * row.defaultCofficient * row.applyProcess * 0.01
           row.avaiableWorkTime = Number(Number(row.avaiableWorkTime).toFixed(1))
           row.workTimeAssign[0].assignWorkTime = row.baseWorkTime * row.defaultKValue * row.defaultCofficient * row.applyProcess * 0.01
+          row.defaultAssignWorkTime = row.defaultAssignWorkTimeIni * row.defaultKValue * row.defaultCofficient * row.applyProcess * 0.01
         },
         // 手动刷新项目类型
         refreshSelectProjectType () {
@@ -999,7 +944,6 @@
           obj = JSON.parse(JSON.stringify(this.formData.projectType[selectLength - 1]))
           this.formData.projectType.push(obj)
           this.refreshSelectProjectType()
-          console.log(this.formData.workTypeTimeDetail)
         },
         // 表格删除按钮
         handleDelete (row, index) {
@@ -1010,7 +954,6 @@
         },
         // 申报类型变化
         handleApplyTypeChange (applyType) {
-          console.log(applyType)
           this.showFlag.freshTable = false
           setTimeout(() => {
             this.showFlag.freshTable = true

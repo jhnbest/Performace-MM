@@ -65,10 +65,10 @@ const sqlMap = {
     addWorkAssign: 'insert into worktimeassign (userID, projectID, workTime, assignRole) values (?, ?, ?, ?)',
     updateProject: 'update worktimelist set submitID = ?, projectTypeID = ?, applyKValue = ?, reviewKValue = ?, applyCofficient = ?, ' +
         'reviewCofficient = ?, updateTime = ?, applyMonth = ?, submitStatus = ?, submitComments = ?, applyProcess = ?, ' +
-        'avaiableWorkTime = ? where id = ?',
+        'avaiableWorkTime = ?, applyBaseWorkTime = ? where id = ?',
     updateRejectProject: 'update worktimelist set submitID = ?, projectTypeID = ?, applyKValue = ?, reviewKValue = ?, applyCofficient = ?, ' +
         'reviewCofficient = ?, updateTime = ?, applyMonth = ?, submitStatus = ?, reviewStatus = ?, submitComments = ?, ' +
-        'applyProcess = ?, avaiableWorkTime = ? where id = ?',
+        'applyProcess = ?, avaiableWorkTime = ?, applyBaseWorkTime = ? where id = ?',
     updateWorkAssign: 'update worktimeassign set userID = ?, projectID = ?, workTime = ?, assignRole = ?, reviewWorkTime = ? where id = ?',
     deleteWorkAssign: 'update worktimeassign set obsoleteStatus = 1 where id = ?',
     // getProjectList: 'SELECT * from worktimelist WHERE submitID = ? and applyMonth = ? and obsoleteStatus != 1', //查找项目列表
@@ -166,7 +166,8 @@ const sqlMap = {
     updateAssignProjectFilled: 'update assignprojectlist set isFilled = 1 where id = ?',
     getAssignWorkDetail: 'select apd.id as apdID, apd.aPLID as aplID, apl.projectLevel from assignprojectdetail apd left join' +
         ' assignprojectlist apl on apd.aPLID = apl.id where apd.id = ?',
-    UpdateAssignWorkDetail: 'update assignprojectdetail set projectStageName = ?, kValue = ?, coefficient = ?, avaiableWorkTime = ? where id = ?',
+    UpdateAssignWorkDetail: 'update assignprojectdetail set projectStageName = ?, kValue = ?, ' +
+        'coefficient = ?, avaiableWorkTime = ?, baseWorkTime = ? where id = ?',
     UpdateAssignWorkList: 'update assignprojectlist set totalWorkTime = ? where id = ?',
     GetProjectTotalWorkTime: 'select sum(avaiableWorkTime)totalWorkTime from assignprojectdetail where aPLID = ?',
     deleteWorkTimeList: 'update worktimelist set obsoleteStatus = 1 where aplID = ?',

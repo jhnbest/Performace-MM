@@ -160,14 +160,15 @@ function workTimeInsertOP(params, i, operate) {
                 updateTime, applyMonth, submitStatus, submitComments, avaiableWorkTime, applyProcess, apdID, aplID, monthID,
                 applyType, lastProcess, applyBaseWorkTime]
         } else if (params.submitType === 'update') { //更新
+            applyBaseWorkTime = params.data[i].applyBaseWorkTime
             if (operate === '1') { // 提交
                 sql = $sql.performance.updateRejectProject
                 arrayParams = [submitID, projectTypeID, applyKValue, reviewKValue, applyCofficient, reviewCofficient, updateTime, applyMonth,
-                    submitStatus, reviewStatus, submitComments, applyProcess, avaiableWorkTime, params.projectID]
+                    submitStatus, reviewStatus, submitComments, applyProcess, avaiableWorkTime, applyBaseWorkTime, params.projectID]
             } else { // 暂存
                 sql = $sql.performance.updateProject
                 arrayParams = [submitID, projectTypeID, applyKValue, reviewKValue, applyCofficient, reviewCofficient, updateTime, applyMonth,
-                    submitStatus, submitComments, applyProcess, avaiableWorkTime, params.projectID]
+                    submitStatus, submitComments, applyProcess, avaiableWorkTime, applyBaseWorkTime, params.projectID]
             }
         }
         $http.connPool(sql, arrayParams, (err, result) => {

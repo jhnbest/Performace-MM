@@ -55,7 +55,17 @@
             collapse-tags
             filterable
             clearable
-            style="width: 350%"></el-cascader>
+            style="width: 350%">
+            <template slot-scope="{ node, data }">
+              <el-tooltip :disabled="data.projectName.length < 11"
+                          class="item"
+                          effect="dark"
+                          :content="data.projectName"
+                          placement="top-start">
+                <span>{{ data.projectName }}</span>
+              </el-tooltip>
+            </template>
+          </el-cascader>
         </el-form-item>
         <br>
         <el-form-item label="项目级别" style="margin-left: 30px" prop="projectLevel">
@@ -496,7 +506,6 @@
                       let assignTo = null
                       this.users.find(items => {
                         for (let item of items.options) {
-                          console.log(item)
                           if (item.id === this.formData.projectManager) {
                             return (assignTo = item.name)
                           }
@@ -511,8 +520,6 @@
                         item.workType = item.projectName
                       }
                       it.tableData = data
-                      console.log('tableData')
-                      console.log(it.tableData)
                     }
                   })
               }
@@ -535,8 +542,6 @@
             for (let item of this.tableData) { // 可用工时替换基本工时（针对目前已经进行到一半的项目）
               item.workTime = item.avaiableWorkTime
             }
-            console.log('-=-=-=-')
-            console.log(this.tableData)
             let params = {
               tableData: this.tableData,
               parentID: this.formData.projectType[0][0],
