@@ -7,7 +7,23 @@
         stripe
         :span-method="objectSpanMethod"
         style="width: 100%;margin: auto" border>
-        <el-table-column label="序号" type="index" align="center"></el-table-column>
+        <el-table-column v-if="info.reviewType === 'reviewed'" type="expand" >
+          <template slot-scope="scope">
+            <el-form label-position="left" inline class="demo-table-expand">
+              <el-form-item label="提交时间">
+                <span>{{ scope.row.submitTime }}</span>
+              </el-form-item>
+              <el-form-item label="审核时间">
+                <span>{{ scope.row.reviewTime }}</span>
+              </el-form-item>
+              <el-form-item label="审核备注">
+                <span v-if="scope.row.reviewComments !== ''">{{ scope.row.reviewComments }}</span>
+                <span v-else>无</span>
+              </el-form-item>
+            </el-form>
+          </template>
+        </el-table-column>
+        <el-table-column label="序号" type="index" align="center" width="50%"></el-table-column>
         <el-table-column label="项目类型" align="center" width="130%">
           <template slot-scope="scope">
             <el-tag :type="scope.row.parentTypeID | parentTypeIDColorFilter">
@@ -31,7 +47,7 @@
             </el-form-item>
           </template>
         </el-table-column>
-        <el-table-column label="完成次数" align="center" prop="applyCofficient" width="110%"></el-table-column>
+        <el-table-column label="完成次数" align="center" prop="applyCofficient" width="80%"></el-table-column>
 <!--        <el-table-column label="审核完成次数" align="center" width="110%">-->
 <!--          <template slot-scope="scope">-->
 <!--            <el-form-item-->
@@ -70,7 +86,7 @@
           </template>
         </el-table-column>
         <el-table-column label="提交时间" align="center" prop="updateTime" width="100%"></el-table-column>
-        <el-table-column label="审核备注" align="center">
+        <el-table-column  v-if="info.reviewType !== 'reviewed'" label="审核备注" align="center">
           <template slot-scope="scope">
             <el-input size="mini" autosize type="textarea" v-model="scope.row.reviewComments"></el-input>
           </template>
@@ -141,7 +157,7 @@
 
 <script>
   import CopReview from '@/components/Cop/CopReview'
-  import { getProjectList, submitReviewPass } from '@/config/interface'
+  import { getProjectList, submitReviewPass, getWorkAssign } from '@/config/interface'
     export default {
       data () {
         return {
@@ -220,36 +236,55 @@
           }
         },
         // 审核表格合并前处理
-        handleReviewTable (reviewTable) {
+        handleReviewTable (Table) {
           let preAplID = 0
-          let count = 0
-          for (let i = 0; i < reviewTable.length; i++) {
-            reviewTable[i].rowSpan = 1
-            reviewTable[i].colSpan = 1
-            if (reviewTable[i].aplID === preAplID) {
-              if (count === 0) {
-                count += 2
-              } else {
-                count++
-              }
-              reviewTable[i].rowSpan = 0
-              reviewTable[i].colSpan = 0
+          let count = 1
+          let preIndex = 0
+          for (let i = 0; i < Table.length; i++) {
+            Table[i].rowSpan = 1
+            Table[i].colSpan = 1
+            if (Table[i].aplID === preAplID) {
+              Table[preIndex].rowSpan = ++count
+              Table[i].rowSpan = 0
+              Table[i].colSpan = 0
             } else {
-              if (count > 0) {
-                reviewTable[i - count].rowSpan = count
-              } else {
-                reviewTable[i - count].rowSpan = 1
-              }
-              count = 0
-              preAplID = reviewTable[i].aplID
+              preIndex = i
+              count = 1
+              preAplID = Table[i].aplID
             }
+          }
+        },
+        // 获取工时分配详情
+        getWorkTimeAssign (row) {
+          const url = getWorkAssign
+          let params = {
+            projectID: row.id
+          }
+          if (this.reqFlag.getWorkTimeAssign) {
+            this.reqFlag.getWorkTimeAssign = false
+            this.$http(url, params)
+              .then(res => {
+                if (res.code === 1) {
+                  let data = res.data
+                  this.formData.totalReviewWorkTime = 0
+                  for (let item of data) {
+                    if (row.reviewStatus !== 1 && item.reviewWorkTime === null) {
+                      item.reviewWorkTime = item.workTime
+                    }
+                    if (row.workTimeAssignReviewStatus === 0) {
+                      item.reviewWorkTime = item.workTime * (1 + row.scale)
+                      item.reviewWorkTime = Number(Number(item.reviewWorkTime).toFixed(1))
+                    }
+                  }
+                }
+                this.reqFlag.getWorkTimeAssign = true
+              })
           }
         },
         // 审核通过
         handleReviewPass (row, index) {
           if (row.workTimeAssignReviewStatus) {
             const url = submitReviewPass
-            console.log(this.formData.workDetailTable)
             let applyYear = this.$moment(row.applyMonth).year()
             let applyMonth = this.$moment(row.applyMonth).month()
             let applyMonthString = this.$common.MonthToString(String(applyMonth + 1))
@@ -338,10 +373,19 @@
         },
         // 表格合并方法
         objectSpanMethod ({ row, column, rowIndex, columnIndex }) {
-          if (columnIndex === 1 || columnIndex === 2) {
-            return {
-              rowspan: row.rowSpan,
-              colspan: row.colSpan
+          if (this.info.reviewType !== 'reviewed') {
+            if (columnIndex === 1 || columnIndex === 2) {
+              return {
+                rowspan: row.rowSpan,
+                colspan: row.colSpan
+              }
+            }
+          } else {
+            if (columnIndex === 2 || columnIndex === 3) {
+              return {
+                rowspan: row.rowSpan,
+                colspan: row.colSpan
+              }
             }
           }
         },

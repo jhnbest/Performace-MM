@@ -1,6 +1,6 @@
 <template>
   <el-dialog title="工时详情" :visible.sync="showFlag" custom-class="dialog-small" @close="closeDialog" width="50%">
-    <div>
+    <div style="margin-top: -20px">
       <div v-if="!formData.isConference">
           <span style="font-weight: bold;font-size: 120%">
             总可用工时：<span style="color: #ff0000;font-size: 130%">{{formData.totalWorkTime}}</span>
@@ -12,7 +12,7 @@
       <br>
       <el-form ref="formData" :model="formData" :rules="formRules">
         <el-table
-          height="300"
+          height="360"
           v-loading="!this.reqFlag.getWorkTimeAssign"
           :data="formData.copInfoTable"
           style="width: 100%;margin: auto">
@@ -85,8 +85,6 @@ export default {
     // 初始化
     init (row, index, reviewType) {
       this.$nextTick(() => {
-        console.log('====CopReview.vue init')
-        console.log(row)
         this.changeShowFlag()
         this.getWorkTimeAssign(row.id, row.scale, row.workTimeAssignReviewStatus, row.reviewStatus)
         this.formData.selectIndex = index
@@ -97,6 +95,7 @@ export default {
         this.formData.totalWorkTime = row.avaiableWorkTime
       })
     },
+    // 获取工时分配详情
     getWorkTimeAssign (id, scale, workTimeAssignReviewStatus, reviewStatus) {
       const url = getWorkAssign
       let params = {
@@ -108,8 +107,6 @@ export default {
           .then(res => {
             if (res.code === 1) {
               let data = res.data
-              console.log('===CopReview.vue getWorkTimeAssign')
-              console.log(data)
               this.formData.totalReviewWorkTime = 0
               for (let item of data) {
                 if (reviewStatus !== 1 && item.reviewWorkTime === null) {
@@ -138,7 +135,6 @@ export default {
             reviewResult: this.formData.copInfoTable,
             projectID: this.formData.projectID
           }
-          console.log(params)
           this.$http(url, params)
           .then(res => {
             if (res.code === 1) {

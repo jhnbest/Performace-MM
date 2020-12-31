@@ -140,6 +140,9 @@
                   } else if (rankPercentage < 1 || rankPercentage === 1) {
                     item.quantitativeScore = 82.5
                   }
+                  if (item.rank === 1) {
+                    item.quantitativeScore = 92.5
+                  }
                 }
                 this.tableData = totalWorkTimeCal
               }

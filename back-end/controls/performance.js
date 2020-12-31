@@ -311,14 +311,10 @@ function projectTypeRecursion(params) {
 
 function updateWorkTimeAssign(data) {
     return new Promise(function (resolve, reject) {
-        let userID = data.userID
-        let projectID = data.projectID
-        let workTime = data.workTime
-        let assignRole = data.assignRole
         let reviewWorkTime = data.reviewWorkTime
         let id = data.id
         let sql = $sql.performance.updateWorkAssign
-        let arrayParams = [userID, projectID, workTime, assignRole, reviewWorkTime, id]
+        let arrayParams = [reviewWorkTime, id]
         $http.connPool(sql, arrayParams, (err, result) => {
             if (err) {
                 let returnData = {
@@ -456,12 +452,14 @@ async function getFullProjectType(res, projectTypeID, resultData) {
 
 async function workTimeAssignReview(data, projectID, res) {
     let workTimeInsertResult = null
+    //---------------------- 更新工时分配审核结果--------------------------
     for (let item of data) {
         workTimeInsertResult = await updateWorkTimeAssign(item)
         if (workTimeInsertResult.err) {
             return $http.writeJson(res, {code: -2, message: '失败', errMsg: workTimeInsertResult.err})
         }
     }
+    //---------------------- 更新工时项目审核状态--------------------------
     workTimeInsertResult = await updateProjectWorkTimeAssignReviewStatus(projectID, 1)
     if (workTimeInsertResult.err) {
         return $http.writeJson(res, {code: -2, message: '失败', errMsg: workTimeInsertResult.err})
@@ -850,8 +848,6 @@ const performance = {
     updateWorkTimeAssignReview (req, res) {
         $http.userVerify(req, res, () => {
             let data = req.body
-            console.log('===performance.js updateWorkTimeAssignReview')
-            console.log(data)
             workTimeAssignReview(data.reviewResult, data.projectID, res).then()
         })
     },

@@ -27,16 +27,6 @@
           <el-button type="danger" size="medium" @click="onCancel('formData')">取 消</el-button>
         </el-form-item>
         <br>
-<!--        <el-form-item label="申报类型" prop="applyType">-->
-<!--          <el-select v-model="formData.applyType" placeholder="请选择" @change="handleApplyTypeChange">-->
-<!--            <el-option v-for="item in applyTypes"-->
-<!--                       :key="item.value"-->
-<!--                       :label="item.text"-->
-<!--                       :value="item.value">-->
-<!--            </el-option>-->
-<!--          </el-select>-->
-<!--        </el-form-item>-->
-<!--        <br>-->
         <el-form-item label="项目类型" prop="projectType">
           <el-cascader
             v-if="showFlag.projectType"
@@ -84,16 +74,6 @@
           stripe
           style="width: 97%;margin: auto">
           <el-table-column type="index" align="center" label="序号"></el-table-column>
-<!--          <el-table-column align="center" label="项目名称" width="150%">-->
-<!--            <template slot-scope="scope">-->
-<!--              <el-form-item-->
-<!--                :prop="'workTypeTimeDetail.' + scope.$index + '.projectName'"-->
-<!--                :rules="formRules.projectName"-->
-<!--                style="margin: auto">-->
-<!--                <el-input type="textarea" v-model="scope.row.projectName" autosize></el-input>-->
-<!--              </el-form-item>-->
-<!--            </template>-->
-<!--          </el-table-column>-->
           <el-table-column label="项目阶段" align="center">
             <template slot-scope="scope">
               <div>

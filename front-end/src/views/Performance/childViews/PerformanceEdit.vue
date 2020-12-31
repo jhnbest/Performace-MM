@@ -66,7 +66,15 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="基本工时" prop="applyBaseWorkTime" align="center" width="80%"></el-table-column>
+          <el-table-column label="基本工时" prop="applyBaseWorkTime" align="center" width="80%">
+            <template slot-scope="scope">
+              <el-input v-if="projectStageEditable"
+                        v-model.number="scope.row.applyBaseWorkTime"
+                        size="mini"
+                        @change="handleKValueCoffChange(scope.row, scope.$index)"></el-input>
+              <span v-else>{{scope.row.applyBaseWorkTime}}</span>
+            </template>
+          </el-table-column>
           <el-table-column label="K值" prop="defaultKValue" align="center" width="150%">
             <template slot-scope="scope">
               <el-form-item
@@ -638,9 +646,9 @@
         },
         // 工时明细表K值和系数变化处理函数
         handleKValueCoffChange (row) {
-          row.avaiableWorkTime = row.baseWorkTime * row.defaultKValue * row.defaultCofficient * (row.applyProcess - row.lastProcess) * 0.01
+          row.avaiableWorkTime = row.applyBaseWorkTime * row.defaultKValue * row.defaultCofficient * (row.applyProcess - row.lastProcess) * 0.01
           row.avaiableWorkTime = Number(Number(row.avaiableWorkTime).toFixed(1))
-          row.workTimeAssign[0].assignWorkTime = row.baseWorkTime * row.defaultKValue * row.defaultCofficient * (row.applyProcess - row.lastProcess) * 0.01
+          row.workTimeAssign[0].assignWorkTime = row.avaiableWorkTime
           row.defaultAssignWorkTime = row.defaultAssignWorkTimeIni * row.defaultKValue * row.defaultCofficient * row.applyProcess * 0.01
         },
         // 新增一行

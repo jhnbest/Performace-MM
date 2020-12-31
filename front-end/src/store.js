@@ -8,11 +8,11 @@ export default new Vuex.Store({
   state: {
     userInfo: !localStorage.getItem('userInfo') ? {} : JSON.parse(localStorage.getItem('userInfo')),
     menuList: [
-      { name: '首页', url: '/home/dashboard', icon: 'el-icon-s-data' },
+      // { name: '首页', url: '/home/dashboard', icon: 'el-icon-s-data' },
       // { name: '用户管理', url: '/home/user', icon: 'el-icon-user' },
       { name: '个人工作台', url: '/home/workStation', icon: 'el-icon-s-unfold' },
       // { name: '工作计划', url: '/home/weekly', icon: 'el-icon-s-grid' },
-      { name: '计划/工时查询', url: '/home/performance', icon: 'el-icon-s-order' },
+      { name: '计划/工时查询', url: '/home/performance', icon: 'el-icon-s-order' }
       // { name: '定性互评', url: '/home/mutualEvaluation', icon: 'el-icon-s-order' }
     ],
     workTimeManagerList: [

@@ -5,7 +5,7 @@
              @close="closeDialog"
              width="50%"
              append-to-body>
-    <div>
+    <div style ="margin-top: -20px">
       <el-form ref="formData" :model="formData" :rules="formRules" :inline="true">
         <el-form-item prop="multiParticipant">
           <el-checkbox v-model="formData.multiParticipant"
@@ -56,7 +56,7 @@
           </span>
         </div>
         <el-table
-          height="250"
+          height="350"
           :data="formData.copInfoTable"
           style="width: 100%;margin: auto">
           <el-table-column type="index" label="序号" align="center"></el-table-column>

@@ -2,7 +2,7 @@
   <el-dialog title="工时详情" :visible.sync="showFlag" custom-class="dialog-small" @close="closeDialog" width="60%">
     <div>
       <el-table
-        height="350"
+        height="400"
         v-loading="!this.reqFlag.getWorkTimeAssign"
         :data="formData.copInfoTable"
         style="width: 100%;margin: auto">

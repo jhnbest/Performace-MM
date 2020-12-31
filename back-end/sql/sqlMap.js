@@ -69,7 +69,7 @@ const sqlMap = {
     updateRejectProject: 'update worktimelist set submitID = ?, projectTypeID = ?, applyKValue = ?, reviewKValue = ?, applyCofficient = ?, ' +
         'reviewCofficient = ?, updateTime = ?, applyMonth = ?, submitStatus = ?, reviewStatus = ?, submitComments = ?, ' +
         'applyProcess = ?, avaiableWorkTime = ?, applyBaseWorkTime = ? where id = ?',
-    updateWorkAssign: 'update worktimeassign set userID = ?, projectID = ?, workTime = ?, assignRole = ?, reviewWorkTime = ? where id = ?',
+    updateWorkAssign: 'update worktimeassign set reviewWorkTime = ? where id = ?',
     deleteWorkAssign: 'update worktimeassign set obsoleteStatus = 1 where id = ?',
     // getProjectList: 'SELECT * from worktimelist WHERE submitID = ? and applyMonth = ? and obsoleteStatus != 1', //查找项目列表
     getProjectList: 'SELECT wl.*, apl.projectName, apl.projectType as parentTypeID, apd.projectStageName, users.name as reviewerName, ' +

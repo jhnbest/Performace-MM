@@ -13,22 +13,31 @@
           @change="handelDateChange">
         </el-date-picker>
       </el-form-item>
-      <!--<el-form-item label="项目类型" prop="projectType" style="margin-left: 20px">
-        <el-cascader
-          v-model="formData.projectType"
-          :options="projectTypeOptions"
-          :props="props"
-          collapse-tags
-          clearable></el-cascader>
-      </el-form-item>-->
-<!--      <el-form-item style="margin-left: 30px">-->
-<!--        <el-button type="primary" size="medium" @click="handleSearchClick">查询</el-button>-->
-<!--      </el-form-item>-->
       <el-form-item style="margin-left: 30px">
-        <span v-if="formData.selectType === '工时查询'" style="font-size: 17px;font-weight: bold">本月实际获得工时:
-          <span style="color: #F56C6C;margin-left: 10px;font-size: 25px">{{formData.totalWorkTime}}</span></span>
-        <span v-if="formData.selectType === '计划查询'" style="font-size: 17px;font-weight: bold">本月预计获得工时:
-          <span style="color: #F56C6C;margin-left: 10px;font-size: 25px">{{planGetWorkTime}}</span></span>
+        <span v-if="formData.selectType === '工时查询'" style="font-size: 21px;font-weight: bold">本月实际获得工时:
+<!--          <span style="color: #F56C6C;margin-left: 10px;font-size: 25px">{{formData.totalWorkTime}}</span>-->
+        <count-to
+          :start-val="0"
+          :end-val="formData.totalWorkTime"
+          :duration="2600"
+          :decimals="1"
+          style="color: #F56C6C;margin-left: 10px;font-size: 25px"/>
+          <span style="font-size: 21px;font-weight: bold;margin-left: 30px">本月小组排名:
+            <count-to
+              :start-val="0"
+              :end-val="formData.rank"
+              :duration="2600"
+              style="color: #F56C6C;margin-left: 10px;font-size: 25px"/>
+          </span>
+        </span>
+        <span v-if="formData.selectType === '计划查询'" style="font-size: 21px;font-weight: bold">本月预计获得工时:
+<!--          <span style="color: #F56C6C;margin-left: 10px;font-size: 25px">{{planGetWorkTime}}</span>-->
+        <count-to
+          :start-val="0"
+          :end-val="planGetWorkTime"
+          :duration="2600"
+          :decimals="1"
+          style="color: #F56C6C;margin-left: 10px;font-size: 25px"/></span>
       </el-form-item>
       <br>
       <el-radio-group v-model="formData.selectType" @change="handleSelectTypeChange">
@@ -40,111 +49,107 @@
     <!-- 分割线 start -->
     <div class="hr-10"></div>
     <!-- 分割线 end -->
-    <div v-if="showFlag.factTableShow" class="main-content">
-<!--      <div class="content-header">-->
-<!--        <el-button type="primary" size="medium" @click="handleAddNew">新增工时申报</el-button>-->
-<!--      </div>-->
-      <div>
-        <el-table
-          :data="workDetailTable"
-          style="width: 99%;margin: auto"
-          v-loading="!this.reqFlag.getProjectList"
-          border
-          :span-method="objectSpanMethod">
-          <el-table-column type="expand">
-            <template slot-scope="scope">
-              <el-form label-position="left" inline class="demo-table-expand">
-                <el-form-item label="提交时间">
-                  <span>{{ scope.row.submitTime }}</span>
-                </el-form-item>
-                <el-form-item label="审核人">
-                  <span>{{ scope.row.reviewerName }}</span>
-                </el-form-item>
-                <el-form-item label="更新时间">
-                  <span>{{ scope.row.updateTime }}</span>
-                </el-form-item>
-                <el-form-item label="审核时间">
-                  <span>{{ scope.row.reviewTime }}</span>
-                </el-form-item>
-                <el-form-item label="审核备注">
-                  <span v-if="scope.row.reviewComments !== ''">{{ scope.row.reviewComments }}</span>
-                  <span v-else>无</span>
-                </el-form-item>
-              </el-form>
-            </template>
-          </el-table-column>
-          <el-table-column label="序号" align="center" type="index"></el-table-column>
-          <el-table-column label="角色" align="center">
-            <template slot-scope="scope">
-              <el-tag :type="roleStatusFilter(scope.row.submitID)" size="medium">
-                {{roleStatusTextFilter(scope.row.submitID)}}
-              </el-tag>
-            </template>
-          </el-table-column>
+    <div class="main-content">
+      <el-table
+        :data="workDetailTable"
+        style="width: 99%;margin: auto"
+        v-loading="!this.reqFlag.getProjectList"
+        border
+        :span-method="objectSpanMethod" v-if="showFlag.factTableShow">
+        <el-table-column type="expand">
+          <template slot-scope="scope">
+            <el-form label-position="left" inline class="demo-table-expand">
+              <el-form-item label="提交时间">
+                <span>{{ scope.row.submitTime }}</span>
+              </el-form-item>
+              <el-form-item label="审核人">
+                <span>{{ scope.row.reviewerName }}</span>
+              </el-form-item>
+              <el-form-item label="更新时间">
+                <span>{{ scope.row.updateTime }}</span>
+              </el-form-item>
+              <el-form-item label="审核时间">
+                <span>{{ scope.row.reviewTime }}</span>
+              </el-form-item>
+              <el-form-item label="审核备注">
+                <span v-if="scope.row.reviewComments !== ''">{{ scope.row.reviewComments }}</span>
+                <span v-else>无</span>
+              </el-form-item>
+            </el-form>
+          </template>
+        </el-table-column>
+        <el-table-column label="序号" align="center" type="index" width="50%"></el-table-column>
+        <el-table-column label="角色" align="center" width="100%">
+          <template slot-scope="scope">
+            <el-tag :type="roleStatusFilter(scope.row.submitID)" size="medium">
+              {{roleStatusTextFilter(scope.row.submitID)}}
+            </el-tag>
+          </template>
+        </el-table-column>
 <!--          <el-table-column label="申报月份" align="center" prop="applyMonth"></el-table-column>-->
-          <el-table-column label="项目名称" align="center" prop="projectName"></el-table-column>
-          <el-table-column label="项目阶段" align="center" prop="projectStageName" width="200%"></el-table-column>
-          <el-table-column label="工时详情" align="center">
-            <template slot-scope="scope">
-              <span class="link-type" @click="handleCoopInfo(scope.row)">点击查看</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="提交状态" align="center" class-name="status-col">
-            <template slot-scope="scope">
-              <el-tag :type="scope.row.submitStatus | submitStatusFilter" size="medium">
-                {{ scope.row.submitStatus | submitStatusTextFilter}}
-              </el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column label="审核状态" align="center">
-            <template slot-scope="scope">
-              <el-tag :type="scope.row.reviewStatus | reviewStatusFilter" size="medium">
-                {{ scope.row.reviewStatus | reviewStatusTextFilter}}
-              </el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column label="获得工时" align="center" prop="assignWorkTime"></el-table-column>
-          <el-table-column label="操作" align="center" width="250">
-            <template slot-scope="scope">
-              <el-button :disabled="scope.row.submitStatus === 1 || ((scope.row.reviewStatus === 1)) || isAssginer(scope.row.submitID)"
-                         type="primary"
-                         size="mini"
-                         @click="handleEdit(scope.row, scope.$index)">编辑</el-button>
-              <el-button v-if="!(scope.row.submitStatus === 1)"
-                         :disabled="(scope.row.reviewStatus === 1 || isAssginer(scope.row.submitID))"
-                         size="mini"
-                         type="success"
-                         @click="handleSubmitStatus(scope.row, scope.$index)">提交</el-button>
-              <el-button v-if="scope.row.submitStatus === 1"
-                         :disabled="(scope.row.reviewStatus === 1 || isAssginer(scope.row.submitID))"
-                         size="mini"
-                         type="info"
-                         @click="handleSubmitStatus(scope.row,scope.$index)">暂存</el-button>
-              <el-button :disabled="(scope.row.reviewStatus === 1 || isAssginer(scope.row.submitID))"
-                         size="mini"
-                         type="danger"
-                         @click="handleDelete(scope.row, scope.$index)">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
+        <el-table-column label="项目名称" align="center" prop="projectName"></el-table-column>
+        <el-table-column label="项目阶段" align="center" prop="projectStageName"></el-table-column>
+        <el-table-column label="工时详情" align="center" width="100%">
+          <template slot-scope="scope">
+            <span class="link-type" @click="handleCoopInfo(scope.row)">点击查看</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="提交状态" align="center" class-name="status-col" width="100%">
+          <template slot-scope="scope">
+            <el-tag :type="scope.row.submitStatus | submitStatusFilter" size="medium">
+              {{ scope.row.submitStatus | submitStatusTextFilter}}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="审核状态" align="center" width="100%">
+          <template slot-scope="scope">
+            <el-tag :type="scope.row.reviewStatus | reviewStatusFilter" size="medium">
+              {{ scope.row.reviewStatus | reviewStatusTextFilter}}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="获得工时" align="center" prop="assignWorkTime"  width="100%"></el-table-column>
+        <el-table-column label="操作" align="center" width="250%">
+          <template slot-scope="scope">
+            <el-button :disabled="scope.row.submitStatus === 1 || ((scope.row.reviewStatus === 1)) || isAssginer(scope.row.submitID)"
+                       type="primary"
+                       size="mini"
+                       @click="handleEdit(scope.row, scope.$index)">编辑</el-button>
+            <el-button v-if="!(scope.row.submitStatus === 1)"
+                       :disabled="(scope.row.reviewStatus === 1 || isAssginer(scope.row.submitID))"
+                       size="mini"
+                       type="success"
+                       @click="handleSubmitStatus(scope.row, scope.$index)">提交</el-button>
+            <el-button v-if="scope.row.submitStatus === 1"
+                       :disabled="(scope.row.reviewStatus === 1 || isAssginer(scope.row.submitID))"
+                       size="mini"
+                       type="info"
+                       @click="handleSubmitStatus(scope.row,scope.$index)">暂存</el-button>
+            <el-button :disabled="(scope.row.reviewStatus === 1 || isAssginer(scope.row.submitID))"
+                       size="mini"
+                       type="danger"
+                       @click="handleDelete(scope.row, scope.$index)">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
-    <!--计划表格-->
-    <div v-if="showFlag.planTableShow" class="main-content">
+    <!---------------------------------------------计划表格--------------------------------------------------->
+    <div class="main-content">
       <el-table :data="workPlanTableData"
                 style="width: 99%;margin: auto"
                 border
-                :span-method="planTableSpanMethod">
-        <el-table-column label="序号" align="center" type="index"></el-table-column>
+                :span-method="planTableSpanMethod"
+                v-if="showFlag.planTableShow">
+        <el-table-column label="序号" align="center" type="index" width="60%"></el-table-column>
 <!--        <el-table-column label="申报月份" align="center" prop="applyMonth"></el-table-column>-->
         <el-table-column label="项目名称" align="center" prop="projectName"></el-table-column>
-        <el-table-column label="项目阶段" align="center" prop="projectStageName" width="200%"></el-table-column>
-        <el-table-column label="计划进展" align="center" prop="applyProcess">
+        <el-table-column label="项目阶段" align="center" prop="projectStageName"></el-table-column>
+        <el-table-column label="计划进展" align="center" prop="applyProcess" width="100%">
           <template slot-scope="scope">
             <span>{{scope.row.applyProcess + '%'}}</span>
           </template>
         </el-table-column>
-        <el-table-column label="预计获得工时" align="center" prop="avaiableWorkTime"></el-table-column>
+        <el-table-column label="预计工时" align="center" prop="avaiableWorkTime" width="100%"></el-table-column>
         <el-table-column label="操作" align="center" width="200">
           <template slot-scope="scope">
             <div v-if="!scope.row.processEditable">
@@ -164,8 +169,9 @@
 
 <script>
     import Cop from '@/components/Cop/Cop'
+    import CountTo from 'vue-count-to'
     import { getProjectType, getProjectList, changeSubmitStatus, deleteProject,
-      getAssignWorkTime, workTimeSubmit, workTimeTemporary, getWorkAssign } from '@/config/interface'
+      getAssignWorkTime, workTimeSubmit, workTimeTemporary, getWorkAssign, getGroupWorkTimeList } from '@/config/interface'
     export default {
       data () {
         return {
@@ -182,7 +188,8 @@
             projectType: [],
             isShowTable: true,
             totalWorkTime: 0,
-            selectType: '工时查询'
+            selectType: '工时查询',
+            rank: 0
           },
           showFlag: {
             cop: false,
@@ -195,7 +202,8 @@
             changeSubmitStatus: true,
             deleteProject: true,
             complete: true,
-            getWorkTimeAssign: true
+            getWorkTimeAssign: true,
+            getGroupWorkTimeList: true
           },
           pageNum: 1, // 请求第几页
           pageSize: this.$store.state.pageSize, // 每页请求多少条
@@ -216,6 +224,7 @@
           // this.getProjectType()
           this.getProjectList().then(res => {
             this.getAssignWorkTimes(res)
+            this.getGroupWorkTimeList(this.$store.state.userInfo.groupID)
           })
         },
         // 获取项目类型
@@ -239,25 +248,18 @@
         // 审核表格合并前处理
         handleTable (Table) {
           let preAplID = 0
-          let count = 0
+          let count = 1
+          let preIndex = 0
           for (let i = 0; i < Table.length; i++) {
             Table[i].rowSpan = 1
             Table[i].colSpan = 1
             if (Table[i].aplID === preAplID) {
-              if (count === 0) {
-                count += 2
-              } else {
-                count++
-              }
+              Table[preIndex].rowSpan = ++count
               Table[i].rowSpan = 0
               Table[i].colSpan = 0
             } else {
-              if (count > 0) {
-                Table[i - count].rowSpan = count
-              } else {
-                Table[i - count].rowSpan = 1
-              }
-              count = 0
+              preIndex = i
+              count = 1
               preAplID = Table[i].aplID
             }
           }
@@ -295,7 +297,6 @@
                     planWorkTimeList.sort(it.compare('aplID'))
                     it.handleTable(factWorkTimeList)
                     it.handleTable(planWorkTimeList)
-                    console.log(planWorkTimeList)
                     it.workPlanTableData = JSON.parse(JSON.stringify(planWorkTimeList))
                     it.workDetailTable = JSON.parse(JSON.stringify(factWorkTimeList))
                     it.totalCount = data.totalCount
@@ -389,6 +390,8 @@
               this.reqFlag.deleteProject = false
               const url = deleteProject
               this.workDetailTable.splice(index, 1)
+              this.workDetailTable.sort(this.compare('aplID'))
+              this.handleTable(this.workDetailTable)
               let params = {
                 id: row.id
               }
@@ -540,21 +543,95 @@
         },
         // 表格合并方法
         objectSpanMethod ({ row, column, rowIndex, columnIndex }) {
-          // if (columnIndex === 2 || columnIndex === 3) {
-          //   return {
-          //     rowspan: row.rowSpan,
-          //     colspan: row.colSpan
-          //   }
-          // }
+          if (columnIndex === 2 || columnIndex === 3) {
+            return {
+              rowspan: row.rowSpan,
+              colspan: row.colSpan
+            }
+          }
         },
         // 计划表格合并方法
         planTableSpanMethod ({ row, column, rowIndex, columnIndex }) {
-          // if (columnIndex === 1) {
-          //   return {
-          //     rowspan: row.rowSpan,
-          //     colspan: row.colSpan
-          //   }
-          // }
+          if (columnIndex === 1) {
+            return {
+              rowspan: row.rowSpan,
+              colspan: row.colSpan
+            }
+          }
+        },
+        // 获取已审项目列表
+        getGroupWorkTimeList (groupID) {
+          const url = getGroupWorkTimeList
+          if (this.reqFlag.getGroupWorkTimeList) {
+            this.reqFlag.getGroupWorkTimeList = false
+            let params = {
+              groupID: groupID,
+              applyMonth: this.formData.title
+            }
+            this.$http(url, params)
+              .then(res => {
+                if (res.code === 1) {
+                  let data = res.data
+                  let userID = []
+                  let totalWorkTimeCal = []
+                  for (let item of data) { // 插入各组员总工时信息
+                    if (userID.indexOf(item.id) === -1) {
+                      userID.push(item.id)
+                      let obj = {
+                        id: item.id,
+                        name: item.name,
+                        totalWorkTime: item.reviewWorkTime
+                      }
+                      totalWorkTimeCal.push(obj)
+                    } else {
+                      totalWorkTimeCal.find(function (wItem) {
+                        if (wItem.id === item.id) {
+                          wItem.totalWorkTime += item.reviewWorkTime
+                          return wItem.totalWorkTime
+                        }
+                      })
+                    }
+                  }
+                  totalWorkTimeCal.sort(this.compare('totalWorkTime')) // 根据总工时排序
+                  let preWorkTime = 0
+                  let preRank = 0
+                  for (let item of totalWorkTimeCal) { // 计算排名
+                    if (item.totalWorkTime === preWorkTime) {
+                      item.rank = preRank
+                    } else {
+                      item.rank = ++preRank
+                    }
+                    preWorkTime = item.totalWorkTime
+                  }
+                  this.formData.rank = totalWorkTimeCal.find(item => {
+                    if (item.id === this.$store.state.userInfo.id) {
+                      return item.rank
+                    }
+                  }).rank
+                  console.log(this.formData.rank)
+                  let length = totalWorkTimeCal.length
+                  for (let item of totalWorkTimeCal) { // 计算定量指标得分
+                    let rankPercentage = item.rank / length
+                    if (rankPercentage < 0.1 || rankPercentage === 0.1) {
+                      item.quantitativeScore = 92.5
+                    } else if (rankPercentage < 0.3 || rankPercentage === 0.3) {
+                      item.quantitativeScore = 90
+                    } else if (rankPercentage < 0.7 || rankPercentage === 0.7) {
+                      item.quantitativeScore = 87.5
+                    } else if (rankPercentage < 0.9 || rankPercentage === 0.9) {
+                      item.quantitativeScore = 85
+                    } else if (rankPercentage < 1 || rankPercentage === 1) {
+                      item.quantitativeScore = 82.5
+                    }
+                    if (item.rank === 1) {
+                      item.quantitativeScore = 92.5
+                    }
+                  }
+                  this.tableData = totalWorkTimeCal
+                }
+                this.reqFlag.getGroupWorkTimeList = true
+              })
+          }
         }
       },
       computed: {
@@ -597,7 +674,8 @@
         }
       },
       components: {
-        Cop
+        Cop,
+        CountTo
       },
       filters: {
         submitStatusFilter (status) {
