@@ -70,6 +70,8 @@ const sqlMap = {
         'reviewCofficient = ?, updateTime = ?, applyMonth = ?, submitStatus = ?, reviewStatus = ?, submitComments = ?, ' +
         'applyProcess = ?, avaiableWorkTime = ?, applyBaseWorkTime = ? where id = ?',
     updateWorkAssign: 'update worktimeassign set reviewWorkTime = ? where id = ?',
+    updateWorkAssignEdit: 'update worktimeassign set userID = ?, projectID = ?, ' +
+        'workTime = ?, assignRole = ?, reviewWorkTime = ? where id = ?',
     deleteWorkAssign: 'update worktimeassign set obsoleteStatus = 1 where id = ?',
     // getProjectList: 'SELECT * from worktimelist WHERE submitID = ? and applyMonth = ? and obsoleteStatus != 1', //查找项目列表
     getProjectList: 'SELECT wl.*, apl.projectName, apl.projectType as parentTypeID, apd.projectStageName, users.name as reviewerName, ' +
@@ -172,7 +174,8 @@ const sqlMap = {
     GetProjectTotalWorkTime: 'select sum(avaiableWorkTime)totalWorkTime from assignprojectdetail where aPLID = ?',
     deleteWorkTimeList: 'update worktimelist set obsoleteStatus = 1 where aplID = ?',
     getWorkTimeAssignItem: 'select id from worktimelist where aplID = ?',
-    updateWorkTimeAssignObsoleteStatus: 'update worktimeassign set obsoleteStatus = 1 where projectID in ('
+    updateWorkTimeAssignObsoleteStatus: 'update worktimeassign set obsoleteStatus = 1 where projectID in (',
+    getMonthProcessByID: 'select * from monthprocess where id = ?'
   }
 }
 module.exports = sqlMap;

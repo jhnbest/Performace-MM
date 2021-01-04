@@ -4,7 +4,6 @@
       <el-form :label-position="labelPosition" label-width="110px" ref="formData" :model="formData" :rules="formRules" :inline="true">
         <el-form-item label="申报月份" prop="title">
           <el-date-picker
-            :disabled="true"
             v-model="formData.title"
             type="month"
             format="yyyy 第 MM 月"
@@ -269,9 +268,6 @@
             workTimeAssign: false
           },
           pickerOptions: {
-            disabledDate (time) {
-              return time.getTime() > Date.now()
-            }
           },
           workTime: 0,
           apdID: null,
@@ -650,6 +646,7 @@
           row.avaiableWorkTime = Number(Number(row.avaiableWorkTime).toFixed(1))
           row.workTimeAssign[0].assignWorkTime = row.avaiableWorkTime
           row.defaultAssignWorkTime = row.defaultAssignWorkTimeIni * row.defaultKValue * row.defaultCofficient * row.applyProcess * 0.01
+          console.log(row)
         },
         // 新增一行
         addNewLine () {

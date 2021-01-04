@@ -16,6 +16,7 @@
     <!-- 分割线 start -->
     <div class="hr-10"></div>
     <!-- 分割线 end -->
+    <el-table></el-table>
   </div>
 </template>
 

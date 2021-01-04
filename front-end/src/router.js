@@ -124,7 +124,7 @@ export default new Router({
         {
           path: 'mutualEvaluation',
           name: 'mutualEvaluation',
-          component: () => import('./views/Performance/childViews/PerformanceEdit.vue'),
+          component: () => import('./views/mutualEvaluation/multualEvaluation'),
           meta: { pagePath: '/home/mutualEvaluation' }
         },
         {

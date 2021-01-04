@@ -27,7 +27,6 @@ export default new Vuex.Store({
   mutations: {
     [types.SAVE_USERINFO] (state, data) {
       state.userInfo = data
-      console.log('===store.js 21')
       console.log(state.userInfo)
     }
   },

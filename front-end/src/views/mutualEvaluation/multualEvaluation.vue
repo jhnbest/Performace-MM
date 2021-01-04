@@ -1,6 +1,6 @@
 <template>
 <div>
-  <span>互评页面</span>
+  <h2>互评页面</h2>
 </div>
 </template>
 

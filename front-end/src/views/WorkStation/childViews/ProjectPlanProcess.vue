@@ -3,7 +3,8 @@
     <div style="text-align: center">
       <el-row :gutter="10">
         <el-col :span="8" :offset="7">
-          <h3>{{formData.yearNum + '年 ' + formData.projectName  + '计划&实际进展填报'}}</h3>
+          <h3 style="color: red;font-size: 25px">{{formData.yearNum + '年 '}}
+            <span style="color: black;font-size: 20px">{{formData.projectName  + '计划&实际进展填报'}}</span></h3>
         </el-col>
         <el-col :span="1" :offset="1">
           <el-button style="margin-top: 17px" size="medium" type="warning" @click="genWorkTimePlanApply">生成项目计划</el-button>
@@ -359,7 +360,8 @@
     getMonthProcessDiff,
     submitPlanProcess,
     updateAssignProjectFilled,
-    workTimeTemporary
+    workTimeTemporary,
+    workTimeSubmit
   } from '@/config/interface'
   import Assign from '@/components/Cop/workTimeAssign'
 
@@ -575,7 +577,7 @@
         handleWorkTimeApply (formData) {
           this.$refs[formData].validate((valid) => {
             if (valid) {
-              let url = workTimeTemporary
+              let url = workTimeSubmit
               this.$http(url, this.submitParams)
                 .then(res => {
                   if (res.code === 1) {
@@ -598,7 +600,7 @@
         handleWorkTimePlanApply (formData) {
           this.$refs[formData].validate((valid) => {
             if (valid) {
-              let url = workTimeTemporary
+              let url = workTimeSubmit
               this.$http(url, this.submitParams)
                 .then(res => {
                   if (res.code === 1) {

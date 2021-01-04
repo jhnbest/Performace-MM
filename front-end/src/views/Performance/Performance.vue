@@ -332,8 +332,10 @@
             }
           }
         },
+        // 申报月份变化
         handelDateChange () {
           this.getProjectList().then(res => {
+            this.getGroupWorkTimeList(this.$store.state.userInfo.groupID)
             this.getAssignWorkTimes(res)
           })
         },
@@ -572,62 +574,70 @@
               .then(res => {
                 if (res.code === 1) {
                   let data = res.data
-                  let userID = []
-                  let totalWorkTimeCal = []
-                  for (let item of data) { // 插入各组员总工时信息
-                    if (userID.indexOf(item.id) === -1) {
-                      userID.push(item.id)
-                      let obj = {
-                        id: item.id,
-                        name: item.name,
-                        totalWorkTime: item.reviewWorkTime
-                      }
-                      totalWorkTimeCal.push(obj)
-                    } else {
-                      totalWorkTimeCal.find(function (wItem) {
-                        if (wItem.id === item.id) {
-                          wItem.totalWorkTime += item.reviewWorkTime
-                          return wItem.totalWorkTime
+                  if (data.length > 0) {
+                    let userID = []
+                    let totalWorkTimeCal = []
+                    for (let item of data) { // 插入各组员总工时信息
+                      if (userID.indexOf(item.id) === -1) {
+                        userID.push(item.id)
+                        let obj = {
+                          id: item.id,
+                          name: item.name,
+                          totalWorkTime: item.reviewWorkTime
                         }
-                      })
+                        totalWorkTimeCal.push(obj)
+                      } else {
+                        totalWorkTimeCal.find(function (wItem) {
+                          if (wItem.id === item.id) {
+                            wItem.totalWorkTime += item.reviewWorkTime
+                            return wItem.totalWorkTime
+                          }
+                        })
+                      }
                     }
-                  }
-                  totalWorkTimeCal.sort(this.compare('totalWorkTime')) // 根据总工时排序
-                  let preWorkTime = 0
-                  let preRank = 0
-                  for (let item of totalWorkTimeCal) { // 计算排名
-                    if (item.totalWorkTime === preWorkTime) {
-                      item.rank = preRank
+                    totalWorkTimeCal.sort(this.compare('totalWorkTime')) // 根据总工时排序
+                    let preWorkTime = 0
+                    let preRank = 0
+                    for (let item of totalWorkTimeCal) { // 计算排名
+                      if (item.totalWorkTime === preWorkTime) {
+                        item.rank = preRank
+                      } else {
+                        item.rank = ++preRank
+                      }
+                      preWorkTime = item.totalWorkTime
+                    }
+                    this.formData.rank = totalWorkTimeCal.find(item => {
+                      if (item.id === this.$store.state.userInfo.id) {
+                        return item.rank
+                      }
+                    })
+                    if (!this.formData.rank) {
+                      this.formData.rank = 0
                     } else {
-                      item.rank = ++preRank
+                      this.formData.rank = this.formData.rank.rank
                     }
-                    preWorkTime = item.totalWorkTime
+                    let length = totalWorkTimeCal.length
+                    for (let item of totalWorkTimeCal) { // 计算定量指标得分
+                      let rankPercentage = item.rank / length
+                      if (rankPercentage < 0.1 || rankPercentage === 0.1) {
+                        item.quantitativeScore = 92.5
+                      } else if (rankPercentage < 0.3 || rankPercentage === 0.3) {
+                        item.quantitativeScore = 90
+                      } else if (rankPercentage < 0.7 || rankPercentage === 0.7) {
+                        item.quantitativeScore = 87.5
+                      } else if (rankPercentage < 0.9 || rankPercentage === 0.9) {
+                        item.quantitativeScore = 85
+                      } else if (rankPercentage < 1 || rankPercentage === 1) {
+                        item.quantitativeScore = 82.5
+                      }
+                      if (item.rank === 1) {
+                        item.quantitativeScore = 92.5
+                      }
+                    }
+                    this.tableData = totalWorkTimeCal
+                  } else {
+                    this.formData.rank = 0
                   }
-                  this.formData.rank = totalWorkTimeCal.find(item => {
-                    if (item.id === this.$store.state.userInfo.id) {
-                      return item.rank
-                    }
-                  }).rank
-                  console.log(this.formData.rank)
-                  let length = totalWorkTimeCal.length
-                  for (let item of totalWorkTimeCal) { // 计算定量指标得分
-                    let rankPercentage = item.rank / length
-                    if (rankPercentage < 0.1 || rankPercentage === 0.1) {
-                      item.quantitativeScore = 92.5
-                    } else if (rankPercentage < 0.3 || rankPercentage === 0.3) {
-                      item.quantitativeScore = 90
-                    } else if (rankPercentage < 0.7 || rankPercentage === 0.7) {
-                      item.quantitativeScore = 87.5
-                    } else if (rankPercentage < 0.9 || rankPercentage === 0.9) {
-                      item.quantitativeScore = 85
-                    } else if (rankPercentage < 1 || rankPercentage === 1) {
-                      item.quantitativeScore = 82.5
-                    }
-                    if (item.rank === 1) {
-                      item.quantitativeScore = 92.5
-                    }
-                  }
-                  this.tableData = totalWorkTimeCal
                 }
                 this.reqFlag.getGroupWorkTimeList = true
               })

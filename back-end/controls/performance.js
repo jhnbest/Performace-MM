@@ -77,8 +77,6 @@ function workTimeAssignDelete(id) {
 
 function workTimeAssign(projectInsertID, data, i, j) {
     return new Promise(function(resolve, reject) {
-        console.log('workTimeAssign')
-        console.log(data.data[i].workTimeAssign[j])
         let sql = null
         let userID = data.data[i].workTimeAssign[j].id
         let projectID = projectInsertID
@@ -94,7 +92,7 @@ function workTimeAssign(projectInsertID, data, i, j) {
                 sql = $sql.performance.addWorkAssign
                 arrayParams = [userID, projectID, workTime, assignRole, reviewWorkTime]
             } else {
-                sql = $sql.performance.updateWorkAssign
+                sql = $sql.performance.updateWorkAssignEdit
                 arrayParams = [userID, projectID, workTime, assignRole, reviewWorkTime, data.data[i].workTimeAssignInsertID[j]]
             }
         }
@@ -125,8 +123,6 @@ function workTimeAssign(projectInsertID, data, i, j) {
 
 function workTimeInsertOP(params, i, operate) {
     return new Promise(function(resolve, reject) {
-        console.log('-=-=-=-=-=-=')
-        console.log(params)
         let submitTime = $time.formatTime()
         let sql = null
         let arrayParams = []
@@ -197,10 +193,8 @@ function workTimeInsertOP(params, i, operate) {
 }
 
 async function workTimeInsert(data, res, operate) {
-    console.log('====performance.js workTimeInsert')
     let workTimeInsertResult = null
     let workTimeAssignResult = null
-    console.log(data)
     for (let i = 0; i < data.data.length; i++) { // 逐条插入工时项目
         workTimeInsertResult = await workTimeInsertOP(data, i, operate)
         if (workTimeInsertResult.err) {
@@ -208,8 +202,6 @@ async function workTimeInsert(data, res, operate) {
         } else if (workTimeInsertResult.result.affectedRows !== 1 && data.submitType === 'insert') {
             return $http.writeJson(res, {code: 2, message: '添加工时记录失败'})
         }
-        console.log('====workTimeAssign')
-        console.log(data.data[i])
         // 插入/更新工时分配信息
         for (let j = 0;j < data.data[i].workTimeAssign.length; j++) {
             let insertID = null
@@ -390,7 +382,6 @@ function getWorkTimeNewOP (checkID, sql, req, res) {
                     reject(-1)
                 } else {
                     result = JSON.parse(JSON.stringify(result))
-                    console.log(result)
                     let obj = {
                         projectTypeID: result[0].projectTypeID,
                         workTime: result[0].workTime,
@@ -499,28 +490,36 @@ function setWorkTimeListPass(sql, arrayParams) {
     })
 }
 
-function updateProjectProcess(data) {
+function updateProjectProcess(data, monthProcessExist) {
     return new Promise(function (resolve, reject) {
-        let param = {
-            id: data.monthID,
-            kValue: data.reviewKValue,
-            coefficient: data.reviewCofficient,
-            aPDID: data.apdID,
-            year: data.applyYear,
-            type: 'fact',
-            applyProcess: data.applyProcess,
-            January: null,
-            February: null,
-            March: null,
-            April: null,
-            May: null,
-            June: null,
-            July: null,
-            August: null,
-            September: null,
-            October: null,
-            November: null,
-            December: null,
+        let param = {}
+        if (!monthProcessExist) {
+            param = {
+                id: data.monthID,
+                kValue: data.reviewKValue,
+                coefficient: data.reviewCofficient,
+                aPDID: data.apdID,
+                year: data.applyYear,
+                type: 'fact',
+                applyProcess: data.applyProcess,
+                January: null,
+                February: null,
+                March: null,
+                April: null,
+                May: null,
+                June: null,
+                July: null,
+                August: null,
+                September: null,
+                October: null,
+                November: null,
+                December: null,
+            }
+        } else {
+            param = monthProcessExist
+            param.kValue = data.reviewKValue
+            param.coefficient = data.reviewCofficient
+            param.applyProcess = data.applyProcess
         }
         param[data.applyMonthString] = data.applyProcess
         $workStation.saveProcess(param).then(res0 => {
@@ -533,6 +532,21 @@ function updateProjectProcess(data) {
                     })
                 })
             })
+        })
+    })
+}
+
+function getMonthProcessByID(id) {
+    return new Promise(function (resolve, reject) {
+        let sql = $sql.workStation.getMonthProcessByID
+        let arrayParams = [id]
+        $http.connPool(sql, arrayParams, (err, result) =>{
+            if (err) {
+                reject(-1)
+            } else {
+                result = JSON.parse(JSON.stringify(result))
+                resolve(result)
+            }
         })
     })
 }
@@ -625,8 +639,6 @@ const performance = {
             defaultCofficient:[]
         }
         $http.userVerify(req, res, () => {
-            console.log('=== performance.js getWorkTime')
-            console.log(params)
             for (let i = 0; i < params.selectWorkTypeNum; i++) {
                 sql = $sql.performance.selectWorkTime
                 arrayParams = [params.subWorkType1Label[i], params.subWorkType3Label[i]]
@@ -634,7 +646,6 @@ const performance = {
                     if(err) {
                          return $http.writeJson(res, {code:-2, message:'失败'})
                     } else {
-                        console.log('-=-=-=-=-=')
                         result = JSON.stringify(result)
                         result = JSON.parse(result)
                         resultData.subWorkType3Label.push(params.subWorkType3Label[i])
@@ -643,7 +654,6 @@ const performance = {
                         resultData.defaultKValue.push(result[0].defaultKValue)
                         resultData.defaultCofficient.push(result[0].defaultCofficient)
                         if (i === params.selectWorkTypeNum - 1) {
-                            console.log(resultData)
                             return $http.writeJson(res, {code: 1, data: resultData, message: '获取列表成功'})
                         }
                     }
@@ -659,7 +669,6 @@ const performance = {
         let resultData = []
         let groupID = null
         $http.userVerify(req, res, () => {
-            console.log('=== performance.js getProjectType')
             groupID = getGroupID(params.projectParentID)
             sql = $sql.performance.selectProjectTypeFirst
             arrayParams = [groupID]
@@ -697,19 +706,15 @@ const performance = {
     // 新增工时申报
     workTimeSubmit (req, res) {
         let data = req.body
-        console.log('===performace.js workTimeSubmit')
-        console.log(data)
         workTimeInsert(data, res, '1').then()
     },
     // 暂存工时申报
     workTimeTemporary (req, res) {
         let data = req.body
-        console.log(data)
         workTimeInsert(data, res, '0')
     },
     // 获取工时申报详情
     getProjectList (req, res) {
-        console.log('===performance.js getProjectList')
         let data = req.body
         $http.userVerify(req, res, () => {
             let searchID = data.searchID
@@ -745,7 +750,6 @@ const performance = {
                     let resultData = {}
                     resultData.totalCount = result[0][0]['totalCount']
                     resultData.list = formatData(result[1])
-                    console.log(resultData)
                     return $http.writeJson(res, {code: 1, data: resultData, message: '获取工时申报成功'})
                 }
             })
@@ -753,9 +757,7 @@ const performance = {
     },
     // 获取工时分配信息
     getWorkAssign (req, res) {
-        console.log('===performance.js getWorkAssign')
         let data = req.body
-        console.log(data)
         $http.userVerify(req, res, () => {
             let checkID = data.projectID
             let sql = $sql.performance.getWorkAssign
@@ -765,7 +767,6 @@ const performance = {
                 sql = sql + ';' + sqlGetReviewStatus
                 arrayParams.push(checkID)
             }
-            console.log(arrayParams)
             $http.connPool(sql, arrayParams, (err, result) =>{
                 if (err) {
                     return $http.writeJson(res, {code: -2, message: '失败'})
@@ -776,7 +777,6 @@ const performance = {
                     } else {
                         result = formatData(result)
                     }
-                    console.log(result)
                     return $http.writeJson(res, {code: 1, data: result, message: '获取工时分配成功'})
                 }
             })
@@ -784,9 +784,7 @@ const performance = {
     },
     // 获取项目信息
     getProjectInfo (req, res) {
-        console.log('===performance.js getProjectInfo')
         let data = req.body
-        console.log(data)
         $http.userVerify(req, res, () => {
             let checkID = data.id
             let sqlGetProjectInfo = $sql.performance.getProjectInfo
@@ -855,7 +853,6 @@ const performance = {
     getUnReviewProjectCount (req, res) {
         $http.userVerify(req, res, () => {
             let data = req.body
-            console.log('====performance.js getUnReviewProjectCount')
             fGetUnReviewProject(data, res).then()
         })
     },
@@ -864,18 +861,30 @@ const performance = {
         $http.userVerify(req, res, () => {
             let curTime = $time.formatTime()
             let data = req.body
-            console.log(data)
             let sql = null
             let arrayParams = []
             if (data.reviewStatus === 1) {
-                updateProjectProcess(data).then(res0 => {
-                    sql = $sql.performance.submitReviewPass
-                    arrayParams = [data.reviewKValue, data.reviewCofficient, data.reviewStatus, curTime, data.reviewComments,
-                        data.reviewer, res0.monthID, data.id]
-                    setWorkTimeListPass(sql, arrayParams).then(() => {
-                        return $http.writeJson(res, { code: 1, message: '成功' })
+                if (data.monthID === null) {  // 月份进展无记录时
+                    updateProjectProcess(data, null).then(res0 => {
+                        sql = $sql.performance.submitReviewPass
+                        arrayParams = [data.reviewKValue, data.reviewCofficient, data.reviewStatus, curTime, data.reviewComments,
+                            data.reviewer, res0.monthID, data.id]
+                        setWorkTimeListPass(sql, arrayParams).then(() => {
+                            return $http.writeJson(res, { code: 1, message: '成功' })
+                        })
                     })
-                })
+                } else { // 更新已有的月份进展
+                    getMonthProcessByID(data.monthID).then(res0 => { // 获取已有月份进展
+                        updateProjectProcess(data, res0).then(res1 => {
+                            sql = $sql.performance.submitReviewPass
+                            arrayParams = [data.reviewKValue, data.reviewCofficient, data.reviewStatus, curTime, data.reviewComments,
+                                data.reviewer, res1.monthID, data.id]
+                            setWorkTimeListPass(sql, arrayParams).then(() => {
+                                return $http.writeJson(res, { code: 1, message: '成功' })
+                            })
+                        })
+                    })
+                }
             } else {
                 sql = $sql.performance.submitReviewRejectOrWithdraw
                 arrayParams = [data.reviewKValue, data.reviewCofficient, data.reviewStatus, curTime, data.reviewComments, data.reviewer,
@@ -897,7 +906,6 @@ const performance = {
                     return $http.writeJson(res, {code: -2, message: '失败', errMsg: err})
                 } else {
                     result = JSON.parse(JSON.stringify(result))
-                    console.log(result)
                     result[0].index = data.index
                     return $http.writeJson(res, {code: 1, data: result[0], message: '成功'})
                 }
@@ -908,7 +916,6 @@ const performance = {
     getGroupWorkTimeList (req, res) {
         $http.userVerify(req, res, () => {
             let data = req.body
-            console.log(data)
             let sql = $sql.performance.getGroupWorkTimeList
             let arrayParams = [data.applyMonth, data.groupID]
             $http.connPool(sql, arrayParams, (err, result) => {
@@ -916,7 +923,6 @@ const performance = {
                     return $http.writeJson(res, {code: -2, message: '失败', errMsg: err})
                 } else {
                     result = JSON.parse(JSON.stringify(result))
-                    console.log(result)
                     return $http.writeJson(res, {code: 1, data: result, message: '失败'})
                 }
             })

@@ -106,8 +106,26 @@
         <el-table :data="tableData" style="width: 95%;margin: auto">
           <el-table-column label="序号" align="center" type="index"></el-table-column>
           <el-table-column label="项目类型" align="center" prop="projectType"></el-table-column>
-          <el-table-column label="项目阶段" align="center" prop="projectName" show-overflow-tooltip></el-table-column>
-          <el-table-column label="基本工时" align="center" prop="workTime"></el-table-column>
+          <el-table-column label="项目阶段" align="center" prop="workType" show-overflow-tooltip>
+            <template slot-scope="scope">
+              <div v-if="scope.row.projectTypeID === 72">
+                <el-input v-model="scope.row.workType" size="mini"></el-input>
+              </div>
+              <div v-else>
+                <span>{{scope.row.workType}}</span>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column label="基本工时" align="center" prop="workTime">
+            <template slot-scope="scope">
+              <div v-if="scope.row.projectTypeID === 72">
+                <el-input-number v-model="scope.row.workTime" size="mini"></el-input-number>
+              </div>
+              <div v-else>
+                <span>{{scope.row.workTime}}</span>
+              </div>
+            </template>
+          </el-table-column>
           <el-table-column label="调整基本工时" align="center" prop="avaiableWorkTime">
             <template slot-scope="scope">
               <el-input-number v-model="scope.row.avaiableWorkTime"
@@ -135,6 +153,11 @@
             </template>
           </el-table-column>
         </el-table>
+        <br>
+        <div style="text-align: center">
+          <el-button type="primary" size="mini" plain @click="addNewLine">新增一行</el-button>
+        </div>
+        <br>
         <br>
       </el-form>
     </div>
@@ -728,6 +751,29 @@
           if (this.reqFlag.getAssignProjectDetail) {
             this.formData.yearNum += 1
             this.getAssignProjectDetail(this.checkAssignProjectID)
+          }
+        },
+        // 新增项目阶段
+        addNewLine () {
+          console.log(this.tableData)
+          if (this.tableData.length > 0) {
+            let obj = {
+              avaiableWorkTime: 0,
+              defaultAssginWorkTime: 0,
+              dynamicKValue: 1,
+              isConference: 0,
+              kValue: 1,
+              projectManager: this.tableData[0].projectManager,
+              projectManagerID: this.tableData[0].projectManagerID,
+              projectName: '',
+              projectType: this.tableData[0].projectType,
+              projectTypeID: 72,
+              workTime: 0,
+              workType: ''
+            }
+            this.tableData.push(obj)
+          } else {
+            this.$common.toast('请先选择指派任务类型', 'warning', 'false')
           }
         }
       },
