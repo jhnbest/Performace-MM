@@ -462,8 +462,6 @@
       methods: {
         // 初始化
         init () {
-          console.log('===JJProjectPlanProcess.vue')
-          console.log('init')
           this.formData.projectType = this.$route.query.projectType
           this.formData.projectName = this.$route.query.projectName
           this.getAssignProjectDetail(this.$route.query.projectID)
@@ -480,8 +478,6 @@
             let lastMonthString = it.$common.MonthToString(String(lastMonth.months + 1))
             let url = getMonthProcessDiff
             let searchData = []
-            console.log('applyMonthPlanProcess')
-            console.log(it.applyMonthPlanProcess)
             for (let item of it.applyMonthPlanProcess) {
               if (type === 'fact') {
                 if (item.isFinish !== 1 && item.type === 'fact' && item[applyMonthString] !== null) {
@@ -520,7 +516,6 @@
                     } else if (type === 'plan') {
                       params.applyType = 'plan'
                     }
-                    console.log(res.data)
                     for (let item of res.data) {
                       let applyMonthProcess = item.processDiff.applyMonthProcess
                       let lastMonthProcess = item.processDiff.lastMonthProcess
@@ -565,8 +560,6 @@
                       params.data.push(obj)
                       it.applyMonthPlanProcessTableData.push(obj)
                     }
-                    console.log('====')
-                    console.log(params)
                     resolve(params)
                   }
                 })
@@ -673,7 +666,6 @@
               it.$http(url, params)
                 .then(res => {
                   if (res.code === 1) {
-                    console.log(res.data)
                     it.reqFlag.getAssignProjectDetail = true
                     resolve(res.data)
                   }
@@ -699,7 +691,6 @@
         },
         // 表格保存按钮
         handleSave (row, index) {
-          console.log(row)
           const url = submitPlanProcess
           for (let item in row) {
             if (row[item] === '') {
@@ -758,7 +749,6 @@
         },
         // 工时分配点击
         handleWorkTimeAssign (row, index) {
-          console.log(row)
           this.showFlag.workTimeAssign = true
           let rowCop = JSON.parse(JSON.stringify(row))
           let params = {
@@ -804,11 +794,9 @@
         }
       },
       created () {
-        console.log('created')
         this.init()
       },
       destroyed () {
-        console.log('destroy')
       },
       name: 'ProjectPlanProcess'
     }

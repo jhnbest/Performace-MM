@@ -173,6 +173,7 @@
               <el-input size="mini"
                         type="textarea"
                         autosize
+                        maxlength="500"
                         v-model="scope.row.submitComments">
               </el-input>
             </template>

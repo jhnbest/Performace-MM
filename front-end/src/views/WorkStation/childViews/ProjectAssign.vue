@@ -154,9 +154,9 @@
           </el-table-column>
         </el-table>
         <br>
-        <div style="text-align: center">
-          <el-button type="primary" size="mini" plain @click="addNewLine">新增一行</el-button>
-        </div>
+<!--        <div style="text-align: center">-->
+<!--          <el-button type="primary" size="mini" plain @click="addNewLine">新增一行</el-button>-->
+<!--        </div>-->
         <br>
         <br>
       </el-form>
@@ -497,7 +497,6 @@
               .then(res => {
                 if (res.code === 1) {
                   let data = res.data
-                  console.log(data)
                   this.projectTypeOptions = data
                   this.reqFlag.getProjectType = true
                 }
@@ -602,7 +601,6 @@
           this.$http(url, params)
             .then(res => {
               if (res.code === 1) {
-                console.log(res.data)
                 for (let item of res.data) {
                   item.editable = false
                 }
@@ -639,7 +637,6 @@
         },
         // 转办
         handleTurnTo (row) {
-          console.log(row)
           row.editable = !row.editable
         },
         // 保存
@@ -705,7 +702,6 @@
               it.$http(url, params)
                 .then(res => {
                   if (res.code === 1) {
-                    console.log(res.data)
                     for (let item of res.data) {
                       item.editable = false
                     }
@@ -755,7 +751,6 @@
         },
         // 新增项目阶段
         addNewLine () {
-          console.log(this.tableData)
           if (this.tableData.length > 0) {
             let obj = {
               avaiableWorkTime: 0,
@@ -773,7 +768,7 @@
             }
             this.tableData.push(obj)
           } else {
-            this.$common.toast('请先选择指派任务类型', 'warning', 'false')
+            this.$common.toast('请选择指派任务类型', 'warning', 'false')
           }
         }
       },
