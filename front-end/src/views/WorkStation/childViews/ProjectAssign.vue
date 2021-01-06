@@ -44,7 +44,7 @@
       </el-row>
       <el-form ref="formData" :model="formData" :rules="formRules" :inline="true">
         <el-form-item label="项目名称" style="margin-left: 30px" prop="projectName">
-          <el-input placeholder="请输入" v-model.trim="formData.projectName" clearable></el-input>
+          <el-input placeholder="请输入" v-model.trim="formData.projectName" clearable style="width: 250%"></el-input>
         </el-form-item>
         <br>
         <el-form-item label="项目类型" prop="projectType" style="margin-left: 30px">
@@ -103,9 +103,9 @@
           <el-button type="danger" size="medium" @click="resetForm('formData')">重置</el-button>
         </el-form-item>
         <br>
-        <el-table :data="tableData" style="width: 95%;margin: auto">
+        <el-table :data="tableData" ref="dragTable" style="width: 95%;margin: auto" row-key="id" border>
           <el-table-column label="序号" align="center" type="index"></el-table-column>
-          <el-table-column label="项目类型" align="center" prop="projectType"></el-table-column>
+          <el-table-column label="项目类型" align="center" prop="projectType" width="110%"></el-table-column>
           <el-table-column label="项目阶段" align="center" prop="workType" show-overflow-tooltip>
             <template slot-scope="scope">
               <div v-if="scope.row.projectTypeID === 72">
@@ -126,7 +126,7 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="调整基本工时" align="center" prop="avaiableWorkTime">
+          <el-table-column label="调整基本工时" align="center" prop="avaiableWorkTime" width="140%">
             <template slot-scope="scope">
               <el-input-number v-model="scope.row.avaiableWorkTime"
                                size="mini"
@@ -135,7 +135,7 @@
                                style="width: 100%"></el-input-number>
             </template>
           </el-table-column>
-          <el-table-column label="K值" align="center" prop="kValue">
+          <el-table-column label="K值" align="center" prop="kValue" width="150%">
             <template slot-scope="scope">
               <el-input-number v-model="scope.row.kValue"
                                size="mini"
@@ -144,19 +144,24 @@
                                style="width: 100%"></el-input-number>
             </template>
           </el-table-column>
-          <el-table-column label="项目经理" align="center" prop="projectManager"></el-table-column>
-          <el-table-column label="操作" align="center">
+          <el-table-column label="项目经理" align="center" prop="projectManager" width="100%"></el-table-column>
+          <el-table-column label="操作" align="center" width="200">
             <template slot-scope="scope">
               <el-button type="danger"
                          @click="handleDelete(scope.row, scope.$index)"
                          size="mini">删除</el-button>
             </template>
           </el-table-column>
+          <el-table-column label="拖拽" align="center" width="100%">
+            <template>
+              <el-button circle icon="el-icon-rank" class="drag-handler"></el-button>
+            </template>
+          </el-table-column>
         </el-table>
         <br>
-<!--        <div style="text-align: center">-->
-<!--          <el-button type="primary" size="mini" plain @click="addNewLine">新增一行</el-button>-->
-<!--        </div>-->
+        <div style="text-align: center">
+          <el-button type="primary" size="mini" plain @click="addNewLine">新增一行</el-button>
+        </div>
         <br>
         <br>
       </el-form>
@@ -371,6 +376,7 @@
 <script>
   import { getUsersName, getProjectType, getWorkTimeNew, submitAssignWorkDetail,
     getAssignedProject, updateAssignProjectList, deleteAssignProject, getAssignProjectDetail } from '@/config/interface'
+  import Sortable from 'sortablejs'
     export default {
       data () {
         return {
@@ -452,9 +458,26 @@
         }
       },
       methods: {
+        // 初始化
         init () {
           this.getUsersName()
           this.getProjectType()
+        },
+        // 表格拖拽初始化
+        setSort () {
+          const el = this.$refs.dragTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
+          this.sortable = Sortable.create(el, {
+            ghostClass: 'sortable-ghost', // Class name for the drop placeholder,
+            setData: function (dataTransfer) {
+              // to avoid Firefox bug
+              // Detail see : https://github.com/RubaXa/Sortable/issues/1012
+              dataTransfer.setData('Text', '')
+            },
+            onEnd: evt => {
+              const targetRow = this.tableData.splice(evt.oldIndex, 1)[0]
+              this.tableData.splice(evt.newIndex, 0, targetRow)
+            }
+          })
         },
         // 获取人员信息
         getUsersName () {
@@ -542,6 +565,8 @@
                         item.workType = item.projectName
                       }
                       it.tableData = data
+                      it.oldTable = it.tableData.map(v => v.id)
+                      it.newTable = it.oldTable.slice()
                     }
                   })
               }
@@ -828,10 +853,15 @@
         console.log('ProjectAssign created!')
         this.init()
       },
+      mounted () {
+        this.setSort()
+      },
       name: 'ProjectAssign'
     }
 </script>
 
 <style scoped>
-
+  .drag-handler{
+    cursor: pointer;
+  }
 </style>
