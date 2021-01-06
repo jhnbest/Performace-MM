@@ -103,6 +103,13 @@
           <el-button type="danger" size="medium" @click="resetForm('formData')">重置</el-button>
         </el-form-item>
         <br>
+        <el-form-item label="整体K值设置" style="margin-left: 40px">
+          <el-input-number v-model="resetKValue"
+                           size="medium"
+                           :step="0.5"
+                           @change="handleResetKValue" style="width: 150px"></el-input-number>
+        </el-form-item>
+        <br>
         <el-table :data="tableData" ref="dragTable" style="width: 95%;margin: auto" row-key="id" border>
           <el-table-column label="序号" align="center" type="index"></el-table-column>
           <el-table-column label="项目类型" align="center" prop="projectType" width="110%"></el-table-column>
@@ -119,7 +126,9 @@
           <el-table-column label="基本工时" align="center" prop="workTime">
             <template slot-scope="scope">
               <div v-if="scope.row.projectTypeID === 72">
-                <el-input-number v-model="scope.row.workTime" size="mini"></el-input-number>
+                <el-input-number v-model="scope.row.workTime"
+                                 size="mini"
+                                 :step="0.5"></el-input-number>
               </div>
               <div v-else>
                 <span>{{scope.row.workTime}}</span>
@@ -130,7 +139,7 @@
             <template slot-scope="scope">
               <el-input-number v-model="scope.row.avaiableWorkTime"
                                size="mini"
-                               :min="1.0"
+                               :min="0.5"
                                :step="0.5"
                                style="width: 100%"></el-input-number>
             </template>
@@ -263,7 +272,6 @@
           <el-table-column label="项目阶段" align="center" prop="projectStageName" fixed></el-table-column>
           <el-table-column label="标准工时" align="center" prop="baseWorkTime" width="50%"></el-table-column>
           <el-table-column label="K值" align="center" prop="kValue" width="50%"></el-table-column>
-          <el-table-column label="完成次数" align="center" prop="coefficient" width="60%"></el-table-column>
           <el-table-column label="类型" align="center" prop="type" width="50%">
             <template slot-scope="scope">
               <span>{{scope.row.type | processTypeFilter}}</span>
@@ -454,7 +462,9 @@
           }],
           usersFilter: [],
           checkAssignProjectID: null,
-          assignProjectName: ''
+          assignProjectName: '',
+          id: 0,
+          resetKValue: 1
         }
       },
       methods: {
@@ -556,6 +566,7 @@
                           }
                         }
                       })
+                      it.id = 0
                       for (let item of data) {
                         item.projectType = parentType
                         item.projectManager = assignTo
@@ -563,10 +574,10 @@
                         item.avaiableWorkTime = item.workTime
                         item.kValue = 1.0
                         item.workType = item.projectName
+                        item.id = ++it.id
                       }
                       it.tableData = data
-                      it.oldTable = it.tableData.map(v => v.id)
-                      it.newTable = it.oldTable.slice()
+                      console.log(it.tableData)
                     }
                   })
               }
@@ -746,7 +757,7 @@
         },
         // 表格列合并方法
         objectSpanMethod ({ row, column, rowIndex, columnIndex }) {
-          if (columnIndex === 0 || columnIndex === 1 || columnIndex === 2 || columnIndex === 3) {
+          if (columnIndex === 0 || columnIndex === 1 || columnIndex === 2) {
             if (rowIndex % 2 === 0) {
               return {
                 rowspan: 2,
@@ -789,11 +800,18 @@
               projectType: this.tableData[0].projectType,
               projectTypeID: 72,
               workTime: 0,
-              workType: ''
+              workType: '',
+              id: ++this.id
             }
             this.tableData.push(obj)
           } else {
             this.$common.toast('请选择指派任务类型', 'warning', 'false')
+          }
+        },
+        // 一键设置K值
+        handleResetKValue () {
+          for (let item of this.tableData) {
+            item.kValue = this.resetKValue
           }
         }
       },
