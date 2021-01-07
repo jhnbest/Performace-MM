@@ -11,7 +11,8 @@
             value-format="yyyy-MM"
             placeholder="选择月"
             :picker-options="pickerOptions"
-            style="width: 150px">
+            style="width: 150px"
+            @change="handleDataChange">
           </el-date-picker>
         </el-form-item>
         <el-form-item label="小组">
@@ -353,6 +354,7 @@
         // 初始化
         init () {
           this.getProjectType()
+          this.getCookie()
         },
         // 提交至工时明细列表
         onSubmitWorkTimeList (formData) {
@@ -939,6 +941,30 @@
           setTimeout(() => {
             this.showFlag.freshTable = true
           }, this.$store.state.refreshInterval)
+        },
+        // 设置cookie
+        setCookie (month, exdays) {
+          let exdate = new Date() // 获取时间
+          exdate.setTime(exdate.getTime() + 24 * 60 * 60 * 1000 * exdays) // 保存的天数
+          // 字符串拼接cookie
+          window.document.cookie = 'pAMonth' + '=' + month + ';path=/;expires=' + exdate.toGMTString()
+        },
+        // 读取cookie
+        getCookie: function () {
+          if (document.cookie.length > 0) {
+            let arr = document.cookie.split('; ') // 这里显示的格式需要切割一下自己可输出看下
+            for (let i = 0; i < arr.length; i++) {
+              let arr2 = arr[i].split('=') // 再次切割
+              // 判断查找相对应的值
+              if (arr2[0] === 'pAMonth') {
+                this.formData.title = arr2[1] // 保存到保存数据的地方
+              }
+            }
+          }
+        },
+        // 申报月份变化
+        handleDataChange () {
+          this.setCookie(this.formData.title, 7)
         }
       },
       computed: {

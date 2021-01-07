@@ -83,8 +83,10 @@
         }
       },
       methods: {
+        // 初始化
         init () {
           if (this.$store.state.userInfo.role === '组长' || this.$store.state.userInfo.role === '管理员') {
+            this.getCookie()
             this.getGroupUsers().then(res => {
               this.getUnReviewProjectCount(res).then(res => {
                 this.groupUsers = res
@@ -165,6 +167,7 @@
         },
         handelDateChange () {
           if (this.$store.state.userInfo.role === '组长' || this.$store.state.userInfo.role === '管理员') {
+            this.setCookie(this.formData.title, 7)
             if (this.formData.reviewType === 'reviewed') {
               this.getGroupUsers().then(res => {
                 this.getReviewedProjectCount(res).then(res => {
@@ -245,6 +248,26 @@
             setTimeout(() => {
               this.formData.refreshTabs = true
             }, this.$store.state.refreshInterval)
+          }
+        },
+        // 设置cookie
+        setCookie (month, exdays) {
+          let exdate = new Date() // 获取时间
+          exdate.setTime(exdate.getTime() + 24 * 60 * 60 * 1000 * exdays) // 保存的天数
+          // 字符串拼接cookie
+          window.document.cookie = 'RMon' + '=' + month + ';path=/;expires=' + exdate.toGMTString()
+        },
+        // 读取cookie
+        getCookie: function () {
+          if (document.cookie.length > 0) {
+            let arr = document.cookie.split('; ') // 这里显示的格式需要切割一下自己可输出看下
+            for (let i = 0; i < arr.length; i++) {
+              let arr2 = arr[i].split('=') // 再次切割
+              // 判断查找相对应的值
+              if (arr2[0] === 'RMon') {
+                this.formData.title = arr2[1] // 保存到保存数据的地方
+              }
+            }
           }
         }
       },

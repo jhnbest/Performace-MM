@@ -106,7 +106,8 @@
         <el-form-item label="整体K值设置" style="margin-left: 40px">
           <el-input-number v-model="resetKValue"
                            size="medium"
-                           :step="0.5"
+                           :step="0.1"
+                           :min="0.1"
                            @change="handleResetKValue" style="width: 150px"></el-input-number>
         </el-form-item>
         <br>
@@ -128,6 +129,7 @@
               <div v-if="scope.row.projectTypeID === 72">
                 <el-input-number v-model="scope.row.workTime"
                                  size="mini"
+                                 :min="0.5"
                                  :step="0.5"></el-input-number>
               </div>
               <div v-else>
@@ -148,8 +150,8 @@
             <template slot-scope="scope">
               <el-input-number v-model="scope.row.kValue"
                                size="mini"
-                               :min="1.0"
-                               :step="0.5"
+                               :min="0.1"
+                               :step="0.1"
                                style="width: 100%"></el-input-number>
             </template>
           </el-table-column>

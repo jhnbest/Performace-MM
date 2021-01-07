@@ -37,9 +37,9 @@
                       :value="formData.reviewType === 'unReview'? groupUser.unReviewProjectCount : groupUser.reviewedProjectCount"
                       class="item"></el-badge>
           </span>
-          <ReviewedPerson v-if="formData.reviewPerson === String(groupUser.id)"
+          <PersionPlan v-if="formData.reviewPerson === String(groupUser.id)"
                           :info="{id: groupUser.id, title: formData.title, reviewType: formData.reviewType}"
-                          @reviewPass="handleReviewPass"></ReviewedPerson>
+                          @reviewPass="handleReviewPass"></PersionPlan>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -47,6 +47,7 @@
 </template>
 
 <script>
+  import PersionPlan from './childViews/PersionPlan'
     export default {
       data () {
         return {
@@ -59,6 +60,9 @@
       methods: {
         handelDateChange () {
         }
+      },
+      components: {
+        PersionPlan
       },
       name: 'workPlanCheck'
     }

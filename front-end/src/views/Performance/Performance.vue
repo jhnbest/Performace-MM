@@ -22,13 +22,13 @@
           :duration="2600"
           :decimals="1"
           style="color: #F56C6C;margin-left: 10px;font-size: 25px"/>
-          <span style="font-size: 21px;font-weight: bold;margin-left: 30px">本月小组排名:
-            <count-to
-              :start-val="0"
-              :end-val="formData.rank"
-              :duration="2600"
-              style="color: #F56C6C;margin-left: 10px;font-size: 25px"/>
-          </span>
+<!--          <span style="font-size: 21px;font-weight: bold;margin-left: 30px">本月小组排名:-->
+<!--            <count-to-->
+<!--              :start-val="0"-->
+<!--              :end-val="formData.rank"-->
+<!--              :duration="2600"-->
+<!--              style="color: #F56C6C;margin-left: 10px;font-size: 25px"/>-->
+<!--          </span>-->
         </span>
         <span v-if="formData.selectType === '计划查询'" style="font-size: 21px;font-weight: bold">本月预计获得工时:
 <!--          <span style="color: #F56C6C;margin-left: 10px;font-size: 25px">{{planGetWorkTime}}</span>-->
@@ -221,7 +221,7 @@
       methods: {
         // 初始化
         init () {
-          // this.getProjectType()
+          this.getCookie()
           this.getProjectList().then(res => {
             this.getAssignWorkTimes(res)
             this.getGroupWorkTimeList(this.$store.state.userInfo.groupID)
@@ -332,11 +332,32 @@
             }
           }
         },
+        // 设置cookie
+        setCookie (month, exdays) {
+          let exdate = new Date() // 获取时间
+          exdate.setTime(exdate.getTime() + 24 * 60 * 60 * 1000 * exdays) // 保存的天数
+          // 字符串拼接cookie
+          window.document.cookie = 'pMonth' + '=' + month + ';path=/;expires=' + exdate.toGMTString()
+        },
+        // 读取cookie
+        getCookie: function () {
+          if (document.cookie.length > 0) {
+            let arr = document.cookie.split('; ') // 这里显示的格式需要切割一下自己可输出看下
+            for (let i = 0; i < arr.length; i++) {
+              let arr2 = arr[i].split('=') // 再次切割
+              // 判断查找相对应的值
+              if (arr2[0] === 'pMonth') {
+                this.formData.title = arr2[1] // 保存到保存数据的地方
+              }
+            }
+          }
+        },
         // 申报月份变化
         handelDateChange () {
           this.getProjectList().then(res => {
             this.getGroupWorkTimeList(this.$store.state.userInfo.groupID)
             this.getAssignWorkTimes(res)
+            this.setCookie(this.formData.title, 7)
           })
         },
         handleAdd () {
@@ -731,6 +752,7 @@
         this.init()
       },
       mounted () {
+        this.getCookie()
       }
     }
 </script>

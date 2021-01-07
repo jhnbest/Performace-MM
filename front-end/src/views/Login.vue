@@ -12,6 +12,8 @@
                   clearable></el-input>
       </el-form-item>
       <el-form-item class="btn-box">
+        <el-checkbox v-model="rememberUser"></el-checkbox>
+        <span style="margin-right: 20px;margin-left: 3px">记住密码</span>
         <el-button type="primary" @click="submitLogin('formData')">登录</el-button>
         <el-button @click="resetForm('formData')">重置</el-button>
         <span style="margin-left: 40px;margin-right: 10px" class="link-type" @click="handleChangePassword">修改密码</span>
@@ -54,7 +56,8 @@ export default {
       },
       showFlag: {
         passwordEdit: true
-      }
+      },
+      rememberUser: true
     }
   },
   methods: {
@@ -70,7 +73,16 @@ export default {
             }
             this.$http(url, params)
             .then(res => {
-              if (res.code == 1) {
+              if (res.code === 1) {
+                if (this.rememberUser) {
+                  console.log('checked == true')
+                  // 传入账号名，密码，和保存天数3个参数
+                  this.setCookie(this.formData.name, this.formData.password, 7)
+                } else {
+                  console.log('清空Cookie')
+                  // 清空Cookie
+                  this.clearCookie()
+                }
                 let data = res.data
                 localStorage.setItem('userInfo', JSON.stringify(data))
                 this.$store.dispatch('saveUserInfo', data)
@@ -97,6 +109,33 @@ export default {
       this.$nextTick(() => {
         this.$refs.passwordEdit.init()
       })
+    },
+    // 设置cookie
+    setCookie (cName, cPwd, exdays) {
+      let exdate = new Date() // 获取时间
+      exdate.setTime(exdate.getTime() + 24 * 60 * 60 * 1000 * exdays) // 保存的天数
+      // 字符串拼接cookie
+      window.document.cookie = 'userName' + '=' + cName + ';path=/;expires=' + exdate.toGMTString()
+      window.document.cookie = 'userPwd' + '=' + cPwd + ';path=/;expires=' + exdate.toGMTString()
+    },
+    // 读取cookie
+    getCookie: function () {
+      if (document.cookie.length > 0) {
+        let arr = document.cookie.split('; ') // 这里显示的格式需要切割一下自己可输出看下
+        for (let i = 0; i < arr.length; i++) {
+          let arr2 = arr[i].split('=') // 再次切割
+          // 判断查找相对应的值
+          if (arr2[0] === 'userName') {
+            this.formData.name = arr2[1] // 保存到保存数据的地方
+          } else if (arr2[0] == 'userPwd') {
+            this.formData.password = arr2[1]
+          }
+        }
+      }
+    },
+    // 清除cookie
+    clearCookie: function () {
+      this.setCookie('', '', -1) // 修改2值都为空，天数为负1天就好了
     }
   },
   created () {
@@ -107,6 +146,9 @@ export default {
         _self.submitLogin('formData')
       }
     }
+  },
+  mounted () {
+    this.getCookie()
   },
   components: {
     PasswordEdit
