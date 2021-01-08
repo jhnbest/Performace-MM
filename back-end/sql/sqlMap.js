@@ -22,9 +22,9 @@ const sqlMap = {
     // 查询用户姓名
     selectUsersName: 'select id, account, dept, name, groupName from users where status != 0',
     // 查询组员信息
-    getGroupUserName: 'select id, name from users where groupName = ? and status != 0',
+    getGroupUserName: 'select id, name, groupName from users where groupName = ? and status != 0',
     // 查询全员信息
-    getAllUserName: 'select id, name from users where status != 0',
+    getAllUserName: 'select id, name, groupName from users where status != 0',
     // 用户旧密码认证
     oldPasswordAuth: 'select password from users where account = ?',
     // 更新密码
@@ -113,7 +113,7 @@ const sqlMap = {
     getAssignWorkTime: 'select reviewWorkTime from worktimeassign where projectID = ? and userID = ? and obsoleteStatus != 1',
     getGroupWorkTimeList: 'select u.id, u.name, wa.reviewWorkTime, wl.applyMonth from worktimeassign wa left join worktimelist ' +
         'wl on wa.projectID = wl.id left join users u on wa.userID = u.id where wl.applyMonth = ? and u.groupName = ? and ' +
-        ' wl.reviewStatus = 1 and wa.obsoleteStatus != 1'
+        ' wl.reviewStatus = 1 and wa.obsoleteStatus != 1 and u.status != 0'
   },
   workStation: {
     getAssignProjectListUn: 'select apl.*, users.name as assigner from assignprojectlist apl left join users on apl.assignerID = users.id where ' +

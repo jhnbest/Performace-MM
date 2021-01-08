@@ -60,6 +60,7 @@
     },
     methods: {
       init () {
+        this.getCookie()
         this.getGroupWorkTimeList(this.$store.state.userInfo.groupID)
       },
       // 比较函数
@@ -110,6 +111,7 @@
                     totalWorkTimeCal.find(function (wItem) {
                       if (wItem.id === item.id) {
                         wItem.totalWorkTime += item.reviewWorkTime
+                        wItem.totalWorkTime = Number(wItem.totalWorkTime.toFixed(1))
                         return wItem.totalWorkTime
                       }
                     })
@@ -128,7 +130,8 @@
                 }
                 let length = totalWorkTimeCal.length
                 for (let item of totalWorkTimeCal) { // 计算定量指标得分
-                  let rankPercentage = item.rank / length
+                  let rankPercentage = Number((item.rank / length).toFixed(1))
+                  console.log(rankPercentage)
                   if (rankPercentage < 0.1 || rankPercentage === 0.1) {
                     item.quantitativeScore = 92.5
                   } else if (rankPercentage < 0.3 || rankPercentage === 0.3) {
@@ -169,12 +172,33 @@
       handelDateChange () {
         let groupID = this.groupName2ID(this.formData.selectType)
         this.getGroupWorkTimeList(groupID)
+        this.setCookie(this.formData.title, 7)
       },
       // 小组切换
       handleSelectTypeChange (selectType) {
         console.log(selectType)
         let groupID = this.groupName2ID(this.formData.selectType)
         this.getGroupWorkTimeList(groupID)
+      },
+      // 设置cookie
+      setCookie (month, exdays) {
+        let exdate = new Date() // 获取时间
+        exdate.setTime(exdate.getTime() + 24 * 60 * 60 * 1000 * exdays) // 保存的天数
+        // 字符串拼接cookie
+        window.document.cookie = 'wcMon' + '=' + month + ';path=/;expires=' + exdate.toGMTString()
+      },
+      // 读取cookie
+      getCookie: function () {
+        if (document.cookie.length > 0) {
+          let arr = document.cookie.split('; ') // 这里显示的格式需要切割一下自己可输出看下
+          for (let i = 0; i < arr.length; i++) {
+            let arr2 = arr[i].split('=') // 再次切割
+            // 判断查找相对应的值
+            if (arr2[0] === 'wcMon') {
+              this.formData.title = arr2[1] // 保存到保存数据的地方
+            }
+          }
+        }
       }
     },
     created () {

@@ -100,6 +100,7 @@
             })
           }
         },
+        // 获取小组成员信息
         getGroupUsers () {
           let it = this
           return new Promise(function (resolve, reject) {
