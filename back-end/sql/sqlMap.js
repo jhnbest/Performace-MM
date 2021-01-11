@@ -175,7 +175,9 @@ const sqlMap = {
     deleteWorkTimeList: 'update worktimelist set obsoleteStatus = 1 where aplID = ?',
     getWorkTimeAssignItem: 'select id from worktimelist where aplID = ?',
     updateWorkTimeAssignObsoleteStatus: 'update worktimeassign set obsoleteStatus = 1 where projectID in (',
-    getMonthProcessByID: 'select * from monthprocess where id = ?'
+    getMonthProcessByID: 'select * from monthprocess where id = ?',
+    getPlanInfo: 'select * from worktimelist where submitID = ? and applyType = "plan" and applyMonth = ?' +
+        ' and obsoleteStatus != 1'
   }
 }
 module.exports = sqlMap;

@@ -35,7 +35,12 @@
               :key="item.id"
               :name="String(item.id)">
               <span slot="label">{{item.name}}</span>
-              <PersionPlan></PersionPlan>
+              <div class="chart-container">
+                <PersionPlan v-if="selectPersion === String(item.id)"
+                             height="100%"
+                             width="100%"
+                             :userInfo="{userID: item.id, title: formData.title}"></PersionPlan>
+              </div>
             </el-tab-pane>
           </el-tabs>
         </el-tab-pane>
@@ -163,5 +168,9 @@
 </script>
 
 <style scoped>
-
+  .chart-container{
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 84px);
+  }
 </style>

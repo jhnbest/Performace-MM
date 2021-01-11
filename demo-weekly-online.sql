@@ -11,7 +11,7 @@
  Target Server Version : 80022
  File Encoding         : 65001
 
- Date: 08/01/2021 16:26:45
+ Date: 11/01/2021 16:45:44
 */
 
 SET NAMES utf8mb4;
@@ -34,7 +34,7 @@ CREATE TABLE `assignprojectdetail`  (
   `obsoleteStatus` tinyint NOT NULL DEFAULT 0 COMMENT '废弃状态',
   `isFinish` tinyint NOT NULL DEFAULT 0 COMMENT '是否已完成',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1697 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1786 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of assignprojectdetail
@@ -1736,6 +1736,97 @@ INSERT INTO `assignprojectdetail` VALUES (1694, 628, 80, '组织各类型会议'
 INSERT INTO `assignprojectdetail` VALUES (1695, 629, 81, '组织技术交流', 2.0, 1.0, 1, 2.0, 0.0, 0, 0);
 INSERT INTO `assignprojectdetail` VALUES (1696, 630, 95, '流程审核', 1.0, 1.0, 1, 1.0, 0.0, 0, 0);
 INSERT INTO `assignprojectdetail` VALUES (1697, 631, 144, '基建项目方案审核', 16.0, 1.0, 1, 16.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1698, 632, 72, '自定义项目阶段', 1.0, 1.0, 1, 1.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1699, 633, 72, '自定义项目阶段', 4.0, 1.0, 1, 4.0, 100.0, 0, 1);
+INSERT INTO `assignprojectdetail` VALUES (1700, 634, 250, '需求调研', 5.0, 4.5, 1, 5.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1701, 634, 251, '方案设计', 5.0, 4.5, 1, 5.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1702, 634, 252, '组织施工', 5.0, 4.5, 1, 5.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1703, 634, 253, '验收交接', 5.0, 4.5, 1, 5.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1704, 635, 261, '工程联系单', 4.0, 1.0, 1, 4.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1705, 636, 175, '项目立项', 20.0, 1.0, 1, 20.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1706, 636, 176, '初步需求调研', 20.0, 1.0, 1, 20.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1707, 636, 177, '初步设计任务书编审', 20.0, 1.0, 1, 20.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1708, 636, 178, '项目启动评审', 30.0, 1.0, 1, 30.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1709, 636, 180, '深化设计任务书编审', 30.0, 1.0, 1, 30.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1710, 636, 181, '设计招标代理单位选择及审批', 30.0, 1.0, 1, 30.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1711, 636, 182, '深化设计单位选择及设计合同签订', 50.0, 1.0, 1, 50.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1712, 636, 183, '组织编审智能化初步设计方案', 100.0, 1.0, 1, 100.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1713, 636, 184, '组织编审智能化深化设计方案', 200.0, 1.0, 1, 200.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1714, 636, 185, '项目三重一大汇报', 50.0, 1.0, 1, 50.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1715, 636, 186, '项目深化设计技术评审及公司审批', 50.0, 1.0, 1, 50.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1716, 636, 188, '造价咨询及招标代理单位选择及审批', 30.0, 1.0, 1, 30.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1717, 636, 189, '造价咨询及清单审核', 100.0, 1.0, 1, 100.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1718, 636, 190, '预算审批', 20.0, 1.0, 1, 20.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1719, 636, 191, '招标文件编制及审批', 50.0, 1.0, 1, 50.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1720, 636, 192, '工程发包程序', 50.0, 1.0, 1, 50.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1721, 636, 193, '施工合同签订', 50.0, 1.0, 1, 50.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1722, 636, 195, '配合施工开工会审及各专业接口交底', 30.0, 1.0, 1, 30.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1723, 636, 196, '主体施工阶段现场管理', 50.0, 1.0, 1, 50.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1724, 636, 197, '配合主体施工验收', 50.0, 1.0, 1, 50.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1725, 636, 198, '智能化工程实施方案二次评审', 50.0, 1.0, 1, 50.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1726, 636, 200, '组织智能化专业进场交底', 60.0, 1.0, 1, 60.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1727, 636, 201, '手机信号室分覆盖建设', 50.0, 1.0, 1, 50.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1728, 636, 202, '运营商接入', 60.0, 1.0, 1, 60.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1729, 636, 203, '机房装修、综合布线阶段现场管理', 150.0, 1.0, 1, 150.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1730, 636, 204, '智能化隐蔽工程检查及验收', 50.0, 1.0, 1, 50.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1731, 636, 205, '设备安装及系统调试阶段现场管理', 250.0, 1.0, 1, 250.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1732, 636, 207, '智能化初步验收及搬迁配合', 100.0, 1.0, 1, 100.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1733, 636, 208, '项目试运行及整改', 30.0, 1.0, 1, 30.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1734, 636, 209, '智能化系统培训', 50.0, 1.0, 1, 50.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1735, 636, 210, '项目正式验收', 30.0, 1.0, 1, 30.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1736, 636, 211, '项目移交', 50.0, 1.0, 1, 50.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1737, 636, 212, '项目总结', 30.0, 1.0, 1, 30.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1738, 637, 176, '初步需求调研', 20.0, 1.7, 1, 20.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1739, 637, 177, '初步设计任务书编审', 20.0, 1.7, 1, 20.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1740, 637, 178, '项目启动评审', 30.0, 1.0, 1, 30.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1741, 637, 180, '深化设计任务书编审', 30.0, 1.7, 1, 30.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1742, 637, 181, '设计招标代理单位选择及审批', 30.0, 1.7, 1, 30.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1743, 637, 182, '深化设计单位选择及设计合同签订', 50.0, 1.7, 1, 50.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1744, 637, 183, '组织编审智能化初步设计方案', 100.0, 1.7, 1, 100.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1745, 637, 184, '组织编审智能化深化设计方案', 200.0, 1.7, 1, 200.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1746, 637, 185, '项目三重一大汇报', 50.0, 1.0, 1, 50.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1747, 637, 186, '项目深化设计技术评审及公司审批', 50.0, 1.7, 1, 50.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1748, 637, 188, '造价咨询及招标代理单位选择及审批', 30.0, 1.7, 1, 30.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1749, 637, 189, '造价咨询及清单审核', 100.0, 1.7, 1, 100.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1750, 637, 190, '预算审批', 20.0, 1.7, 1, 20.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1751, 637, 191, '招标文件编制及审批', 50.0, 1.7, 1, 50.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1752, 637, 192, '工程发包程序', 50.0, 1.7, 1, 50.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1753, 637, 193, '施工合同签订', 50.0, 1.7, 1, 50.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1754, 638, 176, '初步需求调研', 20.0, 2.3, 1, 20.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1755, 638, 177, '初步设计任务书编审', 20.0, 2.3, 1, 20.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1756, 638, 178, '项目启动评审', 30.0, 1.0, 1, 30.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1757, 638, 180, '深化设计任务书编审', 30.0, 2.3, 1, 30.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1758, 638, 181, '设计招标代理单位选择及审批', 30.0, 2.3, 1, 30.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1759, 638, 182, '深化设计单位选择及设计合同签订', 50.0, 2.3, 1, 50.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1760, 638, 183, '组织编审智能化初步设计方案', 100.0, 2.3, 1, 100.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1761, 638, 184, '组织编审智能化深化设计方案', 200.0, 2.3, 1, 200.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1762, 638, 185, '项目三重一大汇报', 50.0, 1.0, 1, 50.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1763, 638, 186, '项目深化设计技术评审及公司审批', 50.0, 2.3, 1, 50.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1764, 638, 188, '造价咨询及招标代理单位选择及审批', 30.0, 2.3, 1, 30.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1765, 638, 189, '造价咨询及清单审核', 100.0, 2.3, 1, 100.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1766, 638, 190, '预算审批', 20.0, 2.3, 1, 20.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1767, 638, 191, '招标文件编制及审批', 50.0, 2.3, 1, 50.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1768, 638, 192, '工程发包程序', 50.0, 2.3, 1, 50.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1769, 638, 193, '施工合同签订', 50.0, 2.3, 1, 50.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1770, 639, 176, '初步需求调研', 20.0, 2.3, 1, 20.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1771, 639, 177, '初步设计任务书编审', 20.0, 2.3, 1, 20.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1772, 639, 178, '项目启动评审', 30.0, 1.0, 1, 30.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1773, 639, 180, '深化设计任务书编审', 30.0, 2.3, 1, 30.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1774, 639, 181, '设计招标代理单位选择及审批', 30.0, 2.3, 1, 30.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1775, 639, 182, '深化设计单位选择及设计合同签订', 50.0, 2.3, 1, 50.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1776, 639, 183, '组织编审智能化初步设计方案', 100.0, 2.3, 1, 100.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1777, 639, 184, '组织编审智能化深化设计方案', 200.0, 2.3, 1, 200.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1778, 639, 185, '项目三重一大汇报', 50.0, 1.0, 1, 50.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1779, 639, 186, '项目深化设计技术评审及公司审批', 50.0, 2.3, 1, 50.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1780, 639, 188, '造价咨询及招标代理单位选择及审批', 30.0, 2.3, 1, 30.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1781, 639, 189, '造价咨询及清单审核', 100.0, 2.3, 1, 100.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1782, 639, 190, '预算审批', 20.0, 2.3, 1, 20.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1783, 639, 191, '招标文件编制及审批', 50.0, 2.3, 1, 50.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1784, 639, 192, '工程发包程序', 50.0, 2.3, 1, 50.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1785, 639, 193, '施工合同签订', 50.0, 2.3, 1, 50.0, 0.0, 1, 0);
+INSERT INTO `assignprojectdetail` VALUES (1786, 640, 95, '流程审核', 1.0, 1.0, 1, 1.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1787, 641, 373, '系统航后维护(家中)', 4.0, 1.0, 1, 4.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1788, 641, 97, '配置变更测试', 2.0, 1.0, 1, 2.0, 0.0, 0, 0);
 
 -- ----------------------------
 -- Table structure for assignprojectlist
@@ -1756,7 +1847,7 @@ CREATE TABLE `assignprojectlist`  (
   `projectLevel` tinyint NOT NULL DEFAULT 1 COMMENT '项目级别',
   `reviewStatus` tinyint NOT NULL DEFAULT 1 COMMENT '审核状态',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 631 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 640 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of assignprojectlist
@@ -2392,6 +2483,16 @@ INSERT INTO `assignprojectlist` VALUES (628, 32, '2021-01-08 13:41:48', 4, '1月
 INSERT INTO `assignprojectlist` VALUES (629, 14, '2021-01-08 15:05:30', 4, '耐威迪（通信线路可视化管理系统）技术交流', 0.0, 14, 2.0, 0.0, 1, 0, 1, 1);
 INSERT INTO `assignprojectlist` VALUES (630, 31, '2021-01-08 16:07:56', 4, 'ACARS系统', 0.0, 31, 1.0, 0.0, 1, 0, 1, 1);
 INSERT INTO `assignprojectlist` VALUES (631, 7, '2021-01-08 16:21:27', 4, '总部大厦项目VAV系统控制部分最新方案审核', 0.0, 7, 16.0, 0.0, 1, 0, 1, 1);
+INSERT INTO `assignprojectlist` VALUES (632, 17, '2021-01-11 09:44:49', 5, 'aoc光纤工程量审核讨论', 0.0, 17, 1.0, 0.0, 1, 0, 1, 0);
+INSERT INTO `assignprojectlist` VALUES (633, 32, '2021-01-11 10:28:35', 5, 'AOC、元翔及配餐区域工程量审核会议', 100.0, 32, 4.0, 0.0, 1, 0, 1, 0);
+INSERT INTO `assignprojectlist` VALUES (634, 28, '2021-01-11 10:32:30', 249, '国际货运、站台和车辆道闸出入口监控建设项目', 0.0, 32, 20.0, 0.0, 0, 0, 1, 1);
+INSERT INTO `assignprojectlist` VALUES (635, 17, '2021-01-11 10:51:19', 4, '审核总部大厦工程联系单内容', 0.0, 17, 4.0, 0.0, 1, 0, 1, 1);
+INSERT INTO `assignprojectlist` VALUES (636, 17, '2021-01-11 13:40:31', 173, '北方总部数据中心一期智能化工程', 0.0, 17, 1990.0, 0.0, 0, 1, 4, 1);
+INSERT INTO `assignprojectlist` VALUES (637, 17, '2021-01-11 13:58:20', 173, '北方总部数据中心一期智能化工程', 0.0, 17, 880.0, 0.0, 0, 0, 4, 1);
+INSERT INTO `assignprojectlist` VALUES (638, 17, '2021-01-11 14:01:01', 173, '大兴机场运行基地一期智能化工程', 0.0, 17, 880.0, 0.0, 0, 0, 4, 1);
+INSERT INTO `assignprojectlist` VALUES (639, 17, '2021-01-11 14:04:47', 173, '大兴机场运行基地一期智能化工程', 0.0, 17, 880.0, 0.0, 0, 1, 4, 1);
+INSERT INTO `assignprojectlist` VALUES (640, 31, '2021-01-11 14:26:33', 4, 'ACARS系统', 0.0, 31, 1.0, 0.0, 1, 0, 1, 1);
+INSERT INTO `assignprojectlist` VALUES (641, 9, '2021-01-11 14:49:35', 4, '1月11日客服中心移动运营商维护', 0.0, 9, 6.0, 0.0, 1, 0, 1, 1);
 
 -- ----------------------------
 -- Table structure for monthprocess
@@ -2417,7 +2518,7 @@ CREATE TABLE `monthprocess`  (
   `PreMonth` float(6, 1) UNSIGNED NOT NULL DEFAULT 0.0 COMMENT '上一月份进展',
   `obsoleteStatus` tinyint NOT NULL DEFAULT 0 COMMENT '废弃状态 ',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1014 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1015 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of monthprocess
@@ -3435,6 +3536,7 @@ INSERT INTO `monthprocess` VALUES (1010, 1688, 2021, 'plan', 100.0, NULL, NULL, 
 INSERT INTO `monthprocess` VALUES (1011, 1689, 2021, 'plan', 100.0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.0, 0);
 INSERT INTO `monthprocess` VALUES (1012, 1684, 2021, 'fact', 100.0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.0, 0);
 INSERT INTO `monthprocess` VALUES (1013, 1692, 2021, 'fact', 100.0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.0, 0);
+INSERT INTO `monthprocess` VALUES (1014, 1699, 2021, 'fact', 100.0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.0, 0);
 
 -- ----------------------------
 -- Table structure for monthprocess_new
@@ -4494,7 +4596,7 @@ CREATE TABLE `worktimeassign`  (
   `assignRole` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '参与人员角色',
   `obsoleteStatus` tinyint NOT NULL DEFAULT 0 COMMENT '废弃状态',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1441 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1448 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of worktimeassign
@@ -5941,6 +6043,14 @@ INSERT INTO `worktimeassign` VALUES (1439, 17, 961, 1.0, NULL, '协作者', 0);
 INSERT INTO `worktimeassign` VALUES (1440, 31, 962, 1.0, NULL, '组织者', 0);
 INSERT INTO `worktimeassign` VALUES (1441, 7, 963, 12.0, NULL, '组织者', 0);
 INSERT INTO `worktimeassign` VALUES (1442, 14, 963, 4.0, NULL, '协作者', 0);
+INSERT INTO `worktimeassign` VALUES (1443, 17, 964, 1.0, NULL, '组织者', 0);
+INSERT INTO `worktimeassign` VALUES (1444, 32, 965, 2.0, 2.0, '组织者', 0);
+INSERT INTO `worktimeassign` VALUES (1445, 17, 965, 1.0, 1.0, '协作者', 0);
+INSERT INTO `worktimeassign` VALUES (1446, 22, 965, 1.0, 1.0, '协作者', 0);
+INSERT INTO `worktimeassign` VALUES (1447, 17, 966, 4.0, NULL, '组织者', 0);
+INSERT INTO `worktimeassign` VALUES (1448, 31, 967, 1.0, NULL, '组织者', 0);
+INSERT INTO `worktimeassign` VALUES (1449, 9, 968, 4.0, NULL, '组织者', 0);
+INSERT INTO `worktimeassign` VALUES (1450, 9, 969, 2.0, NULL, '组织者', 0);
 
 -- ----------------------------
 -- Table structure for worktimelist
@@ -5974,7 +6084,7 @@ CREATE TABLE `worktimelist`  (
   `applyType` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '申报类型',
   `applyBaseWorkTime` float(6, 1) NOT NULL COMMENT '申报的基本工时（非标项目使用）',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 963 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 967 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of worktimelist
@@ -6724,7 +6834,7 @@ INSERT INTO `worktimelist` VALUES (742, 1477, 509, 694, 9, 295, 1.0, 1.0, 1.0, 1
 INSERT INTO `worktimelist` VALUES (743, 1478, 509, 693, 9, 300, 1.0, 1.0, 1.0, 1.0, '2021-01-06 09:13:27', '2021-01-06 09:13:27', '2020-12', 1, '', 1, '2021-01-06 11:21:07', '', 0, 1, 33, 6.0, 60.0, 0.0, 'fact', 10.0);
 INSERT INTO `worktimelist` VALUES (744, 1479, 509, 692, 9, 301, 1.0, 1.0, 1.0, 1.0, '2021-01-06 09:13:27', '2021-01-06 09:13:27', '2020-12', 1, '', 1, '2021-01-06 11:21:04', '', 0, 1, 33, 4.0, 40.0, 0.0, 'fact', 10.0);
 INSERT INTO `worktimelist` VALUES (745, 1480, 510, NULL, 32, 83, 1.0, 1.0, 3.0, 3.0, '2021-01-06 09:14:25', '2021-01-06 09:14:25', '2020-12', 1, '', 2, '2021-01-06 09:37:41', '未完成，修改进展', 1, 0, 17, 12.0, 100.0, 0.0, 'fact', 4.0);
-INSERT INTO `worktimelist` VALUES (746, 1481, 511, NULL, 8, 94, 1.0, NULL, 3.0, NULL, '2021-01-06 10:13:05', '2021-01-06 15:07:08', '2021-01', 0, '1、陈坚波误识别处理（杭州人力陈硕妍派单）\n2、蓝桂华无法识别处理（9299邓宏剑微办公派单）', 0, NULL, '', 0, 0, NULL, 4.5, 100.0, 0.0, 'fact', 1.5);
+INSERT INTO `worktimelist` VALUES (746, 1481, 511, NULL, 8, 94, 1.0, NULL, 3.0, NULL, '2021-01-06 10:13:05', '2021-01-11 15:45:19', '2021-01', 0, '1、陈坚波误识别处理（杭州人力陈硕妍派单）\n2、蓝桂华无法识别处理（9299邓宏剑微办公派单）\n3、INC202101040067\n4、INC202101060017\n5、INC202101100028\n6、INC202101110008\n7、续慧颖微办公通知异常（职服韩艳波派单）\n8、卢韩伟', 0, NULL, '', 0, 0, NULL, 4.5, 100.0, 0.0, 'fact', 1.5);
 INSERT INTO `worktimelist` VALUES (747, 1482, 512, NULL, 31, 95, 1.0, NULL, 1.0, NULL, '2021-01-06 10:13:37', '2021-01-06 10:13:37', '2021-01', 1, '提交《关于VPN发布ACARS系统服务资源的部署申请》，增加1、http://11.8.200.132/xm/login.jsp\n2、http://11.6.48.19:8161/admin/queues.jsp\n3、http://11.6.48.20:8161/admin/queues.jsp\n4、https://11.6.48.19/login\n四个网站资源。', 0, NULL, '', 0, 0, NULL, 1.0, 100.0, 0.0, 'fact', 1.0);
 INSERT INTO `worktimelist` VALUES (748, 1483, 513, 671, 32, 83, 1.0, 1.0, 2.0, 2.0, '2021-01-06 10:15:21', '2021-01-06 10:15:21', '2020-12', 1, '', 1, '2021-01-06 10:54:03', '未完成。', 0, 1, 17, 8.0, 100.0, 0.0, 'fact', 4.0);
 INSERT INTO `worktimelist` VALUES (749, 1484, 514, NULL, 31, 81, 1.0, NULL, 1.0, NULL, '2021-01-06 10:17:58', '2021-01-07 09:43:05', '2021-01', 1, '组织召开《ACARS系统SITA接口技术方案研讨会》（1月6日 与会者研发、邹涛、顾心瑜）', 0, NULL, '', 0, 0, NULL, 2.0, 100.0, 0.0, 'fact', 2.0);
@@ -6942,6 +7052,12 @@ INSERT INTO `worktimelist` VALUES (960, 1694, 628, NULL, 32, 80, 1.0, NULL, 1.0,
 INSERT INTO `worktimelist` VALUES (961, 1695, 629, NULL, 14, 81, 1.0, NULL, 1.0, NULL, '2021-01-08 15:05:30', '2021-01-08 15:05:30', '2021-01', 1, '', 0, NULL, '', 0, 0, NULL, 2.0, 100.0, 0.0, 'fact', 2.0);
 INSERT INTO `worktimelist` VALUES (962, 1696, 630, NULL, 31, 95, 1.0, NULL, 1.0, NULL, '2021-01-08 16:07:56', '2021-01-08 16:07:56', '2021-01', 1, '完成《关于下线ACARS旧系统数据库用户的申请》流程数据管理处审核节点关于“请从业务角度说明，系统下线后历史数据的使用要求，以确定历史数据的归档方式。”进行回复。', 0, NULL, '', 0, 0, NULL, 1.0, 100.0, 0.0, 'fact', 1.0);
 INSERT INTO `worktimelist` VALUES (963, 1697, 631, NULL, 7, 144, 1.0, NULL, 1.0, NULL, '2021-01-08 16:21:27', '2021-01-08 16:21:27', '2021-01', 1, '', 0, NULL, '', 0, 0, NULL, 16.0, 100.0, 0.0, 'fact', 16.0);
+INSERT INTO `worktimelist` VALUES (964, 1698, 632, NULL, 17, 72, 1.0, NULL, 1.0, NULL, '2021-01-11 09:44:49', '2021-01-11 09:44:49', '2021-01', 1, '', 0, NULL, '', 0, 0, NULL, 1.0, 100.0, 0.0, 'fact', 1.0);
+INSERT INTO `worktimelist` VALUES (965, 1699, 633, 1014, 32, 72, 1.0, 1.0, 1.0, 1.0, '2021-01-11 10:28:35', '2021-01-11 10:28:35', '2021-01', 1, '', 1, '2021-01-11 11:39:10', '', 0, 1, 17, 4.0, 100.0, 0.0, 'fact', 4.0);
+INSERT INTO `worktimelist` VALUES (966, 1704, 635, NULL, 17, 261, 1.0, NULL, 1.0, NULL, '2021-01-11 10:51:19', '2021-01-11 10:51:19', '2021-01', 1, '', 0, NULL, '', 0, 0, NULL, 4.0, 100.0, 0.0, 'fact', 4.0);
+INSERT INTO `worktimelist` VALUES (967, 1786, 640, NULL, 31, 95, 1.0, NULL, 1.0, NULL, '2021-01-11 14:26:33', '2021-01-11 14:26:33', '2021-01', 1, '完成《郑州营业部张小冬关于洛阳北郊机场ACARS发送舱单权限的申请》流程审核。 （1月11日）', 0, NULL, '', 0, 0, NULL, 1.0, 100.0, 0.0, 'fact', 1.0);
+INSERT INTO `worktimelist` VALUES (968, 1787, 641, NULL, 9, 373, 1.0, NULL, 1.0, NULL, '2021-01-11 14:49:35', '2021-01-11 14:49:35', '2021-01', 1, '', 0, NULL, '', 0, 0, NULL, 4.0, 100.0, 0.0, 'fact', 4.0);
+INSERT INTO `worktimelist` VALUES (969, 1788, 641, NULL, 9, 97, 1.0, NULL, 1.0, NULL, '2021-01-11 14:49:35', '2021-01-11 14:49:35', '2021-01', 1, '', 0, NULL, '', 0, 0, NULL, 2.0, 100.0, 0.0, 'fact', 2.0);
 
 -- ----------------------------
 -- Event structure for update_schedule

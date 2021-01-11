@@ -839,6 +839,14 @@ const workStation = {
                 return $http.writeJson(res, {code: 1, message: '成功'})
             }
         }
+    },
+    // 获取项目列表
+    getPlanInfo (req, res) {
+        let data = req.body
+        let sql = $sql.workStation.getPlanInfo
+        let arrayParams = [data.id, data.title]
+        $http.connPool(sql, arrayParams, (result, err) => {
+        })
     }
 }
 
