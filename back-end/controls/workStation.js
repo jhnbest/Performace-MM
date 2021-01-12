@@ -845,7 +845,21 @@ const workStation = {
         let data = req.body
         let sql = $sql.workStation.getPlanInfo
         let arrayParams = [data.id, data.title]
-        $http.connPool(sql, arrayParams, (result, err) => {
+        $http.connPool(sql, arrayParams, (err, result) => {
+        })
+    },
+    // 获取指派项目列表(计划查询)
+    getAssignedProjectPlan (req, res) {
+        let data = req.body
+        let sql = $sql.workStation.assignProjectList
+        let arrayParams = [data.userID]
+        $http.connPool(sql, arrayParams, (err, result) =>{
+            if (err) {
+                return $http.writeJson(res, {code: -2, message: '失败', errMsg: err})
+            } else {
+                result = JSON.parse(JSON.stringify(result))
+                return $http.writeJson(res, {code: 1, data: result, message: '成功'})
+            }
         })
     }
 }

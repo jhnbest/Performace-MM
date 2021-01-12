@@ -56,5 +56,6 @@ module.exports = {
     getAssignWorkDetail: path + '/workStation/getAssignWorkDetail', // 获取项目明细
     submitPersonalProject: path + '/workStation/submitPersonalProject', // 提交个人申报项目
     submitMonthPlanProcess: path + '/workStation/submitMonthPlanProcess', // 提交计划至计划进展表
-    getPlanInfo: path + '/workStation/getPlanInfo' // 获取计划列表
+    getPlanInfo: path + '/workStation/getPlanInfo', // 获取计划列表
+    getAssignedProjectPlan: path + '/workStation/getAssignedProjectPlan' // 获取指派项目列表(计划查询)
 };

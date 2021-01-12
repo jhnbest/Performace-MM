@@ -1,11 +1,36 @@
 <template>
   <div>
-    <el-tabs tab-position="left" v-model="selectProject">
+    <el-tabs v-model="selectProject" @tab-click="handleProjectTypeChange">
       <el-tab-pane v-for="projectType in ProjectTypes"
-                   :key="item.id"
-                   :name="item.id">
-        <span slot="label">{{ item.projectName }}</span>
-        <div :id="id" :class="className" :style="{height: height, width: width}"></div>
+                   :key="projectType.id"
+                   :name="String(projectType.id)">
+        <span slot="label">{{ projectType.projectType }}</span>
+        <div v-if="true">
+          <el-table
+            :data="tableData"
+            style="margin: auto"
+            border size="mini"
+            @cell-click="cellClick"
+            highlight-current-row>
+            <el-table-column label="项目名称" align="center" prop="projectName">
+              <template slot-scope="scope">
+                <el-select v-model="scope.row.projectName" placeholder="请选择项目">
+                  <el-option
+                    v-for="item in projects"
+                    :key="item.id"
+                    :label="item.projectName"
+                    :value="item.id">
+                  </el-option>
+                </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column label="项目阶段" align="center" prop="projectStage"></el-table-column>
+            <el-table-column label="计划进展" align="center">
+              <el-table-column v-for="item in Months" :key="item.id" :label="item.name"></el-table-column>
+            </el-table-column>
+          </el-table>
+        </div>
+        <div v-else :id="id" :class="className" :style="{height: height, width: width}"></div>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -13,29 +38,84 @@
 
 <script>
   import echarts from 'echarts'
-  import { getPlanInfo } from '@/config/interface'
+  import { getPlanInfo, getAssignedProjectPlan } from '@/config/interface'
   export default {
     data () {
       return {
         planChart: null,
-        selectProject: null
+        selectProject: '基建类',
+        ProjectTypes: [{
+          id: 173,
+          projectType: '基建类'
+        }, {
+          id: 172,
+          projectType: '选型类'
+        }, {
+          id: 213,
+          projectType: '基础平台类'
+        }, {
+          id: 249,
+          projectType: '修缮类'
+        }, {
+          id: 4,
+          projectType: '其他标准'
+        }, {
+          id: 5,
+          projectType: '其他非标'
+        }],
+        tableData: [],
+        Months: [{
+          id: 1,
+          name: '1月'
+        }, {
+          id: 2,
+          name: '2月'
+        }, {
+          id: 3,
+          name: '3月'
+        }, {
+          id: 4,
+          name: '4月'
+        }, {
+          id: 5,
+          name: '5月'
+        }, {
+          id: 6,
+          name: '6月'
+        }, {
+          id: 7,
+          name: '7月'
+        }, {
+          id: 8,
+          name: '8月'
+        }, {
+          id: 9,
+          name: '9月'
+        }, {
+          id: 10,
+          name: '10月'
+        }, {
+          id: 11,
+          name: '11月'
+        }, {
+          id: 12,
+          name: '12月'
+        }],
+        projects: []
       }
     },
     methods: {
       init () {
+        this.getAssignedProject()
         // this.ChartInit()
-        this.getPlanInfo().then(res => {
-        })
+        this.getPlanInfo()
       },
       // 获取项目承担的项目列表
       getAssignedProject () {
-      },
-      // 获取项目计划信息
-      getPlanInfo () {
-        const url = getPlanInfo
+        const url = getAssignedProjectPlan
         let params = {
-          title: this.userInfo.title,
-          id: this.userInfo.userID
+          userID: this.userInfo.userID
+
         }
         let _this = this
         return new Promise(function (resolve, reject) {
@@ -47,6 +127,24 @@
               }
             })
         })
+      },
+      // 获取项目计划信息
+      getPlanInfo () {
+        const url = getPlanInfo
+        let params = {
+          title: this.userInfo.title,
+          id: this.userInfo.userID
+        }
+        let _this = this
+        // return new Promise(function (resolve, reject) {
+        //   _this.$http(url, params)
+        //     .then(res => {
+        //       if (res.code === 1) {
+        //         console.log(res.data)
+        //         resolve(res.data)
+        //       }
+        //     })
+        // })
       },
       ChartInit () {
         this.planChart = echarts.init(document.getElementById(this.id))
@@ -299,12 +397,25 @@
             ]
           }]
         })
+      },
+      // 项目类型变化
+      handleProjectTypeChange () {
+        console.log(this.selectProject)
+      },
+      // 表格单元格点击
+      cellClick () {
       }
     },
     components: {
     },
     mounted () {
       this.init()
+    },
+    created () {
+      console.log('PersionPlan create')
+    },
+    destroyed () {
+      console.log('PersionPlan destroyed')
     },
     beforeDestroy () {
       if (!this.planChart) {

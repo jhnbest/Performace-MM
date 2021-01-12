@@ -1,14 +1,14 @@
 <template>
   <div>
     <el-form class="main-search" :inline="true">
-      <el-form-item label="月份选择" prop="title">
+      <el-form-item label="年份选择" prop="title">
         <el-date-picker
           v-model="formData.title"
-          type="month"
-          format="yyyy 第 MM 月"
-          value-format="yyyy-MM"
-          placeholder="选择月"
-          style="width: 150px"
+          type="year"
+          format="yyyy年"
+          value-format="yyyy"
+          placeholder="选择年份"
+          style="width: 120px"
           @change="handelDateChange">
         </el-date-picker>
       </el-form-item>
@@ -39,7 +39,7 @@
                 <PersionPlan v-if="selectPersion === String(item.id)"
                              height="100%"
                              width="100%"
-                             :userInfo="{userID: item.id, title: formData.title}"></PersionPlan>
+                             :userInfo="{userID: item.id, year: formData.title}"></PersionPlan>
               </div>
             </el-tab-pane>
           </el-tabs>
@@ -56,7 +56,7 @@
       data () {
         return {
           formData: {
-            title: this.$moment().format('YYYY-MM'),
+            title: this.$moment().format('YYYY'),
             refreshTabs: true
           },
           tableData: [],

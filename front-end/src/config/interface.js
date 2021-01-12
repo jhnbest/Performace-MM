@@ -50,3 +50,4 @@ export const getAssignWorkDetail = '/workStation/getAssignWorkDetail' // 获取�
 export const submitPersonalProject = '/workStation/submitPersonalProject' // 提交个人申报项目
 export const submitMonthPlanProcess = '/workStation/submitMonthPlanProcess' // 提交计划至计划进展表
 export const getPlanInfo = '/workStation/getPlanInfo' // 获取计划列表
+export const getAssignedProjectPlan = '/workStation/getAssignedProjectPlan' // 获取指派的项目信息(计划查询)

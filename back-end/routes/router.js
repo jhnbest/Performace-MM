@@ -63,5 +63,6 @@ router.post(api.getAssignWorkDetail, workStation.getAssignWorkDetail)
 router.post(api.submitPersonalProject, workStation.submitPersonalProject)
 router.post(api.submitMonthPlanProcess, workStation.submitMonthPlanProcess)
 router.post(api.getPlanInfo, workStation.getPlanInfo)
+router.post(api.getAssignedProjectPlan, workStation.getAssignedProjectPlan)
 
 module.exports = router;
