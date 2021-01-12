@@ -852,7 +852,7 @@ const workStation = {
     getAssignedProjectPlan (req, res) {
         let data = req.body
         let sql = $sql.workStation.assignProjectList
-        let arrayParams = [data.userID]
+        let arrayParams = [data.userID, data.projectType]
         $http.connPool(sql, arrayParams, (err, result) =>{
             if (err) {
                 return $http.writeJson(res, {code: -2, message: '失败', errMsg: err})

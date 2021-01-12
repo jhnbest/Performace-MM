@@ -12,14 +12,17 @@
             border size="mini"
             @cell-click="cellClick"
             highlight-current-row>
-            <el-table-column label="项目名称" align="center" prop="projectName">
+            <el-table-column label="项目名称" align="center" prop="projectName" width="250" show-overflow-tooltip>
               <template slot-scope="scope">
-                <el-select v-model="scope.row.projectName" placeholder="请选择项目">
+                <el-select v-model="scope.row.projectName"
+                           placeholder="请选择项目"
+                           size="medium">
                   <el-option
                     v-for="item in projects"
                     :key="item.id"
                     :label="item.projectName"
-                    :value="item.id">
+                    :value="item.id"
+                    style="max-width: 200px;overflow: hidden">
                   </el-option>
                 </el-select>
               </template>
@@ -43,7 +46,7 @@
     data () {
       return {
         planChart: null,
-        selectProject: '基建类',
+        selectProject: '173',
         ProjectTypes: [{
           id: 173,
           projectType: '基建类'
@@ -63,7 +66,7 @@
           id: 5,
           projectType: '其他非标'
         }],
-        tableData: [],
+        tableData: [{}],
         Months: [{
           id: 1,
           name: '1月'
@@ -114,16 +117,27 @@
       getAssignedProject () {
         const url = getAssignedProjectPlan
         let params = {
-          userID: this.userInfo.userID
-
+          userID: this.userInfo.userID,
+          projectType: Number(this.selectProject)
         }
+        this.projects = []
+        this.tableData = [{}]
         let _this = this
         return new Promise(function (resolve, reject) {
           _this.$http(url, params)
             .then(res => {
               if (res.code === 1) {
-                console.log(res.data)
                 resolve(res.data)
+                console.log(res.data)
+                if (res.data.length !== 0) {
+                  for (let item of res.data) {
+                    let obj = {
+                      id: item.id,
+                      projectName: item.projectName
+                    }
+                    _this.projects.push(obj)
+                  }
+                }
               }
             })
         })
@@ -400,7 +414,7 @@
       },
       // 项目类型变化
       handleProjectTypeChange () {
-        console.log(this.selectProject)
+        this.getAssignedProject()
       },
       // 表格单元格点击
       cellClick () {
@@ -412,10 +426,8 @@
       this.init()
     },
     created () {
-      console.log('PersionPlan create')
     },
     destroyed () {
-      console.log('PersionPlan destroyed')
     },
     beforeDestroy () {
       if (!this.planChart) {
@@ -451,5 +463,4 @@
 </script>
 
 <style scoped>
-
 </style>
