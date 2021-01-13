@@ -27,7 +27,7 @@
                 resizable
                 :span-method="objectSpanMethod"
                 :height="tableMaxHeight">
-        <el-table-column label="项目阶段" align="center" prop="projectStageName" fixed></el-table-column>
+        <el-table-column label="项目阶段" align="center" prop="projectStageName" fixed show-overflow-tooltip></el-table-column>
         <el-table-column label="标准工时" align="center" prop="baseWorkTime" width="50%"></el-table-column>
         <el-table-column label="K值" align="center" prop="kValue" width="50%"></el-table-column>
         <el-table-column label="类型" align="center" prop="type" width="50%">

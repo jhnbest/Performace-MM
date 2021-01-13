@@ -1,10 +1,28 @@
 <template>
   <div>
-    <el-tabs v-model="selectProject" @tab-click="handleProjectTypeChange">
-      <el-tab-pane v-for="projectType in ProjectTypes"
-                   :key="projectType.id"
-                   :name="String(projectType.id)">
-        <span slot="label">{{ projectType.projectType }}</span>
+    <el-tabs v-model="selectProjectType" @tab-click="handleProjectTypeChange" v-if="showFlag.showTabs">
+      <el-tab-pane v-for="projectType in projectTypes"
+                   :key="projectType.projectTypeID"
+                   :name="String(projectType.projectTypeID)">
+        <span slot="label">
+          {{ projectType.projectTypeName }}
+          <el-badge :value="projectType.count" class="item"></el-badge></span>
+        <div>
+          <el-select v-model="seletProject"
+                     placeholder="请选择项目"
+                     size="medium"
+                     clearable
+                     style="width: 100%">
+            <el-option
+              v-for="item in projects"
+              :key="item.id"
+              :label="item.projectName"
+              :value="item.id"
+              style="max-width: 200px;overflow: hidden">
+            </el-option>
+          </el-select>
+        </div>
+        <br>
         <div v-if="true">
           <el-table
             :data="tableData"
@@ -12,21 +30,6 @@
             border size="mini"
             @cell-click="cellClick"
             highlight-current-row>
-            <el-table-column label="项目名称" align="center" prop="projectName" width="250" show-overflow-tooltip>
-              <template slot-scope="scope">
-                <el-select v-model="scope.row.projectName"
-                           placeholder="请选择项目"
-                           size="medium">
-                  <el-option
-                    v-for="item in projects"
-                    :key="item.id"
-                    :label="item.projectName"
-                    :value="item.id"
-                    style="max-width: 200px;overflow: hidden">
-                  </el-option>
-                </el-select>
-              </template>
-            </el-table-column>
             <el-table-column label="项目阶段" align="center" prop="projectStage"></el-table-column>
             <el-table-column label="计划进展" align="center">
               <el-table-column v-for="item in Months" :key="item.id" :label="item.name"></el-table-column>
@@ -46,26 +49,8 @@
     data () {
       return {
         planChart: null,
-        selectProject: '173',
-        ProjectTypes: [{
-          id: 173,
-          projectType: '基建类'
-        }, {
-          id: 172,
-          projectType: '选型类'
-        }, {
-          id: 213,
-          projectType: '基础平台类'
-        }, {
-          id: 249,
-          projectType: '修缮类'
-        }, {
-          id: 4,
-          projectType: '其他标准'
-        }, {
-          id: 5,
-          projectType: '其他非标'
-        }],
+        selectProjectType: '173',
+        projectTypes: [],
         tableData: [{}],
         Months: [{
           id: 1,
@@ -104,21 +89,40 @@
           id: 12,
           name: '12月'
         }],
-        projects: []
+        projects: [],
+        showFlag: {
+          showTabs: true
+        },
+        seletProject: null
       }
     },
     methods: {
+      // 初始化
       init () {
-        this.getAssignedProject()
+        this.getAssignedProject().then(res0 => {
+
+        })
         // this.ChartInit()
         this.getPlanInfo()
+      },
+      // 获取项目类型数组索引
+      getIndexOfProjectType (projectTypeID) {
+        if (this.projectTypes.length === 0) {
+          return -1
+        }
+        for (let i = 0; i < this.projectTypes.length; i++) {
+          if (this.projectTypes[i].projectTypeID === projectTypeID) {
+            return i
+          }
+        }
+        return -1
       },
       // 获取项目承担的项目列表
       getAssignedProject () {
         const url = getAssignedProjectPlan
         let params = {
           userID: this.userInfo.userID,
-          projectType: Number(this.selectProject)
+          year: this.userInfo.year
         }
         this.projects = []
         this.tableData = [{}]
@@ -127,17 +131,21 @@
           _this.$http(url, params)
             .then(res => {
               if (res.code === 1) {
-                resolve(res.data)
-                console.log(res.data)
-                if (res.data.length !== 0) {
-                  for (let item of res.data) {
+                _this.projectTypes = []
+                for (let item of res.data) {
+                  let index = _this.getIndexOfProjectType(item.projectType)
+                  if (index === -1) {
                     let obj = {
-                      id: item.id,
-                      projectName: item.projectName
+                      projectTypeID: item.projectType,
+                      projectTypeName: item.projectTypeName,
+                      count: 1
                     }
-                    _this.projects.push(obj)
+                    _this.projectTypes.push(obj)
+                  } else {
+                    _this.projectTypes[index].count++
                   }
                 }
+                resolve(res.data)
               }
             })
         })
@@ -414,7 +422,7 @@
       },
       // 项目类型变化
       handleProjectTypeChange () {
-        this.getAssignedProject()
+        console.log(this.selectProjectType)
       },
       // 表格单元格点击
       cellClick () {
@@ -423,9 +431,9 @@
     components: {
     },
     mounted () {
-      this.init()
     },
     created () {
+      this.init()
     },
     destroyed () {
     },

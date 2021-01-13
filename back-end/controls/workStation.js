@@ -220,7 +220,7 @@ function getMonthProcess(id, year, preResult, resultData) {
     })
 }
 
-async function getAssignProjectDetail(result, resultData, data, res) {
+async function getAssignProjectDetailMonthProcess(result, resultData, data, res) {
     for (let i = 0; i < result.length; i++) {
         await getMonthProcess(result[i].apdID, data.year, result[i], resultData).then(() => {
             if (i === result.length - 1) {
@@ -228,6 +228,22 @@ async function getAssignProjectDetail(result, resultData, data, res) {
             }
         })
     }
+}
+
+function getAssignProjectDetailOP(data) {
+    return new Promise(function (resolve, reject) {
+        let sql = $sql.workStation.getAssignProjectDetail
+        let arrayParams = [data.id]
+        $http.connPool(sql, arrayParams, (err, result) => {
+            if (err) {
+                reject(err)
+            } else {
+                result = JSON.parse(JSON.stringify(result))
+                resolve(result)
+            }
+        })
+    })
+
 }
 
 async function FGetAssignProjectList (result, res) {
@@ -424,6 +440,49 @@ function updateProjectTotalWorkTime(sql, arrayParams) {
     })
 }
 
+function getAssignedProjects(data) {
+    return new Promise(function (resolve, reject) {
+        let sql = $sql.workStation.assignProjectList
+        let arrayParams = [data.userID]
+        $http.connPool(sql, arrayParams, (err, result) =>{
+            if (err) {
+                reject(err)
+            } else {
+                result = JSON.parse(JSON.stringify(result))
+                resolve(result)
+            }
+        })
+    })
+}
+
+async function getAssignProjectDetailPlan(data) {
+    for (let item of data) {
+        await getAssignProjectDetailOP(item).then(res0 => {
+            item.projectDetail = res0
+        })
+    }
+    return new Promise(function (resolve, reject) {
+        resolve(data)
+    })
+}
+
+async function getAssignProjectMonthProcessPlan(data, year) {
+    for (let item of data) {
+        for (let i = 0; i < item.projectDetail.length; i++) {
+            let resultData = []
+            await getMonthProcess(item.projectDetail[i].id, year, item.projectDetail[i], resultData).then(() => {
+                item.projectDetail[i] = []
+                for (let item1 of resultData) {
+                    item.projectDetail[i].push(item1)
+                }
+            })
+        }
+    }
+    return new Promise(function (resolve, reject) {
+        resolve(data)
+    })
+}
+
 const workStation = {
     // 获取指派任务列表
     getAssignProjectList (req, res) {
@@ -457,22 +516,9 @@ const workStation = {
     getAssignProjectDetail (req, res) {
         $http.userVerify(req, res, () => {
             let data = req.body
-            console.log(data)
-            let sql = $sql.workStation.getAssignProjectDetail
-            let arrayParams = [data.id]
-            $http.connPool(sql, arrayParams, (err, result) => {
-                if (err) {
-                    return $http.writeJson(res, {code: -2, message: '失败', errMsg: err})
-                } else {
-                    let resultData = []
-                    result = JSON.parse(JSON.stringify(result))
-                    console.log(result)
-                    if (result.length === 0) {
-                        return $http.writeJson(res, {code: 1, data: result, message: '成功'})
-                    } else {
-                        getAssignProjectDetail(result, resultData, data, res)
-                    }
-                }
+            getAssignProjectDetailOP(data).then(res0 => {
+                let resultData = []
+                getAssignProjectDetailMonthProcess(res0, resultData, data, res)
             })
         })
     },
@@ -504,7 +550,7 @@ const workStation = {
             })
         })
     },
-    //更新该阶段进展
+    // 更新该阶段进展
     projectStageProcessUpdate (id, process) {
         return new Promise(function (resolve, reject) {
             let sql = $sql.workStation.projectStageProcessInsert
@@ -519,7 +565,7 @@ const workStation = {
             })
         })
     },
-    //保存进展
+    // 保存进展
     saveProcess(data) {
         return new Promise(function (resolve, reject) {
             let sql = null
@@ -560,7 +606,7 @@ const workStation = {
             })
         })
     },
-    //计算项目总进展
+    // 计算项目总进展
     projectProcessCal(params) {
         return new Promise(function (resolve, reject) {
             let sql = $sql.workStation.getProjectStageProcess
@@ -582,7 +628,7 @@ const workStation = {
             })
         })
     },
-    //更新项目总进展
+    // 更新项目总进展
     projectProcessUpdate(id, process) {
         return new Promise(function (resolve, reject) {
             let sql = $sql.workStation.projectProcessUpdate
@@ -849,17 +895,14 @@ const workStation = {
         })
     },
     // 获取指派项目列表(计划查询)
-    getAssignedProjectPlan (req, res) {
+    async getAssignedProjectPlan (req, res) {
         let data = req.body
-        let sql = $sql.workStation.assignProjectList
-        let arrayParams = [data.userID, data.projectType]
-        $http.connPool(sql, arrayParams, (err, result) =>{
-            if (err) {
-                return $http.writeJson(res, {code: -2, message: '失败', errMsg: err})
-            } else {
-                result = JSON.parse(JSON.stringify(result))
-                return $http.writeJson(res, {code: 1, data: result, message: '成功'})
-            }
+        getAssignedProjects(data).then(res0 => { // 获取指派的项目列表
+            getAssignProjectDetailPlan(res0).then(res1 => { // 获取各项目对应的项目阶段
+                getAssignProjectMonthProcessPlan(res1, data.year).then(res2 => { // 获取项目阶段月份进展
+                    return $http.writeJson(res, {code: 1, data: res2, message: '成功'})
+                })
+            })
         })
     }
 }

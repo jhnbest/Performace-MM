@@ -178,7 +178,9 @@ const sqlMap = {
     getMonthProcessByID: 'select * from monthprocess where id = ?',
     getPlanInfo: 'select * from worktimelist where submitID = ? and applyType = "plan" and applyMonth = ?' +
         ' and obsoleteStatus != 1',
-    assignProjectList: 'select * from assignprojectlist where userID = ? and projectType = ? and obsoleteStatus != 1'
+    assignProjectList: 'select apl.*, pjn.projectName as projectTypeName from assignprojectlist apl ' +
+        'left join projecttypenew pjn on apl.projectType = pjn.projectTypeID where apl.userID = ? and ' +
+        'apl.obsoleteStatus != 1'
   }
 }
 module.exports = sqlMap;
