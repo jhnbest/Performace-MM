@@ -470,7 +470,7 @@ async function getAssignProjectMonthProcessPlan(data, year) {
     for (let item of data) {
         for (let i = 0; i < item.projectDetail.length; i++) {
             let resultData = []
-            await getMonthProcess(item.projectDetail[i].id, year, item.projectDetail[i], resultData).then(() => {
+            await getMonthProcess(item.projectDetail[i].id, Number(year), item.projectDetail[i], resultData).then(() => {
                 item.projectDetail[i] = []
                 for (let item1 of resultData) {
                     item.projectDetail[i].push(item1)

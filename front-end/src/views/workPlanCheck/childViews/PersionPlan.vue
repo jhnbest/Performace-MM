@@ -8,17 +8,18 @@
           {{ projectType.projectTypeName }}
           <el-badge :value="projectType.count" class="item"></el-badge></span>
         <div>
-          <el-select v-model="seletProject"
+          <el-select v-model="selectProject"
                      placeholder="请选择项目"
                      size="medium"
                      clearable
-                     style="width: 100%">
+                     style="width: 100%"
+                     @change="handleSelectProjectChange"
+                     filterable>
             <el-option
               v-for="item in projects"
               :key="item.id"
               :label="item.projectName"
-              :value="item.id"
-              style="max-width: 200px;overflow: hidden">
+              :value="item.id">
             </el-option>
           </el-select>
         </div>
@@ -30,9 +31,13 @@
             border size="mini"
             @cell-click="cellClick"
             highlight-current-row>
-            <el-table-column label="项目阶段" align="center" prop="projectStage"></el-table-column>
+            <el-table-column label="项目阶段" align="center" prop="projectStageName" show-overflow-tooltip width="200%"></el-table-column>
             <el-table-column label="计划进展" align="center">
-              <el-table-column v-for="item in Months" :key="item.id" :label="item.name"></el-table-column>
+              <el-table-column
+                v-for="item in Months"
+                :key="item.id"
+                :label="item.name"
+                :prop="item.eName"></el-table-column>
             </el-table-column>
           </el-table>
         </div>
@@ -51,10 +56,11 @@
         planChart: null,
         selectProjectType: '173',
         projectTypes: [],
-        tableData: [{}],
+        tableData: [],
         Months: [{
           id: 1,
-          name: '1月'
+          name: '1月',
+          eName: 'January'
         }, {
           id: 2,
           name: '2月'
@@ -93,7 +99,7 @@
         showFlag: {
           showTabs: true
         },
-        seletProject: null
+        selectProject: null
       }
     },
     methods: {
@@ -117,6 +123,14 @@
         }
         return -1
       },
+      // 获取项目信息数组索引
+      getIndexOfProjects (projectID) {
+        for (let i = 0; i < this.projects.length; i++) {
+          if (this.projects[i].id === projectID) {
+            return i
+          }
+        }
+      },
       // 获取项目承担的项目列表
       getAssignedProject () {
         const url = getAssignedProjectPlan
@@ -125,25 +139,40 @@
           year: this.userInfo.year
         }
         this.projects = []
-        this.tableData = [{}]
+        this.tableData = []
         let _this = this
         return new Promise(function (resolve, reject) {
           _this.$http(url, params)
             .then(res => {
               if (res.code === 1) {
                 _this.projectTypes = []
-                for (let item of res.data) {
-                  let index = _this.getIndexOfProjectType(item.projectType)
-                  if (index === -1) {
-                    let obj = {
-                      projectTypeID: item.projectType,
-                      projectTypeName: item.projectTypeName,
-                      count: 1
+                if (res.data.length > 0) {
+                  _this.selectProjectType = String(res.data[0].projectType)
+                  for (let item of res.data) {
+                    let index = _this.getIndexOfProjectType(item.projectType)
+                    if (index === -1) {
+                      let obj = {
+                        projectTypeID: item.projectType,
+                        projectTypeName: item.projectTypeName,
+                        count: 1,
+                        projects: []
+                      }
+                      _this.projectTypes.push(obj)
+                      let length = _this.projectTypes.length
+                      _this.projectTypes[length - 1].projects.push(item)
+                    } else {
+                      _this.projectTypes[index].count++
+                      _this.projectTypes[index].projects.push(item)
                     }
-                    _this.projectTypes.push(obj)
-                  } else {
-                    _this.projectTypes[index].count++
                   }
+                  _this.projects = _this.projectTypes[0].projects
+                  _this.selectProject = _this.projectTypes[0].projects[0].id
+                  for (let projectDetail of _this.projectTypes[0].projects[0].projectDetail) {
+                    _this.tableData.push(projectDetail[0])
+                  }
+                  console.log(_this.projectTypes)
+                  console.log('tableData')
+                  console.log(_this.tableData)
                 }
                 resolve(res.data)
               }
@@ -422,10 +451,28 @@
       },
       // 项目类型变化
       handleProjectTypeChange () {
-        console.log(this.selectProjectType)
+        let index = this.getIndexOfProjectType(Number(this.selectProjectType))
+        this.projects = this.projectTypes[index].projects
+        this.selectProject = this.projectTypes[index].projects[0].id
+        this.tableData = []
+        for (let projectDetail of this.projectTypes[index].projects[0].projectDetail) {
+          this.tableData.push(projectDetail[0])
+        }
       },
       // 表格单元格点击
       cellClick () {
+      },
+      // 选择项目
+      handleSelectProjectChange () {
+        if (this.selectProject) {
+          this.tableData = []
+          console.log(this.selectProject)
+          let index = this.getIndexOfProjects(this.selectProject)
+          for (let projectStage of this.projects[index].projectDetail) {
+            this.tableData.push(projectStage[0])
+          }
+          console.log(this.tableData)
+        }
       }
     },
     components: {
