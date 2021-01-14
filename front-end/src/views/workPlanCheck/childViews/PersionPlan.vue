@@ -24,7 +24,7 @@
           </el-select>
         </div>
         <br>
-        <div v-if="true">
+        <div>
           <el-table
             :data="tableData"
             style="margin: auto"
@@ -37,11 +37,15 @@
                 v-for="item in Months"
                 :key="item.id"
                 :label="item.name"
-                :prop="item.eName"></el-table-column>
+                align="center"
+                :prop="item.eName">
+                <template slot-scope="scope">
+                  <span v-if="scope.row[item.eName] !== null">{{scope.row[item.eName] + '%'}}</span>
+                </template>
+              </el-table-column>
             </el-table-column>
           </el-table>
         </div>
-        <div v-else :id="id" :class="className" :style="{height: height, width: width}"></div>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -63,37 +67,48 @@
           eName: 'January'
         }, {
           id: 2,
-          name: '2月'
+          name: '2月',
+          eName: 'February'
         }, {
           id: 3,
-          name: '3月'
+          name: '3月',
+          eName: 'March'
         }, {
           id: 4,
-          name: '4月'
+          name: '4月',
+          eName: 'April'
         }, {
           id: 5,
-          name: '5月'
+          name: '5月',
+          eName: 'May'
         }, {
           id: 6,
-          name: '6月'
+          name: '6月',
+          eName: 'June'
         }, {
           id: 7,
-          name: '7月'
+          name: '7月',
+          eName: 'July'
         }, {
           id: 8,
-          name: '8月'
+          name: '8月',
+          eName: 'August'
         }, {
           id: 9,
-          name: '9月'
+          name: '9月',
+          eName: 'September'
         }, {
           id: 10,
-          name: '10月'
+          name: '10月',
+          eName: 'October'
         }, {
           id: 11,
-          name: '11月'
+          name: '11月',
+          eName: 'November'
         }, {
           id: 12,
-          name: '12月'
+          name: '12月',
+          eName: 'December'
         }],
         projects: [],
         showFlag: {

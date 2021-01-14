@@ -3,8 +3,12 @@
     <div style="text-align: center">
       <el-row :gutter="10">
         <el-col :span="8" :offset="7">
-          <h3 style="color: red;font-size: 25px">{{formData.yearNum + '年 '}}
-            <span style="color: black;font-size: 20px">{{formData.projectName  + '计划&实际进展填报'}}</span></h3>
+          <el-row>
+            <el-button icon="el-icon-minus" circle size="mini"></el-button>
+            {{ formData.yearNum + '年' }}
+            <el-button icon="el-icon-plus" circle size="mini"></el-button>
+            <span style="color: black;font-size: 20px">{{formData.projectName  + '计划&实际进展填报'}}</span>
+          </el-row>
         </el-col>
         <el-col :span="1" :offset="1">
           <el-button style="margin-top: 17px" size="medium" type="warning" @click="genWorkTimePlanApply">生成项目计划</el-button>

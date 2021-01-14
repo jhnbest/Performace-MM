@@ -246,6 +246,17 @@ function getAssignProjectDetailOP(data) {
 
 }
 
+async function getAssignProjectDetailPlan(data) {
+    for (let item of data) {
+        await getAssignProjectDetailOP(item).then(res0 => {
+            item.projectDetail = res0
+        })
+    }
+    return new Promise(function (resolve, reject) {
+        resolve(data)
+    })
+}
+
 async function FGetAssignProjectList (result, res) {
     for (let i = 0; i < result.length; i++) {
         await $user.getUserNameByID(result[i].assignerID).then(res1 => {
@@ -455,22 +466,11 @@ function getAssignedProjects(data) {
     })
 }
 
-async function getAssignProjectDetailPlan(data) {
-    for (let item of data) {
-        await getAssignProjectDetailOP(item).then(res0 => {
-            item.projectDetail = res0
-        })
-    }
-    return new Promise(function (resolve, reject) {
-        resolve(data)
-    })
-}
-
 async function getAssignProjectMonthProcessPlan(data, year) {
     for (let item of data) {
         for (let i = 0; i < item.projectDetail.length; i++) {
             let resultData = []
-            await getMonthProcess(item.projectDetail[i].id, Number(year), item.projectDetail[i], resultData).then(() => {
+            await getMonthProcess(item.projectDetail[i].apdID, Number(year), item.projectDetail[i], resultData).then(() => {
                 item.projectDetail[i] = []
                 for (let item1 of resultData) {
                     item.projectDetail[i].push(item1)
