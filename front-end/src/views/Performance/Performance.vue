@@ -1,7 +1,8 @@
 <template>
   <div>
     <el-form class="main-search" :inline="true">
-      <el-form-item label="申报月份" prop="title">
+      <el-form-item label="申报月份：" prop="title">
+        <el-button size="mini" type="danger" style="margin-right: 10px" @click="handlePreMonth">上月</el-button>
         <el-date-picker
           v-model="formData.title"
           type="month"
@@ -12,6 +13,7 @@
           style="width: 150px"
           @change="handelDateChange">
         </el-date-picker>
+        <el-button size="mini" type="primary" style="margin-left: 10px" @click="handleNextMonth">下月</el-button>
       </el-form-item>
       <el-form-item style="margin-left: 30px">
         <span v-if="formData.selectType === '工时查询'" style="font-size: 21px;font-weight: bold">本月实际获得工时:
@@ -108,7 +110,7 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="获得工时" align="center" prop="assignWorkTime"  width="100%"></el-table-column>
+        <el-table-column label="获得工时" align="center" prop="assignWorkTime" width="100%"></el-table-column>
         <el-table-column label="操作" align="center" width="250%">
           <template slot-scope="scope">
             <el-button :disabled="scope.row.submitStatus === 1 || ((scope.row.reviewStatus === 1)) || isAssginer(scope.row.submitID)"
@@ -203,7 +205,8 @@
             deleteProject: true,
             complete: true,
             getWorkTimeAssign: true,
-            getGroupWorkTimeList: true
+            getGroupWorkTimeList: true,
+            getAssignWorkTimes: true
           },
           pageNum: 1, // 请求第几页
           pageSize: this.$store.state.pageSize, // 每页请求多少条
@@ -215,7 +218,8 @@
           },
           workDetailTable: [],
           workPlanTableData: [],
-          planGetWorkTime: 0
+          planGetWorkTime: 0,
+          getTotalFinish: false
         }
       },
       methods: {
@@ -432,11 +436,12 @@
         },
         getAssignWorkTimesOP () {
         },
-        getAssignWorkTimes (data) {
+        async getAssignWorkTimes (data) {
           const url = getAssignWorkTime
           let i = 0
           this.formData.totalWorkTime = 0
           if (data.length !== 0) {
+            this.getTotalFinish = false
             for (let item of data) {
               if (item.reviewStatus === 1) {
                 let params = {
@@ -663,6 +668,16 @@
                 this.reqFlag.getGroupWorkTimeList = true
               })
           }
+        },
+        // 上一月
+        handlePreMonth () {
+          this.formData.title = this.$moment(this.formData.title).subtract(1, 'months').format('YYYY-MM')
+          this.handelDateChange()
+        },
+        // 下一月
+        handleNextMonth () {
+          this.formData.title = this.$moment(this.formData.title).add(1, 'months').format('YYYY-MM')
+          this.handelDateChange()
         }
       },
       computed: {
@@ -701,6 +716,13 @@
             } else {
               return true
             }
+          }
+        },
+        GETTOTALWORKTIME () {
+          if (this.getTotalFinish) {
+            return this.formData.totalWorkTime
+          } else {
+            return 0
           }
         }
       },

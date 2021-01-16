@@ -1,18 +1,20 @@
 <template>
   <div>
     <el-form class="main-search" :inline="true">
-      <el-form-item label="年份选择" prop="title">
+      <el-form-item label="年份选择：" prop="title">
+        <el-button size="mini" type="danger" style="margin-right: 10px" @click="handlePreYear">去年</el-button>
         <el-date-picker
           v-model="formData.title"
           type="year"
           format="yyyy年"
           value-format="yyyy"
           placeholder="选择年份"
-          style="width: 120px"
+          style="width: 110px"
           @change="handelDateChange">
         </el-date-picker>
+        <el-button size="mini" type="primary" style="margin-left: 10px" @click="handleNextYear">明年</el-button>
       </el-form-item>
-      <el-form-item label="计划类型" style="margin-left: 10px">
+      <el-form-item label="计划类型：" style="margin-left: 10px">
         <el-radio-group v-model="selectPlanType" @change="handleSelectTypeChange">
           <el-radio-button label="月度计划"></el-radio-button>
           <el-radio-button label="年度计划"></el-radio-button>
@@ -34,13 +36,12 @@
               v-for="item in groupUser.childUsers"
               :key="item.id"
               :name="String(item.id)">
-              <span slot="label">{{item.name}}</span>
-              <div class="chart-container">
+                <span slot="label">{{item.name}}</span>
                 <PersionPlan v-if="selectPersion === String(item.id)"
                              height="100%"
                              width="100%"
+                             ref="childPersionPlan"
                              :userInfo="{userID: item.id, year: formData.title}"></PersionPlan>
-              </div>
             </el-tab-pane>
           </el-tabs>
         </el-tab-pane>
@@ -70,10 +71,14 @@
         }
       },
       methods: {
+        // 初始化
         init () {
           this.getGroupUsers()
         },
         handelDateChange () {
+          this.$refs.childPersionPlan[0].getAssignedProject(this.formData.title).then(() => {
+            this.$refs.childPersionPlan[0].handleProjectTypeChange()
+          })
         },
         // 计划选择
         handleSelectTypeChange () {
@@ -132,13 +137,22 @@
                         it.groupUsers[index].childUsers.push(obj)
                       }
                     }
-                    console.log(it.groupUsers)
                     resolve(it.groupUsers)
                   }
                   it.reqFlag.getGroupUsers = true
                 })
             }
           })
+        },
+        // 去年
+        handlePreYear () {
+          this.formData.title = this.$moment(this.formData.title).subtract(1, 'year').format('YYYY')
+          this.handelDateChange()
+        },
+        // 明年
+        handleNextYear () {
+          this.formData.title = this.$moment(this.formData.title).add(1, 'year').format('YYYY')
+          this.handelDateChange()
         }
       },
       created () {

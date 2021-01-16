@@ -2,25 +2,48 @@
   <div style="margin: 15px">
     <div style="text-align: center">
       <el-row :gutter="10">
-        <el-col :span="8" :offset="7">
+        <el-col :span="10" :offset="5">
           <el-row>
-            <el-button icon="el-icon-minus" circle size="mini"></el-button>
-            {{ formData.yearNum + '年' }}
-            <el-button icon="el-icon-plus" circle size="mini"></el-button>
-            <span style="color: black;font-size: 20px">{{formData.projectName  + '计划&实际进展填报'}}</span>
+            <el-col :span="2">
+              <el-button icon="el-icon-minus"
+                         circle
+                         size="mini"
+                         type="danger"
+                         style="margin-top: 4px"
+                         @click="handleDecYear"
+                         :disabled="!this.reqFlag.getAssignProjectDetail"></el-button>
+            </el-col>
+            <el-col :span="5">
+              <span style="font-size: 25px;color: red;font-weight: bolder">{{ formData.yearNum + '年' }}</span>
+            </el-col>
+            <el-col :span="2">
+              <el-button icon="el-icon-plus"
+                         circle
+                         size="mini"
+                         type="primary"
+                         style="margin-top: 4px"
+                         @click="handleAddYear"
+                         :disabled="!this.reqFlag.getAssignProjectDetail"></el-button>
+            </el-col>
+            <el-col :span="15">
+              <div>
+                <span style="font-size: 23px">{{formData.projectName  + '计划&实际进展填报'}}</span>
+              </div>
+            </el-col>
           </el-row>
         </el-col>
         <el-col :span="1" :offset="1">
-          <el-button style="margin-top: 17px" size="medium" type="warning" @click="genWorkTimePlanApply">生成项目计划</el-button>
+          <el-button style="margin-top: 8px" size="medium" type="warning" @click="genWorkTimePlanApply">生成项目计划</el-button>
         </el-col>
         <el-col :span="1" :offset="2">
-          <el-button style="margin-top: 17px" size="medium" type="success" @click="genWorkTimeApply">生成工时申报</el-button>
+          <el-button style="margin-top: 8px" size="medium" type="primary" @click="genWorkTimeApply">生成工时申报</el-button>
         </el-col>
         <el-col :span="1" :offset="2">
-          <el-button style="margin-top: 17px" size="medium" type="danger" @click="handleBack">返回</el-button>
+          <el-button style="margin-top: 8px" size="medium" type="danger" @click="handleBack">返回</el-button>
         </el-col>
       </el-row>
     </div>
+    <br>
     <!-----------------------------------------------------主表格----------------------------------------------------------->
     <el-form ref="formData" :model="formData" :rules="formRules">
       <el-table v-loading="!reqFlag.getAssignProjectDetail"
@@ -40,11 +63,6 @@
           </template>
         </el-table-column>
         <el-table-column label="项目进度" align="center">
-          <el-table-column align="center" width="40%">
-            <template slot="header">
-              <span class="link-type" @click="handleDecYear">&lt;&lt;</span>
-            </template>
-          </el-table-column>
           <el-table-column label="1月" align="center" width="73%">
             <template slot-scope="scope">
               <el-input v-if="scope.row.editable" v-model.number="scope.row.January" size="mini" type="number"></el-input>
@@ -127,11 +145,6 @@
               <el-input v-if="scope.row.editable" v-model.number="scope.row.December" size="mini" type="number"></el-input>
               <span v-else>{{scope.row.December}}</span>
               <span v-if="!scope.row.editable && scope.row.December !== null && scope.row.December !== ''">%</span>
-            </template>
-          </el-table-column>
-          <el-table-column align="center" width="40%">
-            <template slot="header">
-              <span class="link-type" @click="handleAddYear">&gt;&gt;</span>
             </template>
           </el-table-column>
         </el-table-column>
@@ -666,7 +679,7 @@
       },
       computed: {
         tableMaxHeight () {
-          return window.innerHeight - 150 + 'px'
+          return window.innerHeight - 160 + 'px'
         },
         totalGetWorkTime () {
           let total = 0

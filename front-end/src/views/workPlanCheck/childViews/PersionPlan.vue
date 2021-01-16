@@ -4,8 +4,7 @@
       <el-tab-pane v-for="projectType in projectTypes"
                    :key="projectType.projectTypeID"
                    :name="String(projectType.projectTypeID)">
-        <span slot="label">
-          {{ projectType.projectTypeName }}
+        <span slot="label"> {{ projectType.projectTypeName }}
           <el-badge :value="projectType.count" class="item"></el-badge></span>
         <div>
           <el-select v-model="selectProject"
@@ -31,14 +30,14 @@
             border size="mini"
             @cell-click="cellClick"
             highlight-current-row>
-            <el-table-column label="项目阶段" align="center" prop="projectStageName" show-overflow-tooltip width="200%"></el-table-column>
+            <el-table-column label="项目阶段" align="center" prop="projectStageName" show-overflow-tooltip></el-table-column>
             <el-table-column label="计划进展" align="center">
               <el-table-column
                 v-for="item in Months"
                 :key="item.id"
                 :label="item.name"
                 align="center"
-                :prop="item.eName">
+                :prop="item.eName" width="70%">
                 <template slot-scope="scope">
                   <span v-if="scope.row[item.eName] !== null">{{scope.row[item.eName] + '%'}}</span>
                 </template>
@@ -58,7 +57,7 @@
     data () {
       return {
         planChart: null,
-        selectProjectType: '173',
+        selectProjectType: null,
         projectTypes: [],
         tableData: [],
         Months: [{
@@ -120,11 +119,8 @@
     methods: {
       // 初始化
       init () {
-        this.getAssignedProject().then(res0 => {
-
-        })
+        this.getAssignedProject(this.userInfo.year).then()
         // this.ChartInit()
-        this.getPlanInfo()
       },
       // 获取项目类型数组索引
       getIndexOfProjectType (projectTypeID) {
@@ -147,22 +143,22 @@
         }
       },
       // 获取项目承担的项目列表
-      getAssignedProject () {
+      getAssignedProject (year) {
         const url = getAssignedProjectPlan
         let params = {
           userID: this.userInfo.userID,
-          year: this.userInfo.year
+          year: year
         }
         this.projects = []
         this.tableData = []
+        this.projectTypes = []
         let _this = this
         return new Promise(function (resolve, reject) {
           _this.$http(url, params)
             .then(res => {
               if (res.code === 1) {
-                _this.projectTypes = []
                 if (res.data.length > 0) {
-                  _this.selectProjectType = String(res.data[0].projectType)
+                  // _this.selectProjectType = String(res.data[0].projectType)
                   for (let item of res.data) {
                     let index = _this.getIndexOfProjectType(item.projectType)
                     if (index === -1) {
@@ -180,14 +176,11 @@
                       _this.projectTypes[index].projects.push(item)
                     }
                   }
-                  _this.projects = _this.projectTypes[0].projects
-                  _this.selectProject = _this.projectTypes[0].projects[0].id
-                  for (let projectDetail of _this.projectTypes[0].projects[0].projectDetail) {
-                    _this.tableData.push(projectDetail[0])
-                  }
-                  console.log(_this.projectTypes)
-                  console.log('tableData')
-                  console.log(_this.tableData)
+                  // _this.projects = _this.projectTypes[0].projects
+                  // _this.selectProject = _this.projectTypes[0].projects[0].id
+                  // for (let projectDetail of _this.projectTypes[0].projects[0].projectDetail) {
+                  //   _this.tableData.push(projectDetail[0])
+                  // }
                 }
                 resolve(res.data)
               }
@@ -196,21 +189,6 @@
       },
       // 获取项目计划信息
       getPlanInfo () {
-        const url = getPlanInfo
-        let params = {
-          title: this.userInfo.title,
-          id: this.userInfo.userID
-        }
-        let _this = this
-        // return new Promise(function (resolve, reject) {
-        //   _this.$http(url, params)
-        //     .then(res => {
-        //       if (res.code === 1) {
-        //         console.log(res.data)
-        //         resolve(res.data)
-        //       }
-        //     })
-        // })
       },
       ChartInit () {
         this.planChart = echarts.init(document.getElementById(this.id))
@@ -481,12 +459,10 @@
       handleSelectProjectChange () {
         if (this.selectProject) {
           this.tableData = []
-          console.log(this.selectProject)
           let index = this.getIndexOfProjects(this.selectProject)
           for (let projectStage of this.projects[index].projectDetail) {
             this.tableData.push(projectStage[0])
           }
-          console.log(this.tableData)
         }
       }
     },

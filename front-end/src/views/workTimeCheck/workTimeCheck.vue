@@ -1,7 +1,8 @@
 <template>
   <div>
     <el-form class="main-search" :inline="true">
-      <el-form-item label="申报月份" prop="title">
+      <el-form-item label="申报月份：" prop="title">
+        <el-button size="mini" type="danger" style="margin-right: 10px" @click="handlePreMonth">上月</el-button>
         <el-date-picker
           v-model="formData.title"
           type="month"
@@ -11,6 +12,7 @@
           style="width: 150px"
           @change="handelDateChange">
         </el-date-picker>
+        <el-button size="mini" type="primary" style="margin-left: 10px" @click="handleNextMonth">下月</el-button>
       </el-form-item>
     </el-form>
     <!-- 分割线 start -->
@@ -199,6 +201,16 @@
             }
           }
         }
+      },
+      // 上一月
+      handlePreMonth () {
+        this.formData.title = this.$moment(this.formData.title).subtract(1, 'months').format('YYYY-MM')
+        this.handelDateChange()
+      },
+      // 下一月
+      handleNextMonth () {
+        this.formData.title = this.$moment(this.formData.title).add(1, 'months').format('YYYY-MM')
+        this.handelDateChange()
       }
     },
     created () {
