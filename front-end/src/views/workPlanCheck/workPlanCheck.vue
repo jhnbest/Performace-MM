@@ -77,7 +77,7 @@
         },
         handelDateChange () {
           this.$refs.childPersionPlan[0].getAssignedProject(this.formData.title).then(() => {
-            this.$refs.childPersionPlan[0].handleProjectTypeChange()
+            this.$refs.childPersionPlan[0].handleYearChange()
           })
         },
         // 计划选择

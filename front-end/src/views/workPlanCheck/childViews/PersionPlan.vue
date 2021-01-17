@@ -3,7 +3,7 @@
     <el-tabs v-model="selectProjectType" @tab-click="handleProjectTypeChange" v-if="showFlag.showTabs">
       <el-tab-pane v-for="projectType in projectTypes"
                    :key="projectType.projectTypeID"
-                   :name="String(projectType.projectTypeID)">
+                   :name="String(projectType.projectTypeID)" :lazy="true">
         <span slot="label"> {{ projectType.projectTypeName }}
           <el-badge :value="projectType.count" class="item"></el-badge></span>
         <div>
@@ -45,6 +45,8 @@
             </el-table-column>
           </el-table>
         </div>
+        <br>
+        <planChart v-if="selectProjectType === String(projectType.projectTypeID)" height="100%" width="100%"></planChart>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -52,6 +54,7 @@
 
 <script>
   import echarts from 'echarts'
+  import planChart from './planChart'
   import { getPlanInfo, getAssignedProjectPlan } from '@/config/interface'
   export default {
     data () {
@@ -111,7 +114,8 @@
         }],
         projects: [],
         showFlag: {
-          showTabs: true
+          showTabs: true,
+          planChartShow: true
         },
         selectProject: null
       }
@@ -119,8 +123,9 @@
     methods: {
       // 初始化
       init () {
-        this.getAssignedProject(this.userInfo.year).then()
-        // this.ChartInit()
+        console.log('init')
+        this.getAssignedProject(this.userInfo.year).then(() => {
+        })
       },
       // 获取项目类型数组索引
       getIndexOfProjectType (projectTypeID) {
@@ -141,6 +146,19 @@
             return i
           }
         }
+      },
+      // 获取选择项目的数组索引
+      getSelectProjectIndex (projectTypeIndex, selectProject) {
+        if (this.projectTypes[projectTypeIndex].projects.length === 0) {
+          console.log('err')
+          return -1
+        }
+        for (let i = 0; i < this.projectTypes[projectTypeIndex].projects.length; i++) {
+          if (selectProject === this.projectTypes[projectTypeIndex].projects[i].id) {
+            return i
+          }
+        }
+        return -1
       },
       // 获取项目承担的项目列表
       getAssignedProject (year) {
@@ -190,257 +208,12 @@
       // 获取项目计划信息
       getPlanInfo () {
       },
-      ChartInit () {
-        this.planChart = echarts.init(document.getElementById(this.id))
-        const xData = (function () {
-          const data = []
-          for (let i = 0; i < 12; i++) {
-            data.push(i + 1 + '月')
-          }
-          return data
-        }())
-        this.planChart.setOption({
-          backgroundColor: '#344b58',
-          title: {
-            text: 'statistics',
-            x: '20',
-            top: '20',
-            textStyle: {
-              color: '#fff',
-              fontSize: '22'
-            },
-            subtextStyle: {
-              color: '#90979c',
-              fontSize: '16'
-            }
-          },
-          tooltip: {
-            trigger: 'axis',
-            axisPointer: {
-              textStyle: {
-                color: '#fff'
-              },
-              type: 'shadow'
-            }
-          },
-          grid: {
-            left: '5%',
-            right: '5%',
-            borderWidth: 0,
-            top: 150,
-            bottom: 95,
-            textStyle: {
-              color: '#fff'
-            }
-          },
-          legend: {
-            x: '5%',
-            top: '10%',
-            textStyle: {
-              color: '#90979c'
-            },
-            data: ['female', 'male', 'average', 'ffmale']
-          },
-          calculable: true,
-          xAxis: [{
-            type: 'category',
-            axisLine: {
-              lineStyle: {
-                color: '#90979c'
-              }
-            },
-            splitLine: {
-              show: false
-            },
-            axisTick: {
-              show: false
-            },
-            splitArea: {
-              show: false
-            },
-            axisLabel: {
-              interval: 0
-
-            },
-            data: xData
-          }],
-          yAxis: [{
-            type: 'value',
-            splitLine: {
-              show: false
-            },
-            axisLine: {
-              lineStyle: {
-                color: '#90979c'
-              }
-            },
-            axisTick: {
-              show: false
-            },
-            axisLabel: {
-              interval: 0
-            },
-            splitArea: {
-              show: false
-            }
-          }],
-          dataZoom: [{
-            show: true,
-            height: 30,
-            xAxisIndex: [
-              0
-            ],
-            bottom: 30,
-            start: 10,
-            end: 80,
-            handleIcon: 'path://M306.1,413c0,2.2-1.8,4-4,4h-59.8c-2.2,0-4-1.8-4-4V200.8c0-2.2,1.8-4,4-4h59.8c2.2,0,4,1.8,4,4V413z',
-            handleSize: '110%',
-            handleStyle: {
-              color: '#d3dee5'
-
-            },
-            textStyle: {
-              color: '#fff' },
-            borderColor: '#90979c'
-          }, {
-            type: 'inside',
-            show: true,
-            height: 15,
-            start: 1,
-            end: 35
-          }],
-          series: [{
-            name: 'female',
-            type: 'bar',
-            stack: 'total',
-            barMaxWidth: 35,
-            barGap: '10%',
-            itemStyle: {
-              normal: {
-                color: 'rgba(255,144,128,1)',
-                label: {
-                  show: true,
-                  textStyle: {
-                    color: '#fff'
-                  },
-                  position: 'insideTop',
-                  formatter (p) {
-                    return p.value > 0 ? p.value : ''
-                  }
-                }
-              }
-            },
-            data: [
-              709,
-              1917,
-              2455,
-              2610,
-              1719,
-              1433,
-              1544,
-              3285,
-              5208,
-              3372,
-              2484,
-              4078
-            ]
-          }, {
-            name: 'male',
-            type: 'bar',
-            stack: 'total',
-            itemStyle: {
-              normal: {
-                color: 'rgba(0,191,183,1)',
-                barBorderRadius: 0,
-                label: {
-                  show: true,
-                  position: 'insideTop',
-                  formatter (p) {
-                    return p.value > 0 ? p.value : ''
-                  }
-                }
-              }
-            },
-            data: [
-              0,
-              1776,
-              507,
-              1200,
-              800,
-              482,
-              204,
-              1390,
-              1001,
-              951,
-              381,
-              220
-            ]
-          }, {
-            name: 'average',
-            type: 'line',
-            stack: 'total',
-            symbolSize: 10,
-            symbol: 'circle',
-            itemStyle: {
-              normal: {
-                color: 'rgba(252,230,48,1)',
-                barBorderRadius: 0,
-                label: {
-                  show: true,
-                  position: 'top',
-                  formatter (p) {
-                    return p.value > 0 ? p.value : ''
-                  }
-                }
-              }
-            },
-            data: [
-              1036,
-              3693,
-              2962,
-              3810,
-              2519,
-              1915,
-              1748,
-              4675,
-              6209,
-              4323,
-              2865,
-              4298
-            ]
-          }, {
-            name: 'ffmale',
-            type: 'bar',
-            stack: 'total',
-            itemStyle: {
-              normal: {
-                color: 'rgb(126,45,177)',
-                barBorderRadius: 0,
-                label: {
-                  show: true,
-                  position: 'insideTop',
-                  formatter (p) {
-                    return p.value > 0 ? p.value : ''
-                  }
-                }
-              }
-            },
-            data: [
-              0,
-              1776,
-              507,
-              1200,
-              800,
-              482,
-              204,
-              1390,
-              1001,
-              951,
-              381,
-              220
-            ]
-          }]
-        })
+      // 更新图表
+      refreshPlanChart () {
+        this.showFlag.planChartShow = false
+        setTimeout(() => {
+          this.showFlag.planChartShow = true
+        }, this.$store.state.refreshInterval)
       },
       // 项目类型变化
       handleProjectTypeChange () {
@@ -449,6 +222,16 @@
         this.selectProject = this.projectTypes[index].projects[0].id
         this.tableData = []
         for (let projectDetail of this.projectTypes[index].projects[0].projectDetail) {
+          this.tableData.push(projectDetail[0])
+        }
+      },
+      // 年份变化调用
+      handleYearChange () {
+        let index = this.getIndexOfProjectType(Number(this.selectProjectType))
+        this.projects = this.projectTypes[index].projects
+        let selectProjectIndex = this.getSelectProjectIndex(index, this.selectProject)
+        this.tableData = []
+        for (let projectDetail of this.projectTypes[index].projects[selectProjectIndex].projectDetail) {
           this.tableData.push(projectDetail[0])
         }
       },
@@ -464,9 +247,20 @@
             this.tableData.push(projectStage[0])
           }
         }
+      },
+      // 销毁图表
+      destroyPlanChart () {
+        console.log('destroy')
+        if (!this.planChart) {
+          console.log('planChart not exist!')
+          return
+        }
+        this.planChart.dispose()
+        this.planChart = null
       }
     },
     components: {
+      planChart
     },
     mounted () {
     },
