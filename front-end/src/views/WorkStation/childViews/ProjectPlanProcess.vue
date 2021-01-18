@@ -27,7 +27,7 @@
             </el-col>
             <el-col :span="15">
               <div>
-                <span style="font-size: 23px">{{formData.projectName  + '计划&实际进展填报'}}</span>
+                <span style="font-size: 22px">{{formData.projectName  + '计划&实际进展填报'}}</span>
               </div>
             </el-col>
           </el-row>
@@ -275,7 +275,6 @@
     workTimeSubmit
   } from '@/config/interface'
   import Assign from '@/components/Cop/workTimeAssign'
-
   export default {
       data () {
         return {
@@ -686,6 +685,7 @@
           for (let item of this.applyMonthPlanProcessTableData) {
             total += item.avaiableWorkTime
           }
+          total = Number(total.toFixed(2))
           return total
         }
       },

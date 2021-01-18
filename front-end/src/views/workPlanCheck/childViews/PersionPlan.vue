@@ -46,7 +46,13 @@
           </el-table>
         </div>
         <br>
-        <planChart v-if="selectProjectType === String(projectType.projectTypeID)" height="100%" width="100%"></planChart>
+        <div class="chart-container">
+          <planChart v-if="selectProjectType === String(projectType.projectTypeID)"
+                     height="100%"
+                     width="100%"
+                     ref="planChart"
+                     :title=" projects[0]? projects[0].name : ' '"></planChart>
+        </div>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -215,11 +221,82 @@
           this.showFlag.planChartShow = true
         }, this.$store.state.refreshInterval)
       },
+      // 获取项目每月预计获得工时
+      getPlanGetWorkTime (data) {
+        let planGetWorkTime = []
+        let totalProcess = []
+        let projectDetailNum = data.projectDetail.length
+        // let unusedProjectDetailNum = 0
+        // for (let projectDetailItem of data.projectDetail) {
+        //   let count = 0
+        //   for (let i = 0; i < this.Months.length; i++) {
+        //     let MonthProcess = projectDetailItem[0][this.Months[i].eName]
+        //     if (!MonthProcess) {
+        //       count++
+        //     }
+        //   }
+        //   if (count === this.Months.length) {
+        //     unusedProjectDetailNum++
+        //   }
+        // }
+        // projectDetailNum -= unusedProjectDetailNum
+        for (let projectDetailItem of data.projectDetail) {
+          for (let i = 0; i < this.Months.length; i++) {
+            // console.log(projectDetailItem[0][this.Months[i].eName])
+            let getWorkTime = 0
+            let MonthProcess = projectDetailItem[0][this.Months[i].eName]
+            let baseWorkTime = projectDetailItem[0].baseWorkTime
+            let kValue = projectDetailItem[0].kValue
+            let curMonthProcess = 0
+            if (MonthProcess) {
+              if (i !== 0) {
+                let preMonthProcess = projectDetailItem[0][this.Months[i - 1].eName]
+                getWorkTime = (MonthProcess - preMonthProcess) * baseWorkTime * kValue * 0.01
+                curMonthProcess = (MonthProcess - preMonthProcess) * (1 / projectDetailNum)
+              } else {
+                getWorkTime = MonthProcess * baseWorkTime * kValue * 0.01
+                curMonthProcess = MonthProcess * (1 / projectDetailNum)
+              }
+            }
+            if (planGetWorkTime[i] || planGetWorkTime[i] === 0) {
+              planGetWorkTime[i] += getWorkTime
+              planGetWorkTime[i] = Number(planGetWorkTime[i].toFixed(2))
+            } else {
+              planGetWorkTime.push(getWorkTime)
+            }
+            if (totalProcess[i] || totalProcess[i] === 0) {
+              totalProcess[i] += curMonthProcess
+            } else {
+              totalProcess.push(curMonthProcess)
+            }
+          }
+        }
+        totalProcess[0] = Number(totalProcess[0].toFixed(1))
+        for (let i = 1; i < totalProcess.length; i++) {
+          totalProcess[i] += totalProcess[i - 1]
+          totalProcess[i] = Number(totalProcess[i].toFixed(1))
+          if (totalProcess[i] > 100) {
+            totalProcess[i] = 100
+          }
+        }
+        let obj = {
+          planGetWorkTime: planGetWorkTime,
+          totalProcess: totalProcess
+        }
+        console.log(obj)
+        return obj
+      },
       // 项目类型变化
       handleProjectTypeChange () {
         let index = this.getIndexOfProjectType(Number(this.selectProjectType))
         this.projects = this.projectTypes[index].projects
         this.selectProject = this.projectTypes[index].projects[0].id
+        let result = this.getPlanGetWorkTime(this.projectTypes[index].projects[0])
+        this.$nextTick(() => {
+          this.$refs.planChart[0].updatePlanGetWorkTime(result.planGetWorkTime)
+          this.$refs.planChart[0].updateTotalProcess(result.totalProcess)
+          this.$refs.planChart[0].updateTitle(this.projects[0].projectName)
+        })
         this.tableData = []
         for (let projectDetail of this.projectTypes[index].projects[0].projectDetail) {
           this.tableData.push(projectDetail[0])
@@ -228,11 +305,18 @@
       // 年份变化调用
       handleYearChange () {
         let index = this.getIndexOfProjectType(Number(this.selectProjectType))
-        this.projects = this.projectTypes[index].projects
-        let selectProjectIndex = this.getSelectProjectIndex(index, this.selectProject)
-        this.tableData = []
-        for (let projectDetail of this.projectTypes[index].projects[selectProjectIndex].projectDetail) {
-          this.tableData.push(projectDetail[0])
+        if (index !== -1) {
+          this.projects = this.projectTypes[index].projects
+          let selectProjectIndex = this.getSelectProjectIndex(index, this.selectProject)
+          this.tableData = []
+          for (let projectDetail of this.projectTypes[index].projects[selectProjectIndex].projectDetail) {
+            this.tableData.push(projectDetail[0])
+          }
+          let result = this.getPlanGetWorkTime(this.projects[selectProjectIndex])
+          this.$nextTick(() => {
+            this.$refs.planChart[0].updatePlanGetWorkTime(result.planGetWorkTime)
+            this.$refs.planChart[0].updateTotalProcess(result.totalProcess)
+          })
         }
       },
       // 表格单元格点击
@@ -246,6 +330,12 @@
           for (let projectStage of this.projects[index].projectDetail) {
             this.tableData.push(projectStage[0])
           }
+          let result = this.getPlanGetWorkTime(this.projects[index])
+          this.$nextTick(() => {
+            this.$refs.planChart[0].updatePlanGetWorkTime(result.planGetWorkTime)
+            this.$refs.planChart[0].updateTotalProcess(result.totalProcess)
+            this.$refs.planChart[0].updateTitle(this.projects[index].projectName)
+          })
         }
       },
       // 销毁图表
@@ -277,22 +367,6 @@
       this.planChart = null
     },
     props: {
-      className: {
-        type: String,
-        default: 'chart'
-      },
-      id: {
-        type: String,
-        default: 'chart'
-      },
-      width: {
-        type: String,
-        default: '200px'
-      },
-      height: {
-        type: String,
-        default: '200px'
-      },
       userInfo: {
         type: Object,
         default: null
@@ -303,4 +377,9 @@
 </script>
 
 <style scoped>
+  .chart-container{
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 84px);
+  }
 </style>

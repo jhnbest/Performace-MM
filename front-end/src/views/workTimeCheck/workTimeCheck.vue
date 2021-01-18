@@ -39,9 +39,9 @@
         <el-table-column label="小组排名" align="center" prop="rank"></el-table-column>
         <el-table-column label="定量指标得分" align="center" prop="quantitativeScore"></el-table-column>
       </el-table>
-      <br>
-      <br>
     </div>
+    <br>
+    <br>
   </div>
 </template>
 

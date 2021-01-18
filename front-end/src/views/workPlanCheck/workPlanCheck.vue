@@ -37,11 +37,11 @@
               :key="item.id"
               :name="String(item.id)">
                 <span slot="label">{{item.name}}</span>
+              <keep-alive>
                 <PersionPlan v-if="selectPersion === String(item.id)"
-                             height="100%"
-                             width="100%"
                              ref="childPersionPlan"
                              :userInfo="{userID: item.id, year: formData.title}"></PersionPlan>
+              </keep-alive>
             </el-tab-pane>
           </el-tabs>
         </el-tab-pane>
@@ -76,9 +76,11 @@
           this.getGroupUsers()
         },
         handelDateChange () {
-          this.$refs.childPersionPlan[0].getAssignedProject(this.formData.title).then(() => {
-            this.$refs.childPersionPlan[0].handleYearChange()
-          })
+          if (this.$refs.childPersionPlan) {
+            this.$refs.childPersionPlan[0].getAssignedProject(this.formData.title).then(() => {
+              this.$refs.childPersionPlan[0].handleYearChange()
+            })
+          }
         },
         // 计划选择
         handleSelectTypeChange () {

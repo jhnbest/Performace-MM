@@ -4,7 +4,9 @@
 
 <script>
   import echarts from 'echarts'
+  import resize from '@/components/Chart/mixins/resize'
   export default {
+    mixins: [resize],
     data () {
       return {
         chart: null
@@ -26,14 +28,14 @@
         const xData = (function () {
           const data = []
           for (let i = 1; i < 13; i++) {
-            data.push(i + 'month')
+            data.push(i + '月')
           }
           return data
         }())
         this.chart.setOption({
           backgroundColor: '#344b58',
           title: {
-            text: 'statistics',
+            text: this.title,
             x: '20',
             top: '20',
             textStyle: {
@@ -69,7 +71,7 @@
             textStyle: {
               color: '#90979c'
             },
-            data: ['female', 'male', 'average']
+            data: ['预计工时', '总进度']
           },
           calculable: true,
           xAxis: [{
@@ -95,31 +97,48 @@
             data: xData
           }],
           yAxis: [{
-            type: 'value',
-            splitLine: {
+            type: 'value', // value: 连续数据; category: 离散数据; time: 时间轴; log: 对数轴
+            splitLine: { // 坐标轴在grid中的分割线
               show: false
             },
-            axisLine: {
+            axisLine: { // 坐标轴轴线相关
               lineStyle: {
                 color: '#90979c'
               }
             },
-            axisTick: {
+            axisTick: { // 坐标轴刻度相关
+              show: true
+            },
+            axisLabel: { // 坐标轴刻度标签
+              interval: 'auto'
+            },
+            splitArea: { // 坐标轴在grid区域中的分隔区域
+              show: false
+            }
+          }, {
+            type: 'value', // value: 连续数据; category: 离散数据; time: 时间轴; log: 对数轴
+            splitLine: { // 坐标轴在grid中的分割线
               show: false
             },
-            axisLabel: {
-              interval: 0
+            axisLine: { // 坐标轴轴线相关
+              lineStyle: {
+                color: '#90979c'
+              }
             },
-            splitArea: {
+            axisTick: { // 坐标轴刻度相关
+              show: true
+            },
+            axisLabel: { // 坐标轴刻度标签
+              interval: 'auto'
+            },
+            splitArea: { // 坐标轴在grid区域中的分隔区域
               show: false
             }
           }],
           dataZoom: [{
             show: true,
             height: 30,
-            xAxisIndex: [
-              0
-            ],
+            xAxisIndex: [0],
             bottom: 30,
             start: 10,
             end: 80,
@@ -127,12 +146,11 @@
             handleSize: '110%',
             handleStyle: {
               color: '#d3dee5'
-
             },
             textStyle: {
-              color: '#fff' },
+              color: '#fff'
+            },
             borderColor: '#90979c'
-
           }, {
             type: 'inside',
             show: true,
@@ -141,104 +159,70 @@
             end: 35
           }],
           series: [{
-            name: 'female',
+            name: '预计工时',
             type: 'bar',
             stack: 'total',
-            barMaxWidth: 35,
-            barGap: '10%',
             itemStyle: {
               normal: {
-                color: 'rgba(255,144,128,1)',
+                color: 'rgba(0,191,183,1)',
+                barBorderRadius: 0,
                 label: {
                   show: true,
-                  textStyle: {
-                    color: '#fff'
-                  },
-                  position: 'insideTop',
+                  position: 'top',
                   formatter (p) {
                     return p.value > 0 ? p.value : ''
                   }
                 }
               }
             },
-            data: [
-              709,
-              1917,
-              2455,
-              2610,
-              1719,
-              1433,
-              1544,
-              3285,
-              5208,
-              3372,
-              2484,
-              4078
-            ]
+            data: [],
+            yAxisIndex: 0
           }, {
-              name: 'male',
-              type: 'bar',
-              stack: 'total',
-              itemStyle: {
-                normal: {
-                  color: 'rgba(0,191,183,1)',
-                  barBorderRadius: 0,
-                  label: {
-                    show: true,
-                    position: 'top',
-                    formatter (p) {
-                      return p.value > 0 ? p.value : ''
-                    }
+            name: '总进度',
+            type: 'line',
+            symbolSize: 10,
+            symbol: 'circle',
+            itemStyle: {
+              normal: {
+                color: 'rgba(252,230,48,1)',
+                barBorderRadius: 0,
+                label: {
+                  show: true,
+                  position: 'top',
+                  formatter (p) {
+                    return p.value > 0 ? p.value : ''
                   }
                 }
-              },
-              data: [
-                327,
-                1776,
-                507,
-                1200,
-                800,
-                482,
-                204,
-                1390,
-                1001,
-                951,
-                381,
-                220
-              ]
-          }, {
-              name: 'average',
-              type: 'line',
-              stack: 'total',
-              symbolSize: 10,
-              symbol: 'circle',
-              itemStyle: {
-                normal: {
-                  color: 'rgba(252,230,48,1)',
-                  barBorderRadius: 0,
-                  label: {
-                    show: true,
-                    position: 'top',
-                    formatter (p) {
-                      return p.value > 0 ? p.value : ''
-                    }
-                  }
-                }
-              },
-              data: [
-                1036,
-                3693,
-                2962,
-                3810,
-                2519,
-                1915,
-                1748,
-                4675,
-                6209,
-                4323,
-                2865,
-                4298
-              ]
+              }
+            },
+            data: [],
+            yAxisIndex: 1
+          }]
+        })
+      },
+      // 更新图表预计获得工时数据
+      updatePlanGetWorkTime (data) {
+        this.chart.setOption({
+          series: [{
+            name: '预计工时',
+            data: data
+          }]
+        })
+      },
+      // 更新图表计划进度
+      updateTotalProcess (data) {
+        this.chart.setOption({
+          series: [{
+            name: '总进度',
+            data: data
+          }]
+        })
+      },
+      // 更新图表标题
+      updateTitle (title) {
+        this.chart.setOption({
+          title: [{
+            text: title + ' 月预计工时&年度进展明细'
           }]
         })
       }
@@ -259,6 +243,10 @@
       height: {
         type: String,
         default: '200px'
+      },
+      title: {
+        type: String,
+        default: '错误'
       }
     },
     name: 'planChart.vue'
