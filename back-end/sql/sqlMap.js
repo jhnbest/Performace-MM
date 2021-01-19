@@ -16,7 +16,7 @@ const sqlMap = {
     // 用户列表
     selectList: 'select id, name, email, type, create_time, update_time, status from user where status != 0',
     // 用户列表Test
-    selectList1: 'select account, dept, groupName, name, role, status from users where status != 0',
+    selectList1: 'select * from users where status != 0',
     // 查询周报列表条数Test
     selectTotal1: 'select count(*) as totalCount from users where status != 0',
     // 查询用户姓名
@@ -181,6 +181,9 @@ const sqlMap = {
     assignProjectList: 'select apl.*, pjn.projectName as projectTypeName from assignprojectlist apl ' +
         'left join projecttypenew pjn on apl.projectType = pjn.projectTypeID where apl.userID = ? and ' +
         'apl.obsoleteStatus != 1'
+  },
+  mutualRates: {
+    getUserRates: 'select * from mutualrate where ratePersion = ? and rateMonth = ?'
   }
 }
 module.exports = sqlMap;

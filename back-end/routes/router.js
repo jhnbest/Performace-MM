@@ -4,6 +4,7 @@ let user = require('../controls/user');
 let weekly = require('../controls/weekly');
 let performance = require('../controls/performance');
 let workStation = require('../controls/workStation');
+let mutualRates = require('../controls/mutualRate');
 let api = require('../config/api');
 
 let router = express.Router();
@@ -64,5 +65,9 @@ router.post(api.submitPersonalProject, workStation.submitPersonalProject)
 router.post(api.submitMonthPlanProcess, workStation.submitMonthPlanProcess)
 router.post(api.getPlanInfo, workStation.getPlanInfo)
 router.post(api.getAssignedProjectPlan, workStation.getAssignedProjectPlan)
+
+// 互评模块
+router.post(api.getUserRates, mutualRates.getUserRates)
+router.post(api.submitRatesResult, mutualRates.submitRatesResult)
 
 module.exports = router;

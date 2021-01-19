@@ -57,7 +57,9 @@
         style="width: 99%;margin: auto"
         v-loading="!this.reqFlag.getProjectList"
         border
-        :span-method="objectSpanMethod" v-if="showFlag.factTableShow">
+        :span-method="objectSpanMethod"
+        v-if="showFlag.factTableShow"
+        :header-cell-style="{ backgroundColor:'#48bfe5', color: '#333' }">
         <el-table-column type="expand">
           <template slot-scope="scope">
             <el-form label-position="left" inline class="demo-table-expand">

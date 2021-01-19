@@ -57,5 +57,9 @@ module.exports = {
     submitPersonalProject: path + '/workStation/submitPersonalProject', // 提交个人申报项目
     submitMonthPlanProcess: path + '/workStation/submitMonthPlanProcess', // 提交计划至计划进展表
     getPlanInfo: path + '/workStation/getPlanInfo', // 获取计划列表
-    getAssignedProjectPlan: path + '/workStation/getAssignedProjectPlan' // 获取指派项目列表(计划查询)
+    getAssignedProjectPlan: path + '/workStation/getAssignedProjectPlan', // 获取指派项目列表(计划查询)
+
+    // 互评模块
+    getUserRates: path + '/mutualRates/getUserRates', // 互评模块
+    submitRatesResult: path + '/mutualRates/submitRatesResult' // 互评模块
 };

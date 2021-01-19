@@ -226,23 +226,8 @@
         let planGetWorkTime = []
         let totalProcess = []
         let projectDetailNum = data.projectDetail.length
-        // let unusedProjectDetailNum = 0
-        // for (let projectDetailItem of data.projectDetail) {
-        //   let count = 0
-        //   for (let i = 0; i < this.Months.length; i++) {
-        //     let MonthProcess = projectDetailItem[0][this.Months[i].eName]
-        //     if (!MonthProcess) {
-        //       count++
-        //     }
-        //   }
-        //   if (count === this.Months.length) {
-        //     unusedProjectDetailNum++
-        //   }
-        // }
-        // projectDetailNum -= unusedProjectDetailNum
         for (let projectDetailItem of data.projectDetail) {
           for (let i = 0; i < this.Months.length; i++) {
-            // console.log(projectDetailItem[0][this.Months[i].eName])
             let getWorkTime = 0
             let MonthProcess = projectDetailItem[0][this.Months[i].eName]
             let baseWorkTime = projectDetailItem[0].baseWorkTime
@@ -283,7 +268,6 @@
           planGetWorkTime: planGetWorkTime,
           totalProcess: totalProcess
         }
-        console.log(obj)
         return obj
       },
       // 项目类型变化
@@ -340,7 +324,6 @@
       },
       // 销毁图表
       destroyPlanChart () {
-        console.log('destroy')
         if (!this.planChart) {
           console.log('planChart not exist!')
           return

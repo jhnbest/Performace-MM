@@ -23,6 +23,7 @@
       this.chart = null
     },
     methods: {
+      // 图标初始化
       initChart () {
         this.chart = echarts.init(document.getElementById(this.id))
         const xData = (function () {
@@ -140,10 +141,10 @@
             height: 30,
             xAxisIndex: [0],
             bottom: 30,
-            start: 10,
-            end: 80,
+            start: 0,
+            end: 100,
             handleIcon: 'path://M306.1,413c0,2.2-1.8,4-4,4h-59.8c-2.2,0-4-1.8-4-4V200.8c0-2.2,1.8-4,4-4h59.8c2.2,0,4,1.8,4,4V413z',
-            handleSize: '110%',
+            handleSize: '100%',
             handleStyle: {
               color: '#d3dee5'
             },
@@ -155,8 +156,8 @@
             type: 'inside',
             show: true,
             height: 15,
-            start: 1,
-            end: 35
+            start: 0,
+            end: 100
           }],
           series: [{
             name: '预计工时',
