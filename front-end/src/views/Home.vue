@@ -35,7 +35,7 @@
           <el-submenu index="1" v-if="$store.state.userInfo.role !== '普通成员'">
             <template slot="title">
               <i class="el-icon-s-custom" style="font-size: 20px"></i>
-              <span style="font-size: 16px">工时管理</span>
+              <span style="font-size: 16px">绩效管理</span>
             </template>
             <el-menu-item v-for="item in workTimeManagerList" :key="item.url" :index="item.url"
                           @click="handleSelect(item.url)">

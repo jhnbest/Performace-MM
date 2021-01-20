@@ -2,7 +2,7 @@
 <div>
   <el-form class="main-search" :inline="true">
     <el-row>
-      <el-col :span="10">
+      <el-col :span="15">
         <el-form-item label="互评月份：" prop="title">
           <el-button size="mini" type="danger" style="margin-right: 10px" @click="handlePreMonth">上月</el-button>
           <el-date-picker
@@ -14,11 +14,22 @@
             style="width: 150px"
             @change="handelDateChange">
           </el-date-picker>
-          <el-button size="mini" type="success" style="margin-left: 10px" @click="handleNextMonth">下月</el-button>
+          <el-button size="mini" type="primary" style="margin-left: 10px" @click="handleNextMonth">下月</el-button>
+          <span style="font-size: 21px;font-weight: bold;margin-left: 40px">本月互评得分:
+            <count-to
+              :start-val="0"
+              :end-val="1"
+              :duration="2600"
+              :decimals="1"
+              style="color: #F56C6C;margin-left: 10px;font-size: 25px"/></span>
         </el-form-item>
       </el-col>
-      <el-col :span="4" :offset="10">
-        <el-button type="primary" @click="submitRatesResult">提交</el-button>
+      <el-col :span="6" :offset="3">
+        <el-button type="primary" @click="submitRatesResult" :disabled="isRated">
+          <span v-if="!isRated">提交</span>
+          <span v-else>已提交</span>
+        </el-button>
+        <el-button type="success" :disabled="!isRated" @click="updateRateTableData">更新</el-button>
         <el-button type="warning" @click="resetTable">重置</el-button>
       </el-col>
     </el-row>
@@ -30,27 +41,33 @@
   <div style="margin-left: 20px">
     <span style="font-size: 15px">评价标准显示：</span>
     <el-switch v-model="showFlag.descTableShow" @change="handleSwitchChange"></el-switch>
+    <span style="margin-left: 60px;font-weight: bolder">本月互评状态：
+      <span v-if="isRated" style="font-weight: bolder;color: green;font-size: 23px">已评价</span>
+      <span v-else style="font-weight: bolder;color: red;font-size: 23px">未评价</span>
+    </span>
   </div>
   <br v-if="showFlag.descTableShow">
-  <div v-if="showFlag.descTableShow">
-    <el-table :data="tableData"
-              border
-              style="margin: auto; width: 99%"
-              :span-method="objectSpanMethod"
-              stripe
-              :header-cell-style="{ backgroundColor:'#48bfe5', color: '#333' }">
-      <el-table-column label="序号" align="center" width="50%" type="index"></el-table-column>
-      <el-table-column label="一级指标" align="center" width="100%" prop="l1"></el-table-column>
-      <el-table-column label="二级指标" align="center" width="100%" prop="l2"></el-table-column>
-      <el-table-column label="评分衡量标准" align="center" prop="standard" show-overflow-tooltip></el-table-column>
-      <el-table-column label="分值" align="center" prop="score" width="100%"></el-table-column>
-      <el-table-column label="对应星级" align="center" width="145%">
-        <template slot-scope="scope">
-          <el-rate v-model="scope.row.star" disabled></el-rate>
-        </template>
-      </el-table-column>
-    </el-table>
-  </div>
+  <transition name="el-zoom-in-top">
+    <div v-if="showFlag.descTableShow">
+      <el-table :data="tableData"
+                border
+                style="margin: auto; width: 99%"
+                :span-method="objectSpanMethod"
+                stripe
+                :header-cell-style="{ backgroundColor:'#48bfe5', color: '#333' }">
+        <el-table-column label="序号" align="center" width="50%" type="index"></el-table-column>
+        <el-table-column label="一级指标" align="center" width="100%" prop="l1"></el-table-column>
+        <el-table-column label="二级指标" align="center" width="100%" prop="l2"></el-table-column>
+        <el-table-column label="评分衡量标准" align="center" prop="standard" show-overflow-tooltip></el-table-column>
+        <el-table-column label="分值" align="center" prop="score" width="100%"></el-table-column>
+        <el-table-column label="对应星级" align="center" width="145%">
+          <template slot-scope="scope">
+            <el-rate v-model="scope.row.star" disabled></el-rate>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+  </transition>
   <br v-if="showFlag.descTableShow">
   <br>
   <div>
@@ -60,40 +77,56 @@
               :span-method="rateTableMethod"
               stripe
               size="mini"
-              :header-cell-style="{ backgroundColor:'#48bfe5', color: '#333' }">
+              :header-cell-style="{ backgroundColor:'#48bfe5', color: '#333' }"
+              v-loading="!reqFlag.getUserRates">
       <el-table-column label="姓名" align="center" prop="ratedName" min-width="30"></el-table-column>
       <el-table-column label="评价项" align="center">
         <el-table-column label="工作态度" align="center">
           <el-table-column label="责任意识" align="center" min-width="110">
             <template slot-scope="scope">
-              <el-rate v-model="scope.row.t1Star" show-text :texts="scoreText" @change="handleStarChange(scope.row)"></el-rate>
+              <el-rate v-model="scope.row.t1Star"
+                       show-text
+                       :texts="scoreText"
+                       @change="handleStarChange(scope.row)"></el-rate>
             </template>
           </el-table-column>
           <el-table-column label="团队协作" align="center" min-width="110">
             <template slot-scope="scope">
-              <el-rate v-model="scope.row.t2Star" show-text :texts="scoreText" @change="handleStarChange(scope.row)"></el-rate>
+              <el-rate v-model="scope.row.t2Star"
+                       show-text :texts="scoreText"
+                       @change="handleStarChange(scope.row)"></el-rate>
             </template>
           </el-table-column>
           <el-table-column label="组织纪律" align="center" min-width="110">
             <template slot-scope="scope">
-              <el-rate v-model="scope.row.t3Star" show-text :texts="scoreText" @change="handleStarChange(scope.row)"></el-rate>
+              <el-rate v-model="scope.row.t3Star"
+                       show-text :texts="scoreText"
+                       @change="handleStarChange(scope.row)"></el-rate>
             </template>
           </el-table-column>
         </el-table-column>
         <el-table-column label="工作能力" align="center">
           <el-table-column label="计划能力" align="center" min-width="110">
             <template slot-scope="scope">
-              <el-rate v-model="scope.row.t4Star" show-text :texts="scoreText" @change="handleStarChange(scope.row)"></el-rate>
+              <el-rate v-model="scope.row.t4Star"
+                       show-text :texts="scoreText"
+                       @change="handleStarChange(scope.row)"></el-rate>
             </template>
           </el-table-column>
           <el-table-column label="执行能力" align="center" min-width="110">
             <template slot-scope="scope">
-              <el-rate v-model="scope.row.t5Star" show-text :texts="scoreText" @change="handleStarChange(scope.row)"></el-rate>
+              <el-rate v-model="scope.row.t5Star"
+                       show-text
+                       :texts="scoreText"
+                       @change="handleStarChange(scope.row)"></el-rate>
             </template>
           </el-table-column>
           <el-table-column label="综合能力" align="center" min-width="110">
             <template slot-scope="scope">
-              <el-rate v-model="scope.row.t6Star" show-text :texts="scoreText" @change="handleStarChange(scope.row)"></el-rate>
+              <el-rate v-model="scope.row.t6Star"
+                       show-text
+                       :texts="scoreText"
+                       @change="handleStarChange(scope.row)"></el-rate>
             </template>
           </el-table-column>
         </el-table-column>
@@ -107,7 +140,8 @@
 </template>
 
 <script>
-  import { getUsersName, getUserRates, submitRatesResult } from '@/config/interface'
+  import { getUsersName, getUserRates, submitRatesResult, updateUserRate } from '@/config/interface'
+  import CountTo from 'vue-count-to'
   export default {
     data () {
       return {
@@ -115,7 +149,7 @@
           title: this.$moment().format('YYYY-MM')
         },
         showFlag: {
-          descTableShow: true
+          descTableShow: false
         },
         tableData: [{
           l1: '工作态度',
@@ -313,8 +347,13 @@
         }],
         rateTableData: [],
         users: [],
-        defaultStar: 3,
-        scoreText: ['82.5', '85', '87.5', '90', '92.5']
+        defaultStar: 4,
+        scoreText: ['82.5', '85', '87.5', '90', '92.5'],
+        isRated: false,
+        ratesTableTmp: [],
+        reqFlag: {
+          getUserRates: true
+        }
       }
     },
     methods: {
@@ -325,6 +364,7 @@
         this.getUsersList().then(res1 => {
           _this.users = res1
           _this.getUserRates().then(res2 => {
+            _this.isRated = res2.length !== 0
             _this.genRateTableData(res1, res2)
           })
         })
@@ -345,6 +385,54 @@
           default:
             return 87.5
         }
+      },
+      // 评分转星级
+      ratesToStar (rates) {
+        switch (rates) {
+          case 92.5:
+            return 5
+          case 90:
+            return 4
+          case 87.5:
+            return 3
+          case 85:
+            return 2
+          case 82.5:
+            return 1
+          default:
+            return 4
+        }
+      },
+      // 评分类型转换
+      rateTypeSwitch (rateType) {
+        switch (rateType) {
+          case 1:
+            return 't1Star'
+          case 2:
+            return 't2Star'
+          case 3:
+            return 't3Star'
+          case 4:
+            return 't4Star'
+          case 5:
+            return 't5Star'
+          case 6:
+            return 't6Star'
+          default:
+            return 't1Star'
+        }
+      },
+      // 获取被评价人数组索引
+      getIndexOfRatedPersion (id) {
+        if (this.ratesTableTmp.length === 0) {
+          return -1
+        }
+        for (let i = 0; i < this.ratesTableTmp.length; i++) {
+          if (this.ratesTableTmp[i].ratedPersion === id) {
+            return i
+          }
+        }
+        return -1
       },
       // 获取用户列表
       getUsersList () {
@@ -369,15 +457,18 @@
           rateMonth: this.formData.title
         }
         let _this = this
-        return new Promise(function (resolve, reject) {
-          _this.$http(url, params)
-            .then(res => {
-              if (res.code === 1) {
-                console.log(res.data)
-                resolve(res.data)
-              }
-            })
-        })
+        if (this.reqFlag.getUserRates) {
+          this.reqFlag.getUserRates = false
+          return new Promise(function (resolve, reject) {
+            _this.$http(url, params)
+              .then(res => {
+                if (res.code === 1) {
+                  resolve(res.data)
+                }
+                _this.reqFlag.getUserRates = true
+              })
+          })
+        }
       },
       // 计算互评总分
       calMultualScore (t1Star, t2Star, t3Star, t4Star, t5Star, t6Star) {
@@ -417,18 +508,25 @@
             }
           }
         } else {
-          for (let user of users) {
-            if (curGroupName === '技术标准组' || curGroupName === '工程组') { // 当前用户属于技术标准组和工程组
-              if (user.groupName === '技术标准组' && user.id !== curID) {
-                let obj = {
-                  ratedID: user.id,
-                  ratedName: user.name
-                }
+          this.ratesTableTmp = []
+          for (let item1 of rates) {
+            let index = this.getIndexOfRatedPersion(item1.ratedPersion)
+            if (index === -1) {
+              let obj = {
+                ratedPersion: item1.ratedPersion,
+                ratedName: item1.ratedPersionName
               }
-            } else if (curGroupName === '通信组') { // 当前用户属于通信组
-            } else { // 处经理
+              obj[this.rateTypeSwitch(item1.rateType)] = this.ratesToStar(item1.rate)
+              this.ratesTableTmp.push(obj)
+            } else {
+              this.ratesTableTmp[index][this.rateTypeSwitch(item1.rateType)] = this.ratesToStar(item1.rate)
             }
           }
+          for (let item of this.ratesTableTmp) { // 计算各被评价人总分
+            item.totalScore = this.calMultualScore(item.t1Star, item.t2Star, item.t3Star, item.t4Star,
+              item.t5Star, item.t6Star)
+          }
+          this.rateTableData = this.ratesTableTmp
         }
       },
       // 上一月
@@ -445,6 +543,7 @@
       handelDateChange () {
         let _this = this
         this.getUserRates().then(res1 => {
+          _this.isRated = res1.length !== 0
           _this.genRateTableData(_this.users, res1)
         })
       },
@@ -573,11 +672,32 @@
       submitRatesResult () {
         const url = submitRatesResult
         let params = {
+          data: this.rateTableData,
+          title: this.formData.title,
+          userID: this.$store.state.userInfo.id
+        }
+        let _this = this
+        this.$http(url, params)
+          .then(res => {
+            if (res.code === 1) {
+              _this.isRated = true
+              this.$common.toast('提交成功', 'success', false)
+            }
+          })
+      },
+      // 更新表格
+      updateRateTableData () {
+        const url = updateUserRate
+        console.log(this.rateTableData)
+        let params = {
         }
       },
       // 重置
       resetTable () {
       }
+    },
+    components: {
+      CountTo
     },
     created () {
       this.init()

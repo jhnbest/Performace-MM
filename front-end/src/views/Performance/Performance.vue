@@ -51,14 +51,13 @@
     <!-- 分割线 start -->
     <div class="hr-10"></div>
     <!-- 分割线 end -->
-    <div class="main-content">
+    <div class="main-content" v-if="showFlag.factTableShow">
       <el-table
         :data="workDetailTable"
         style="width: 99%;margin: auto"
         v-loading="!this.reqFlag.getProjectList"
         border
         :span-method="objectSpanMethod"
-        v-if="showFlag.factTableShow"
         :header-cell-style="{ backgroundColor:'#48bfe5', color: '#333' }">
         <el-table-column type="expand">
           <template slot-scope="scope">
@@ -138,12 +137,11 @@
       </el-table>
     </div>
     <!---------------------------------------------计划表格--------------------------------------------------->
-    <div class="main-content">
+    <div class="main-content" v-if="showFlag.planTableShow">
       <el-table :data="workPlanTableData"
                 style="width: 99%;margin: auto"
                 border
-                :span-method="planTableSpanMethod"
-                v-if="showFlag.planTableShow">
+                :span-method="planTableSpanMethod">
         <el-table-column label="序号" align="center" type="index" width="60%"></el-table-column>
 <!--        <el-table-column label="申报月份" align="center" prop="applyMonth"></el-table-column>-->
         <el-table-column label="项目名称" align="center" prop="projectName"></el-table-column>

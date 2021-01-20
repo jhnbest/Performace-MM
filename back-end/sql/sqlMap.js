@@ -183,7 +183,10 @@ const sqlMap = {
         'apl.obsoleteStatus != 1'
   },
   mutualRates: {
-    getUserRates: 'select * from mutualrate where ratePersion = ? and rateMonth = ?'
+    getUserRates: 'select mr.*, u.name as ratedPersionName from mutualrate mr left join users u on ' +
+        'mr.ratedPersion = u.id where mr.ratePersion = ? and mr.rateMonth = ?',
+    submitRatesResult: 'insert into mutualrate (ratePersion, ratedPersion, rateMonth, rate, rateType, rateTime) ' +
+        'values (?, ?, ?, ?, ?, ?)'
   }
 }
 module.exports = sqlMap;

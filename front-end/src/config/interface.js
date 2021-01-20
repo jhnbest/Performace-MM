@@ -54,3 +54,4 @@ export const getAssignedProjectPlan = '/workStation/getAssignedProjectPlan' // �
 
 export const getUserRates = '/mutualRates/getUserRates' // 获取互评信息
 export const submitRatesResult = '/mutualRates/submitRatesResult' // 提交互评结果
+export const updateUserRate = '/mutualRates/updateUserRate' // 更新互评结果

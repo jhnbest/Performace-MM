@@ -1,17 +1,17 @@
 /*
  Navicat Premium Data Transfer
 
- Source Server         : 11.22.232.34-jhn
+ Source Server         : jhn_MySQL
  Source Server Type    : MySQL
- Source Server Version : 80022
- Source Host           : 11.22.232.34:3306
- Source Schema         : workTimeMM
+ Source Server Version : 80020
+ Source Host           : localhost:3306
+ Source Schema         : demo-weekly
 
  Target Server Type    : MySQL
- Target Server Version : 80022
+ Target Server Version : 80020
  File Encoding         : 65001
 
- Date: 19/01/2021 18:19:48
+ Date: 20/01/2021 16:49:33
 */
 
 SET NAMES utf8mb4;
@@ -34,7 +34,7 @@ CREATE TABLE `assignprojectdetail`  (
   `obsoleteStatus` tinyint NOT NULL DEFAULT 0 COMMENT '废弃状态',
   `isFinish` tinyint NOT NULL DEFAULT 0 COMMENT '是否已完成',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1871 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1878 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of assignprojectdetail
@@ -1909,6 +1909,13 @@ INSERT INTO `assignprojectdetail` VALUES (1867, 685, 96, '故障处置（工作�
 INSERT INTO `assignprojectdetail` VALUES (1868, 686, 81, '组织技术交流', 2.0, 1.0, 1, 2.0, 0.0, 0, 0);
 INSERT INTO `assignprojectdetail` VALUES (1869, 687, 80, '组织各类型会议', 2.0, 1.0, 1, 2.0, 100.0, 0, 1);
 INSERT INTO `assignprojectdetail` VALUES (1870, 688, 77, '搜集相关信息，整理材料', 2.0, 1.0, 1, 2.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1871, 689, 81, '组织技术交流', 2.0, 1.0, 1, 4.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1872, 690, 77, '搜集相关信息，整理材料', 2.0, 1.0, 1, 2.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1873, 691, 77, '搜集相关信息，整理材料', 2.0, 1.0, 1, 2.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1874, 692, 384, '参加非本处室组织会议', 1.0, 1.0, 1, 1.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1875, 693, 95, '流程审核', 1.0, 1.0, 1, 1.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1876, 694, 77, '搜集相关信息，整理材料', 2.0, 1.0, 1, 2.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1877, 695, 95, '流程审核', 1.0, 1.0, 1, 1.0, 0.0, 0, 0);
 
 -- ----------------------------
 -- Table structure for assignprojectlist
@@ -1929,7 +1936,7 @@ CREATE TABLE `assignprojectlist`  (
   `projectLevel` tinyint NOT NULL DEFAULT 1 COMMENT '项目级别',
   `reviewStatus` tinyint NOT NULL DEFAULT 1 COMMENT '审核状态',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 689 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 696 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of assignprojectlist
@@ -2622,6 +2629,13 @@ INSERT INTO `assignprojectlist` VALUES (685, 31, '2021-01-19 09:28:37', 4, 'ACAR
 INSERT INTO `assignprojectlist` VALUES (686, 31, '2021-01-19 11:40:36', 4, '基于ACARS系统故障整改措施的安全质量改进跟踪讨论会', 0.0, 31, 2.0, 0.0, 1, 0, 1, 1);
 INSERT INTO `assignprojectlist` VALUES (687, 13, '2021-01-19 13:53:13', 4, '宝利通技术交流会', 100.0, 13, 2.0, 0.0, 1, 0, 1, 1);
 INSERT INTO `assignprojectlist` VALUES (688, 31, '2021-01-19 14:28:44', 4, 'ACARS系统', 0.0, 31, 2.0, 0.0, 1, 0, 1, 1);
+INSERT INTO `assignprojectlist` VALUES (689, 32, '2021-01-20 08:47:42', 4, '共济科技技术交流', 0.0, 32, 2.0, 0.0, 1, 0, 1, 1);
+INSERT INTO `assignprojectlist` VALUES (690, 32, '2021-01-20 08:49:18', 4, '完成1月第3周处室用餐信息收集，整理和上报，并取餐（每次耗时0.5小时）', 0.0, 32, 2.0, 0.0, 1, 0, 1, 1);
+INSERT INTO `assignprojectlist` VALUES (691, 8, '2021-01-20 09:30:26', 4, '疫苗接种报名信息收集', 0.0, 8, 2.0, 0.0, 1, 0, 1, 1);
+INSERT INTO `assignprojectlist` VALUES (692, 31, '2021-01-20 10:22:43', 4, '客舱互联网建设', 0.0, 31, 1.0, 0.0, 1, 0, 1, 1);
+INSERT INTO `assignprojectlist` VALUES (693, 31, '2021-01-20 10:42:22', 4, 'ACARS系统', 0.0, 31, 1.0, 0.0, 1, 0, 1, 1);
+INSERT INTO `assignprojectlist` VALUES (694, 31, '2021-01-20 10:43:06', 4, 'ACARS系统SITA接口', 0.0, 31, 2.0, 0.0, 1, 0, 1, 1);
+INSERT INTO `assignprojectlist` VALUES (695, 31, '2021-01-20 11:02:31', 4, 'ACARS系统SITS接口', 0.0, 31, 1.0, 0.0, 1, 0, 1, 1);
 
 -- ----------------------------
 -- Table structure for monthprocess
@@ -3817,18 +3831,403 @@ CREATE TABLE `monthprocess_new`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `mutualrate`;
 CREATE TABLE `mutualrate`  (
-  `id` int NOT NULL COMMENT '主键',
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
   `ratePersion` int NOT NULL COMMENT '评分人',
   `ratedPersion` int NOT NULL COMMENT '被评分人',
   `rateMonth` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '评分月份',
   `rate` float(4, 1) NOT NULL COMMENT '得分',
-  `rateType` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '评分类型',
+  `rateType` tinyint NOT NULL COMMENT '评分类型',
+  `rateTime` datetime(0) NOT NULL COMMENT '评分时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of mutualrate
 -- ----------------------------
+INSERT INTO `mutualrate` VALUES (1, 15, 7, '2021-01', 92.5, 1, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (2, 15, 7, '2021-01', 92.5, 2, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (3, 15, 7, '2021-01', 92.5, 3, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (4, 15, 7, '2021-01', 92.5, 4, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (5, 15, 7, '2021-01', 92.5, 5, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (6, 15, 7, '2021-01', 92.5, 6, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (7, 15, 8, '2021-01', 90.0, 1, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (8, 15, 8, '2021-01', 90.0, 2, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (9, 15, 8, '2021-01', 90.0, 3, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (10, 15, 8, '2021-01', 90.0, 4, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (11, 15, 8, '2021-01', 90.0, 5, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (12, 15, 8, '2021-01', 90.0, 6, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (13, 15, 11, '2021-01', 90.0, 1, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (14, 15, 11, '2021-01', 90.0, 2, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (15, 15, 11, '2021-01', 90.0, 3, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (16, 15, 11, '2021-01', 90.0, 4, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (17, 15, 11, '2021-01', 90.0, 5, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (18, 15, 11, '2021-01', 90.0, 6, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (19, 15, 13, '2021-01', 90.0, 1, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (20, 15, 13, '2021-01', 90.0, 2, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (21, 15, 13, '2021-01', 90.0, 3, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (22, 15, 13, '2021-01', 90.0, 4, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (23, 15, 13, '2021-01', 90.0, 5, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (24, 15, 13, '2021-01', 90.0, 6, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (25, 15, 14, '2021-01', 90.0, 1, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (26, 15, 14, '2021-01', 90.0, 2, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (27, 15, 14, '2021-01', 90.0, 3, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (28, 15, 14, '2021-01', 90.0, 4, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (29, 15, 14, '2021-01', 90.0, 5, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (30, 15, 14, '2021-01', 90.0, 6, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (31, 15, 16, '2021-01', 90.0, 1, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (32, 15, 16, '2021-01', 90.0, 2, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (33, 15, 16, '2021-01', 90.0, 3, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (34, 15, 16, '2021-01', 90.0, 4, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (35, 15, 16, '2021-01', 90.0, 5, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (36, 15, 16, '2021-01', 90.0, 6, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (37, 15, 17, '2021-01', 90.0, 1, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (38, 15, 17, '2021-01', 90.0, 2, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (39, 15, 17, '2021-01', 90.0, 3, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (40, 15, 17, '2021-01', 90.0, 4, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (41, 15, 17, '2021-01', 90.0, 5, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (42, 15, 17, '2021-01', 90.0, 6, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (43, 15, 19, '2021-01', 90.0, 1, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (44, 15, 19, '2021-01', 90.0, 2, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (45, 15, 19, '2021-01', 90.0, 3, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (46, 15, 19, '2021-01', 90.0, 4, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (47, 15, 19, '2021-01', 90.0, 5, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (48, 15, 19, '2021-01', 90.0, 6, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (49, 15, 22, '2021-01', 90.0, 1, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (50, 15, 22, '2021-01', 90.0, 2, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (51, 15, 22, '2021-01', 90.0, 3, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (52, 15, 22, '2021-01', 90.0, 4, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (53, 15, 22, '2021-01', 90.0, 5, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (54, 15, 22, '2021-01', 90.0, 6, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (55, 15, 23, '2021-01', 90.0, 1, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (56, 15, 23, '2021-01', 90.0, 2, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (57, 15, 23, '2021-01', 90.0, 3, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (58, 15, 23, '2021-01', 90.0, 4, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (59, 15, 23, '2021-01', 90.0, 5, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (60, 15, 23, '2021-01', 90.0, 6, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (61, 15, 24, '2021-01', 90.0, 1, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (62, 15, 24, '2021-01', 90.0, 2, '2021-01-20 11:24:43');
+INSERT INTO `mutualrate` VALUES (63, 15, 24, '2021-01', 90.0, 3, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (64, 15, 24, '2021-01', 90.0, 4, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (65, 15, 24, '2021-01', 90.0, 5, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (66, 15, 24, '2021-01', 90.0, 6, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (67, 15, 25, '2021-01', 90.0, 1, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (68, 15, 25, '2021-01', 90.0, 2, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (69, 15, 25, '2021-01', 90.0, 3, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (70, 15, 25, '2021-01', 90.0, 4, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (71, 15, 25, '2021-01', 90.0, 5, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (72, 15, 25, '2021-01', 90.0, 6, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (73, 15, 27, '2021-01', 90.0, 1, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (74, 15, 27, '2021-01', 90.0, 2, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (75, 15, 27, '2021-01', 90.0, 3, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (76, 15, 27, '2021-01', 90.0, 4, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (77, 15, 27, '2021-01', 90.0, 5, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (78, 15, 27, '2021-01', 90.0, 6, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (79, 15, 28, '2021-01', 90.0, 1, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (80, 15, 28, '2021-01', 90.0, 2, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (81, 15, 28, '2021-01', 90.0, 3, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (82, 15, 28, '2021-01', 90.0, 4, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (83, 15, 28, '2021-01', 90.0, 5, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (84, 15, 28, '2021-01', 90.0, 6, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (85, 15, 30, '2021-01', 90.0, 1, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (86, 15, 30, '2021-01', 90.0, 2, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (87, 15, 30, '2021-01', 90.0, 3, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (88, 15, 30, '2021-01', 90.0, 4, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (89, 15, 30, '2021-01', 90.0, 5, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (90, 15, 30, '2021-01', 90.0, 6, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (91, 15, 32, '2021-01', 90.0, 1, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (92, 15, 32, '2021-01', 90.0, 2, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (93, 15, 32, '2021-01', 90.0, 3, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (94, 15, 32, '2021-01', 90.0, 4, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (95, 15, 32, '2021-01', 90.0, 5, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (96, 15, 32, '2021-01', 90.0, 6, '2021-01-20 11:24:44');
+INSERT INTO `mutualrate` VALUES (97, 15, 7, '2020-12', 90.0, 1, '2021-01-20 14:05:28');
+INSERT INTO `mutualrate` VALUES (98, 15, 7, '2020-12', 90.0, 2, '2021-01-20 14:05:28');
+INSERT INTO `mutualrate` VALUES (99, 15, 7, '2020-12', 90.0, 3, '2021-01-20 14:05:28');
+INSERT INTO `mutualrate` VALUES (100, 15, 7, '2020-12', 92.5, 4, '2021-01-20 14:05:28');
+INSERT INTO `mutualrate` VALUES (101, 15, 7, '2020-12', 90.0, 5, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (102, 15, 7, '2020-12', 90.0, 6, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (103, 15, 8, '2020-12', 90.0, 1, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (104, 15, 8, '2020-12', 92.5, 2, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (105, 15, 8, '2020-12', 92.5, 3, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (106, 15, 8, '2020-12', 92.5, 4, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (107, 15, 8, '2020-12', 92.5, 5, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (108, 15, 8, '2020-12', 90.0, 6, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (109, 15, 11, '2020-12', 90.0, 1, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (110, 15, 11, '2020-12', 92.5, 2, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (111, 15, 11, '2020-12', 92.5, 3, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (112, 15, 11, '2020-12', 90.0, 4, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (113, 15, 11, '2020-12', 92.5, 5, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (114, 15, 11, '2020-12', 92.5, 6, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (115, 15, 13, '2020-12', 92.5, 1, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (116, 15, 13, '2020-12', 92.5, 2, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (117, 15, 13, '2020-12', 90.0, 3, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (118, 15, 13, '2020-12', 90.0, 4, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (119, 15, 13, '2020-12', 90.0, 5, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (120, 15, 13, '2020-12', 90.0, 6, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (121, 15, 14, '2020-12', 92.5, 1, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (122, 15, 14, '2020-12', 92.5, 2, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (123, 15, 14, '2020-12', 92.5, 3, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (124, 15, 14, '2020-12', 90.0, 4, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (125, 15, 14, '2020-12', 90.0, 5, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (126, 15, 14, '2020-12', 90.0, 6, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (127, 15, 16, '2020-12', 90.0, 1, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (128, 15, 16, '2020-12', 90.0, 2, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (129, 15, 16, '2020-12', 90.0, 3, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (130, 15, 16, '2020-12', 90.0, 4, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (131, 15, 16, '2020-12', 90.0, 5, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (132, 15, 16, '2020-12', 90.0, 6, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (133, 15, 17, '2020-12', 90.0, 1, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (134, 15, 17, '2020-12', 90.0, 2, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (135, 15, 17, '2020-12', 92.5, 3, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (136, 15, 17, '2020-12', 90.0, 4, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (137, 15, 17, '2020-12', 87.5, 5, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (138, 15, 17, '2020-12', 90.0, 6, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (139, 15, 19, '2020-12', 90.0, 1, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (140, 15, 19, '2020-12', 90.0, 2, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (141, 15, 19, '2020-12', 90.0, 3, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (142, 15, 19, '2020-12', 90.0, 4, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (143, 15, 19, '2020-12', 90.0, 5, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (144, 15, 19, '2020-12', 90.0, 6, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (145, 15, 22, '2020-12', 90.0, 1, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (146, 15, 22, '2020-12', 90.0, 2, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (147, 15, 22, '2020-12', 90.0, 3, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (148, 15, 22, '2020-12', 90.0, 4, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (149, 15, 22, '2020-12', 90.0, 5, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (150, 15, 22, '2020-12', 90.0, 6, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (151, 15, 23, '2020-12', 90.0, 1, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (152, 15, 23, '2020-12', 90.0, 2, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (153, 15, 23, '2020-12', 90.0, 3, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (154, 15, 23, '2020-12', 90.0, 4, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (155, 15, 23, '2020-12', 90.0, 5, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (156, 15, 23, '2020-12', 90.0, 6, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (157, 15, 24, '2020-12', 90.0, 1, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (158, 15, 24, '2020-12', 90.0, 2, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (159, 15, 24, '2020-12', 90.0, 3, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (160, 15, 24, '2020-12', 90.0, 4, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (161, 15, 24, '2020-12', 90.0, 5, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (162, 15, 24, '2020-12', 90.0, 6, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (163, 15, 25, '2020-12', 90.0, 1, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (164, 15, 25, '2020-12', 90.0, 2, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (165, 15, 25, '2020-12', 90.0, 3, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (166, 15, 25, '2020-12', 90.0, 4, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (167, 15, 25, '2020-12', 90.0, 5, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (168, 15, 25, '2020-12', 90.0, 6, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (169, 15, 27, '2020-12', 90.0, 1, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (170, 15, 27, '2020-12', 90.0, 2, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (171, 15, 27, '2020-12', 90.0, 3, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (172, 15, 27, '2020-12', 90.0, 4, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (173, 15, 27, '2020-12', 90.0, 5, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (174, 15, 27, '2020-12', 90.0, 6, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (175, 15, 28, '2020-12', 90.0, 1, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (176, 15, 28, '2020-12', 90.0, 2, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (177, 15, 28, '2020-12', 90.0, 3, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (178, 15, 28, '2020-12', 90.0, 4, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (179, 15, 28, '2020-12', 90.0, 5, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (180, 15, 28, '2020-12', 90.0, 6, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (181, 15, 30, '2020-12', 90.0, 1, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (182, 15, 30, '2020-12', 90.0, 2, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (183, 15, 30, '2020-12', 90.0, 3, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (184, 15, 30, '2020-12', 90.0, 4, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (185, 15, 30, '2020-12', 90.0, 5, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (186, 15, 30, '2020-12', 90.0, 6, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (187, 15, 32, '2020-12', 90.0, 1, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (188, 15, 32, '2020-12', 90.0, 2, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (189, 15, 32, '2020-12', 90.0, 3, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (190, 15, 32, '2020-12', 90.0, 4, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (191, 15, 32, '2020-12', 90.0, 5, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (192, 15, 32, '2020-12', 90.0, 6, '2021-01-20 14:05:29');
+INSERT INTO `mutualrate` VALUES (193, 15, 7, '2021-02', 90.0, 1, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (194, 15, 7, '2021-02', 90.0, 2, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (195, 15, 7, '2021-02', 90.0, 3, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (196, 15, 7, '2021-02', 90.0, 4, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (197, 15, 7, '2021-02', 90.0, 5, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (198, 15, 7, '2021-02', 90.0, 6, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (199, 15, 8, '2021-02', 90.0, 1, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (200, 15, 8, '2021-02', 90.0, 2, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (201, 15, 8, '2021-02', 90.0, 3, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (202, 15, 8, '2021-02', 90.0, 4, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (203, 15, 8, '2021-02', 90.0, 5, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (204, 15, 8, '2021-02', 90.0, 6, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (205, 15, 11, '2021-02', 90.0, 1, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (206, 15, 11, '2021-02', 90.0, 2, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (207, 15, 11, '2021-02', 90.0, 3, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (208, 15, 11, '2021-02', 90.0, 4, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (209, 15, 11, '2021-02', 90.0, 5, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (210, 15, 11, '2021-02', 90.0, 6, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (211, 15, 13, '2021-02', 90.0, 1, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (212, 15, 13, '2021-02', 90.0, 2, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (213, 15, 13, '2021-02', 90.0, 3, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (214, 15, 13, '2021-02', 90.0, 4, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (215, 15, 13, '2021-02', 90.0, 5, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (216, 15, 13, '2021-02', 90.0, 6, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (217, 15, 14, '2021-02', 90.0, 1, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (218, 15, 14, '2021-02', 90.0, 2, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (219, 15, 14, '2021-02', 90.0, 3, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (220, 15, 14, '2021-02', 90.0, 4, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (221, 15, 14, '2021-02', 90.0, 5, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (222, 15, 14, '2021-02', 90.0, 6, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (223, 15, 16, '2021-02', 90.0, 1, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (224, 15, 16, '2021-02', 90.0, 2, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (225, 15, 16, '2021-02', 90.0, 3, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (226, 15, 16, '2021-02', 90.0, 4, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (227, 15, 16, '2021-02', 90.0, 5, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (228, 15, 16, '2021-02', 90.0, 6, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (229, 15, 17, '2021-02', 90.0, 1, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (230, 15, 17, '2021-02', 90.0, 2, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (231, 15, 17, '2021-02', 90.0, 3, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (232, 15, 17, '2021-02', 90.0, 4, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (233, 15, 17, '2021-02', 90.0, 5, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (234, 15, 17, '2021-02', 90.0, 6, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (235, 15, 19, '2021-02', 90.0, 1, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (236, 15, 19, '2021-02', 90.0, 2, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (237, 15, 19, '2021-02', 90.0, 3, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (238, 15, 19, '2021-02', 90.0, 4, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (239, 15, 19, '2021-02', 90.0, 5, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (240, 15, 19, '2021-02', 90.0, 6, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (241, 15, 22, '2021-02', 90.0, 1, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (242, 15, 22, '2021-02', 90.0, 2, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (243, 15, 22, '2021-02', 90.0, 3, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (244, 15, 22, '2021-02', 90.0, 4, '2021-01-20 14:16:42');
+INSERT INTO `mutualrate` VALUES (245, 15, 22, '2021-02', 90.0, 5, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (246, 15, 22, '2021-02', 90.0, 6, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (247, 15, 23, '2021-02', 90.0, 1, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (248, 15, 23, '2021-02', 90.0, 2, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (249, 15, 23, '2021-02', 90.0, 3, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (250, 15, 23, '2021-02', 90.0, 4, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (251, 15, 23, '2021-02', 90.0, 5, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (252, 15, 23, '2021-02', 90.0, 6, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (253, 15, 24, '2021-02', 90.0, 1, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (254, 15, 24, '2021-02', 90.0, 2, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (255, 15, 24, '2021-02', 90.0, 3, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (256, 15, 24, '2021-02', 90.0, 4, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (257, 15, 24, '2021-02', 90.0, 5, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (258, 15, 24, '2021-02', 90.0, 6, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (259, 15, 25, '2021-02', 90.0, 1, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (260, 15, 25, '2021-02', 90.0, 2, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (261, 15, 25, '2021-02', 90.0, 3, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (262, 15, 25, '2021-02', 90.0, 4, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (263, 15, 25, '2021-02', 90.0, 5, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (264, 15, 25, '2021-02', 90.0, 6, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (265, 15, 27, '2021-02', 90.0, 1, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (266, 15, 27, '2021-02', 90.0, 2, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (267, 15, 27, '2021-02', 90.0, 3, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (268, 15, 27, '2021-02', 90.0, 4, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (269, 15, 27, '2021-02', 90.0, 5, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (270, 15, 27, '2021-02', 90.0, 6, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (271, 15, 28, '2021-02', 90.0, 1, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (272, 15, 28, '2021-02', 90.0, 2, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (273, 15, 28, '2021-02', 90.0, 3, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (274, 15, 28, '2021-02', 90.0, 4, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (275, 15, 28, '2021-02', 90.0, 5, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (276, 15, 28, '2021-02', 90.0, 6, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (277, 15, 30, '2021-02', 90.0, 1, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (278, 15, 30, '2021-02', 90.0, 2, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (279, 15, 30, '2021-02', 90.0, 3, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (280, 15, 30, '2021-02', 90.0, 4, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (281, 15, 30, '2021-02', 90.0, 5, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (282, 15, 30, '2021-02', 90.0, 6, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (283, 15, 32, '2021-02', 90.0, 1, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (284, 15, 32, '2021-02', 90.0, 2, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (285, 15, 32, '2021-02', 90.0, 3, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (286, 15, 32, '2021-02', 90.0, 4, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (287, 15, 32, '2021-02', 90.0, 5, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (288, 15, 32, '2021-02', 90.0, 6, '2021-01-20 14:16:43');
+INSERT INTO `mutualrate` VALUES (289, 15, 7, '2020-11', 92.5, 1, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (290, 15, 7, '2020-11', 90.0, 2, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (291, 15, 7, '2020-11', 90.0, 3, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (292, 15, 7, '2020-11', 90.0, 4, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (293, 15, 7, '2020-11', 90.0, 5, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (294, 15, 7, '2020-11', 90.0, 6, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (295, 15, 8, '2020-11', 90.0, 1, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (296, 15, 8, '2020-11', 90.0, 2, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (297, 15, 8, '2020-11', 90.0, 3, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (298, 15, 8, '2020-11', 90.0, 4, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (299, 15, 8, '2020-11', 90.0, 5, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (300, 15, 8, '2020-11', 90.0, 6, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (301, 15, 11, '2020-11', 90.0, 1, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (302, 15, 11, '2020-11', 90.0, 2, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (303, 15, 11, '2020-11', 90.0, 3, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (304, 15, 11, '2020-11', 90.0, 4, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (305, 15, 11, '2020-11', 90.0, 5, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (306, 15, 11, '2020-11', 90.0, 6, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (307, 15, 13, '2020-11', 90.0, 1, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (308, 15, 13, '2020-11', 90.0, 2, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (309, 15, 13, '2020-11', 90.0, 3, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (310, 15, 13, '2020-11', 90.0, 4, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (311, 15, 13, '2020-11', 90.0, 5, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (312, 15, 13, '2020-11', 90.0, 6, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (313, 15, 14, '2020-11', 90.0, 1, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (314, 15, 14, '2020-11', 90.0, 2, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (315, 15, 14, '2020-11', 90.0, 3, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (316, 15, 14, '2020-11', 90.0, 4, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (317, 15, 14, '2020-11', 90.0, 5, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (318, 15, 14, '2020-11', 90.0, 6, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (319, 15, 16, '2020-11', 90.0, 1, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (320, 15, 16, '2020-11', 90.0, 2, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (321, 15, 16, '2020-11', 90.0, 3, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (322, 15, 16, '2020-11', 90.0, 4, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (323, 15, 16, '2020-11', 90.0, 5, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (324, 15, 16, '2020-11', 90.0, 6, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (325, 15, 17, '2020-11', 90.0, 1, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (326, 15, 17, '2020-11', 90.0, 2, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (327, 15, 17, '2020-11', 90.0, 3, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (328, 15, 17, '2020-11', 90.0, 4, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (329, 15, 17, '2020-11', 90.0, 5, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (330, 15, 17, '2020-11', 90.0, 6, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (331, 15, 19, '2020-11', 90.0, 1, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (332, 15, 19, '2020-11', 90.0, 2, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (333, 15, 19, '2020-11', 90.0, 3, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (334, 15, 19, '2020-11', 90.0, 4, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (335, 15, 19, '2020-11', 90.0, 5, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (336, 15, 19, '2020-11', 90.0, 6, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (337, 15, 22, '2020-11', 90.0, 1, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (338, 15, 22, '2020-11', 90.0, 2, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (339, 15, 22, '2020-11', 90.0, 3, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (340, 15, 22, '2020-11', 90.0, 4, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (341, 15, 22, '2020-11', 90.0, 5, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (342, 15, 22, '2020-11', 90.0, 6, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (343, 15, 23, '2020-11', 90.0, 1, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (344, 15, 23, '2020-11', 90.0, 2, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (345, 15, 23, '2020-11', 90.0, 3, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (346, 15, 23, '2020-11', 90.0, 4, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (347, 15, 23, '2020-11', 90.0, 5, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (348, 15, 23, '2020-11', 90.0, 6, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (349, 15, 24, '2020-11', 90.0, 1, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (350, 15, 24, '2020-11', 90.0, 2, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (351, 15, 24, '2020-11', 90.0, 3, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (352, 15, 24, '2020-11', 90.0, 4, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (353, 15, 24, '2020-11', 90.0, 5, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (354, 15, 24, '2020-11', 90.0, 6, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (355, 15, 25, '2020-11', 90.0, 1, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (356, 15, 25, '2020-11', 90.0, 2, '2021-01-20 14:26:34');
+INSERT INTO `mutualrate` VALUES (357, 15, 25, '2020-11', 90.0, 3, '2021-01-20 14:26:35');
+INSERT INTO `mutualrate` VALUES (358, 15, 25, '2020-11', 90.0, 4, '2021-01-20 14:26:35');
+INSERT INTO `mutualrate` VALUES (359, 15, 25, '2020-11', 90.0, 5, '2021-01-20 14:26:35');
+INSERT INTO `mutualrate` VALUES (360, 15, 25, '2020-11', 90.0, 6, '2021-01-20 14:26:35');
+INSERT INTO `mutualrate` VALUES (361, 15, 27, '2020-11', 90.0, 1, '2021-01-20 14:26:35');
+INSERT INTO `mutualrate` VALUES (362, 15, 27, '2020-11', 90.0, 2, '2021-01-20 14:26:35');
+INSERT INTO `mutualrate` VALUES (363, 15, 27, '2020-11', 90.0, 3, '2021-01-20 14:26:35');
+INSERT INTO `mutualrate` VALUES (364, 15, 27, '2020-11', 90.0, 4, '2021-01-20 14:26:35');
+INSERT INTO `mutualrate` VALUES (365, 15, 27, '2020-11', 90.0, 5, '2021-01-20 14:26:35');
+INSERT INTO `mutualrate` VALUES (366, 15, 27, '2020-11', 90.0, 6, '2021-01-20 14:26:35');
+INSERT INTO `mutualrate` VALUES (367, 15, 28, '2020-11', 90.0, 1, '2021-01-20 14:26:35');
+INSERT INTO `mutualrate` VALUES (368, 15, 28, '2020-11', 90.0, 2, '2021-01-20 14:26:35');
+INSERT INTO `mutualrate` VALUES (369, 15, 28, '2020-11', 90.0, 3, '2021-01-20 14:26:35');
+INSERT INTO `mutualrate` VALUES (370, 15, 28, '2020-11', 90.0, 4, '2021-01-20 14:26:35');
+INSERT INTO `mutualrate` VALUES (371, 15, 28, '2020-11', 90.0, 5, '2021-01-20 14:26:35');
+INSERT INTO `mutualrate` VALUES (372, 15, 28, '2020-11', 90.0, 6, '2021-01-20 14:26:35');
+INSERT INTO `mutualrate` VALUES (373, 15, 30, '2020-11', 90.0, 1, '2021-01-20 14:26:35');
+INSERT INTO `mutualrate` VALUES (374, 15, 30, '2020-11', 90.0, 2, '2021-01-20 14:26:35');
+INSERT INTO `mutualrate` VALUES (375, 15, 30, '2020-11', 90.0, 3, '2021-01-20 14:26:35');
+INSERT INTO `mutualrate` VALUES (376, 15, 30, '2020-11', 90.0, 4, '2021-01-20 14:26:35');
+INSERT INTO `mutualrate` VALUES (377, 15, 30, '2020-11', 90.0, 5, '2021-01-20 14:26:35');
+INSERT INTO `mutualrate` VALUES (378, 15, 30, '2020-11', 90.0, 6, '2021-01-20 14:26:35');
+INSERT INTO `mutualrate` VALUES (379, 15, 32, '2020-11', 90.0, 1, '2021-01-20 14:26:35');
+INSERT INTO `mutualrate` VALUES (380, 15, 32, '2020-11', 90.0, 2, '2021-01-20 14:26:35');
+INSERT INTO `mutualrate` VALUES (381, 15, 32, '2020-11', 90.0, 3, '2021-01-20 14:26:35');
+INSERT INTO `mutualrate` VALUES (382, 15, 32, '2020-11', 90.0, 4, '2021-01-20 14:26:35');
+INSERT INTO `mutualrate` VALUES (383, 15, 32, '2020-11', 90.0, 5, '2021-01-20 14:26:35');
+INSERT INTO `mutualrate` VALUES (384, 15, 32, '2020-11', 90.0, 6, '2021-01-20 14:26:35');
 
 -- ----------------------------
 -- Table structure for projectlist
@@ -4870,7 +5269,7 @@ CREATE TABLE `worktimeassign`  (
   `assignRole` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '参与人员角色',
   `obsoleteStatus` tinyint NOT NULL DEFAULT 0 COMMENT '废弃状态',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1617 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1625 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of worktimeassign
@@ -6491,6 +6890,14 @@ INSERT INTO `worktimeassign` VALUES (1613, 13, 1077, 2.0, 2.0, '组织者', 0);
 INSERT INTO `worktimeassign` VALUES (1614, 23, 1077, 1.0, 1.0, '协作者', 0);
 INSERT INTO `worktimeassign` VALUES (1615, 15, 1077, 1.0, 1.0, '协作者', 0);
 INSERT INTO `worktimeassign` VALUES (1616, 31, 1078, 2.0, NULL, '组织者', 0);
+INSERT INTO `worktimeassign` VALUES (1617, 32, 1079, 2.5, NULL, '组织者', 0);
+INSERT INTO `worktimeassign` VALUES (1618, 14, 1079, 1.5, NULL, '协作者', 0);
+INSERT INTO `worktimeassign` VALUES (1619, 32, 1080, 2.0, NULL, '组织者', 0);
+INSERT INTO `worktimeassign` VALUES (1620, 8, 1081, 2.0, NULL, '组织者', 0);
+INSERT INTO `worktimeassign` VALUES (1621, 31, 1082, 1.0, NULL, '组织者', 0);
+INSERT INTO `worktimeassign` VALUES (1622, 31, 1083, 1.0, NULL, '组织者', 0);
+INSERT INTO `worktimeassign` VALUES (1623, 31, 1084, 2.0, NULL, '组织者', 0);
+INSERT INTO `worktimeassign` VALUES (1624, 31, 1085, 1.0, NULL, '组织者', 0);
 
 -- ----------------------------
 -- Table structure for worktimelist
@@ -6524,7 +6931,7 @@ CREATE TABLE `worktimelist`  (
   `applyType` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '申报类型',
   `applyBaseWorkTime` float(6, 1) NOT NULL COMMENT '申报的基本工时（非标项目使用）',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1079 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1086 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of worktimelist
@@ -7607,6 +8014,13 @@ INSERT INTO `worktimelist` VALUES (1075, 1867, 685, NULL, 31, 96, 1.0, NULL, 1.0
 INSERT INTO `worktimelist` VALUES (1076, 1868, 686, NULL, 31, 81, 1.0, NULL, 1.0, NULL, '2021-01-19 11:40:36', '2021-01-19 11:40:36', '2021-01', 1, '组织并召开《基于ACARS系统故障整改措施的安全质量改进跟踪讨论会》。', 0, NULL, '', 0, 0, NULL, 2.0, 100.0, 0.0, 'fact', 2.0);
 INSERT INTO `worktimelist` VALUES (1077, 1869, 687, 1138, 13, 80, 1.0, 1.0, 1.0, 1.0, '2021-01-19 13:53:13', '2021-01-19 13:53:13', '2021-01', 1, '1.8组织宝利通视频会议技术交流会', 1, '2021-01-19 13:53:25', '', 0, 1, 13, 2.0, 100.0, 0.0, 'fact', 2.0);
 INSERT INTO `worktimelist` VALUES (1078, 1870, 688, NULL, 31, 77, 1.0, NULL, 1.0, NULL, '2021-01-19 14:28:44', '2021-01-19 14:28:44', '2021-01', 1, '整理ACARS新系统运维培训材料。编写运维手册。', 0, NULL, '', 0, 0, NULL, 2.0, 100.0, 0.0, 'fact', 2.0);
+INSERT INTO `worktimelist` VALUES (1079, 1871, 689, NULL, 32, 81, 1.0, NULL, 2.0, NULL, '2021-01-20 08:47:43', '2021-01-20 08:47:43', '2021-01', 1, '', 0, NULL, '', 0, 0, NULL, 4.0, 100.0, 0.0, 'fact', 2.0);
+INSERT INTO `worktimelist` VALUES (1080, 1872, 690, NULL, 32, 77, 1.0, NULL, 1.0, NULL, '2021-01-20 08:49:18', '2021-01-20 08:49:18', '2021-01', 1, '', 0, NULL, '', 0, 0, NULL, 2.0, 100.0, 0.0, 'fact', 2.0);
+INSERT INTO `worktimelist` VALUES (1081, 1873, 691, NULL, 8, 77, 1.0, NULL, 1.0, NULL, '2021-01-20 09:30:26', '2021-01-20 09:30:26', '2021-01', 0, '', 0, NULL, '', 0, 0, NULL, 2.0, 100.0, 0.0, 'fact', 2.0);
+INSERT INTO `worktimelist` VALUES (1082, 1874, 692, NULL, 31, 384, 1.0, NULL, 1.0, NULL, '2021-01-20 10:22:43', '2021-01-20 10:22:43', '2021-01', 1, '向陈总汇报B787客舱互联网工作开展近况，讨论流量采购推进事宜。', 0, NULL, '', 0, 0, NULL, 1.0, 100.0, 0.0, 'fact', 1.0);
+INSERT INTO `worktimelist` VALUES (1083, 1875, 693, NULL, 31, 95, 1.0, NULL, 1.0, NULL, '2021-01-20 10:42:22', '2021-01-20 10:42:22', '2021-01', 1, '完成《通信工程处颜河生ACARS系统SITA接口上线部署申请（信息大厦）不包含外网web应用》流程技术方案和产品设计书提交。', 0, NULL, '', 0, 0, NULL, 1.0, 100.0, 0.0, 'fact', 1.0);
+INSERT INTO `worktimelist` VALUES (1084, 1876, 694, NULL, 31, 77, 1.0, NULL, 1.0, NULL, '2021-01-20 10:43:06', '2021-01-20 10:43:06', '2021-01', 1, '完成ACARS系统SITA接口技术方案和产品设计书编写。', 0, NULL, '', 0, 0, NULL, 2.0, 100.0, 0.0, 'fact', 2.0);
+INSERT INTO `worktimelist` VALUES (1085, 1877, 695, NULL, 31, 95, 1.0, NULL, 1.0, NULL, '2021-01-20 11:02:31', '2021-01-20 11:02:31', '2021-01', 1, '完成《关于新增ACARS系统SITA接入平台服务器资源的申请》流程沟通节点回复。', 0, NULL, '', 0, 0, NULL, 1.0, 100.0, 0.0, 'fact', 1.0);
 
 -- ----------------------------
 -- Event structure for update_schedule
