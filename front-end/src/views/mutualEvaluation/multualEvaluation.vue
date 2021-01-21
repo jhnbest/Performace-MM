@@ -24,13 +24,12 @@
               style="color: #F56C6C;margin-left: 10px;font-size: 25px"/></span>
         </el-form-item>
       </el-col>
-      <el-col :span="6" :offset="3">
+      <el-col :span="4" :offset="5">
         <el-button type="primary" @click="submitRatesResult" :disabled="isRated">
           <span v-if="!isRated">提交</span>
           <span v-else>已提交</span>
         </el-button>
-        <el-button type="success" :disabled="!isRated" @click="updateRateTableData">更新</el-button>
-        <el-button type="warning" @click="resetTable">重置</el-button>
+        <el-button type="success" :disabled="!isRated || !isChanged" @click="updateRateTableData">更新</el-button>
       </el-col>
     </el-row>
   </el-form>
@@ -78,7 +77,7 @@
               stripe
               size="mini"
               :header-cell-style="{ backgroundColor:'#48bfe5', color: '#333' }"
-              v-loading="!reqFlag.getUserRates">
+              v-loading="!reqFlag.getUserRates && !reqFlag.getUsersList">
       <el-table-column label="姓名" align="center" prop="ratedName" min-width="30"></el-table-column>
       <el-table-column label="评价项" align="center">
         <el-table-column label="工作态度" align="center">
@@ -87,21 +86,23 @@
               <el-rate v-model="scope.row.t1Star"
                        show-text
                        :texts="scoreText"
-                       @change="handleStarChange(scope.row)"></el-rate>
+                       @change="handleT1StarChange(scope.row)"></el-rate>
             </template>
           </el-table-column>
           <el-table-column label="团队协作" align="center" min-width="110">
             <template slot-scope="scope">
               <el-rate v-model="scope.row.t2Star"
-                       show-text :texts="scoreText"
-                       @change="handleStarChange(scope.row)"></el-rate>
+                       show-text
+                       :texts="scoreText"
+                       @change="handleT2StarChange(scope.row)"></el-rate>
             </template>
           </el-table-column>
           <el-table-column label="组织纪律" align="center" min-width="110">
             <template slot-scope="scope">
               <el-rate v-model="scope.row.t3Star"
-                       show-text :texts="scoreText"
-                       @change="handleStarChange(scope.row)"></el-rate>
+                       show-text
+                       :texts="scoreText"
+                       @change="handleT3StarChange(scope.row)"></el-rate>
             </template>
           </el-table-column>
         </el-table-column>
@@ -109,8 +110,9 @@
           <el-table-column label="计划能力" align="center" min-width="110">
             <template slot-scope="scope">
               <el-rate v-model="scope.row.t4Star"
-                       show-text :texts="scoreText"
-                       @change="handleStarChange(scope.row)"></el-rate>
+                       show-text
+                       :texts="scoreText"
+                       @change="handleT4StarChange(scope.row)"></el-rate>
             </template>
           </el-table-column>
           <el-table-column label="执行能力" align="center" min-width="110">
@@ -118,7 +120,7 @@
               <el-rate v-model="scope.row.t5Star"
                        show-text
                        :texts="scoreText"
-                       @change="handleStarChange(scope.row)"></el-rate>
+                       @change="handleT5StarChange(scope.row)"></el-rate>
             </template>
           </el-table-column>
           <el-table-column label="综合能力" align="center" min-width="110">
@@ -126,7 +128,7 @@
               <el-rate v-model="scope.row.t6Star"
                        show-text
                        :texts="scoreText"
-                       @change="handleStarChange(scope.row)"></el-rate>
+                       @change="handleT6StarChange(scope.row)"></el-rate>
             </template>
           </el-table-column>
         </el-table-column>
@@ -140,7 +142,8 @@
 </template>
 
 <script>
-  import { getUsersName, getUserRates, submitRatesResult, updateUserRate } from '@/config/interface'
+  import { getUsersName, getUserRates, submitRatesResult, updateUserRate,
+    getCurMutualRate } from '@/config/interface'
   import CountTo from 'vue-count-to'
   export default {
     data () {
@@ -350,10 +353,16 @@
         defaultStar: 4,
         scoreText: ['82.5', '85', '87.5', '90', '92.5'],
         isRated: false,
+        isChanged: false,
         ratesTableTmp: [],
         reqFlag: {
-          getUserRates: true
-        }
+          getUserRates: true,
+          getUsersList: true
+        },
+        ratesTmp: [],
+        ratesToUpdate: [],
+        ratedArray: [],
+        curMutualRate: 0
       }
     },
     methods: {
@@ -361,6 +370,7 @@
       init () {
         let _this = this
         this.getCookie()
+        this.getCurMutualRate()
         this.getUsersList().then(res1 => {
           _this.users = res1
           _this.getUserRates().then(res2 => {
@@ -368,6 +378,71 @@
             _this.genRateTableData(res1, res2)
           })
         })
+      },
+      // 计算本人互评分数
+      CalMutualRate (param) {
+        let flag = 0
+        for (let i = 0; i < this.ratedArray.length; i++) {
+          if (this.ratedArray[i].ratePersion === param.ratePersion) {
+            flag++
+            this.ratedArray[i][this.rateTypeSwitch(param.rateType)] = param.rate
+            this.ratedArray[i].totalScore = this.calMultualScoreByScore(
+              this.ratedArray[i].t1Star,
+              this.ratedArray[i].t2Star,
+              this.ratedArray[i].t3Star,
+              this.ratedArray[i].t4Star,
+              this.ratedArray[i].t5Star,
+              this.ratedArray[i].t6Star)
+            break
+          }
+        }
+        if (!flag) {
+          let obj = {
+            ratePersion: param.ratePersion,
+            t1Star: 0,
+            t2Star: 0,
+            t3Star: 0,
+            t4Star: 0,
+            t5Star: 0,
+            t6Star: 0,
+            totalScore: 0
+          }
+          obj[this.rateTypeSwitch(param.rateType)] = param.rate
+          obj.totalScore = this.calMultualScoreByScore(obj.t1Star, obj.t2Star, obj.t3Star, obj.t4Star,
+            obj.t5Star, obj.t6Star)
+          this.ratedArray.push(obj)
+        }
+      },
+      // 获取本人互评分数
+      getCurMutualRate () {
+        const url = getCurMutualRate
+        let params = {
+          userID: this.$store.state.userInfo.id,
+          rateMonth: this.formData.title
+        }
+        this.ratedArray = []
+        this.$http(url, params)
+          .then(res => {
+            if (res.code === 1) {
+              console.log(res.data)
+              for (let item of res.data) {
+                this.CalMutualRate(item)
+              }
+              let count = 0
+              let totalRate = 0
+              let manageRate = 0
+              for (let item of this.ratedArray) {
+                if (item.ratePersion !== 26) {
+                  count++
+                  totalRate += item.totalScore
+                } else {
+                  manageRate = item.totalScore
+                }
+              }
+              this.curMutualRate = totalRate / count
+              console.log(this.ratedArray)
+            }
+          })
       },
       // 星级转评分
       starToRates (star) {
@@ -439,15 +514,18 @@
         const url = getUsersName
         let params = {}
         let _this = this
-        return new Promise(function (resolve, reject) {
-          _this.$http(url, params)
-            .then(res => {
-              if (res.code === 1) {
-                console.log(res.data)
-                resolve(res.data.list)
-              }
-            })
-        })
+        if (this.reqFlag.getUsersList) {
+          this.reqFlag.getUsersList = false
+          return new Promise(function (resolve, reject) {
+            _this.$http(url, params)
+              .then(res => {
+                if (res.code === 1) {
+                  resolve(res.data.list)
+                }
+                _this.reqFlag.getUsersList = true
+              })
+          })
+        }
       },
       // 获取互评信息
       getUserRates () {
@@ -470,6 +548,12 @@
           })
         }
       },
+      // 计算互评总分(通过各评分类型分数)
+      calMultualScoreByScore (t1Score, t2Score, t3Score, t4Score, t5Score, t6Score) {
+        let totalScore = t1Score * 0.15 + t2Score * 0.2 + t3Score * 0.1 +
+          t4Score * 0.1 + t5Score * 0.3 + t6Score * 0.15
+        return totalScore
+      },
       // 计算互评总分
       calMultualScore (t1Star, t2Star, t3Star, t4Star, t5Star, t6Star) {
         let t1Score = this.starToRates(t1Star)
@@ -484,12 +568,49 @@
       },
       // 生成用户互评数据
       genRateTableData (users, rates) {
+        this.isChanged = false
         this.rateTableData = []
         let curGroupName = this.$store.state.userInfo.groupName
         let curID = this.$store.state.userInfo.id
         if (rates.length === 0) { // 该月还未进行互评
           for (let user of users) {
-            if (user.groupName === '技术标准组' || user.groupName === '工程组') {
+            if (curGroupName === '技术标准组' || curGroupName === '工程组') {
+              if (user.groupName === '技术标准组' || user.groupName === '工程组') {
+                if (curID !== user.id) {
+                  let obj = {
+                    ratedID: user.id,
+                    ratedName: user.name,
+                    t1Star: this.defaultStar,
+                    t2Star: this.defaultStar,
+                    t3Star: this.defaultStar,
+                    t4Star: this.defaultStar,
+                    t5Star: this.defaultStar,
+                    t6Star: this.defaultStar
+                  }
+                  obj.totalScore = this.calMultualScore(obj.t1Star, obj.t2Star, obj.t3Star,
+                    obj.t4Star, obj.t5Star, obj.t6Star)
+                  this.rateTableData.push(obj)
+                }
+              }
+            } else if (curGroupName === '通信组') {
+              if (user.groupName === '通信组') {
+                if (curID !== user.id) {
+                  let obj = {
+                    ratedID: user.id,
+                    ratedName: user.name,
+                    t1Star: this.defaultStar,
+                    t2Star: this.defaultStar,
+                    t3Star: this.defaultStar,
+                    t4Star: this.defaultStar,
+                    t5Star: this.defaultStar,
+                    t6Star: this.defaultStar
+                  }
+                  obj.totalScore = this.calMultualScore(obj.t1Star, obj.t2Star, obj.t3Star,
+                    obj.t4Star, obj.t5Star, obj.t6Star)
+                  this.rateTableData.push(obj)
+                }
+              }
+            } else if (curGroupName === '处经理') {
               if (curID !== user.id) {
                 let obj = {
                   ratedID: user.id,
@@ -509,6 +630,7 @@
           }
         } else {
           this.ratesTableTmp = []
+          this.ratesTmp = JSON.parse(JSON.stringify(rates))
           for (let item1 of rates) {
             let index = this.getIndexOfRatedPersion(item1.ratedPersion)
             if (index === -1) {
@@ -526,17 +648,19 @@
             item.totalScore = this.calMultualScore(item.t1Star, item.t2Star, item.t3Star, item.t4Star,
               item.t5Star, item.t6Star)
           }
-          this.rateTableData = this.ratesTableTmp
+          this.rateTableData = JSON.parse(JSON.stringify(this.ratesTableTmp))
         }
       },
       // 上一月
       handlePreMonth () {
         this.formData.title = this.$moment(this.formData.title).subtract(1, 'months').format('YYYY-MM')
+        this.setMonthCookie(this.formData.title, 7)
         this.handelDateChange()
       },
       // 下一月
       handleNextMonth () {
         this.formData.title = this.$moment(this.formData.title).add(1, 'months').format('YYYY-MM')
+        this.setMonthCookie(this.formData.title, 7)
         this.handelDateChange()
       },
       // 申报月份变化
@@ -643,6 +767,13 @@
         // 字符串拼接cookie
         window.document.cookie = 'sst' + '=' + showTable + ';path=/;expires=' + exdate.toGMTString()
       },
+      // 设置月份cookie
+      setMonthCookie (month, exdays) {
+        let exdate = new Date() // 获取时间
+        exdate.setTime(exdate.getTime() + 24 * 60 * 60 * 1000 * exdays) // 保存的天数
+        // 字符串拼接cookie
+        window.document.cookie = 'mMon' + '=' + month + ';path=/;expires=' + exdate.toGMTString()
+      },
       // 读取cookie
       getCookie: function () {
         if (document.cookie.length > 0) {
@@ -652,6 +783,9 @@
             // 判断查找相对应的值
             if (arr2[0] === 'sst') {
               this.showFlag.descTableShow = arr2[1] === 'true'
+            }
+            if (arr2[0] === 'mMon') {
+              this.formData.title = arr2[1]
             }
           }
         }
@@ -664,9 +798,62 @@
       // 评分表格合并方法
       rateTableMethod () {
       },
-      // 星级变化
-      handleStarChange (row) {
+      // 更新待更新评分数据
+      updateRateToUpdate (ratesUpdate) {
+        let flag = 0
+        for (let i = 0; i < this.ratesToUpdate.length; i++) {
+          if (this.ratesToUpdate[i].id === ratesUpdate.id) {
+            this.ratesToUpdate[i] = ratesUpdate
+            flag++
+            break
+          }
+        }
+        if (!flag) { // 没有匹配的数据
+          this.ratesToUpdate.push(ratesUpdate)
+        }
+      },
+      // 更新带id的评分数据
+      updateRateRawRateData (rateType, ratedPersion, rate) {
+        this.isChanged = true
+        for (let i = 0; i < this.ratesTmp.length; i++) {
+          if (this.ratesTmp[i].rateType === rateType &&
+            this.ratesTmp[i].ratedPersion === ratedPersion) {
+            this.ratesTmp[i].rate = rate
+            this.updateRateToUpdate(this.ratesTmp[i])
+            console.log(this.ratesToUpdate)
+            break
+          }
+        }
+      },
+      // 评分项1星级变化
+      handleT1StarChange (row) {
         row.totalScore = this.calMultualScore(row.t1Star, row.t2Star, row.t3Star, row.t4Star, row.t5Star, row.t6Star)
+        this.updateRateRawRateData(1, row.ratedPersion, this.starToRates(row.t1Star))
+      },
+      // 评分项2星级变化
+      handleT2StarChange (row) {
+        row.totalScore = this.calMultualScore(row.t1Star, row.t2Star, row.t3Star, row.t4Star, row.t5Star, row.t6Star)
+        this.updateRateRawRateData(2, row.ratedPersion, this.starToRates(row.t2Star))
+      },
+      // 评分项3星级变化
+      handleT3StarChange (row) {
+        row.totalScore = this.calMultualScore(row.t1Star, row.t2Star, row.t3Star, row.t4Star, row.t5Star, row.t6Star)
+        this.updateRateRawRateData(3, row.ratedPersion, this.starToRates(row.t3Star))
+      },
+      // 评分项4星级变化
+      handleT4StarChange (row) {
+        row.totalScore = this.calMultualScore(row.t1Star, row.t2Star, row.t3Star, row.t4Star, row.t5Star, row.t6Star)
+        this.updateRateRawRateData(4, row.ratedPersion, this.starToRates(row.t4Star))
+      },
+      // 评分项5星级变化
+      handleT5StarChange (row) {
+        row.totalScore = this.calMultualScore(row.t1Star, row.t2Star, row.t3Star, row.t4Star, row.t5Star, row.t6Star)
+        this.updateRateRawRateData(5, row.ratedPersion, this.starToRates(row.t5Star))
+      },
+      // 评分项6星级变化
+      handleT6StarChange (row) {
+        row.totalScore = this.calMultualScore(row.t1Star, row.t2Star, row.t3Star, row.t4Star, row.t5Star, row.t6Star)
+        this.updateRateRawRateData(6, row.ratedPersion, this.starToRates(row.t6Star))
       },
       // 提交
       submitRatesResult () {
@@ -681,16 +868,25 @@
           .then(res => {
             if (res.code === 1) {
               _this.isRated = true
+              _this.isChanged = false
               this.$common.toast('提交成功', 'success', false)
             }
           })
       },
-      // 更新表格
+      // 更新按钮
       updateRateTableData () {
         const url = updateUserRate
         console.log(this.rateTableData)
         let params = {
+          ratesToUpdate: this.ratesToUpdate
         }
+        this.$http(url, params)
+          .then(res => {
+            if (res.code === 1) {
+              this.isChanged = false
+              this.$common.toast('更新成功', 'success', false)
+            }
+          })
       },
       // 重置
       resetTable () {

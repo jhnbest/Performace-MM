@@ -52,7 +52,7 @@
         </el-form-item>
         <br>
         <el-form-item label="项目名称" prop="projectName">
-          <el-input v-model="formData.projectName" placeholder="请输入"></el-input>
+          <el-input v-model="formData.projectName" placeholder="请输入" style="width: 250%"></el-input>
         </el-form-item>
         <br>
         <el-form-item label="项目级别" prop="projectLevel">

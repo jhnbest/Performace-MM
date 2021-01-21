@@ -55,3 +55,5 @@ export const getAssignedProjectPlan = '/workStation/getAssignedProjectPlan' // �
 export const getUserRates = '/mutualRates/getUserRates' // 获取互评信息
 export const submitRatesResult = '/mutualRates/submitRatesResult' // 提交互评结果
 export const updateUserRate = '/mutualRates/updateUserRate' // 更新互评结果
+export const getCurMutualRate = '/mutualRates/getCurMutualRate' // 获取本人互评得分
+export const getAllUserRates = '/mutualRates/getAllUserRates' // 获取本处员工互评得分

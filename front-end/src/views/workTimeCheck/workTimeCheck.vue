@@ -31,9 +31,12 @@
                           || $store.state.userInfo.groupName === '处经理'"></el-radio-button>
       </el-radio-group>
     </div>
-    <div>
-      <el-table :data="tableData" style="width: 97%;margin: auto">
-        <el-table-column label="序号" align="center" type="index"></el-table-column>
+    <div style="margin-top: -20px">
+      <el-table :data="tableData"
+                style="width: 97%; margin: auto"
+                border
+                :header-cell-style="{ backgroundColor:'#48bfe5', color: '#333'}">
+        <el-table-column label="序号" align="center" type="index" width="50"></el-table-column>
         <el-table-column label="姓名" align="center" prop="name"></el-table-column>
         <el-table-column label="获得工时" align="center" prop="totalWorkTime"></el-table-column>
         <el-table-column label="小组排名" align="center" prop="rank"></el-table-column>

@@ -181,7 +181,7 @@
     <div v-if="showFlag.assigned">
       <h3 class="v-line-icon-red">已指派</h3>
       <el-table :data="assignedTable" style="width: 95%;margin: auto">
-        <el-table-column label="序号" align="center" type="index"></el-table-column>
+        <el-table-column label="序号" align="center" type="index" width="50"></el-table-column>
         <el-table-column label="指派时间" align="center">
           <template slot-scope="scope">
             <span>{{scope.row.assignDate}}</span>

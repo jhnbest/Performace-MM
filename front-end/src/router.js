@@ -138,6 +138,12 @@ export default new Router({
           meta: { pagePath: '/home/mutualEvaluation' }
         },
         {
+          path: 'mulEvaCheck',
+          name: 'mulEvaCheck',
+          component: () => import('./views/mutualEvaluation/muLEvaCheck'),
+          meta: { pagePath: '/home/mulEvaCheck' }
+        },
+        {
           path: 'workTimeReview',
           name: 'workTimeReview',
           component: () => import('./views/workTimeReview/WorkTimeReview.vue'),

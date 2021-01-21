@@ -6,7 +6,9 @@
         :data="formData.workDetailTable"
         stripe
         :span-method="objectSpanMethod"
-        style="width: 100%;margin: auto" border>
+        style="width: 100%;margin: auto"
+        border
+        :header-cell-style="{ backgroundColor:'#48bfe5', color: '#333' }">
         <el-table-column v-if="info.reviewType === 'reviewed'" type="expand" >
           <template slot-scope="scope">
             <el-form label-position="left" inline class="demo-table-expand">
@@ -31,8 +33,8 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="项目名称" align="center" prop="projectName"></el-table-column>
-        <el-table-column label="项目阶段" align="center" prop="projectStageName"></el-table-column>
+        <el-table-column label="项目名称" align="center" prop="projectName" show-overflow-tooltip></el-table-column>
+        <el-table-column label="项目阶段" align="center" prop="projectStageName" show-overflow-tooltip></el-table-column>
         <el-table-column label="基本工时" align="center" prop="applyBaseWorkTime" width="80%"></el-table-column>
         <el-table-column label="申报K值" align="center" prop="applyKValue" width="80%"></el-table-column>
         <el-table-column label="审核K值" align="center" width="100%">

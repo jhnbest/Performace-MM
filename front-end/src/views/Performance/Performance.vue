@@ -218,8 +218,7 @@
           },
           workDetailTable: [],
           workPlanTableData: [],
-          planGetWorkTime: 0,
-          getTotalFinish: false
+          planGetWorkTime: 0
         }
       },
       methods: {
@@ -434,32 +433,34 @@
             }
           })
         },
-        getAssignWorkTimesOP () {
-        },
         async getAssignWorkTimes (data) {
           const url = getAssignWorkTime
           let i = 0
           this.formData.totalWorkTime = 0
+          let params = {
+            userID: this.$store.state.userInfo.id,
+            projectData: []
+          }
           if (data.length !== 0) {
-            this.getTotalFinish = false
             for (let item of data) {
               if (item.reviewStatus === 1) {
-                let params = {
-                  index: i,
-                  projectID: item.id,
-                  userID: this.$store.state.userInfo.id
-                }
-                this.$http(url, params)
-                  .then(res => {
-                    if (res.code === 1) {
-                      let data = res.data
-                      this.workDetailTable[data.index].assignWorkTime = data.reviewWorkTime
-                      this.formData.totalWorkTime += data.reviewWorkTime
-                    }
-                  })
+                item.index = i
+                params.projectData.push(item)
               }
               i++
             }
+            this.$http(url, params)
+              .then(res => {
+                if (res.code === 1) {
+                  let data = res.data
+                  let totalWorkTimeTmp = 0
+                  for (let item of data) {
+                    this.workDetailTable[item.index].assignWorkTime = item.reviewWorkTime
+                    totalWorkTimeTmp += item.reviewWorkTime
+                  }
+                  this.formData.totalWorkTime = totalWorkTimeTmp
+                }
+              })
           }
         },
         // 切换标签事件
@@ -716,13 +717,6 @@
             } else {
               return true
             }
-          }
-        },
-        GETTOTALWORKTIME () {
-          if (this.getTotalFinish) {
-            return this.formData.totalWorkTime
-          } else {
-            return 0
           }
         }
       },

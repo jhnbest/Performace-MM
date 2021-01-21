@@ -69,5 +69,8 @@ router.post(api.getAssignedProjectPlan, workStation.getAssignedProjectPlan)
 // 互评模块
 router.post(api.getUserRates, mutualRates.getUserRates)
 router.post(api.submitRatesResult, mutualRates.submitRatesResult)
+router.post(api.updateUserRate, mutualRates.updateUserRate)
+router.post(api.getCurMutualRate, mutualRates.getCurMutualRate)
+router.post(api.getAllUserRates, mutualRates.getAllUserRates)
 
 module.exports = router;

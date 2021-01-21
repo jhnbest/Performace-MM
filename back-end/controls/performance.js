@@ -551,6 +551,19 @@ function getMonthProcessByID(id) {
     })
 }
 
+function RCPDDatabase(sql, arrayParams) {
+    return new Promise(function (resolve, reject) {
+        $http.connPool(sql, arrayParams, (err, result) => {
+            if (err) {
+                reject(err)
+            } else {
+                result = JSON.parse(JSON.stringify(result))
+                resolve(result)
+            }
+        })
+    })
+}
+
 const performance = {
     // 加周报 start
     add (req, res) {
@@ -896,20 +909,30 @@ const performance = {
         })
     },
     // 获取分配的工时
-    getAssignWorkTime (req, res) {
-        $http.userVerify(req, res, () => {
+    async getAssignWorkTime (req, res) {
+        $http.userVerify(req, res, async () => {
             let data = req.body
             let sql = $sql.performance.getAssignWorkTime
-            let arrayParams = [data.projectID, data.userID]
-            $http.connPool(sql, arrayParams, (err, result) => {
-                if (err) {
-                    return $http.writeJson(res, {code: -2, message: '失败', errMsg: err})
-                } else {
-                    result = JSON.parse(JSON.stringify(result))
-                    result[0].index = data.index
-                    return $http.writeJson(res, {code: 1, data: result[0], message: '成功'})
-                }
-            })
+            let arrayParams = []
+            let resultData = []
+            for (let item of data.projectData) {
+                arrayParams = [item.id, data.userID]
+                await RCPDDatabase(sql, arrayParams).then(res0 => {
+                    res0[0].index = item.index
+                    resultData.push(res0[0])
+                })
+            }
+            console.log(resultData)
+            return $http.writeJson(res, {code: 1, data: resultData, message: '成功'})
+            // $http.connPool(sql, arrayParams, (err, result) => {
+            //     if (err) {
+            //         return $http.writeJson(res, {code: -2, message: '失败', errMsg: err})
+            //     } else {
+            //         result = JSON.parse(JSON.stringify(result))
+            //         result[0].index = data.index
+            //         return $http.writeJson(res, {code: 1, data: result[0], message: '成功'})
+            //     }
+            // })
         })
     },
     // 获取小组申报工时列表

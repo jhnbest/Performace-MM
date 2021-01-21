@@ -185,8 +185,11 @@ const sqlMap = {
   mutualRates: {
     getUserRates: 'select mr.*, u.name as ratedPersionName from mutualrate mr left join users u on ' +
         'mr.ratedPersion = u.id where mr.ratePersion = ? and mr.rateMonth = ?',
-    submitRatesResult: 'insert into mutualrate (ratePersion, ratedPersion, rateMonth, rate, rateType, rateTime) ' +
-        'values (?, ?, ?, ?, ?, ?)'
+    submitRatesResult: 'insert into mutualrate (ratePersion, ratedPersion, rateMonth, rate, rateType, rateTime, updateTime) ' +
+        'values (?, ?, ?, ?, ?, ?, ?)',
+    updateUserRate: 'update mutualrate set rate = ?, updateTime = ? where id = ?',
+    getCurMutualRate: 'select * from mutualrate where ratedPersion = ? and rateMonth = ?',
+    getRateData: 'select * from mutualrate where ratePersion = ? and rateMonth = ?'
   }
 }
 module.exports = sqlMap;

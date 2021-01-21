@@ -60,6 +60,9 @@ module.exports = {
     getAssignedProjectPlan: path + '/workStation/getAssignedProjectPlan', // 获取指派项目列表(计划查询)
 
     // 互评模块
-    getUserRates: path + '/mutualRates/getUserRates', // 互评模块
-    submitRatesResult: path + '/mutualRates/submitRatesResult' // 互评模块
+    getUserRates: path + '/mutualRates/getUserRates', // 获取互评信息
+    submitRatesResult: path + '/mutualRates/submitRatesResult', // 提交互评结果
+    updateUserRate: path + '/mutualRates/updateUserRate', // 更新互评结果
+    getCurMutualRate: path + '/mutualRates/getCurMutualRate', // 获取本人互评得分
+    getAllUserRates: path + '/mutualRates/getAllUserRates' // 获取本处员工互评得分
 };
