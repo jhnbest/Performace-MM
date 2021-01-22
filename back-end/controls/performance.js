@@ -922,17 +922,7 @@ const performance = {
                     resultData.push(res0[0])
                 })
             }
-            console.log(resultData)
             return $http.writeJson(res, {code: 1, data: resultData, message: '成功'})
-            // $http.connPool(sql, arrayParams, (err, result) => {
-            //     if (err) {
-            //         return $http.writeJson(res, {code: -2, message: '失败', errMsg: err})
-            //     } else {
-            //         result = JSON.parse(JSON.stringify(result))
-            //         result[0].index = data.index
-            //         return $http.writeJson(res, {code: 1, data: result[0], message: '成功'})
-            //     }
-            // })
         })
     },
     // 获取小组申报工时列表

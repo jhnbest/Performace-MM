@@ -100,7 +100,6 @@
         },
         // 点击填报按钮事件
         handleFillIn (row) {
-          console.log(this.fatherParams)
           this.$router.push({
             path: '/home/projectPlanProcess',
             query: {
@@ -113,7 +112,6 @@
         },
         // 删除按钮
         handleDelete (row) {
-          console.log(row)
           this.$common.msgBox('confirm', '操作提示', '此操作将删除所有与该项目相关的工时申报（包括已获得工时），确定删除？', () => {
             if (this.reqFlag.deleteProject) {
               this.reqFlag.deleteProject = false

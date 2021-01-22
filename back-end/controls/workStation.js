@@ -117,7 +117,6 @@ function fillFactMonthData(obj, preResult, year, aPDID) {
 //                 reject(-1)
 //             } else  {
 //                 result = JSON.parse(JSON.stringify(result))
-//                 console.log(result)
 //                 if (result.length === 0) { //无任何进展数据
 //                     let obj = {}
 //                     fillPlanMonthData(obj, preResult, year, id)
@@ -328,7 +327,6 @@ function getMonthProcessDiffOP(applyMonth, applyYear, lastMonth, lastYear, data,
                 reject(-1)
             } else {
                 result = JSON.parse(JSON.stringify(result))
-                console.log(result)
                 let applyMonthProcess = null
                 let lastMonthProcess = null
                 for (let item of result) {
@@ -341,8 +339,6 @@ function getMonthProcessDiffOP(applyMonth, applyYear, lastMonth, lastYear, data,
                         lastMonthProcess = item[lastMonth]
                     }
                 }
-                console.log(applyMonthProcess)
-                console.log(lastMonthProcess)
                 if (lastMonthProcess == null || applyMonthProcess === null) {
                     if (lastMonthProcess == null) {
                         lastMonthProcess = 0
@@ -489,7 +485,6 @@ const workStation = {
         $http.userVerify(req, res, () => {
             let data = req.body
             let sql = null
-            console.log(data)
             if (data.searchType === 'unFilled') {
                 sql = $sql.workStation.getAssignProjectListUn + ';' + $sql.workStation.getAssignProjectListUnCount
             } else if (data.searchType === 'completed') {
@@ -505,7 +500,6 @@ const workStation = {
                     result[0] = JSON.parse(JSON.stringify(result[0]))
                     result[1] = JSON.parse(JSON.stringify(result[1]))
                     result[0] = formatData(result[0])
-                    console.log(result)
                     return $http.writeJson(res, {code: 1, data: result, message: '成功'})
 
                 }
@@ -591,7 +585,6 @@ const workStation = {
                 } else {
                     let resultData = {}
                     result = JSON.parse(JSON.stringify(result))
-                    console.log(result)
                     if (data.id !== null) {
                         resultData = {
                             monthID: data.id
@@ -610,14 +603,12 @@ const workStation = {
     projectProcessCal(params) {
         return new Promise(function (resolve, reject) {
             let sql = $sql.workStation.getProjectStageProcess
-            console.log(params.aPLID)
             let arrayParams = [params.aPLID, params.aPLID]
             $http.connPool(sql, arrayParams, (err, result) => {
                 if (err) {
                     reject(-1)
                 } else {
                     result = JSON.parse(JSON.stringify(result))
-                    console.log(result)
                     let totalCount = result[0][0].totalCount
                     let totalProcess = 0.0
                     for (let item of result[1]) {
@@ -645,7 +636,6 @@ const workStation = {
     // 保存计划进展
     submitPlanProcess (req, res) {
         let data = req.body
-        console.log(data)
         workStation.saveProcess(data).then((res0) => { //保存进展
             // if (data.type === 'fact') { //填写的是实际进展
             //     this.projectStageProcessCal(data.aPDID, data.year).then(res1 => { //计算该阶段进展
@@ -668,8 +658,6 @@ const workStation = {
         let data = req.body
         let sql = null
         let arrayParams = []
-        console.log('====submitAssignWorkDetail')
-        console.log(data)
         let projectTypeID = data.parentID
         let projectName = data.projectName
         let userID = data.tableData[0].projectManagerID
@@ -691,7 +679,6 @@ const workStation = {
         sql = $sql.workStation.insertAssignProjectList
         arrayParams = [userID, curTime, projectTypeID, projectName, assignerID, totalWorkTime, projectLevel, reviewStatus, isFilled]
         insertAssignProjectList(sql, arrayParams).then( res1 => {
-            console.log(res1)
             let insertID = res1.insertId
             sql = $sql.workStation.insertAssignProjectDetail
             arrayParams = []
@@ -740,7 +727,6 @@ const workStation = {
     // 获取每月进展对应工时
     async getMonthProcessDiff (req, res) {
         let params = req.body
-        console.log(params)
         let applyMonth = params.applyMonth
         let applyYear = params.applyYear
         let lastMonth = params.lastMonth
@@ -754,7 +740,6 @@ const workStation = {
                     res2.processDiff = res1
                     resultData.push(res2)
                     if (i === params.data.length - 1) {
-                        console.log(resultData)
                         return $http.writeJson(res, {code: 1, data: resultData, message: '成功'})
                     }
                 })
@@ -764,7 +749,6 @@ const workStation = {
     // 获取已指派项目列表
     getAssignedProject (req, res) {
         let data = req.body
-        console.log(data)
         let sql = $sql.workStation.getAssignedProject
         let arrayParams = [data.assignerID]
         $http.connPool(sql, arrayParams, (err, result) => {
@@ -780,7 +764,6 @@ const workStation = {
     // 更新已指派项目
     updateAssignProjectList (req, res) {
         let data = req.body.data
-        console.log(data)
         let sql = $sql.workStation.updateAssignProjectList
         let arrayParams = [data.projectManagerID, data.projectName, data.projectLevel, data.id]
         $http.connPool(sql, arrayParams, (err, result) => {
@@ -794,7 +777,6 @@ const workStation = {
     // 删除已指派项目
     deleteAssignProject (req, res) {
         let data = req.body
-        console.log(data)
         let sql = $sql.workStation.deleteAssignProjectList + ';'
             + $sql.workStation.deleteAssignProjectDetail + ';'
             + $sql.workStation.getAssignProjectDetailID + ';'
@@ -811,7 +793,6 @@ const workStation = {
                     result[2] = JSON.parse(JSON.stringify(result[2]))
                     result[3] = JSON.parse(JSON.stringify(result[3]))
                     result[4] = JSON.parse(JSON.stringify(result[4]))
-                    console.log(result)
                     updateMonthProcessObsoleteStatus(result[2]).then(res1 => {
                         updateWorkTimeAssignObsoleteStatus(result[4]).then(res2 => {
                             return $http.writeJson(res, { code: 1, message: '成功' })
@@ -846,7 +827,6 @@ const workStation = {
     // 获取项目明细
     getAssignWorkDetail (req, res) {
         let data = req.body
-        console.log(data)
         let sql = $sql.workStation.getAssignWorkDetail
         let arrayParams = [data.apdID]
         $http.connPool(sql, arrayParams, (err, result) => {
@@ -854,7 +834,6 @@ const workStation = {
                 return $http.writeJson(res, {code: -2, message:'失败', errMsg: err})
             } else {
                 result = JSON.parse(JSON.stringify(result))
-                console.log(result)
                 return $http.writeJson(res, {code: 1, data: result[0], message: '成功'})
             }
         })
@@ -877,7 +856,6 @@ const workStation = {
     // 提交计划至计划进展表
     async submitMonthPlanProcess (req, res) {
         let data = req.body
-        console.log(data)
         let i = 0
         for (let item of data.paramsData) {
             await workStation.saveProcess(item)

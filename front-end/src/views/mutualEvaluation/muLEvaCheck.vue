@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="$store.state.userInfo.id === 26 || $store.state.userInfo.id === 15" >
     <el-form class="main-search" :inline="true">
       <el-form-item label="互评月份：" prop="title">
       <el-button size="mini" type="danger" style="margin-right: 10px" @click="handlePreMonth">上月</el-button>
@@ -24,19 +24,27 @@
         :data="tableData"
         style="margin: auto; width: 99%"
         border
-        :header-cell-style="{ backgroundColor:'#48bfe5', color: '#333'}" :cell-style="{ padding: '5px 0' }">
+        :header-cell-style="{ backgroundColor:'#48bfe5', color: '#333'}"
+        :cell-style="{ padding: '5px 0' }"
+        v-loading="!reqFlag.getAllUserRates">
         <el-table-column label="序号" align="center" type="index" width="50"></el-table-column>
         <el-table-column label="小组" align="center" prop="groupName"></el-table-column>
         <el-table-column label="姓名" align="center" prop="name"></el-table-column>
-        <el-table-column label="员工评价得分" align="center" prop="staffRate"></el-table-column>
-        <el-table-column label="管理者评价得分" align="center" prop="managerRate"></el-table-column>
         <el-table-column label="当月评价状态" align="center">
           <template slot-scope="scope">
             <el-tag :type="scope.row.isRate? 'success' : 'danger'" size="medium">{{scope.row.isRate? '已评价' : '未评价'}}</el-tag>
           </template>
         </el-table-column>
+        <el-table-column label="员工互评得分" align="center" prop="staffRate"></el-table-column>
+        <el-table-column label="管理者评价得分" align="center" prop="managerRate"></el-table-column>
+<!--        <el-table-column label="总分" align="center" prop="totalRate"></el-table-column>-->
       </el-table>
+      <br>
+      <br>
     </div>
+  </div>
+  <div v-else>
+    <h2>暂无权限</h2>
   </div>
 </template>
 
@@ -49,7 +57,8 @@
           title: this.$moment().format('YYYY-MM')
         },
         reqFlag: {
-          getUsersList: true
+          getUsersList: true,
+          getAllUserRates: true
         },
         tableData: [],
         ratesTableTmp: [],
@@ -59,10 +68,32 @@
     methods: {
       // 初始化
       init () {
+        this.getCookie()
         this.getUsersList().then(res1 => {
           this.usersList = res1
-          this.getAllUserRates(res1)
+          this.getAllUserRates(res1).then(() => {
+          })
         })
+      },
+      // 设置月份cookie
+      setMonthCookie (month, exdays) {
+        let exdate = new Date() // 获取时间
+        exdate.setTime(exdate.getTime() + 24 * 60 * 60 * 1000 * exdays) // 保存的天数
+        // 字符串拼接cookie
+        window.document.cookie = 'mCMon' + '=' + month + ';path=/;expires=' + exdate.toGMTString()
+      },
+      // 读取月份cookie
+      getCookie: function () {
+        if (document.cookie.length > 0) {
+          let arr = document.cookie.split('; ') // 这里显示的格式需要切割一下自己可输出看下
+          for (let i = 0; i < arr.length; i++) {
+            let arr2 = arr[i].split('=') // 再次切割
+            // 判断查找相对应的值
+            if (arr2[0] === 'mCMon') {
+              this.formData.title = arr2[1]
+            }
+          }
+        }
       },
       // 获取全处员工互评信息
       getAllUserRates (users) {
@@ -71,24 +102,33 @@
           usersData: users,
           rateMonth: this.formData.title
         }
-        this.$http(url, params)
-          .then(res => {
-            if (res.code === 1) {
-              this.tableData = []
-              for (let item of res.data) {
-                let obj = {
-                  id: item.id,
-                  name: item.name,
-                  groupName: item.groupName
+        let _this = this
+        if (this.reqFlag.getAllUserRates) {
+          this.reqFlag.getAllUserRates = false
+          return new Promise(function (resolve, reject) {
+            _this.$http(url, params)
+              .then(res => {
+                if (res.code === 1) {
+                  _this.tableData = []
+                  for (let item of res.data) {
+                    let obj = {
+                      id: item.id,
+                      name: item.name,
+                      groupName: item.groupName
+                    }
+                    let getRated = _this.getMulRated(item.ratedData)
+                    obj.staffRate = Number(getRated.staffRate.toFixed(3))
+                    obj.managerRate = Number(getRated.manageRate.toFixed(3))
+                    obj.isRate = item.rateData.length !== 0
+                    obj.totalRate = Number((obj.staffRate * 0.1 + obj.managerRate * 0.2).toFixed(3))
+                    _this.tableData.push(obj)
+                  }
+                  _this.reqFlag.getAllUserRates = true
+                  resolve(1)
                 }
-                let getRated = this.getMulRated(item.ratedData)
-                obj.staffRate = getRated.staffRate
-                obj.managerRate = getRated.manageRate
-                obj.isRate = item.rateData.length !== 0
-                this.tableData.push(obj)
-              }
-            }
+              })
           })
+        }
       },
       // 获取被评价人数组索引
       getIndexOfRatedPersion (id) {
@@ -186,7 +226,8 @@
       },
       // 月份变化
       handelDateChange () {
-        this.getAllUserRates(this.usersList)
+        this.setMonthCookie(this.formData.title, 7)
+        this.getAllUserRates(this.usersList).then()
       },
       // 上一月
       handlePreMonth () {

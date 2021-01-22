@@ -52,23 +52,6 @@ function RCPDDatabase(sql, arrayParams) {
     })
 }
 
-async function ratesResultFun (param) {
-    for (let item1 of param.data) {
-        for (let item2 of rateTypes) {
-            let rate = starToRates(item1[item2.rateTypeName])
-            let rateType = item2.id
-            let ratedPersion = item1.ratedID
-            let ratePersion = param.userID
-            let rateMonth = param.title
-            let sql = $sql.mutualRates.submitRatesResult
-            let rateTime = $time.formatTime()
-            let updateTime = rateTime
-            let arrayParams = [ratePersion, ratedPersion, rateMonth, rate, rateType, rateTime, updateTime]
-            await RCPDDatabase(sql, arrayParams)
-        }
-    }
-}
-
 const mutualRate = {
     // 获取互评信息
     getUserRates (req, res) {
@@ -86,9 +69,24 @@ const mutualRate = {
     },
     // 提交互评信息
     submitRatesResult (req, res) {
-        let data = req.body
-        ratesResultFun(data).then()
-        return $http.writeJson(res, {code: 1, data: 'yes', message: '成功'})
+        let sendData = req.body
+        let promises = []
+        for (let item1 of sendData.data) {
+            for (let item2 of rateTypes) {
+                let rate = starToRates(item1[item2.rateTypeName])
+                let rateType = item2.id
+                let ratedPersion = item1.ratedID
+                let ratePersion = sendData.userID
+                let rateMonth = sendData.title
+                let sql = $sql.mutualRates.submitRatesResult
+                let rateTime = $time.formatTime()
+                let arrayParams = [ratePersion, ratedPersion, rateMonth, rate, rateType, rateTime, rateTime]
+                promises.push(RCPDDatabase(sql, arrayParams))
+            }
+        }
+        Promise.all(promises).then(() => {
+            return $http.writeJson(res, {code: 1, data: 'yes', message: '成功'})
+        })
     },
     // 更新互评信息
     async updateUserRate (req, res) {
@@ -96,12 +94,14 @@ const mutualRate = {
         let sql = $sql.mutualRates.updateUserRate
         let updateTime = $time.formatTime()
         let arrayParams = []
-        console.log(data)
-        for (let item of data.ratesToUpdate) {
-            arrayParams = [item.rate, updateTime, item.id]
-            await RCPDDatabase(sql, arrayParams)
+        let promises = []
+        for (let i = 0; i < data.ratesToUpdate.length; i++) {
+            arrayParams = [data.ratesToUpdate[i].rate, updateTime, data.ratesToUpdate[i].id]
+            promises[i] = RCPDDatabase(sql, arrayParams)
         }
-        return $http.writeJson(res, {code: 1, data: 'success', message: '成功'})
+        Promise.all(promises).then(() => {
+            return $http.writeJson(res, {code: 1, data: 'success', message: '成功'})
+        })
     },
     // 获取本人互评得分
     getCurMutualRate (req, res) {
@@ -112,28 +112,58 @@ const mutualRate = {
             return $http.writeJson(res, { code: 1, data: res0, message: 'success'})
         })
     },
+    // // 获取本处员工互评得分
+    // async getAllUserRates (req, res) {
+    //     let data = req.body
+    //     let resultData = []
+    //     for (let item of data.usersData) {
+    //         let sql = $sql.mutualRates.getCurMutualRate
+    //         let arrayParams = [item.id, data.rateMonth]
+    //         await RCPDDatabase(sql, arrayParams).then(async (res0) => {
+    //             sql = $sql.mutualRates.getRateData
+    //             await RCPDDatabase(sql, arrayParams).then(async (res1) => {
+    //                 let obj = {
+    //                     id: item.id,
+    //                     name: item.name,
+    //                     groupName: item.groupName,
+    //                     ratedData: res0,
+    //                     rateData: res1
+    //                 }
+    //                 resultData.push(obj)
+    //             })
+    //         })
+    //     }
+    //     return $http.writeJson(res, { code: 1, data: resultData, message: '成功' })
+    // },
     // 获取本处员工互评得分
     async getAllUserRates (req, res) {
         let data = req.body
         let resultData = []
-        for (let item of data.usersData) {
-            let sql = $sql.mutualRates.getCurMutualRate
-            let arrayParams = [item.id, data.rateMonth]
-            await RCPDDatabase(sql, arrayParams).then(async (res0) => {
-                sql = $sql.mutualRates.getRateData
-                await RCPDDatabase(sql, arrayParams).then(async (res1) => {
-                    let obj = {
-                        id: item.id,
-                        name: item.name,
-                        groupName: item.groupName,
-                        ratedData: res0,
-                        rateData: res1
-                    }
-                    resultData.push(obj)
-                })
-            })
+        let promises = []
+        let sql = null
+        let arrayParams = []
+        for (let i = 0; i < data.usersData.length; i++) {
+            sql = $sql.mutualRates.getCurMutualRate
+            arrayParams = [data.usersData[i].id, data.rateMonth]
+            promises.push(RCPDDatabase(sql, arrayParams))
+            sql = $sql.mutualRates.getRateData
+            promises.push(RCPDDatabase(sql, arrayParams))
         }
-        return $http.writeJson(res, { code: 1, data: resultData, message: '成功' })
+        Promise.all(promises).then(result => {
+            let j = 0
+            for (let i = 0; i < data.usersData.length; i++) {
+                j = i * 2
+                let obj = {
+                    id: data.usersData[i].id,
+                    name: data.usersData[i].name,
+                    groupName: data.usersData[i].groupName,
+                    ratedData: result[j],
+                    rateData: result[j + 1]
+                }
+                resultData.push(obj)
+            }
+            return $http.writeJson(res, { code: 1, data: resultData, message: '成功' })
+        })
     }
 }
 
