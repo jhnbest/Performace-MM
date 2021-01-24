@@ -1,5 +1,5 @@
 <template>
-    <div v-if="false" class="dashboard-editor-container">
+    <div v-if="true" class="dashboard-editor-container">
       <panel-group/>
       <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
         <line-chart :chart-data="lineChartData" />
