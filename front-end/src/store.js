@@ -13,7 +13,7 @@ export default new Vuex.Store({
       { name: '个人工作台', url: '/home/workStation', icon: 'el-icon-s-data' },
       // { name: '工作计划', url: '/home/weekly', icon: 'el-icon-s-grid' },
       { name: '计划/工时查询', url: '/home/performance', icon: 'el-icon-s-order' },
-      { name: '定性互评', url: '/home/mutualEvaluation', icon: 'el-icon-s-finance' }
+      { name: '定性评价', url: '/home/mutualEvaluation', icon: 'el-icon-s-finance' }
     ],
     workTimeManagerList: [
       { name: '工时审核', url: '/home/workTimeReview', icon: 'el-icon-s-claim' },
@@ -23,7 +23,16 @@ export default new Vuex.Store({
       { name: '用户管理', url: '/home/users', icon: 'el-icon-user-solid' }
     ],
     pageSize: 100, // 每页请求多少条
-    refreshInterval: 300 // 组件手动刷新间隔 ms
+    refreshInterval: 300, // 组件手动刷新间隔 ms
+    commonStaffMutualCof: 0.1,
+    commonStaffManagerCof: 0.2,
+    commonStaffQuantitativeCof: 0.7,
+    groupLeaderMutualCof: 0.3,
+    groupLeaderManagerCof: 0.4,
+    groupLeaderQuantitativeCof: 0.3,
+    directorMutualCof: 0.2,
+    directorManagerCof: 0.3,
+    directorQuantitativeCof: 0.5
   },
   mutations: {
     [types.SAVE_USERINFO] (state, data) {

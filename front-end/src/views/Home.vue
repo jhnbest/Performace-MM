@@ -2,7 +2,10 @@
   <el-container class="home-wrap">
     <!-- header start -->
     <el-header class="flex">
-      <div class="logo flex-item"><i style="font-size: 25px" class="el-icon-date"></i><span style="font-weight: bolder;font-size: 25px"> 通信工程处绩效管理系统</span></div>
+      <div class="logo flex-item">
+        <svg-icon icon-class="communication" style="font-size: 33px" />
+<!--        <i style="font-size: 25px" class="el-icon-date"></i>-->
+        <span style="font-weight: bolder;font-size: 25px"> 通信工程处绩效管理系统</span></div>
       <div class="user-info">
         <el-dropdown @command="handleCommand">
           <el-button type="primary">

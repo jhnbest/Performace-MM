@@ -2,7 +2,7 @@
     <div v-if="true" class="dashboard-editor-container">
       <panel-group/>
       <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
-        <line-chart :chart-data="lineChartData" />
+<!--        <line-chart :chart-data="lineChartData" />-->
       </el-row>
     </div>
     <div v-else>
@@ -15,8 +15,8 @@
   import LineChart from '@/components/Dashboard/LineChart'
     export default {
       components: {
-        PanelGroup,
-        LineChart
+        PanelGroup
+        // LineChart
       },
         name: 'index.vue'
     }
@@ -31,9 +31,9 @@
   }
 
   .dashboard-editor-container {
-    background-color: #e3e3e3;
+    background-color: #f1f0f0;
     min-height: 150vh;
-    padding: 50px 60px 0px;
+    padding: 20px 15px 0px;
     .pan-info-roles {
       font-size: 12px;
       font-weight: 700;

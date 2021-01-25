@@ -1,5 +1,7 @@
+/* eslint-disable */
 import { Message, MessageBox } from 'element-ui'
 import router from '../../router'
+import { getUsersName } from '@/config/interface'
 
 const commonFn = {
 	toast (str, type, showClose, onCloseFn) {

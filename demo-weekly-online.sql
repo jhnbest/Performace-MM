@@ -11,7 +11,7 @@
  Target Server Version : 80022
  File Encoding         : 65001
 
- Date: 22/01/2021 18:10:04
+ Date: 25/01/2021 18:07:20
 */
 
 SET NAMES utf8mb4;
@@ -34,7 +34,7 @@ CREATE TABLE `assignprojectdetail`  (
   `obsoleteStatus` tinyint NOT NULL DEFAULT 0 COMMENT '废弃状态',
   `isFinish` tinyint NOT NULL DEFAULT 0 COMMENT '是否已完成',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1910 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1916 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of assignprojectdetail
@@ -1948,6 +1948,12 @@ INSERT INTO `assignprojectdetail` VALUES (1906, 712, 88, '省内行程单', 4.0,
 INSERT INTO `assignprojectdetail` VALUES (1907, 713, 106, '项目尾款支付', 2.0, 1.0, 1, 2.0, 0.0, 0, 0);
 INSERT INTO `assignprojectdetail` VALUES (1908, 714, 382, '账单、报表审核', 2.0, 1.0, 1, 2.0, 0.0, 0, 0);
 INSERT INTO `assignprojectdetail` VALUES (1909, 715, 377, '法定节假日待命（B角）/天', 3.8, 1.0, 1, 11.4, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1910, 716, 95, '流程审核', 1.0, 1.0, 1, 1.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1911, 717, 250, '需求调研', 5.0, 1.0, 1, 5.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1912, 717, 251, '方案设计', 5.0, 2.0, 1, 5.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1913, 717, 252, '组织施工', 5.0, 2.0, 1, 5.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1914, 717, 253, '验收交接', 5.0, 1.0, 1, 5.0, 0.0, 0, 0);
+INSERT INTO `assignprojectdetail` VALUES (1915, 718, 96, '故障处置（工作日）', 3.0, 1.0, 1, 3.0, 0.0, 0, 0);
 
 -- ----------------------------
 -- Table structure for assignprojectlist
@@ -1968,7 +1974,7 @@ CREATE TABLE `assignprojectlist`  (
   `projectLevel` tinyint NOT NULL DEFAULT 1 COMMENT '项目级别',
   `reviewStatus` tinyint NOT NULL DEFAULT 1 COMMENT '审核状态',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 716 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 719 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of assignprojectlist
@@ -2688,6 +2694,9 @@ INSERT INTO `assignprojectlist` VALUES (712, 23, '2021-01-22 11:22:07', 4, '出�
 INSERT INTO `assignprojectlist` VALUES (713, 12, '2021-01-22 14:43:10', 4, '海事卫星手持机自费付款', 0.0, 12, 2.0, 0.0, 1, 0, 1, 1);
 INSERT INTO `assignprojectlist` VALUES (714, 12, '2021-01-22 14:44:20', 4, '海事卫星手持机账单审核', 0.0, 12, 2.0, 0.0, 1, 0, 1, 1);
 INSERT INTO `assignprojectlist` VALUES (715, 12, '2021-01-22 14:45:31', 4, '元旦值班（B角）', 0.0, 12, 3.8, 0.0, 1, 0, 1, 1);
+INSERT INTO `assignprojectlist` VALUES (716, 31, '2021-01-25 09:54:56', 4, 'ACARS系统', 0.0, 31, 1.0, 0.0, 1, 0, 1, 1);
+INSERT INTO `assignprojectlist` VALUES (717, 17, '2021-01-25 10:14:41', 249, '2101-采购类-有关呼和浩特营业部安装办公室电子门禁的申请', 0.0, 32, 20.0, 0.0, 0, 0, 1, 1);
+INSERT INTO `assignprojectlist` VALUES (718, 31, '2021-01-25 13:17:49', 4, 'ACARS系统', 0.0, 31, 3.0, 0.0, 1, 0, 1, 1);
 
 -- ----------------------------
 -- Table structure for monthprocess
@@ -4985,7 +4994,7 @@ CREATE TABLE `worktimeassign`  (
   `assignRole` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '参与人员角色',
   `obsoleteStatus` tinyint NOT NULL DEFAULT 0 COMMENT '废弃状态',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1674 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1676 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of worktimeassign
@@ -6663,6 +6672,8 @@ INSERT INTO `worktimeassign` VALUES (1670, 23, 1120, 4.0, NULL, '组织者', 0);
 INSERT INTO `worktimeassign` VALUES (1671, 12, 1121, 2.0, NULL, '组织者', 0);
 INSERT INTO `worktimeassign` VALUES (1672, 12, 1122, 2.0, NULL, '组织者', 0);
 INSERT INTO `worktimeassign` VALUES (1673, 12, 1123, 11.4, NULL, '组织者', 0);
+INSERT INTO `worktimeassign` VALUES (1674, 31, 1124, 1.0, NULL, '组织者', 0);
+INSERT INTO `worktimeassign` VALUES (1675, 31, 1125, 3.0, NULL, '组织者', 0);
 
 -- ----------------------------
 -- Table structure for worktimelist
@@ -6696,7 +6707,7 @@ CREATE TABLE `worktimelist`  (
   `applyType` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '申报类型',
   `applyBaseWorkTime` float(6, 1) NOT NULL COMMENT '申报的基本工时（非标项目使用）',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1124 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1126 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of worktimelist
@@ -7824,6 +7835,8 @@ INSERT INTO `worktimelist` VALUES (1120, 1906, 712, NULL, 23, 88, 1.0, NULL, 1.0
 INSERT INTO `worktimelist` VALUES (1121, 1907, 713, NULL, 12, 106, 1.0, NULL, 1.0, NULL, '2021-01-22 14:43:10', '2021-01-22 14:43:10', '2021-01', 1, '', 0, NULL, '', 0, 0, NULL, 2.0, 100.0, 0.0, 'plan', 2.0);
 INSERT INTO `worktimelist` VALUES (1122, 1908, 714, NULL, 12, 382, 1.0, NULL, 1.0, NULL, '2021-01-22 14:44:20', '2021-01-22 14:44:20', '2021-01', 0, '', 0, NULL, '', 0, 0, NULL, 2.0, 100.0, 0.0, 'fact', 2.0);
 INSERT INTO `worktimelist` VALUES (1123, 1909, 715, NULL, 12, 377, 1.0, NULL, 3.0, NULL, '2021-01-22 14:45:31', '2021-01-22 14:45:31', '2021-01', 0, '', 0, NULL, '', 0, 0, NULL, 11.4, 100.0, 0.0, 'fact', 3.8);
+INSERT INTO `worktimelist` VALUES (1124, 1910, 716, NULL, 31, 95, 1.0, NULL, 1.0, NULL, '2021-01-25 09:54:56', '2021-01-25 09:54:56', '2021-01', 1, '完成《1月4日ACARS系统故障》故障原因分析确认流程。', 0, NULL, '', 0, 0, NULL, 1.0, 100.0, 0.0, 'fact', 1.0);
+INSERT INTO `worktimelist` VALUES (1125, 1915, 718, NULL, 31, 96, 1.0, NULL, 1.0, NULL, '2021-01-25 13:17:49', '2021-01-25 13:17:49', '2021-01', 1, '处理1月25日9299报修B-1749飞机丢失MF878U航班的关舱报的故障。', 0, NULL, '', 0, 0, NULL, 3.0, 100.0, 0.0, 'fact', 3.0);
 
 -- ----------------------------
 -- Event structure for update_schedule

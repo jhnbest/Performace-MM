@@ -6,6 +6,7 @@ import './themes/element/element-variables.scss'
 import App from './App.vue'
 import router from './router'
 import store from './store'
+import './icons' // icon
 import common from './assets/js/common.js'
 import { http, baseURL } from './config/http.js'
 import vueQuillEditor from 'vue-quill-editor' // 引入富文本工具
