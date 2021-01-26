@@ -52,7 +52,18 @@
         </el-form-item>
         <br>
         <el-form-item label="项目名称" prop="projectName">
-          <el-input v-model="formData.projectName" placeholder="请输入" style="width: 250%"></el-input>
+          <el-tooltip :disabled="!isShowProjectNameToolTip" :content="formData.projectName" placement="top">
+            <el-input v-model="formData.projectName"
+                      placeholder="请输入"
+                      style="width: 250%"
+                      @input="handleProjectNameInput"></el-input>
+          </el-tooltip>
+        </el-form-item>
+        <el-form-item style="margin-left: 310px">
+          <span>字数限制：
+            <span v-if="!isProjectNameWordExceed">{{inputProjectNameWord + '/' + maxProjectName}}</span>
+            <span v-else style="color: red">{{inputProjectNameWord + '/' + maxProjectName}}</span>
+          </span>
         </el-form-item>
         <br>
         <el-form-item label="项目级别" prop="projectLevel">
@@ -174,9 +185,17 @@
               <el-input size="mini"
                         type="textarea"
                         autosize
-                        maxlength="500"
-                        v-model="scope.row.submitComments">
+                        v-model="scope.row.submitComments"
+                        @input="inputCommentsChange(scope.row)">
               </el-input>
+              <span style="font-size: 10px">字数限制：
+                <span v-if="!scope.row.isInputCommentsWordExceed">
+                  {{scope.row.inputCommentsWord? scope.row.inputCommentsWord : 0}} {{'/' + maxInputCommentsWord}}
+                </span>
+                <span v-else style="color: red">
+                  {{scope.row.inputCommentsWord? scope.row.inputCommentsWord : 0}} {{'/' + maxInputCommentsWord}}
+                </span>
+              </span>
             </template>
           </el-table-column>
           <el-table-column label="操作" align="center" width="100%">
@@ -206,6 +225,13 @@
     export default {
       data () {
         return {
+          isProjectNameWordExceed: false,
+          isInputCommentsWordExceed: false,
+          inputProjectNameWord: 0,
+          maxProjectName: 100,
+          inputCommentsWord: 0,
+          isShowProjectNameToolTip: false,
+          maxInputCommentsWord: 500,
           userListOptions: [{
             name: '组织',
             options: [{
@@ -355,6 +381,26 @@
         init () {
           this.getProjectType()
           this.getCookie()
+        },
+        // 项目名称输入框监控
+        handleProjectNameInput () {
+          this.inputProjectNameWord = this.formData.projectName.length
+          this.isProjectNameWordExceed = this.formData.projectName.length > this.maxProjectName
+          if (this.isProjectNameWordExceed) {
+            this.$common.toast('项目名称字数过多，请删减', 'error', false)
+          }
+          this.isShowProjectNameToolTip = this.formData.projectName.length > 64
+        },
+        // 备注输入名称监控
+        inputCommentsChange (row) {
+          row.inputCommentsWord = row.submitComments.length
+          row.isInputCommentsWordExceed = row.inputCommentsWord > this.maxInputCommentsWord
+          if (row.isInputCommentsWordExceed) {
+            this.$common.toast('备注字数过多，请删减', 'error', false)
+            this.isInputCommentsWordExceed = true
+          } else {
+            this.isInputCommentsWordExceed = false
+          }
         },
         // 提交至工时明细列表
         onSubmitWorkTimeList (formData) {
@@ -512,24 +558,32 @@
         onSubmitWorkTime (formData) {
           this.$refs[formData].validate(valid => {
             if (valid) {
-              let projectParentArray = []
-              for (let item of this.formData.projectType) {
-                if (projectParentArray.indexOf(item[0]) === -1) {
-                  projectParentArray.push(item[0])
-                }
-              }
-              if (projectParentArray.length > 1) {
-                this.$common.toast('一级活动限选一种', 'error', 'false')
-              } else {
-                this.onSubmitProjectList().then(() => { // 提交至项目明细表
-                  if (this.formData.applyType === 'plan') { // 如果是计划项目，则更新计划进展表
-                    this.onSubmitMonthPlanProcess().then(() => {
-                      this.onSubmitWorkTimeList(formData) // 提交至工时明细表
-                    })
-                  } else {
-                    this.onSubmitWorkTimeList(formData) // 提交至工时明细表
+              if (!this.isProjectNameWordExceed && !this.isInputCommentsWordExceed) {
+                let projectParentArray = []
+                for (let item of this.formData.projectType) {
+                  if (projectParentArray.indexOf(item[0]) === -1) {
+                    projectParentArray.push(item[0])
                   }
-                })
+                }
+                if (projectParentArray.length > 1) {
+                  this.$common.toast('一级活动限选一种', 'error', 'false')
+                } else {
+                  this.onSubmitProjectList().then(() => { // 提交至项目明细表
+                    if (this.formData.applyType === 'plan') { // 如果是计划项目，则更新计划进展表
+                      this.onSubmitMonthPlanProcess().then(() => {
+                        this.onSubmitWorkTimeList(formData) // 提交至工时明细表
+                      })
+                    } else {
+                      this.onSubmitWorkTimeList(formData) // 提交至工时明细表
+                    }
+                  })
+                }
+              } else {
+                if (this.isProjectNameWordExceed) {
+                  this.$common.toast('项目名称过长', 'error', false)
+                } else if (this.isInputCommentsWordExceed) {
+                  this.$common.toast('备注字数过多', 'error', false)
+                }
               }
             }
           })

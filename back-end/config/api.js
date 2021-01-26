@@ -41,6 +41,7 @@ module.exports = {
     submitReviewPass: path + '/performance/submitReviewPass', // 审核通过,
     getAssignWorkTime: path + '/performance/getAssignWorkTime', // 获取分配的工时数
     getGroupWorkTimeList: path + '/performance/getGroupWorkTimeList', // 获取小组已审工时列表
+    getAllWorkTimeList: path + '/performance/getAllWorkTimeList', // 获取全处已审工时列表
 
     // workStation-个人工作台
     getAssignProjectList: path + '/workStation/getAssignProjectList',

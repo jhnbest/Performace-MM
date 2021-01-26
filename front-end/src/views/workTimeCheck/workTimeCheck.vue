@@ -136,7 +136,6 @@
                 let length = totalWorkTimeCal.length
                 for (let item of totalWorkTimeCal) { // 计算定量指标得分
                   let rankPercentage = Number((item.rank / length).toFixed(1))
-                  console.log(rankPercentage)
                   if (rankPercentage < 0.1 || rankPercentage === 0.1) {
                     item.quantitativeScore = 92.5
                   } else if (rankPercentage < 0.3 || rankPercentage === 0.3) {

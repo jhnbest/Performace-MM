@@ -113,6 +113,9 @@ const sqlMap = {
     getAssignWorkTime: 'select reviewWorkTime from worktimeassign where projectID = ? and userID = ? and obsoleteStatus != 1',
     getGroupWorkTimeList: 'select u.id, u.name, wa.reviewWorkTime, wl.applyMonth from worktimeassign wa left join worktimelist ' +
         'wl on wa.projectID = wl.id left join users u on wa.userID = u.id where wl.applyMonth = ? and u.groupName = ? and ' +
+        ' wl.reviewStatus = 1 and wa.obsoleteStatus != 1 and u.status != 0',
+    getAllWorkTimeList: 'select u.id, u.name, u.groupName as groupID, wa.reviewWorkTime, wl.applyMonth from worktimeassign wa left join worktimelist ' +
+        'wl on wa.projectID = wl.id left join users u on wa.userID = u.id where wl.applyMonth = ? and ' +
         ' wl.reviewStatus = 1 and wa.obsoleteStatus != 1 and u.status != 0'
   },
   workStation: {

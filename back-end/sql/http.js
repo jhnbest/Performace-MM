@@ -52,7 +52,7 @@ const $http = {
               message: '登录过期'
             }
             $http.writeJson(res, resultData)
-          }else{
+          } else {
             cb()
           }
         }

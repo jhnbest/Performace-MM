@@ -25,9 +25,9 @@
             </div>
             <div class="card-panel-description">
               <div class="card-panel-text">
-                绩效评价得分
+                绩效得分
               </div>
-              <count-to :start-val="0" :end-val="1024" :duration="2600" class="card-panel-num" />
+              <count-to :start-val="0" :end-val="performanceScore" :duration="1000" :decimals="2" class="card-panel-num" />
             </div>
           </div>
         </el-col>
@@ -38,9 +38,9 @@
             </div>
             <div class="card-panel-description">
               <div class="card-panel-text">
-                绩效评价排名
+                绩效排名
               </div>
-              <count-to :start-val="0" :end-val="100" :duration="3000" class="card-panel-num" />
+              <count-to :start-val="0" :end-val="performanceRank" :duration="1000" class="card-panel-num" />
             </div>
           </div>
         </el-col>
@@ -53,7 +53,7 @@
               <div class="card-panel-text">
                 定量评价得分
               </div>
-              <count-to :start-val="0" :end-val="1" :duration="3200" class="card-panel-num" />
+              <count-to :start-val="0" :end-val="quantitativeScore" :duration="1000" :decimals="2" class="card-panel-num" />
             </div>
           </div>
         </el-col>
@@ -66,7 +66,8 @@
               <div class="card-panel-text">
                 定量评价排名
               </div>
-              <count-to :start-val="0" :end-val="136" :duration="3600" class="card-panel-num" />
+              <count-to :start-val="0" :end-val="quantitativeRank" :duration="1000" class="card-panel-num" />
+              <span style="font-size: 19px">{{'/ ' + quantitativeNum}}</span>
             </div>
           </div>
         </el-col>
@@ -79,7 +80,7 @@
               <div class="card-panel-text">
                 定性互评得分
               </div>
-              <count-to :start-val="0" :end-val="136" :duration="3600" class="card-panel-num" />
+              <count-to :start-val="0" :end-val="multualScore" :duration="1000" :decimals="2" class="card-panel-num" />
             </div>
           </div>
         </el-col>
@@ -92,7 +93,8 @@
               <div class="card-panel-text">
                 定性互评排名
               </div>
-              <count-to :start-val="0" :end-val="136" :duration="3600" class="card-panel-num" />
+              <count-to :start-val="0" :end-val="multualRank" :duration="1000" class="card-panel-num" />
+              <span style="font-size: 19px">{{'/ ' + multualNum}}</span>
             </div>
           </div>
         </el-col>
@@ -104,7 +106,7 @@
 <script>
 import CountTo from 'vue-count-to'
 import { getUsersName, getUserRates, submitRatesResult, updateUserRate,
-  getCurMutualRate, getAllUserRates } from '@/config/interface'
+  getCurMutualRate, getAllUserRates, getGroupWorkTimeList, getAllWorkTimeList } from '@/config/interface'
 
 export default {
   data () {
@@ -115,7 +117,9 @@ export default {
       users: [],
       reqFlag: {
         getUsersList: true,
-        getAllUserRates: true
+        getAllUserRates: true,
+        getGroupWorkTimeList: true,
+        getAllWorkTimeList: true
       },
       ratesTableTmp: [],
       multualScore: 0,
@@ -124,6 +128,8 @@ export default {
       quantitativeRank: 0,
       performanceScore: 0,
       performanceRank: 0,
+      multualNum: 0,
+      quantitativeNum: 0,
       commonStaffMutualCof: this.$store.state.commonStaffMutualCof,
       commonStaffManagerCof: this.$store.state.commonStaffManagerCof,
       commonStaffQuantitativeCof: this.$store.state.commonStaffQuantitativeCof,
@@ -142,12 +148,287 @@ export default {
     // 初始化
     init () {
       let allUsersRates = []
+      let promises = []
+      let count = 0
+      let allQuantitativeScore = []
       this.getUsersList().then(res0 => {
         this.users = res0
-        this.getAllUserRates(res0, allUsersRates).then(res1 => {
-          this.calMutualRatesRank(res1)
+        this.calGroupMemNum(res0)
+        promises[count++] = this.getAllWorkTimeList()
+        promises[count++] = this.getAllUserRates(res0, allUsersRates)
+        Promise.all(promises).then((result) => {
+          let groupedWorkTimeList = this.groupedWorkTimeList(result[0])
+          for (let item of groupedWorkTimeList) {
+            item.caledQuantitative = this.calQuantitativeScore(item.workTimeList)
+            for (let itemInside of item.caledQuantitative) {
+              allQuantitativeScore.push(itemInside)
+            }
+          }
+          let multualRestuls = this.calMutualRatesRank(result[1])
+          let finalResult = JSON.parse(JSON.stringify(multualRestuls))
+          for (let item of finalResult) {
+            let quantitativeInfo = allQuantitativeScore.find(quantitativeInfo => {
+              return item.id === quantitativeInfo.id
+            })
+            if (quantitativeInfo) {
+              item.quantitativeScore = quantitativeInfo.quantitativeScore
+              item.quantitativeRank = quantitativeInfo.rank
+              if (item.id === this.$store.state.userInfo.id) {
+                this.quantitativeRank = quantitativeInfo.rank
+                this.quantitativeScore = quantitativeInfo.quantitativeScore
+              }
+            } else {
+              item.quantitativeScore = 0
+              item.quantitativeRank = 0
+              if (item.id === this.$store.state.userInfo.id) {
+                this.quantitativeRank = 0
+                this.quantitativeScore = 0
+              }
+            }
+            if (item.id === 7 || item.id === 11) { // 主任岗
+              item.performanceScore = item.quantitativeScore * this.directorQuantitativeCof + item.mutualScore
+            } else if (item.id === 13 || item.id === 17) { // 组长
+              item.performanceScore = item.quantitativeScore * this.groupLeaderQuantitativeCof + item.mutualScore
+            } else { // 普通成员
+              item.performanceScore = item.quantitativeScore * this.commonStaffQuantitativeCof + item.mutualScore
+            }
+            finalResult.sort(this.sortBy('performanceScore'))
+          }
+          this.performanceScore = finalResult.find(finalResultItem => {
+            return finalResultItem.id === this.$store.state.userInfo.id
+          }).performanceScore
+          let count = 0
+          let prePerformanceScore = -1
+          let prePerformanceRank = -1
+          for (let item of finalResult) {
+            if (item.performanceScore === prePerformanceScore) {
+              item.performanceRank = prePerformanceRank
+            } else {
+              item.performanceRank = count
+              prePerformanceScore = item.performanceScore
+              prePerformanceRank = count
+            }
+            count++
+          }
+          console.log(finalResult)
+          this.performanceRank = finalResult.find(finalResultItem => {
+            return finalResultItem.id === this.$store.state.userInfo.id
+          }).performanceRank
         })
       })
+    },
+    // 将获得的信息按小组分类
+    groupedWorkTimeList (allWorkTimeList) {
+      let groupedWorkTimeList = []
+      for (let item of allWorkTimeList) {
+        if (item.id !== this.$store.state.managerID) {
+          let index = groupedWorkTimeList.findIndex(itemInside => {
+            return itemInside.groupID === item.groupID
+          })
+          if (index === -1) {
+            let obj = {
+              groupID: item.groupID,
+              workTimeList: []
+            }
+            obj.workTimeList.push(item)
+            groupedWorkTimeList.push(obj)
+          } else {
+            groupedWorkTimeList[index].workTimeList.push(item)
+          }
+        }
+      }
+      return groupedWorkTimeList
+    },
+    // 计算定量得分与排名
+    calQuantitativeScore (groupWorkTimeList) {
+      let totalWorkTimeCal = []
+      if (groupWorkTimeList.length > 0) {
+        let userID = []
+        for (let item of groupWorkTimeList) { // 插入各组员总工时信息
+          if (userID.indexOf(item.id) === -1) {
+            userID.push(item.id)
+            let obj = {
+              id: item.id,
+              name: item.name,
+              totalWorkTime: item.reviewWorkTime
+            }
+            totalWorkTimeCal.push(obj)
+          } else {
+            totalWorkTimeCal.find(function (wItem) {
+              if (wItem.id === item.id) {
+                wItem.totalWorkTime += item.reviewWorkTime
+                return wItem.totalWorkTime
+              }
+            })
+          }
+        }
+        totalWorkTimeCal.sort(this.compare('totalWorkTime')) // 根据总工时排序
+        let preWorkTime = 0
+        let preRank = 0
+        for (let item of totalWorkTimeCal) { // 计算排名
+          if (item.totalWorkTime === preWorkTime) {
+            item.rank = preRank
+          } else {
+            item.rank = ++preRank
+          }
+          preWorkTime = item.totalWorkTime
+        }
+        // ==============================计算定量指标得分=======================================
+        let length = totalWorkTimeCal.length
+        for (let item of totalWorkTimeCal) { // 计算定量指标得分
+          item.quantitativeScore = this.calGetScore(length, item.rank)
+        }
+      } else {
+      }
+      return totalWorkTimeCal
+    },
+    // 排序比较函数
+    sortBy (props) {
+      return function (a, b) {
+        return b[props] - a[props]
+      }
+    },
+    // 分组人数计算
+    calGroupMemNum (users) {
+      let standAndEngineerRates = []
+      let standGroupMembers = []
+      let engineerGroupMembers = []
+      let communicationRates = []
+      for (let item of users) {
+        if (item.groupName === '技术标准组' || item.groupName === '工程组') {
+          if (item.groupName === '技术标准组') {
+            standGroupMembers.push(item)
+          } else {
+            engineerGroupMembers.push(item)
+          }
+          standAndEngineerRates.push(item)
+        } else if (item.groupName === '通信组') {
+          communicationRates.push(item)
+        }
+      }
+      if (this.$store.state.userInfo.groupName === '技术标准组' ||
+        this.$store.state.userInfo.groupName === '工程组') {
+        if (this.$store.state.userInfo.groupName === '技术标准组') {
+          this.quantitativeNum = standGroupMembers.length
+        } else {
+          this.quantitativeNum = engineerGroupMembers.length
+        }
+        this.multualNum = standAndEngineerRates.length
+      } else {
+        this.multualNum = communicationRates.length
+        this.quantitativeNum = communicationRates.length
+      }
+    },
+    // 获取全处工时信息
+    getAllWorkTimeList () {
+      const url = getAllWorkTimeList
+      if (this.reqFlag.getAllWorkTimeList) {
+        this.reqFlag.getAllWorkTimeList = false
+        let params = {
+          applyMonth: this.formData.title
+        }
+        let _this = this
+        return new Promise(function (resolve, reject) {
+          _this.$http(url, params).then(res => {
+            let recvData = res.data
+            _this.reqFlag.getAllWorkTimeList = true
+            resolve(recvData)
+          }).catch(() => {
+            _this.$common.toast('请求失败', 'error', false)
+            reject(new Error('请求失败'))
+          })
+        })
+      }
+    },
+    // 获取小组工时信息
+    getGroupWorkTimeList (groupID) {
+      const url = getGroupWorkTimeList
+      if (this.reqFlag.getGroupWorkTimeList) {
+        this.reqFlag.getGroupWorkTimeList = false
+        let params = {
+          groupID: groupID,
+          applyMonth: this.formData.title
+        }
+        let _this = this
+        return new Promise((resolve, reject) => {
+          _this.$http(url, params).then(res => {
+            if (res.code === 1) {
+              let recvData = res.data
+              let totalWorkTimeCal = []
+              if (recvData.length > 0) {
+                let userID = []
+                for (let item of recvData) { // 插入各组员总工时信息
+                  if (userID.indexOf(item.id) === -1) {
+                    userID.push(item.id)
+                    let obj = {
+                      id: item.id,
+                      name: item.name,
+                      totalWorkTime: item.reviewWorkTime
+                    }
+                    totalWorkTimeCal.push(obj)
+                  } else {
+                    totalWorkTimeCal.find(function (wItem) {
+                      if (wItem.id === item.id) {
+                        wItem.totalWorkTime += item.reviewWorkTime
+                        return wItem.totalWorkTime
+                      }
+                    })
+                  }
+                }
+                totalWorkTimeCal.sort(_this.compare('totalWorkTime')) // 根据总工时排序
+                let preWorkTime = 0
+                let preRank = 0
+                for (let item of totalWorkTimeCal) { // 计算排名
+                  if (item.totalWorkTime === preWorkTime) {
+                    item.rank = preRank
+                  } else {
+                    item.rank = ++preRank
+                  }
+                  preWorkTime = item.totalWorkTime
+                }
+                _this.quantitativeRank = totalWorkTimeCal.find(item => {
+                  return item.id === _this.$store.state.userInfo.id
+                }).rank
+                // ==============================计算定量指标得分=======================================
+                let length = totalWorkTimeCal.length
+                for (let item of totalWorkTimeCal) { // 计算定量指标得分
+                  item.quantitativeScore = _this.calGetScore(length, item.rank)
+                }
+                _this.quantitativeScore = totalWorkTimeCal.find(item => {
+                  return item.id === _this.$store.state.userInfo.id
+                }).quantitativeScore
+              } else {
+                _this.quantitativeRank = 0
+                _this.quantitativeScore = 0
+              }
+              resolve(totalWorkTimeCal)
+            } else {
+              reject(new Error('小组工时请求失败'))
+            }
+            _this.reqFlag.getGroupWorkTimeList = true
+          })
+        })
+      }
+    },
+    // 数据排序方法
+    compare (params) {
+      return function (o, p) {
+        let a, b
+        if (typeof o === 'object' && typeof p === 'object' && o && p) {
+          a = o[params]
+          b = p[params]
+          if (a === b) {
+            return 0
+          }
+          if (typeof a === typeof b) {
+            return a > b ? -1 : 1
+          }
+          return typeof a > typeof b ? -1 : 1
+        } else {
+          let obj = {}
+          throw (obj)
+        }
+      }
     },
     // 获取领导评价相关信息
     getManagerResult (id, allUsersRates) {
@@ -196,12 +477,6 @@ export default {
           }
         }
       }
-      console.log('std')
-      console.log(standAndEngineerRates)
-      console.log('com')
-      console.log(communicationRates)
-      console.log('all')
-      console.log(allUserRates)
       // =================================定性评价得分计算===============================================
       // 技术标准组与工程组互评排名&得分计算
       let tmpStaffRate = -1
@@ -232,7 +507,7 @@ export default {
       // 全处员工领导评价排名&得分计算
       tmpStaffRate = -1
       count = 1
-      for (let i = 0; i < allUserRates.length - 1; i++) {
+      for (let i = 0; i < allUserRates.length; i++) {
         if (allUserRates[i].managerRate === tmpStaffRate) {
           allUserRates[i].managerRateRank = allUserRates[i - 1].managerRateRank
         } else {
@@ -242,42 +517,51 @@ export default {
         allUserRates[i].managerScore =
           this.calGetScore(allUserRates.length, allUserRates[i].managerRateRank)
       }
-      // let allRates = []
-      // // =================================定性评价结果合并===============================================
-      // // 合并三个组结果
-      // for (let item of standAndEngineerRates) {
-      //   let managerResult = this.getManagerResult(item.id, allUserRates)
-      //   item.managerRateRank = managerResult.managerRateRank
-      //   item.managerScore = managerResult.managerScore
-      //   if (item.id === 7 || item.id === 11) { // 主任岗
-      //     item.mutualScore = item.staffMutualScore * this.directorMutualCof +
-      //       item.managerScore * this.directorManagerCof
-      //   } else if (item.id === 13 || item.id === 17) { // 组长
-      //     item.mutualScore = item.staffMutualScore * this.groupLeaderMutualCof +
-      //       item.managerScore * this.groupLeaderManagerCof
-      //   } else { // 普通成员
-      //     item.mutualScore = item.staffMutualScore * this.commonStaffMutualCof +
-      //       item.managerScore * this.commonStaffManagerCof
-      //   }
-      //   allRates.push(item)
-      // }
-      // for (let item of communicationRates) {
-      //   let managerResult = this.getManagerResult(item.id, allUserRates)
-      //   item.managerRateRank = managerResult.managerRateRank
-      //   item.managerScore = managerResult.managerScore
-      //   if (item.id === 7 || item.id === 11) { // 主任岗
-      //     item.mutualScore = item.staffMutualScore * this.directorMutualCof +
-      //       item.managerScore * this.directorManagerCof
-      //   } else if (item.id === 13 || item.id === 17) { // 组长
-      //     item.mutualScore = item.staffMutualScore * this.groupLeaderMutualCof +
-      //       item.managerScore * this.groupLeaderManagerCof
-      //   } else { // 普通成员
-      //     item.mutualScore = item.staffMutualScore * this.commonStaffMutualCof +
-      //       item.managerScore * this.commonStaffManagerCof
-      //   }
-      //   allRates.push(item)
-      // }
-      // console.log(allRates)
+      let allRates = []
+      // =================================定性评价结果合并===============================================
+      // 合并三个组结果
+      for (let item of standAndEngineerRates) {
+        let managerResult = this.getManagerResult(item.id, allUserRates)
+        item.managerRateRank = managerResult.managerRateRank
+        item.managerScore = managerResult.managerScore
+        if (item.id === 7 || item.id === 11) { // 主任岗
+          item.mutualScore = item.staffMutualScore * this.directorMutualCof +
+            item.managerScore * this.directorManagerCof
+        } else if (item.id === 13 || item.id === 17) { // 组长
+          item.mutualScore = item.staffMutualScore * this.groupLeaderMutualCof +
+            item.managerScore * this.groupLeaderManagerCof
+        } else { // 普通成员
+          item.mutualScore = item.staffMutualScore * this.commonStaffMutualCof +
+            item.managerScore * this.commonStaffManagerCof
+        }
+        allRates.push(item)
+      }
+      for (let item of communicationRates) {
+        let managerResult = this.getManagerResult(item.id, allUserRates)
+        item.managerRateRank = managerResult.managerRateRank
+        item.managerScore = managerResult.managerScore
+        if (item.id === 7 || item.id === 11) { // 主任岗
+          item.mutualScore = item.staffMutualScore * this.directorMutualCof +
+            item.managerScore * this.directorManagerCof
+        } else if (item.id === 13 || item.id === 17) { // 组长
+          item.mutualScore = item.staffMutualScore * this.groupLeaderMutualCof +
+            item.managerScore * this.groupLeaderManagerCof
+        } else { // 普通成员
+          item.mutualScore = item.staffMutualScore * this.commonStaffMutualCof +
+            item.managerScore * this.commonStaffManagerCof
+        }
+        allRates.push(item)
+      }
+      let curRateResult = allRates.find((item) => {
+        return item.id === this.$store.state.userInfo.id
+      })
+      if (curRateResult) {
+        this.multualScore = curRateResult.staffMutualScore
+        this.multualRank = curRateResult.staffRateRank
+      } else {
+        this.$common.toast('暂未统计', 'error', false)
+      }
+      return allRates
     },
     // 定性、定量指标得分计算
     calGetScore (length, rank) {
@@ -389,7 +673,6 @@ export default {
           _this.$http(url, params)
             .then(res => {
               if (res.code === 1) {
-                _this.tableData = []
                 for (let item of res.data) {
                   let obj = {
                     id: item.id,
@@ -408,18 +691,6 @@ export default {
             })
         })
       }
-    },
-    // 获取被评价人数组索引
-    getIndexOfRatedPersion (id) {
-      if (this.ratesTableTmp.length === 0) {
-        return -1
-      }
-      for (let i = 0; i < this.ratesTableTmp.length; i++) {
-        if (this.ratesTableTmp[i].ratePersion === id) {
-          return i
-        }
-      }
-      return -1
     },
     // 评分类型转换
     rateTypeSwitch (rateType) {
@@ -453,7 +724,9 @@ export default {
       let count = 0
       if (ratedData.length !== 0) {
         for (let item of ratedData) {
-          let index = this.getIndexOfRatedPersion(item.ratePersion)
+          let index = this.ratesTableTmp.findIndex((itemInside) => {
+            return item.ratePersion === itemInside.ratePersion
+          })
           if (index === -1) {
             let obj = {
               ratePersion: item.ratePersion
@@ -478,26 +751,29 @@ export default {
       if (count === 0) {
         count = 1 // 防止NAN
       }
-      let obj = {
+      return {
         staffRate: totalRate / count,
         manageRate: manageRate
       }
-      return obj
     },
     // 上一月
     handlePreMonth () {
       this.formData.title = this.$moment(this.formData.title).subtract(1, 'months').format('YYYY-MM')
-      this.setMonthCookie(this.formData.title, 7)
+      // this.setMonthCookie(this.formData.title, 7)
       this.handelDateChange()
     },
     // 下一月
     handleNextMonth () {
       this.formData.title = this.$moment(this.formData.title).add(1, 'months').format('YYYY-MM')
-      this.setMonthCookie(this.formData.title, 7)
+      // this.setMonthCookie(this.formData.title, 7)
       this.handelDateChange()
     },
     // 日期变化
     handelDateChange () {
+      let allUsersRates = []
+      this.getAllUserRates(this.users, allUsersRates).then(res0 => {
+        this.calMutualRatesRank(res0)
+      })
     },
     handleSetLineChartData (type) {
       this.$emit('handleSetLineChartData', type)

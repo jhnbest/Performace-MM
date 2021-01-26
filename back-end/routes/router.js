@@ -48,6 +48,7 @@ router.post(api.getUnReviewProjectCount, performance.getUnReviewProjectCount)
 router.post(api.submitReviewPass, performance.submitReviewPass)
 router.post(api.getAssignWorkTime, performance.getAssignWorkTime)
 router.post(api.getGroupWorkTimeList, performance.getGroupWorkTimeList)
+router.post(api.getAllWorkTimeList, performance.getAllWorkTimeList)
 
 // workStation-个人工作台
 router.post(api.getAssignProjectList, workStation.getAssignProjectList)

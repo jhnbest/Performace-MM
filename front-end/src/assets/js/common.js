@@ -7,7 +7,7 @@ const commonFn = {
 	toast (str, type, showClose, onCloseFn) {
 		let time = 2000
 		if (showClose) {
-			time = 3000
+			time = 30000
 		}
 		Message({
 			showClose: showClose,

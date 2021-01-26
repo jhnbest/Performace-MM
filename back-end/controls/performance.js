@@ -931,14 +931,22 @@ const performance = {
             let data = req.body
             let sql = $sql.performance.getGroupWorkTimeList
             let arrayParams = [data.applyMonth, data.groupID]
-            $http.connPool(sql, arrayParams, (err, result) => {
-                if (err) {
-                    return $http.writeJson(res, {code: -2, message: '失败', errMsg: err})
-                } else {
-                    result = JSON.parse(JSON.stringify(result))
-                    return $http.writeJson(res, {code: 1, data: result, message: '失败'})
-                }
+            RCPDDatabase(sql, arrayParams).then(result => {
+                return $http.writeJson(res, {code: 1, data: result, message: '失败'})
+            }).catch(err => {
+                return $http.writeJson(res, {code: -2, message: '失败', errMsg: err})
             })
+        })
+    },
+    // 获取全处已审工时列表
+    getAllWorkTimeList (req, res) {
+        let sendData = req.body
+        let sql = $sql.performance.getAllWorkTimeList
+        let arrayParams = [sendData.applyMonth]
+        RCPDDatabase(sql, arrayParams).then(result => {
+            return $http.writeJson(res, {code: 1, data: result, message: '失败'})
+        }).catch(err => {
+            return $http.writeJson(res, {code: -2, message: '失败', errMsg: err})
         })
     }
 }
