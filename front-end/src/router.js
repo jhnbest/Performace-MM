@@ -42,12 +42,6 @@ export default new Router({
           meta: { pagePath: '/home/dashboard' }
         },
         {
-          path: 'user',
-          name: 'user',
-          component: () => import(/* webpackChunkName: "user" */ './views/User/User.vue'),
-          meta: { pagePath: '/home/user' }
-        },
-        {
           path: 'users',
           name: 'users',
           component: () => import(/* webpackChunkName: "users" */ './views/User/Users.vue'),
@@ -72,12 +66,6 @@ export default new Router({
           meta: { pagePath: '/home/workStation' }
         },
         {
-          path: 'weekly',
-          name: 'weekly',
-          component: () => import(/* webpackChunkName: "weekly" */ './views/Weekly/Weekly.vue'),
-          meta: { pagePath: '/home/weekly' }
-        },
-        {
           path: 'performance',
           name: 'performance',
           component: () => import(/* webpackChunkName: "weekly" */ './views/Performance/Performance.vue'),
@@ -94,24 +82,6 @@ export default new Router({
           name: 'workTimeCheck',
           component: () => import(/* webpackChunkName: "weekly" */ './views/workTimeCheck/workTimeCheck.vue'),
           meta: { pagePath: '/home/workTimeCheck' }
-        },
-        {
-          path: 'weeklyadd',
-          name: 'weeklyadd',
-          component: () => import(/* webpackChunkName: "weekly" */ './views/Weekly/childViews/WeeklyAdd.vue'),
-          meta: { pagePath: '/home/weekly' }
-        },
-        {
-          path: 'weeklyedit',
-          name: 'weeklyedit',
-          component: () => import(/* webpackChunkName: "weekly" */ './views/Weekly/childViews/WeeklyEdit.vue'),
-          meta: { pagePath: '/home/weekly' }
-        },
-        {
-          path: 'weeklydetail',
-          name: 'weeklydetail',
-          component: () => import(/* webpackChunkName: "weekly" */ './views/Weekly/childViews/WeeklyDetail.vue'),
-          meta: { pagePath: '/home/weekly' }
         },
         {
           path: 'performanceAdd',

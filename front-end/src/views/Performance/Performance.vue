@@ -41,20 +41,18 @@
           :decimals="1"
           style="color: #F56C6C;margin-left: 10px;font-size: 25px"/></span>
       </el-form-item>
-      <br>
-      <el-radio-group v-model="formData.selectType" @change="handleSelectTypeChange">
+      <el-radio-group v-model="formData.selectType" @change="handleSelectTypeChange" style="margin-left: 50px">
         <el-radio-button label="计划查询"></el-radio-button>
         <el-radio-button label="工时查询"></el-radio-button>
       </el-radio-group>
     </el-form>
-    <br>
     <!-- 分割线 start -->
     <div class="hr-10"></div>
     <!-- 分割线 end -->
-    <div class="main-content" v-if="showFlag.factTableShow">
-      <el-table
+    <div>
+      <el-table v-if="showFlag.factTableShow"
         :data="workDetailTable"
-        style="width: 99%;margin: auto"
+        style="width: 99%;margin: auto; margin-top: 20px"
         v-loading="!this.reqFlag.getProjectList"
         border
         :span-method="objectSpanMethod"
@@ -137,11 +135,12 @@
       </el-table>
     </div>
     <!---------------------------------------------计划表格--------------------------------------------------->
-    <div class="main-content" v-if="showFlag.planTableShow">
-      <el-table :data="workPlanTableData"
-                style="width: 99%;margin: auto"
+    <div>
+      <el-table :data="workPlanTableData" v-if="showFlag.planTableShow"
+                style="width: 99%;margin: auto;margin-top: 20px"
                 border
-                :span-method="planTableSpanMethod">
+                :span-method="planTableSpanMethod"
+                :header-cell-style="{ backgroundColor:'#48bfe5', color: '#333' }">
         <el-table-column label="序号" align="center" type="index" width="60%"></el-table-column>
 <!--        <el-table-column label="申报月份" align="center" prop="applyMonth"></el-table-column>-->
         <el-table-column label="项目名称" align="center" prop="projectName"></el-table-column>

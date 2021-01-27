@@ -13,7 +13,6 @@
         @change="handelDateChange">
       </el-date-picker>
       <el-button size="mini" type="primary" style="margin-left: 10px" @click="handleNextMonth">下月</el-button>
-      <el-button @click="init">初始化</el-button>
     </div>
     <div class="hr-10" style="margin-top: 20px; margin-bottom: 20px"></div>
     <div>
@@ -27,7 +26,12 @@
               <div class="card-panel-text">
                 绩效得分
               </div>
-              <count-to :start-val="0" :end-val="performanceScore" :duration="1000" :decimals="2" class="card-panel-num" />
+              <div v-if="isCount">
+                <count-to :start-val="0" :end-val="performanceScore" :duration="1000" :decimals="2" class="card-panel-num" />
+              </div>
+              <div v-else>
+                <span style="font-size: 15px;color: red">暂未统计</span>
+              </div>
             </div>
           </div>
         </el-col>
@@ -40,7 +44,13 @@
               <div class="card-panel-text">
                 绩效排名
               </div>
-              <count-to :start-val="0" :end-val="performanceRank" :duration="1000" class="card-panel-num" />
+              <div v-if="isCount">
+                <count-to :start-val="0" :end-val="performanceRank" :duration="1000" class="card-panel-num" />
+                <span style="font-size: 19px">{{'/ ' + usersNum}}</span>
+              </div>
+              <div v-else>
+                <span style="font-size: 15px;color: red">暂未统计</span>
+              </div>
             </div>
           </div>
         </el-col>
@@ -53,7 +63,12 @@
               <div class="card-panel-text">
                 定量评价得分
               </div>
-              <count-to :start-val="0" :end-val="quantitativeScore" :duration="1000" :decimals="2" class="card-panel-num" />
+              <div v-if="isCount">
+                <count-to :start-val="0" :end-val="quantitativeScore" :duration="1000" :decimals="2" class="card-panel-num" />
+              </div>
+              <div v-else>
+                <span style="font-size: 15px;color: red">暂未统计</span>
+              </div>
             </div>
           </div>
         </el-col>
@@ -66,8 +81,13 @@
               <div class="card-panel-text">
                 定量评价排名
               </div>
-              <count-to :start-val="0" :end-val="quantitativeRank" :duration="1000" class="card-panel-num" />
-              <span style="font-size: 19px">{{'/ ' + quantitativeNum}}</span>
+              <div v-if="isCount">
+                <count-to :start-val="0" :end-val="quantitativeRank" :duration="1000" class="card-panel-num" />
+                <span style="font-size: 19px">{{'/ ' + quantitativeNum}}</span>
+              </div>
+              <div v-else>
+                <span style="font-size: 15px;color: red">暂未统计</span>
+              </div>
             </div>
           </div>
         </el-col>
@@ -80,7 +100,12 @@
               <div class="card-panel-text">
                 定性互评得分
               </div>
-              <count-to :start-val="0" :end-val="multualScore" :duration="1000" :decimals="2" class="card-panel-num" />
+              <div v-if="isCount">
+                <count-to :start-val="0" :end-val="multualScore" :duration="1000" :decimals="2" class="card-panel-num" />
+              </div>
+              <div v-else>
+                <span style="font-size: 15px;color: red">暂未统计</span>
+              </div>
             </div>
           </div>
         </el-col>
@@ -93,8 +118,13 @@
               <div class="card-panel-text">
                 定性互评排名
               </div>
-              <count-to :start-val="0" :end-val="multualRank" :duration="1000" class="card-panel-num" />
-              <span style="font-size: 19px">{{'/ ' + multualNum}}</span>
+              <div v-if="isCount">
+                <count-to :start-val="0" :end-val="multualRank" :duration="1000" class="card-panel-num" />
+                <span style="font-size: 19px">{{'/ ' + multualNum}}</span>
+              </div>
+              <div v-else>
+                <span style="font-size: 15px;color: red">暂未统计</span>
+              </div>
             </div>
           </div>
         </el-col>
@@ -105,7 +135,7 @@
 
 <script>
 import CountTo from 'vue-count-to'
-import { getUsersName, getUserRates, submitRatesResult, updateUserRate,
+import { getUsersName, getUserRates, submitRatesResult, updateUserRate, getPerformanceIsCount,
   getCurMutualRate, getAllUserRates, getGroupWorkTimeList, getAllWorkTimeList } from '@/config/interface'
 
 export default {
@@ -130,6 +160,8 @@ export default {
       performanceRank: 0,
       multualNum: 0,
       quantitativeNum: 0,
+      usersNum: 0,
+      isCount: false,
       commonStaffMutualCof: this.$store.state.commonStaffMutualCof,
       commonStaffManagerCof: this.$store.state.commonStaffManagerCof,
       commonStaffQuantitativeCof: this.$store.state.commonStaffQuantitativeCof,
@@ -150,72 +182,76 @@ export default {
       let allUsersRates = []
       let promises = []
       let count = 0
-      let allQuantitativeScore = []
       this.getUsersList().then(res0 => {
         this.users = res0
         this.calGroupMemNum(res0)
         promises[count++] = this.getAllWorkTimeList()
         promises[count++] = this.getAllUserRates(res0, allUsersRates)
         Promise.all(promises).then((result) => {
-          let groupedWorkTimeList = this.groupedWorkTimeList(result[0])
-          for (let item of groupedWorkTimeList) {
-            item.caledQuantitative = this.calQuantitativeScore(item.workTimeList)
-            for (let itemInside of item.caledQuantitative) {
-              allQuantitativeScore.push(itemInside)
-            }
-          }
-          let multualRestuls = this.calMutualRatesRank(result[1])
-          let finalResult = JSON.parse(JSON.stringify(multualRestuls))
-          for (let item of finalResult) {
-            let quantitativeInfo = allQuantitativeScore.find(quantitativeInfo => {
-              return item.id === quantitativeInfo.id
-            })
-            if (quantitativeInfo) {
-              item.quantitativeScore = quantitativeInfo.quantitativeScore
-              item.quantitativeRank = quantitativeInfo.rank
-              if (item.id === this.$store.state.userInfo.id) {
-                this.quantitativeRank = quantitativeInfo.rank
-                this.quantitativeScore = quantitativeInfo.quantitativeScore
-              }
-            } else {
-              item.quantitativeScore = 0
-              item.quantitativeRank = 0
-              if (item.id === this.$store.state.userInfo.id) {
-                this.quantitativeRank = 0
-                this.quantitativeScore = 0
-              }
-            }
-            if (item.id === 7 || item.id === 11) { // 主任岗
-              item.performanceScore = item.quantitativeScore * this.directorQuantitativeCof + item.mutualScore
-            } else if (item.id === 13 || item.id === 17) { // 组长
-              item.performanceScore = item.quantitativeScore * this.groupLeaderQuantitativeCof + item.mutualScore
-            } else { // 普通成员
-              item.performanceScore = item.quantitativeScore * this.commonStaffQuantitativeCof + item.mutualScore
-            }
-            finalResult.sort(this.sortBy('performanceScore'))
-          }
-          this.performanceScore = finalResult.find(finalResultItem => {
-            return finalResultItem.id === this.$store.state.userInfo.id
-          }).performanceScore
-          let count = 0
-          let prePerformanceScore = -1
-          let prePerformanceRank = -1
-          for (let item of finalResult) {
-            if (item.performanceScore === prePerformanceScore) {
-              item.performanceRank = prePerformanceRank
-            } else {
-              item.performanceRank = count
-              prePerformanceScore = item.performanceScore
-              prePerformanceRank = count
-            }
-            count++
-          }
-          console.log(finalResult)
-          this.performanceRank = finalResult.find(finalResultItem => {
-            return finalResultItem.id === this.$store.state.userInfo.id
-          }).performanceRank
+          this.calPerformanceScore(result)
         })
       })
+    },
+    // 计算绩效得分
+    calPerformanceScore (result) {
+      let allQuantitativeScore = []
+      let groupedWorkTimeList = this.groupedWorkTimeList(result[0]) // 对数据进行分组
+      for (let item of groupedWorkTimeList) {
+        item.caledQuantitative = this.calQuantitativeScore(item.workTimeList)
+        for (let itemInside of item.caledQuantitative) {
+          allQuantitativeScore.push(itemInside)
+        }
+      }
+      let multualRestuls = this.calMutualRatesRank(result[1]) // 定性评价结果
+      let finalResult = JSON.parse(JSON.stringify(multualRestuls)) // 合并定性评价和定量评价
+      for (let item of finalResult) {
+        let quantitativeInfo = allQuantitativeScore.find(quantitativeInfo => {
+          return item.id === quantitativeInfo.id
+        })
+        if (quantitativeInfo) {
+          item.quantitativeScore = quantitativeInfo.quantitativeScore
+          item.quantitativeRank = quantitativeInfo.rank
+          if (item.id === this.$store.state.userInfo.id) {
+            this.quantitativeRank = quantitativeInfo.rank
+            this.quantitativeScore = quantitativeInfo.quantitativeScore
+          }
+        } else {
+          item.quantitativeScore = 0
+          item.quantitativeRank = 0
+          if (item.id === this.$store.state.userInfo.id) {
+            this.quantitativeRank = 0
+            this.quantitativeScore = 0
+          }
+        }
+        if (item.id === 7 || item.id === 11) { // 主任岗
+          item.performanceScore = item.quantitativeScore * this.directorQuantitativeCof + item.mutualScore
+        } else if (item.id === 13 || item.id === 17) { // 组长
+          item.performanceScore = item.quantitativeScore * this.groupLeaderQuantitativeCof + item.mutualScore
+        } else { // 普通成员
+          item.performanceScore = item.quantitativeScore * this.commonStaffQuantitativeCof + item.mutualScore
+        }
+        finalResult.sort(this.sortBy('performanceScore'))
+      }
+      this.performanceScore = finalResult.find(finalResultItem => {
+        return finalResultItem.id === this.$store.state.userInfo.id
+      }).performanceScore
+      let count = 0
+      let prePerformanceScore = -1
+      let prePerformanceRank = -1
+      for (let item of finalResult) {
+        if (item.performanceScore === prePerformanceScore) {
+          item.performanceRank = prePerformanceRank
+        } else {
+          item.performanceRank = count
+          prePerformanceScore = item.performanceScore
+          prePerformanceRank = count
+        }
+        count++
+      }
+      console.log(finalResult)
+      this.performanceRank = finalResult.find(finalResultItem => {
+        return finalResultItem.id === this.$store.state.userInfo.id
+      }).performanceRank
     },
     // 将获得的信息按小组分类
     groupedWorkTimeList (allWorkTimeList) {
@@ -294,6 +330,7 @@ export default {
       let standGroupMembers = []
       let engineerGroupMembers = []
       let communicationRates = []
+      this.usersNum = users.length - 1
       for (let item of users) {
         if (item.groupName === '技术标准组' || item.groupName === '工程组') {
           if (item.groupName === '技术标准组') {
@@ -771,8 +808,12 @@ export default {
     // 日期变化
     handelDateChange () {
       let allUsersRates = []
-      this.getAllUserRates(this.users, allUsersRates).then(res0 => {
-        this.calMutualRatesRank(res0)
+      let count = 0
+      let promises = []
+      promises[count++] = this.getAllWorkTimeList()
+      promises[count++] = this.getAllUserRates(this.users, allUsersRates)
+      Promise.all(promises).then((result) => {
+        this.calPerformanceScore(result)
       })
     },
     handleSetLineChartData (type) {

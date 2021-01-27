@@ -53,7 +53,8 @@
                 size="mini"
                 resizable
                 :span-method="objectSpanMethod"
-                :height="tableMaxHeight">
+                :height="tableHeight"
+                ref="rateTable">
         <el-table-column label="项目阶段" align="center" prop="projectStageName" fixed show-overflow-tooltip></el-table-column>
         <el-table-column label="标准工时" align="center" prop="baseWorkTime" width="50%"></el-table-column>
         <el-table-column label="K值" align="center" prop="kValue" width="50%"></el-table-column>
@@ -366,7 +367,8 @@
           submitParams: {},
           showFlag: {
             workTimeAssign: false
-          }
+          },
+          tableHeight: null
         }
       },
       methods: {
@@ -674,6 +676,16 @@
           this.submitParams.data[params.index].workTimeAssign = params.workTimeAssignDetail
           this.submitParams.data[params.index].multipleAssign = params.multipleAssign
           this.submitParams.data[params.index].multipleSelect = params.multipleSelect
+        },
+        // 刷新表格尺寸
+        refreshTableSize () {
+          this.$nextTick(() => {
+            this.tableHeight = window.innerHeight - this.$refs.rateTable.$el.offsetTop - 5
+            let _this = this
+            window.onresize = function () {
+              _this.tableHeight = window.innerHeight - _this.$refs.rateTable.$el.offsetTop - 5
+            }
+          })
         }
       },
       computed: {
@@ -707,7 +719,10 @@
       created () {
         this.init()
       },
-      destroyed () {
+      mounted () {
+        this.refreshTableSize()
+      },
+    destroyed () {
       },
       name: 'ProjectPlanProcess'
     }

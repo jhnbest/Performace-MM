@@ -479,6 +479,19 @@ async function getAssignProjectMonthProcessPlan(data, year) {
     })
 }
 
+function RCPDDatabase(sql, arrayParams) {
+    return new Promise(function (resolve, reject) {
+        $http.connPool(sql, arrayParams, (err, result) => {
+            if (err) {
+                reject(err)
+            } else {
+                result = JSON.parse(JSON.stringify(result))
+                resolve(result)
+            }
+        })
+    })
+}
+
 const workStation = {
     // 获取指派任务列表
     getAssignProjectList (req, res) {
@@ -510,8 +523,12 @@ const workStation = {
     getAssignProjectDetail (req, res) {
         $http.userVerify(req, res, () => {
             let data = req.body
-            getAssignProjectDetailOP(data).then(res0 => {
+            let sql = $sql.workStation.getAssignProjectDetail
+            let arrayParams = [data.id]
+            console.log(arrayParams)
+            RCPDDatabase(sql, arrayParams).then(res0 => {
                 let resultData = []
+                console.log(res0)
                 getAssignProjectDetailMonthProcess(res0, resultData, data, res)
             })
         })
@@ -678,7 +695,7 @@ const workStation = {
         let curTime = $time.formatTime()
         sql = $sql.workStation.insertAssignProjectList
         arrayParams = [userID, curTime, projectTypeID, projectName, assignerID, totalWorkTime, projectLevel, reviewStatus, isFilled]
-        insertAssignProjectList(sql, arrayParams).then( res1 => {
+        RCPDDatabase(sql, arrayParams).then( res1 => {
             let insertID = res1.insertId
             sql = $sql.workStation.insertAssignProjectDetail
             arrayParams = []

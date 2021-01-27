@@ -73,5 +73,6 @@ router.post(api.submitRatesResult, mutualRates.submitRatesResult)
 router.post(api.updateUserRate, mutualRates.updateUserRate)
 router.post(api.getCurMutualRate, mutualRates.getCurMutualRate)
 router.post(api.getAllUserRates, mutualRates.getAllUserRates)
+router.post(api.getPerformanceIsCount, mutualRates.getPerformanceIsCount)
 
 module.exports = router;

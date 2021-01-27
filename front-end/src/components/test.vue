@@ -85,6 +85,7 @@
               .then(res => {
                 if (res.code === 1) {
                   this.formData.tableData = res.data[0]
+                  console.log(this.formData.tableData)
                   this.$emit('countFeedback', res.data[1][0].totalCount)
                 }
                 this.reqFlag.getAssignProjectList = true

@@ -23,9 +23,19 @@
           </el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" size="medium" @click="onSubmitWorkTime('formData')">提交</el-button>
-          <el-button v-if="formData.applyType === 'fact'" type="info" size="medium" @click="onTemporaryWorkTime('formData')">暂存</el-button>
-          <el-button type="danger" size="medium" @click="onCancel('formData')">取 消</el-button>
+          <el-button type="primary"
+                     size="medium"
+                     @click="onSubmitWorkTime('formData')"
+                     :disabled="!reqFlag.submitOrTemporaryWorkTime">提交</el-button>
+          <el-button v-if="formData.applyType === 'fact'"
+                     type="info"
+                     size="medium"
+                     @click="onTemporaryWorkTime('formData')"
+                     :disabled="!reqFlag.submitOrTemporaryWorkTime">暂存</el-button>
+          <el-button type="danger"
+                     size="medium"
+                     @click="onCancel('formData')"
+                     :disabled="!reqFlag.submitOrTemporaryWorkTime">取 消</el-button>
         </el-form-item>
         <br>
         <el-form-item label="项目类型" prop="projectType">
@@ -341,7 +351,8 @@
             workTypeList: true,
             usersName: true,
             getProjectType: true,
-            getWorkTimeNew: true
+            getWorkTimeNew: true,
+            submitOrTemporaryWorkTime: true
           },
           showFlag: {
             workTimeAssign: false,
@@ -404,12 +415,12 @@
         },
         // 提交至工时明细列表
         onSubmitWorkTimeList (formData) {
-          const url = workTimeSubmit
-          if (this.reqFlag.add) {
-            this.reqFlag.add = false
-            let title = this.formData.title
+          let _this = this
+          return new Promise(function (resolve, reject) {
+            const url = workTimeSubmit
+            let title = _this.formData.title
             let tableDataCopy = []
-            for (let item of this.formData.workTypeTimeDetail) {
+            for (let item of _this.formData.workTypeTimeDetail) { // 无进展的项目阶段不提交
               item.avaiableWorkTime = Number(item.avaiableWorkTime)
               if (item.avaiableWorkTime !== 0) {
                 item.lastProcess = 0
@@ -421,24 +432,26 @@
                 submitType: 'insert',
                 submitDate: title,
                 data: tableDataCopy,
-                applyType: this.formData.applyType
+                applyType: _this.formData.applyType
               }
-              this.$http(url, params)
+              _this.$http(url, params)
                 .then(res => {
                   if (res.code === 1) {
-                    this.$common.toast('添加成功', 'success', false)
-                    this.onCancel(formData)
+                    _this.$common.toast('添加成功', 'success', false)
+                    resolve(res.code)
+                    _this.onCancel(formData)
                   } else {
-                    this.$common.toast('添加失败', 'error', false)
-                    this.onCancel(formData)
+                    _this.$common.toast('添加失败', 'error', false)
+                    resolve(res.code)
+                    _this.onCancel(formData)
                   }
-                  this.reqFlag.add = true
                 })
             } else {
-              this.$common.toast('添加成功', 'success', false)
-              this.onCancel(formData)
+              _this.$common.toast('添加成功', 'success', false)
+              resolve(1)
+              _this.onCancel(formData)
             }
-          }
+          })
         },
         // 提交项目进展
         onSubmitProjectProcess (param) {
@@ -568,15 +581,22 @@
                 if (projectParentArray.length > 1) {
                   this.$common.toast('一级活动限选一种', 'error', 'false')
                 } else {
-                  this.onSubmitProjectList().then(() => { // 提交至项目明细表
-                    if (this.formData.applyType === 'plan') { // 如果是计划项目，则更新计划进展表
-                      this.onSubmitMonthPlanProcess().then(() => {
-                        this.onSubmitWorkTimeList(formData) // 提交至工时明细表
-                      })
-                    } else {
-                      this.onSubmitWorkTimeList(formData) // 提交至工时明细表
-                    }
-                  })
+                  if (this.reqFlag.submitOrTemporaryWorkTime) {
+                    this.reqFlag.submitOrTemporaryWorkTime = false
+                    this.onSubmitProjectList().then(() => { // 提交至项目明细表
+                      if (this.formData.applyType === 'plan') { // 如果是计划项目，则更新计划进展表
+                        this.onSubmitMonthPlanProcess().then(() => {
+                          this.onSubmitWorkTimeList(formData).then(() => { // 提交至工时明细表
+                            this.reqFlag.submitOrTemporaryWorkTime = true
+                          })
+                        })
+                      } else {
+                        this.onSubmitWorkTimeList(formData).then(() => { // 提交至工时明细表
+                          this.reqFlag.submitOrTemporaryWorkTime = true
+                        })
+                      }
+                    })
+                  }
                 }
               } else {
                 if (this.isProjectNameWordExceed) {
@@ -590,12 +610,12 @@
         },
         // 暂存至工时明细列表
         onTemporaryWorkTimeList (formData) {
-          const url = workTimeTemporary
-          if (this.reqFlag.add) {
-            this.reqFlag.add = false
-            let title = this.formData.title
+          let _this = this
+          return new Promise(function (resolve, reject) {
+            const url = workTimeTemporary
+            let title = _this.formData.title
             let tableDataCopy = []
-            for (let item of this.formData.workTypeTimeDetail) {
+            for (let item of _this.formData.workTypeTimeDetail) {
               item.avaiableWorkTime = Number(item.avaiableWorkTime)
               if (item.avaiableWorkTime !== 0) {
                 tableDataCopy.push(item)
@@ -606,42 +626,49 @@
               let params = {
                 submitType: 'insert',
                 submitDate: title,
-                data: this.formData.workTypeTimeDetail,
-                applyType: this.formData.applyType
+                data: _this.formData.workTypeTimeDetail,
+                applyType: _this.formData.applyType
               }
-              this.$http(url, params)
+              _this.$http(url, params)
                 .then(res => {
                   if (res.code === 1) {
-                    this.$common.toast('暂存成功', 'success', false)
-                    this.onCancel(formData)
+                    _this.$common.toast('暂存成功', 'success', false)
+                    resolve(res.code)
+                    _this.onCancel(formData)
                   } else {
-                    this.$common.toast('添加失败', 'error', false)
-                    this.onCancel(formData)
+                    _this.$common.toast('添加失败', 'error', false)
+                    resolve(res.code)
+                    _this.onCancel(formData)
                   }
-                  this.reqFlag.add = true
                 })
             } else {
               this.$common.toast('暂存成功', 'success', false)
+              resolve(1)
               this.onCancel(formData)
             }
-          }
+          })
         },
         // 暂存工时申报
         onTemporaryWorkTime (formData) {
           this.$refs[formData].validate(valid => {
-            if (valid) {
-              let projectParentArray = []
-              for (let item of this.formData.projectType) {
-                if (projectParentArray.indexOf(item[0]) === -1) {
-                  projectParentArray.push(item[0])
+            if (this.reqFlag.submitOrTemporaryWorkTime) {
+              if (valid) {
+                this.reqFlag.submitOrTemporaryWorkTime = false
+                let projectParentArray = []
+                for (let item of this.formData.projectType) {
+                  if (projectParentArray.indexOf(item[0]) === -1) {
+                    projectParentArray.push(item[0])
+                  }
                 }
-              }
-              if (projectParentArray.length > 1) {
-                this.$common.toast('一级活动限选一种', 'error', 'false')
-              } else {
-                this.onSubmitProjectList().then(() => { // 提交至项目明细表
-                  this.onTemporaryWorkTimeList(formData) // 暂存至工时明细表
-                })
+                if (projectParentArray.length > 1) {
+                  this.$common.toast('一级活动限选一种', 'error', 'false')
+                } else {
+                  this.onSubmitProjectList().then(() => { // 提交至项目明细表
+                    this.onTemporaryWorkTimeList(formData).then(() => { // 暂存至工时明细表
+                      this.reqFlag.submitOrTemporaryWorkTime = true
+                    })
+                  })
+                }
               }
             }
           })

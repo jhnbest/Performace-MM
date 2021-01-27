@@ -14,12 +14,12 @@
         </el-date-picker>
         <el-button size="mini" type="primary" style="margin-left: 10px" @click="handleNextYear">明年</el-button>
       </el-form-item>
-      <el-form-item label="计划类型：" style="margin-left: 10px">
-        <el-radio-group v-model="selectPlanType" @change="handleSelectTypeChange">
-          <el-radio-button label="月度计划"></el-radio-button>
-          <el-radio-button label="年度计划"></el-radio-button>
-        </el-radio-group>
-      </el-form-item>
+<!--      <el-form-item label="计划类型：" style="margin-left: 10px">-->
+<!--        <el-radio-group v-model="selectPlanType" @change="handleSelectTypeChange">-->
+<!--          <el-radio-button label="月度计划"></el-radio-button>-->
+<!--          <el-radio-button label="年度计划"></el-radio-button>-->
+<!--        </el-radio-group>-->
+<!--      </el-form-item>-->
     </el-form>
     <!-- 分割线 start -->
     <div class="hr-10"></div>

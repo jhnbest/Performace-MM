@@ -4,7 +4,7 @@
     <el-row>
       <el-col :span="15">
         <el-form-item label="互评月份：" prop="title">
-          <el-button size="mini" type="danger" style="margin-right: 10px" @click="handlePreMonth">上月</el-button>
+          <el-button size="mini" type="danger" style="margin-right: 10px" @click="handlePreMonth" :disabled="!reqFlag.getUserRates">上月</el-button>
           <el-date-picker
             v-model="formData.title"
             type="month"
@@ -14,7 +14,7 @@
             style="width: 150px"
             @change="handelDateChange">
           </el-date-picker>
-          <el-button size="mini" type="primary" style="margin-left: 10px" @click="handleNextMonth">下月</el-button>
+          <el-button size="mini" type="primary" style="margin-left: 10px" @click="handleNextMonth" :disabled="!reqFlag.getUserRates">下月</el-button>
 <!--          <span style="font-size: 21px;font-weight: bold;margin-left: 40px">本月互评得分:-->
 <!--            <count-to-->
 <!--              :start-val="0"-->
@@ -40,7 +40,7 @@
   <!-- 分割线 end -->
   <br>
   <div style="margin-left: 20px; margin-top: -15px">
-    <span style="font-size: 15px">评价标准显示：</span>
+    <span style="font-size: 15px">评价标准：</span>
     <el-switch v-model="showFlag.descTableShow" @change="handleSwitchChange"></el-switch>
     <span style="margin-left: 60px;font-weight: bolder">本月互评状态：
       <span v-if="isRated" style="font-weight: bolder;color: green;font-size: 23px">已评价</span>
@@ -54,11 +54,10 @@
               style="margin: auto; width: 99%"
               :span-method="objectSpanMethod"
               stripe
-              :header-cell-style="{ backgroundColor:'#f10a0a', color: '#333' }">
-      <el-table-column label="序号" align="center" width="50%" type="index"></el-table-column>
+              :header-cell-style="{ backgroundColor:'#ff2525', color: '#333' }">
       <el-table-column label="一级指标" align="center" width="100%" prop="l1"></el-table-column>
       <el-table-column label="二级指标" align="center" width="100%" prop="l2"></el-table-column>
-      <el-table-column label="评分衡量标准" align="center" prop="standard" show-overflow-tooltip></el-table-column>
+      <el-table-column label="评分衡量标准" align="center" prop="standard"></el-table-column>
       <el-table-column label="分值" align="center" prop="score" width="100%"></el-table-column>
       <el-table-column label="对应星级" align="center" width="145%">
         <template slot-scope="scope">
@@ -68,23 +67,23 @@
     </el-table>
   </div>
   <br v-if="showFlag.descTableShow">
-  <br>
-  <div>
-    <el-table :data="realTimeShowTableData"
-              style="width: 99%; margin: auto"
-              border
-              size="mini"
-              :header-cell-style="{ backgroundColor:'#38ef90', color: '#333'}">
-      <el-table-column label="类别" align="center" prop="rateType" width="100"></el-table-column>
-      <el-table-column label="评价细则" align="center" prop="rateDetail"></el-table-column>
-      <el-table-column label="选中星级" align="center" prop="star" width="150">
-        <template slot-scope="scope">
-          <el-rate v-model="scope.row.star" :disabled="true"></el-rate>
-        </template>
-      </el-table-column>
-      <el-table-column label="得分" align="center" prop="score" width="110"></el-table-column>
-    </el-table>
-  </div>
+<!--  <br>-->
+<!--  <div>-->
+<!--    <el-table :data="realTimeShowTableData"-->
+<!--              style="width: 99%; margin: auto"-->
+<!--              border-->
+<!--              size="large"-->
+<!--              :header-cell-style="{ backgroundColor:'#58c480', color: '#333'}">-->
+<!--      <el-table-column label="类别" align="center" prop="rateType" width="100"></el-table-column>-->
+<!--      <el-table-column label="评价细则" align="center" prop="rateDetail"></el-table-column>-->
+<!--      <el-table-column label="选中星级" align="center" prop="star" width="150">-->
+<!--        <template slot-scope="scope">-->
+<!--          <el-rate v-model="scope.row.star" :disabled="true"></el-rate>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
+<!--      <el-table-column label="得分" align="center" prop="score" width="110"></el-table-column>-->
+<!--    </el-table>-->
+<!--  </div>-->
   <br>
   <div>
     <el-table :data="rateTableData"
@@ -92,17 +91,18 @@
               style="margin: auto; width: 99%"
               :span-method="rateTableMethod"
               stripe
-              size="mini"
+              size="large"
               :header-cell-style="{ backgroundColor:'#48bfe5', color: '#333' }"
               v-loading="!reqFlag.getUsersList"
-              :height="tableHeight" ref="rateTable">
+              :height="tableHeight"
+              ref="rateTable">
       <el-table-column label="姓名" align="center" prop="ratedName" min-width="50"></el-table-column>
         <el-table-column label="工作态度" align="center">
           <el-table-column label="责任意识(15%)" align="center" min-width="110">
             <template slot-scope="scope">
 <!--              <el-popover placement="top-start" title="测试" trigger="manual" content="jsdklfjdd" v-model="visible">-->
                 <el-rate v-model="scope.row.t1Star"
-                         @change="handleT1StarChange(scope.row)" slot="reference"></el-rate>
+                         @change="handleT1StarChange(scope.row)" slot="reference" style="size: 50px"></el-rate>
 <!--              </el-popover>-->
             </template>
           </el-table-column>
@@ -709,7 +709,7 @@
       },
       // 表格合并方法
       objectSpanMethod ({ row, column, rowIndex, columnIndex }) {
-        if (columnIndex === 1) {
+        if (columnIndex === 0) {
           if (rowIndex === 0) {
             return {
               rowspan: 15,
@@ -732,7 +732,7 @@
             }
           }
         }
-        if (columnIndex === 2) {
+        if (columnIndex === 1) {
           if (rowIndex === 0) {
             return {
               rowspan: 5,
@@ -829,6 +829,7 @@
       // 标准表格显示开关
       handleSwitchChange () {
         this.setCookie(this.showFlag.descTableShow, 7)
+        this.refreshTableSize()
       },
       // 评分表格合并方法
       rateTableMethod () {
@@ -945,6 +946,16 @@
               this.reqFlag.updateRateToUpdate = true
             })
         }
+      },
+      // 刷新表格尺寸
+      refreshTableSize () {
+        this.$nextTick(() => {
+          this.tableHeight = window.innerHeight - this.$refs.rateTable.$el.offsetTop - 5
+          let _this = this
+          window.onresize = function () {
+            _this.tableHeight = window.innerHeight - _this.$refs.rateTable.$el.offsetTop - 5
+          }
+        })
       }
     },
     components: {
@@ -957,20 +968,12 @@
 
     },
     mounted () {
-      this.$nextTick(() => {
-        this.tableHeight = window.innerHeight - this.$refs.rateTable.$el.offsetTop - 20
-        let _this = this
-        window.onresize = function () {
-          _this.tableHeight = window.innerHeight - _this.$refs.rateTable.$el.offsetTop - 20
-        }
-      })
+      console.log('mounted')
+      this.refreshTableSize()
     },
     name: 'multualEvaluation'
   }
 </script>
 
 <style scoped>
-  .el-tooltip__popper{
-    max-width: 50%;
-  }
 </style>

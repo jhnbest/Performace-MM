@@ -164,6 +164,11 @@ const mutualRate = {
             }
             return $http.writeJson(res, { code: 1, data: resultData, message: '成功' })
         })
+    },
+    // 获取绩效信息统计标志
+    getPerformanceIsCount (req, res) {
+        let sendData = req.data
+        let sql = $sql.mutualRates.getPerformanceIsCount
     }
 }
 
