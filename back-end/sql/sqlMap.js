@@ -192,7 +192,8 @@ const sqlMap = {
         'values (?, ?, ?, ?, ?, ?, ?)',
     updateUserRate: 'update mutualrate set rate = ?, updateTime = ? where id = ?',
     getCurMutualRate: 'select * from mutualrate where ratedPersion = ? and rateMonth = ?',
-    getRateData: 'select * from mutualrate where ratePersion = ? and rateMonth = ?'
+    getRateData: 'select * from mutualrate where ratePersion = ? and rateMonth = ?',
+    getPerformanceIsCount: 'select * from globalflag where year(setTime) = ? and month(setTime) = ? and flagType = ?'
   }
 }
 module.exports = sqlMap;

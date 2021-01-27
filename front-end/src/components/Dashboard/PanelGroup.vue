@@ -2,7 +2,10 @@
   <div>
     <div>
       <span style='font-weight: bolder'>时间选择：</span>
-      <el-button size="mini" type="danger" style="margin-right: 10px" @click="handlePreMonth">上月</el-button>
+      <el-button size="mini"
+                 type="danger"
+                 style="margin-right: 10px"
+                 @click="handlePreMonth" :disabled="!reqFlag.getPerformanceScore">上月</el-button>
       <el-date-picker
         v-model="formData.title"
         type="month"
@@ -12,7 +15,12 @@
         style="width: 150px"
         @change="handelDateChange">
       </el-date-picker>
-      <el-button size="mini" type="primary" style="margin-left: 10px" @click="handleNextMonth">下月</el-button>
+      <el-button size="mini"
+                 type="primary"
+                 style="margin-left: 10px"
+                 @click="handleNextMonth"
+                 :disabled="!reqFlag.getPerformanceScore">下月</el-button>
+      <el-button @click="getPerformanceIsCount">测试按钮</el-button>
     </div>
     <div class="hr-10" style="margin-top: 20px; margin-bottom: 20px"></div>
     <div>
@@ -135,7 +143,7 @@
 
 <script>
 import CountTo from 'vue-count-to'
-import { getUsersName, getUserRates, submitRatesResult, updateUserRate, getPerformanceIsCount,
+import { getUsersName, getPerformanceIsCount,
   getCurMutualRate, getAllUserRates, getGroupWorkTimeList, getAllWorkTimeList } from '@/config/interface'
 
 export default {
@@ -149,7 +157,8 @@ export default {
         getUsersList: true,
         getAllUserRates: true,
         getGroupWorkTimeList: true,
-        getAllWorkTimeList: true
+        getAllWorkTimeList: true,
+        getPerformanceScore: true
       },
       ratesTableTmp: [],
       multualScore: 0,
@@ -182,13 +191,46 @@ export default {
       let allUsersRates = []
       let promises = []
       let count = 0
-      this.getUsersList().then(res0 => {
-        this.users = res0
-        this.calGroupMemNum(res0)
-        promises[count++] = this.getAllWorkTimeList()
-        promises[count++] = this.getAllUserRates(res0, allUsersRates)
-        Promise.all(promises).then((result) => {
-          this.calPerformanceScore(result)
+      if (this.reqFlag.getPerformanceScore) {
+        this.reqFlag.getPerformanceScore = false
+        this.getPerformanceIsCount().then(res0 => {
+          if (res0 === 1) {
+            this.getUsersList().then(res1 => {
+              this.users = res1
+              this.calGroupMemNum(res1)
+              promises[count++] = this.getAllWorkTimeList()
+              promises[count++] = this.getAllUserRates(res1, allUsersRates)
+              Promise.all(promises).then((result) => {
+                this.calPerformanceScore(result)
+                this.reqFlag.getPerformanceScore = true
+              })
+            })
+          } else {
+            this.reqFlag.getPerformanceScore = true
+          }
+        }).catch(() => {
+          this.$common.toast('请求错误1', 'error', false)
+          this.reqFlag.getPerformanceScore = true
+        })
+      }
+    },
+    // 判断当月绩效评分是否已统计完毕
+    getPerformanceIsCount () {
+      const url = getPerformanceIsCount
+      let params = {
+        year: this.$moment(this.formData.title).year(),
+        month: this.$moment(this.formData.title).month() + 1,
+        flagType: 'performanceCount'
+      }
+      let _this = this
+      return new Promise(function (resolve, reject) {
+        _this.$http(url, params).then(res => {
+          console.log(res.data)
+          if (res.code === 1) {
+            resolve(res.data.flagValue)
+          } else {
+            reject(new Error('请求错误'))
+          }
         })
       })
     },
@@ -248,7 +290,6 @@ export default {
         }
         count++
       }
-      console.log(finalResult)
       this.performanceRank = finalResult.find(finalResultItem => {
         return finalResultItem.id === this.$store.state.userInfo.id
       }).performanceRank
@@ -810,11 +851,28 @@ export default {
       let allUsersRates = []
       let count = 0
       let promises = []
-      promises[count++] = this.getAllWorkTimeList()
-      promises[count++] = this.getAllUserRates(this.users, allUsersRates)
-      Promise.all(promises).then((result) => {
-        this.calPerformanceScore(result)
-      })
+      if (this.reqFlag.getPerformanceScore) {
+        this.reqFlag.getPerformanceScore = false
+        this.getPerformanceIsCount().then(res0 => {
+          if (res0 === 1) {
+            this.getUsersList().then(res1 => {
+              this.users = res1
+              this.calGroupMemNum(res1)
+              promises[count++] = this.getAllWorkTimeList()
+              promises[count++] = this.getAllUserRates(res1, allUsersRates)
+              Promise.all(promises).then((result) => {
+                this.calPerformanceScore(result)
+                this.reqFlag.getPerformanceScore = true
+              })
+            })
+          } else {
+            this.reqFlag.getPerformanceScore = true
+          }
+        }).catch(() => {
+          this.$common.toast('请求错误1', 'error', false)
+          this.reqFlag.getPerformanceScore = true
+        })
+      }
     },
     handleSetLineChartData (type) {
       this.$emit('handleSetLineChartData', type)

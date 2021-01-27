@@ -167,8 +167,15 @@ const mutualRate = {
     },
     // 获取绩效信息统计标志
     getPerformanceIsCount (req, res) {
-        let sendData = req.data
+        let sendData = req.body
+        console.log(sendData)
         let sql = $sql.mutualRates.getPerformanceIsCount
+        let arrayParams = [sendData.year, sendData.month, sendData.flagType]
+        RCPDDatabase(sql, arrayParams).then(res0 => {
+            return $http.writeJson(res, {code: 1, data: res0, message: 'success'})
+        }).catch(err => {
+            return $http.writeJson(res, {code: -1, err: err, message: 'false'})
+        })
     }
 }
 
