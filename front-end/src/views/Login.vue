@@ -88,7 +88,7 @@ export default {
                 this.$store.dispatch('saveUserInfo', data)
                 this.$common.toast('登陆成功', 'success', false)
                 this.$router.push({
-                  path: '/home/dashboard',
+                  path: '/home/workStation',
                   query: {}
                 })
               }

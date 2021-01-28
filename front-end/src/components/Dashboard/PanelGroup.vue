@@ -1,7 +1,6 @@
 <template>
   <div>
     <div>
-      <span style='font-weight: bolder'>时间选择：</span>
       <el-button size="mini"
                  type="danger"
                  style="margin-right: 10px"
@@ -20,7 +19,17 @@
                  style="margin-left: 10px"
                  @click="handleNextMonth"
                  :disabled="!reqFlag.getPerformanceScore">下月</el-button>
-      <el-button @click="getPerformanceIsCount">测试按钮</el-button>
+      <el-popover
+        placement="bottom"
+        width="500"
+        trigger="click">
+        <span>1、每月的绩效得分、定量和定性互评得分以及相应的排名将于
+          <span style="font-weight: bolder;color: red">每月工时申报及互评截止后(每月3日0点)</span>进行统计；
+        </span><br>
+        <span>2、各评价指标的得分计算请参照手册<el-link type="primary" href="http://ekp.xiamenair.com.cn/ekp/xmair/manual/xmair_manual_file_new/xmairManualFileNewIndex.do?method=view&fdId=170234705c05efcbe81ae4045b6bbabe&toType=pdfView&title=MF%2F3508-10-%E9%80%9A%E4%BF%A1%E5%B7%A5%E7%A8%8B%E5%A4%84%E7%BB%A9%E6%95%88%E7%AE%A1%E7%90%86%E5%8A%9E%E6%B3%95&s_path=%E6%89%8B%E5%86%8C%E7%AE%A1%E7%90%86%E3%80%80%3E%E3%80%80%E6%89%8B%E5%86%8C%E6%9F%A5%E9%98%85%E3%80%80%3E%E3%80%80%E6%89%8B%E5%86%8C%E7%B1%BB%E5%88%AB%E3%80%80%3E%E3%80%80%E9%83%A8%E9%97%A8%E7%BA%A7%E3%80%80%3E%E3%80%80%E5%90%84%E9%83%A8%E9%97%A8%E3%80%80%3E%E3%80%8035%E4%BF%A1%E6%81%AF%E9%83%A8%E7%AE%A1%E7%90%86%E6%89%8B%E5%86%8C%E3%80%80%3E%E3%80%80%E6%89%8B%E5%86%8C%E7%9B%AE%E5%BD%95%E3%80%80%3E%E3%80%80MF%2F3508-10-%E9%80%9A%E4%BF%A1%E5%B7%A5%E7%A8%8B%E5%A4%84%E7%BB%A9%E6%95%88%E7%AE%A1%E7%90%86%E5%8A%9E%E6%B3%95&s_css=default" target="_blank">
+          《通信工程处绩效管理办法》</el-link>。</span><br>
+        <span slot="reference" @click="dashboardAbout" class="pointer-type" style="margin-left: 20px"><i class="el-icon-warning-outline"></i>相关说明</span>
+      </el-popover>
     </div>
     <div class="hr-10" style="margin-top: 20px; margin-bottom: 20px"></div>
     <div>
@@ -873,6 +882,9 @@ export default {
           this.reqFlag.getPerformanceScore = true
         })
       }
+    },
+    // 首页关于
+    dashboardAbout () {
     },
     handleSetLineChartData (type) {
       this.$emit('handleSetLineChartData', type)

@@ -2,7 +2,11 @@
   <div>
     <el-form class="main-search" :inline="true">
       <el-form-item label="申报月份：" prop="title">
-        <el-button size="mini" type="danger" style="margin-right: 10px" @click="handlePreMonth">上月</el-button>
+        <el-button size="mini"
+                   type="danger"
+                   style="margin-right: 10px"
+                   @click="handlePreMonth"
+                   :disabled="!reqFlag.handelDateChange">上月</el-button>
         <el-date-picker
           v-model="formData.title"
           type="month"
@@ -13,7 +17,11 @@
           style="width: 150px"
           @change="handelDateChange">
         </el-date-picker>
-        <el-button size="mini" type="primary" style="margin-left: 10px" @click="handleNextMonth">下月</el-button>
+        <el-button size="mini"
+                   type="primary"
+                   style="margin-left: 10px"
+                   @click="handleNextMonth"
+                   :disabled="!reqFlag.handelDateChange">下月</el-button>
       </el-form-item>
       <el-form-item style="margin-left: 30px">
         <span v-if="formData.selectType === '工时查询'" style="font-size: 21px;font-weight: bold">本月实际获得工时:
@@ -21,7 +29,7 @@
         <count-to
           :start-val="0"
           :end-val="formData.totalWorkTime"
-          :duration="2600"
+          :duration="1000"
           :decimals="1"
           style="color: #F56C6C;margin-left: 10px;font-size: 25px"/>
 <!--          <span style="font-size: 21px;font-weight: bold;margin-left: 30px">本月小组排名:-->
@@ -53,7 +61,6 @@
       <el-table v-if="showFlag.factTableShow"
         :data="workDetailTable"
         style="width: 99%;margin: auto; margin-top: 20px"
-        v-loading="!this.reqFlag.getProjectList"
         border
         :span-method="objectSpanMethod"
         :header-cell-style="{ backgroundColor:'#48bfe5', color: '#333' }">
@@ -205,7 +212,8 @@
             complete: true,
             getWorkTimeAssign: true,
             getGroupWorkTimeList: true,
-            getAssignWorkTimes: true
+            getAssignWorkTimes: true,
+            handelDateChange: true
           },
           pageNum: 1, // 请求第几页
           pageSize: this.$store.state.pageSize, // 每页请求多少条
@@ -224,10 +232,18 @@
         // 初始化
         init () {
           this.getCookie()
-          this.getProjectList().then(res => {
-            this.getAssignWorkTimes(res)
-            this.getGroupWorkTimeList(this.$store.state.userInfo.groupID)
-          })
+          let promises = []
+          let count = 0
+          if (this.reqFlag.handelDateChange) {
+            this.reqFlag.handelDateChange = false
+            this.getProjectList().then(res => {
+              promises[count++] = this.getGroupWorkTimeList(this.$store.state.userInfo.groupID)
+              promises[count++] = this.getAssignWorkTimes(res)
+              Promise.all(promises).then(() => {
+                this.reqFlag.handelDateChange = true
+              })
+            })
+          }
         },
         // 获取项目类型
         getProjectType () {
@@ -268,6 +284,8 @@
         },
         // 获取工时申报列表
         getProjectList () {
+          this.workPlanTableData = []
+          this.workDetailTable = []
           let it = this
           return new Promise(function (resolve, reject) {
             const url = getProjectList
@@ -303,13 +321,13 @@
                     it.workDetailTable = JSON.parse(JSON.stringify(factWorkTimeList))
                     it.totalCount = data.totalCount
                     it.currentPage = it.pageNum
-                    it.reqFlag.getProjectList = true
                     if (it.formData.selectType === '工时查询') {
                       resolve(factWorkTimeList)
                     } else if (it.formData.selectType === '计划查询') {
                       resolve(planWorkTimeList)
                     }
                   }
+                  it.reqFlag.getProjectList = true
                 })
             }
           })
@@ -356,11 +374,19 @@
         },
         // 申报月份变化
         handelDateChange () {
-          this.getProjectList().then(res => {
-            this.getGroupWorkTimeList(this.$store.state.userInfo.groupID)
-            this.getAssignWorkTimes(res)
-            this.setCookie(this.formData.title, 7)
-          })
+          this.setCookie(this.formData.title, 7)
+          let promises = []
+          let count = 0
+          if (this.reqFlag.handelDateChange) {
+            this.reqFlag.handelDateChange = false
+            this.getProjectList().then(res => {
+              promises[count++] = this.getGroupWorkTimeList(this.$store.state.userInfo.groupID)
+              promises[count++] = this.getAssignWorkTimes(res)
+              Promise.all(promises).then(() => {
+                this.reqFlag.handelDateChange = true
+              })
+            })
+          }
         },
         handleAdd () {
           this.$router.push({ path: '/home/PerformanceAdd' })
@@ -448,18 +474,24 @@
               }
               i++
             }
-            this.$http(url, params)
-              .then(res => {
-                if (res.code === 1) {
-                  let data = res.data
-                  let totalWorkTimeTmp = 0
-                  for (let item of data) {
-                    this.workDetailTable[item.index].assignWorkTime = item.reviewWorkTime
-                    totalWorkTimeTmp += item.reviewWorkTime
+            let _this = this
+            return new Promise(function (resolve, reject) {
+              _this.$http(url, params)
+                .then(res => {
+                  if (res.code === 1) {
+                    let data = res.data
+                    let totalWorkTimeTmp = 0
+                    for (let item of data) {
+                      _this.workDetailTable[item.index].assignWorkTime = item.reviewWorkTime
+                      totalWorkTimeTmp += item.reviewWorkTime
+                    }
+                    _this.formData.totalWorkTime = totalWorkTimeTmp
+                    resolve(totalWorkTimeTmp)
+                  } else {
+                    reject(new Error('请求失败'))
                   }
-                  this.formData.totalWorkTime = totalWorkTimeTmp
-                }
-              })
+                })
+            })
           }
         },
         // 切换标签事件
@@ -596,8 +628,9 @@
               groupID: groupID,
               applyMonth: this.formData.title
             }
-            this.$http(url, params)
-              .then(res => {
+            let _this = this
+            return new Promise(function (resolve, reject) {
+              _this.$http(url, params).then(res => {
                 if (res.code === 1) {
                   let data = res.data
                   if (data.length > 0) {
@@ -621,7 +654,7 @@
                         })
                       }
                     }
-                    totalWorkTimeCal.sort(this.compare('totalWorkTime')) // 根据总工时排序
+                    totalWorkTimeCal.sort(_this.compare('totalWorkTime')) // 根据总工时排序
                     let preWorkTime = 0
                     let preRank = 0
                     for (let item of totalWorkTimeCal) { // 计算排名
@@ -632,15 +665,15 @@
                       }
                       preWorkTime = item.totalWorkTime
                     }
-                    this.formData.rank = totalWorkTimeCal.find(item => {
-                      if (item.id === this.$store.state.userInfo.id) {
+                    _this.formData.rank = totalWorkTimeCal.find(item => {
+                      if (item.id === _this.$store.state.userInfo.id) {
                         return item.rank
                       }
                     })
-                    if (!this.formData.rank) {
-                      this.formData.rank = 0
+                    if (!_this.formData.rank) {
+                      _this.formData.rank = 0
                     } else {
-                      this.formData.rank = this.formData.rank.rank
+                      _this.formData.rank = _this.formData.rank.rank
                     }
                     let length = totalWorkTimeCal.length
                     for (let item of totalWorkTimeCal) { // 计算定量指标得分
@@ -660,13 +693,17 @@
                         item.quantitativeScore = 92.5
                       }
                     }
-                    this.tableData = totalWorkTimeCal
+                    _this.tableData = totalWorkTimeCal
                   } else {
-                    this.formData.rank = 0
+                    _this.formData.rank = 0
                   }
+                  resolve(1)
+                } else {
+                  reject(new Error('请求失败'))
                 }
-                this.reqFlag.getGroupWorkTimeList = true
-              })
+                _this.reqFlag.getGroupWorkTimeList = true
+                })
+            })
           }
         },
         // 上一月

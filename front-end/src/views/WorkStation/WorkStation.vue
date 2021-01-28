@@ -93,31 +93,38 @@
           },
           JJData: {
             projectTypeID: 173,
-            searchType: 'unFilled'
+            searchType: 'unFilled',
+            color: '#67d4f6'
           },
           XXData: {
             projectTypeID: 172,
-            searchType: 'unFilled'
+            searchType: 'unFilled',
+            color: '#67d4f6'
           },
           JCPTData: {
             projectTypeID: 213,
-            searchType: 'unFilled'
+            searchType: 'unFilled',
+            color: '#67d4f6'
           },
           JCPTTXData: {
             projectTypeID: 275,
-            searchType: 'unFilled'
+            searchType: 'unFilled',
+            color: '#67d4f6'
           },
           XSData: {
             projectTypeID: 249,
-            searchType: 'unFilled'
+            searchType: 'unFilled',
+            color: '#67d4f6'
           },
           OtherStandData: {
             projectTypeID: 4,
-            searchType: 'unFilled'
+            searchType: 'unFilled',
+            color: '#67d4f6'
           },
           OtherUnStandData: {
             projectTypeID: 5,
-            searchType: 'unFilled'
+            searchType: 'unFilled',
+            color: '#67d4f6'
           },
           showFlag: true,
           unFilledTotalCount: 0

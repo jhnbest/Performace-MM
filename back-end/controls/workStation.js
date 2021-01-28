@@ -525,10 +525,8 @@ const workStation = {
             let data = req.body
             let sql = $sql.workStation.getAssignProjectDetail
             let arrayParams = [data.id]
-            console.log(arrayParams)
             RCPDDatabase(sql, arrayParams).then(res0 => {
                 let resultData = []
-                console.log(res0)
                 getAssignProjectDetailMonthProcess(res0, resultData, data, res)
             })
         })

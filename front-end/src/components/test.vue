@@ -1,14 +1,21 @@
 <template>
-  <div class="main-content" v-if="showFlag.isFresh">
+  <div v-if="showFlag.isFresh">
     <el-table
       row-key="id"
-      :tree-props="{children: 'children'}"
       :data="formData.tableData"
-      :row-class-name="tableRowClassName">
+      :row-class-name="tableRowClassName"
+      border
+      :header-cell-style="{ backgroundColor: fatherParams.color, color: '#333'}"
+      size="medium"
+      style="margin: auto;width: 99%">
       <el-table-column type="index" label="序号" width="60" align="center"></el-table-column>
       <el-table-column label="指派时间" align="center" prop="assignDate"  width="100"></el-table-column>
-      <el-table-column label="项目名称" align="center" prop="projectName"></el-table-column>
-      <el-table-column label="项目级别" align="center" prop="projectName" width="100">
+      <el-table-column label="项目名称" align="center">
+        <template slot-scope="scope">
+          <span class="link-type" @click="handleEditProject(scope.row)">{{scope.row.projectName}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="项目级别" align="center" prop="projectName" width="120">
         <template slot-scope="scope">
           <div>
             <el-tag :type="scope.row.projectLevel | projectLevelColorFilter">
@@ -17,38 +24,43 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="完成度" align="center" width="70">
+      <el-table-column label="完成度" align="center" width="80">
         <template slot-scope="scope">
           <el-progress :text-inside="true" :stroke-width="26" :percentage="scope.row.process"></el-progress>
         </template>
       </el-table-column>
-      <el-table-column v-if="this.fatherParams.projectTypeID !== 5" label="指派人" align="center" prop="assigner"></el-table-column>
-<!--      <el-table-column v-else label="审核状态" align="center">-->
-<!--        <template slot-scope="scope">-->
-<!--          <el-tag :type="scope.row.reviewStatus | reviewStatusTypeFilter">-->
-<!--            {{scope.row.reviewStatus | reviewStatusStringFilter}}-->
-<!--          </el-tag>-->
-<!--        </template>-->
-<!--      </el-table-column>-->
-<!--      <el-table-column label="总工时" align="center" prop="totalWorkTime"></el-table-column>-->
-      <el-table-column label="计划/实际进展" prop="planCompletion" align="center" v-if="this.fatherParams.searchType === 'unFilled'">
+      <el-table-column label="指派人" align="center" prop="assigner" width="100"></el-table-column>
+      <el-table-column label="操作" align="center" width="180">
         <template slot-scope="scope">
-          <span class="link-type" @click="handleFillIn(scope.row)">点击填报</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" prop="planCompletion" align="center" v-if="this.fatherParams.searchType === 'Filled'">
-        <template slot-scope="scope">
-          <span class="link-type" @click="handleFillIn(scope.row)">重新填报</span>
-        </template>
-      </el-table-column>
-      <el-table-column v-if="this.fatherParams.projectTypeID === 4 || this.fatherParams.projectTypeID === 5"
-                       label="操作"
-                       align="center">
-        <template slot-scope="scope">
-          <el-button type="danger" size="mini" @click="handleDelete(scope.row)">删除</el-button>
+          <el-button v-if="fatherParams.searchType === 'unFilled'"
+                     size="mini"
+                     type="primary"
+                     @click="handleFillIn(scope.row)">填报进度</el-button>
+          <el-button v-if="fatherParams.searchType === 'Filled'"
+                     type="primary"
+                     size="mini"
+                     @click="handleFillIn(scope.row)">重新填报</el-button>
+          <el-button type="danger"
+                     size="mini"
+                     @click="handleDelete(scope.row)"
+                     :disabled="scope.row.assignerID !== $store.state.userInfo.id || scope.row.process === 100">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
+    <el-dialog :visible.sync="editProject" width="90%" center>
+      <span slot="title" style="font-weight: bolder;font-size: 20px">{{dialogProjectName + '项目'}}</span>
+      <el-table :data="dialogProjectData"
+                border
+                style="margin: auto;width: 99%"
+                size="mini">
+        <el-table-column label="序号" align="center" type="index"></el-table-column>
+        <el-table-column label="项目阶段" align="center" prop="projectStage"></el-table-column>
+      </el-table>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="editProject = false">取 消</el-button>
+        <el-button type="primary" @click="editProject = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -67,7 +79,10 @@
           reqFlag: {
             getAssignProjectList: true,
             deleteProject: true
-          }
+          },
+          editProject: false,
+          dialogProjectName: '',
+          dialogProjectData: null
         }
       },
       methods: {
@@ -136,6 +151,11 @@
                 })
             }
           })
+        },
+        // 编辑项目
+        handleEditProject (row) {
+          this.editProject = true
+          this.dialogProjectName = row.projectName
         }
       },
       filters: {

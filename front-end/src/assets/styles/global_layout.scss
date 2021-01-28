@@ -180,6 +180,12 @@ input[type="number"]{
     color: rgb(32, 160, 255);
   }
 }
+.pointer-type,
+.pointer-type:focus {
+  color: #6e7071;
+  cursor: pointer;
+  text-align: right;
+}
 
 .status-col {
   .cell {

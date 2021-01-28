@@ -180,7 +180,11 @@
     <!---------------------------------------------------------已指派页面---------------------------------------------------->
     <div v-if="showFlag.assigned">
       <h3 class="v-line-icon-red">已指派</h3>
-      <el-table :data="assignedTable" style="width: 95%;margin: auto">
+      <el-table :data="assignedTable"
+                style="width: 99%;margin: auto"
+                border
+                size="mini"
+                :header-cell-style="{ backgroundColor:'#48bfe5', color: '#333'}">
         <el-table-column label="序号" align="center" type="index" width="50"></el-table-column>
         <el-table-column label="指派时间" align="center">
           <template slot-scope="scope">
@@ -779,6 +783,7 @@
             this.formData.yearNum -= 1
             this.getAssignProjectDetail(this.checkAssignProjectID)
           }
+          console.log(this.formData.yearNum)
         },
         // 下一年度进展
         handleAddYear () {

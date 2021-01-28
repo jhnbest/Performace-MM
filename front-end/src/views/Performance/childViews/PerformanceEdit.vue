@@ -409,7 +409,7 @@
             let tableDataCopy = []
             for (let item of this.formData.workTypeTimeDetail) {
               item.avaiableWorkTime = Number(item.avaiableWorkTime)
-              if (item.avaiableWorkTime !== 0) {
+              if (item.avaiableWorkTime !== 0 && item.applyProcess !== 0) {
                 tableDataCopy.push(item)
               }
             }
@@ -432,8 +432,8 @@
                   this.reqFlag.edit = true
                 })
             } else {
-              this.$common.toast('提交成功', 'success', false)
-              this.onCancel(formData)
+              this.reqFlag.edit = true
+              this.$common.toast('申报工时为0，请修改,', 'info', false)
             }
           }
         },
@@ -487,39 +487,39 @@
         // 暂存至工时申报列表
         onTemporaryWorkTimeList (formData) {
           const url = workTimeTemporary
-          if (this.reqFlag.add) {
-            this.reqFlag.add = false
-          }
-          let title = this.formData.title
-          let tableDataCopy = []
-          for (let item of this.formData.workTypeTimeDetail) {
-            item.avaiableWorkTime = Number(item.avaiableWorkTime)
-            if (item.avaiableWorkTime !== 0) {
-              tableDataCopy.push(item)
+          if (this.reqFlag.edit) {
+            this.reqFlag.edit = false
+            let title = this.formData.title
+            let tableDataCopy = []
+            for (let item of this.formData.workTypeTimeDetail) {
+              item.avaiableWorkTime = Number(item.avaiableWorkTime)
+              if (item.avaiableWorkTime !== 0 && item.applyProcess !== 0) {
+                tableDataCopy.push(item)
+              }
             }
-          }
-          if (tableDataCopy.length !== 0) {
-            let params = {
-              projectID: this.id,
-              submitType: 'update',
-              submitDate: title,
-              data: this.formData.workTypeTimeDetail
+            if (tableDataCopy.length !== 0) {
+              let params = {
+                projectID: this.id,
+                submitType: 'update',
+                submitDate: title,
+                data: this.formData.workTypeTimeDetail
+              }
+              this.$http(url, params)
+                .then(res => {
+                  if (res.code === 1) {
+                    this.$common.toast('暂存成功', 'success', false)
+                    this.onCancel(formData)
+                  } else {
+                    console.log(res.code)
+                    this.$common.toast('暂存失败', 'success', false)
+                    this.onCancel(formData)
+                  }
+                  this.reqFlag.edit = true
+                })
+            } else {
+              this.$common.toast('申报工时为0，请修改,', 'warning', false)
+              this.reqFlag.edit = true
             }
-            this.$http(url, params)
-              .then(res => {
-                if (res.code === 1) {
-                  this.$common.toast('暂存成功', 'success', false)
-                  this.onCancel(formData)
-                } else {
-                  console.log(res.code)
-                  this.$common.toast('暂存失败', 'success', false)
-                  this.onCancel(formData)
-                }
-                this.reqFlag.add = true
-              })
-          } else {
-            this.$common.toast('暂存成功', 'success', false)
-            this.onCancel(formData)
           }
         },
         // 暂存工时申报

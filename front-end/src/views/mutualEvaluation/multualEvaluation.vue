@@ -1,10 +1,14 @@
 <template>
 <div>
   <el-form class="main-search" :inline="true">
-    <el-row>
-      <el-col :span="15">
+    <el-row type="flex">
+      <el-col :xs="12" :sm="12" :lg="9" :xl="6">
         <el-form-item label="互评月份：" prop="title">
-          <el-button size="mini" type="danger" style="margin-right: 10px" @click="handlePreMonth" :disabled="!reqFlag.getUserRates">上月</el-button>
+          <el-button size="mini"
+                     type="danger"
+                     style="margin-right: 10px"
+                     @click="handlePreMonth"
+                     :disabled="!reqFlag.getUserRates">上月</el-button>
           <el-date-picker
             v-model="formData.title"
             type="month"
@@ -14,17 +18,32 @@
             style="width: 150px"
             @change="handelDateChange">
           </el-date-picker>
-          <el-button size="mini" type="primary" style="margin-left: 10px" @click="handleNextMonth" :disabled="!reqFlag.getUserRates">下月</el-button>
-<!--          <span style="font-size: 21px;font-weight: bold;margin-left: 40px">本月互评得分:-->
-<!--            <count-to-->
-<!--              :start-val="0"-->
-<!--              :end-val="1"-->
-<!--              :duration="2600"-->
-<!--              :decimals="1"-->
-<!--              style="color: #F56C6C;margin-left: 10px;font-size: 25px"/></span>-->
+          <el-button size="mini"
+                     type="primary"
+                     style="margin-left: 10px"
+                     @click="handleNextMonth"
+                     :disabled="!reqFlag.getUserRates">下月</el-button>
         </el-form-item>
       </el-col>
-      <el-col :span="4" :offset="5">
+      <el-col :xs="2" :sm="2" :lg="2" :xl="2" style="margin-top: 10px">
+        <el-popover
+          placement="bottom"
+          width="470"
+          trigger="click">
+          <span>1、查看评价标准，了解评价衡量标准以及分值对应的评价星级；</span><br>
+          <span>2、点击评价对象相应评价项下的星星，完成该评价项的评分(未点击默认按照4颗星计算分值)</span>；<br>
+          <span>3、完成对所有评价对象的所有评价项的评分，点击提交按钮即可；</span><br>
+          <span>4、若需要更改当月的评价，则直接修改相应的星星，然后点击更新即可；</span><br>
+          <span>5、每月
+            <span style="font-weight: bolder;color: red">3日0点前</span>，
+            需完成对处室相关成员的评价。若未提交当月评价，
+            <span style="font-weight: bolder;color: red">则默认按照上一月份的评价数据计算</span>；
+          </span><br>
+          <span>6、评价截止时间过后，将<span style="font-weight: bolder;color: red">不能</span>修改当月评价。</span><br>
+          <span slot="reference" @click="descriprionClick" class="pointer-type"><i class="el-icon-warning-outline"></i>填报说明</span>
+        </el-popover>
+      </el-col>
+      <el-col :xs="12" :sm="12" :lg="{span: 4, offset: 9 }" :xl="{span: 3, offset: 14 }">
         <el-button type="primary" @click="submitRatesResult" :disabled="isRated">
           <span v-if="!isRated">提交</span>
           <span v-else>已提交</span>
@@ -267,15 +286,15 @@
         }, {
           l1: '工作能力',
           l2: '计划能力',
-          standard: '计划能力一般。个人工作目标不够清晰，创新性不强(组员);' +
-            '计划能力一般。能带领导团队制订团队计划并有效分解，但团队目标不够清晰，创新性不强(组长)',
+          standard: '(组员)计划能力一般。个人工作目标不够清晰，创新性不强;' +
+            '(组长)计划能力一般。能带领导团队制订团队计划并有效分解，但团队目标不够清晰，创新性不强',
           score: '87.5',
           star: 3
         }, {
           l1: '工作能力',
           l2: '计划能力',
-          standard: '计划能力较差。个人工作计划不够明确或不合理(组员);' +
-            '计划能力较差。能够制定团队计划但未能有效分解或分配不合理(组长)',
+          standard: '(组员)计划能力较差。个人工作计划不够明确或不合理;' +
+            '(组长)计划能力较差。能够制定团队计划但未能有效分解或分配不合理',
           score: '85',
           star: 2
         }, {
@@ -319,20 +338,20 @@
         }, {
           l1: '工作能力',
           l2: '综合能力',
-          standard: '个人学习能力、文字表达能力及组织协调能力极强。' +
+          standard: '(组员)个人学习能力、文字表达能力及组织协调能力极强。' +
             '能够将理论与实践相结合，把学习知识用于工作改进与创新；' +
-            '具有良好的人际沟通能力，积极主动与上级领导、同事沟通工作事件，促进工作高效完成(组员);' +
-            '个人学习能力、文字表达能力及组织协调能力极强；能够制订团队培训计划并按计划推进，团队培训效果好；' +
+            '具有良好的人际沟通能力，积极主动与上级领导、同事沟通工作事件，促进工作高效完成;' +
+            '(组长)个人学习能力、文字表达能力及组织协调能力极强；能够制订团队培训计划并按计划推进，团队培训效果好；' +
             '能够指导团队成员将理论与实践相结合，把学习知识用于工作改进与创新。具有良好的人际沟通能力，' +
-            '积极主动与上级领导、同事沟通工作事件，促进团队工作高效完成。(组长);',
+            '积极主动与上级领导、同事沟通工作事件，促进团队工作高效完成。;',
           score: '92.5',
           star: 5
         }, {
           l1: '工作能力',
           l2: '综合能力',
-          standard: '个人学习能力、文字表达能力及组织协调能力较强。具有一定的沟通能力，遇到问题时能与上级领导同事沟通(组员)' +
-            '个人学习能力、文字表达能力及组织协调能力较强；能够制订团队培训计划并按计划推进；能够有效指导团队成员开展工作。' +
-            '具有一定的沟通能力，遇到问题时能与上级领导同事沟通。(组长)',
+          standard: '(组员)个人学习能力、文字表达能力及组织协调能力较强。具有一定的沟通能力，遇到问题时能与上级领导同事沟通' +
+            '(组长)个人学习能力、文字表达能力及组织协调能力较强；能够制订团队培训计划并按计划推进；能够有效指导团队成员开展工作。' +
+            '具有一定的沟通能力，遇到问题时能与上级领导同事沟通。',
           score: '90',
           star: 4
         }, {
@@ -354,6 +373,7 @@
           score: '82.5',
           star: 1
         }],
+        descriptionContent: '1、首先查看评价标准，了解',
         rateTableData: [],
         users: [],
         defaultStar: 4,
@@ -371,7 +391,8 @@
         ratedArray: [],
         curMutualRate: 0,
         tableHeight: null,
-        realTimeShowTableData: []
+        realTimeShowTableData: [],
+        showInstructiongs: false
       }
     },
     methods: {
@@ -951,11 +972,20 @@
       refreshTableSize () {
         this.$nextTick(() => {
           this.tableHeight = window.innerHeight - this.$refs.rateTable.$el.offsetTop - 5
+          if (this.tableHeight < 0) {
+            this.tableHeight = window.innerHeight - 100
+          }
           let _this = this
           window.onresize = function () {
             _this.tableHeight = window.innerHeight - _this.$refs.rateTable.$el.offsetTop - 5
+            if (_this.tableHeight < 0) {
+              _this.tableHeight = window.innerHeight - 100
+            }
           }
         })
+      },
+      // 填报说明显示
+      descriprionClick () {
       }
     },
     components: {
@@ -965,7 +995,6 @@
       this.init()
     },
     watch: {
-
     },
     mounted () {
       console.log('mounted')

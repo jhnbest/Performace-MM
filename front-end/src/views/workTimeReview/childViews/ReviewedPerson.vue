@@ -110,7 +110,7 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" align="center" width="200%">
+        <el-table-column label="操作" align="center" width="200%" fixed="right">
           <template slot-scope="scope">
             <el-popconfirm
               confirm-button-text="确定"

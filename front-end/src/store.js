@@ -9,7 +9,6 @@ export default new Vuex.Store({
     userInfo: !localStorage.getItem('userInfo') ? {} : JSON.parse(localStorage.getItem('userInfo')),
     menuList: [
       { name: '首页', url: '/home/dashboard', icon: 'el-icon-s-home' },
-      // { name: '用户管理', url: '/home/user', icon: 'el-icon-user' },
       { name: '个人工作台', url: '/home/workStation', icon: 'el-icon-s-data' },
       // { name: '工作计划', url: '/home/weekly', icon: 'el-icon-s-grid' },
       { name: '计划/工时查询', url: '/home/performance', icon: 'el-icon-s-order' },

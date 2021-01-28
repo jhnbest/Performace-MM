@@ -1,45 +1,37 @@
 <template>
   <div style="margin: 15px">
     <div style="text-align: center">
-      <el-row :gutter="10">
-        <el-col :span="10" :offset="5">
-          <el-row>
-            <el-col :span="2">
-              <el-button icon="el-icon-minus"
-                         circle
-                         size="mini"
-                         type="danger"
-                         style="margin-top: 4px"
-                         @click="handleDecYear"
-                         :disabled="!this.reqFlag.getAssignProjectDetail"></el-button>
-            </el-col>
-            <el-col :span="5">
-              <span style="font-size: 25px;color: red;font-weight: bolder">{{ formData.yearNum + '年' }}</span>
-            </el-col>
-            <el-col :span="2">
-              <el-button icon="el-icon-plus"
-                         circle
-                         size="mini"
-                         type="primary"
-                         style="margin-top: 4px"
-                         @click="handleAddYear"
-                         :disabled="!this.reqFlag.getAssignProjectDetail"></el-button>
-            </el-col>
-            <el-col :span="15">
-              <div>
-                <span style="font-size: 22px">{{formData.projectName  + '计划&实际进展填报'}}</span>
-              </div>
-            </el-col>
-          </el-row>
+      <el-row align="middle" type="flex">
+        <el-col :xs="1" :sm="1" :lg="1" :xl="{span: 1, push: 0}">
+          <el-button icon="el-icon-minus"
+                     circle
+                     size="mini"
+                     type="danger"
+                     @click="handleDecYear"
+                     :disabled="!this.reqFlag.getAssignProjectDetail"></el-button>
         </el-col>
-        <el-col :span="1" :offset="1">
-          <el-button style="margin-top: 8px" size="medium" type="warning" @click="genWorkTimePlanApply">生成项目计划</el-button>
+        <el-col :span="1.5">
+          <span style="font-size: 25px;color: red;font-weight: bolder">{{ formData.yearNum + '年' }}</span>
         </el-col>
-        <el-col :span="1" :offset="2">
-          <el-button style="margin-top: 8px" size="medium" type="primary" @click="genWorkTimeApply">生成工时申报</el-button>
+        <el-col :xs="1" :sm="1" :lg="1" :xl="1">
+          <el-button icon="el-icon-plus"
+                     circle
+                     size="mini"
+                     type="primary"
+                     @click="handleAddYear"
+                     :disabled="!this.reqFlag.getAssignProjectDetail"></el-button>
         </el-col>
-        <el-col :span="1" :offset="2">
-          <el-button style="margin-top: 8px" size="medium" type="danger" @click="handleBack">返回</el-button>
+        <el-col :xs="9" :sm="9" :lg="{span: 9, offset: 2}" :xl="{span: 10, offset: 2}">
+          <span style="font-size: 22px">{{formData.projectName  + '计划&实际进展填报'}}</span>
+        </el-col>
+        <el-col :xs="3" :sm="3" :lg="{span: 3, offset: 1}" :xl="{span: 2, offset: 3}">
+          <el-button size="medium" type="warning" @click="genWorkTimePlanApply">生成项目计划</el-button>
+        </el-col>
+        <el-col :xs="3" :sm="3" :lg="{span: 3}" :xl="{span: 2}">
+          <el-button size="medium" type="primary" @click="genWorkTimeApply">生成工时申报</el-button>
+        </el-col>
+        <el-col :xs="1" :sm="1" :lg="{span: 1}" :xl="{span: 1}">
+          <el-button size="medium" type="danger" @click="handleBack">返回</el-button>
         </el-col>
       </el-row>
     </div>
@@ -215,7 +207,9 @@
       </div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleWorkTimeApply('dialogForm')">生成</el-button>
+        <el-button type="primary"
+                   @click="handleWorkTimeApply('dialogForm')"
+                   :disabled="!reqFlag.genWorkTimeApply">生成</el-button>
       </div>
       <Assign v-if="showFlag.workTimeAssign" ref="workTimeAssign" @assignDetail="handleAssign"/>
     </el-dialog>
@@ -353,7 +347,8 @@
           },
           reqFlag: {
             getAssignProjectDetail: true,
-            savePlanProcess: true
+            savePlanProcess: true,
+            genWorkTimeApply: true
           },
           dialogFormVisible: false,
           dialogPlanFormVisible: false,
@@ -403,9 +398,11 @@
             }
             it.applyMonthPlanProcessTableData = []
             if (searchData.length === 0) {
+              it.reqFlag.genWorkTimeApply = false
               it.$common.toast('该月份项目无计划/实际进展', 'error', 'true')
-              resolve([])
+              resolve({})
             } else {
+              it.reqFlag.genWorkTimeApply = true
               let params = {
                 applyMonth: applyMonthString,
                 applyYear: applyYear,
@@ -483,21 +480,33 @@
           this.$refs[formData].validate((valid) => {
             if (valid) {
               let url = workTimeSubmit
-              this.$http(url, this.submitParams)
-                .then(res => {
-                  if (res.code === 1) {
-                    url = updateAssignProjectFilled
-                    let params = {
-                      assignProjectID: this.$route.query.projectID
+              let _this = this
+              return new Promise(function (resolve, reject) {
+                if (_this.reqFlag.genWorkTimeApply) {
+                  _this.reqFlag.genWorkTimeApply = false
+                  _this.$http(url, _this.submitParams).then(res => {
+                    if (res.code === 1) {
+                      url = updateAssignProjectFilled
+                      let params = {
+                        assignProjectID: _this.$route.query.projectID
+                      }
+                      _this.$http(url, params)
+                        .then((res) => {
+                          if (res.code === 1) {
+                            _this.$common.toast('生成成功', 'success', false)
+                            _this.$router.push({ path: '/home/workStation' })
+                            _this.dialogFormVisible = false
+                            resolve(res.code)
+                          } else {
+                            this.$common.toast('生成失败', 'error', false)
+                            reject(res.code)
+                          }
+                          _this.reqFlag.genWorkTimeApply = true
+                        })
                     }
-                    this.$http(url, params)
-                      .then(() => {
-                        this.$common.toast('生成成功', 'success', 'false')
-                        this.$router.push({ path: '/home/workStation' })
-                        this.dialogFormVisible = false
-                      })
-                  }
-                })
+                  })
+                }
+              })
             }
           })
         },
@@ -515,7 +524,7 @@
                     }
                     this.$http(url, params)
                       .then(() => {
-                        this.$common.toast('生成成功', 'success', 'false')
+                        this.$common.toast('生成成功', 'success', false)
                         this.$router.push({ path: '/home/workStation' })
                         this.dialogFormVisible = false
                       })
@@ -681,9 +690,15 @@
         refreshTableSize () {
           this.$nextTick(() => {
             this.tableHeight = window.innerHeight - this.$refs.rateTable.$el.offsetTop - 5
+            if (this.tableHeight < 0) {
+              this.tableHeight = window.innerHeight - 100
+            }
             let _this = this
             window.onresize = function () {
               _this.tableHeight = window.innerHeight - _this.$refs.rateTable.$el.offsetTop - 5
+              if (_this.tableHeight < 0) {
+                _this.tableHeight = window.innerHeight - 100
+              }
             }
           })
         }

@@ -422,7 +422,7 @@
             let tableDataCopy = []
             for (let item of _this.formData.workTypeTimeDetail) { // 无进展的项目阶段不提交
               item.avaiableWorkTime = Number(item.avaiableWorkTime)
-              if (item.avaiableWorkTime !== 0) {
+              if (item.avaiableWorkTime !== 0 && item.applyProcess !== 0) {
                 item.lastProcess = 0
                 tableDataCopy.push(item)
               }
@@ -437,17 +437,17 @@
               _this.$http(url, params)
                 .then(res => {
                   if (res.code === 1) {
-                    _this.$common.toast('添加成功', 'success', false)
+                    _this.$common.toast('提交成功', 'success', false)
                     resolve(res.code)
                     _this.onCancel(formData)
                   } else {
-                    _this.$common.toast('添加失败', 'error', false)
+                    _this.$common.toast('提交失败', 'error', false)
                     resolve(res.code)
                     _this.onCancel(formData)
                   }
                 })
             } else {
-              _this.$common.toast('添加成功', 'success', false)
+              _this.$common.toast('提交成功', 'success', false)
               resolve(1)
               _this.onCancel(formData)
             }
@@ -617,7 +617,7 @@
             let tableDataCopy = []
             for (let item of _this.formData.workTypeTimeDetail) {
               item.avaiableWorkTime = Number(item.avaiableWorkTime)
-              if (item.avaiableWorkTime !== 0) {
+              if (item.avaiableWorkTime !== 0 && item.applyProcess !== 0) {
                 tableDataCopy.push(item)
                 item.lastProcess = 0
               }
