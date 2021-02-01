@@ -66,7 +66,9 @@
                   :props="props"
                   @change="handleProjectTypeChange(scope.row)"
                   clearable
-                  :show-all-levels="false" size="mini">
+                  :show-all-levels="false"
+                  size="mini"
+                  ref="projectStageType">
                   <template slot-scope="{ node, data }">
                     <el-tooltip :disabled="data.projectName.length < 11"
                                 class="item"
@@ -95,7 +97,7 @@
                 </span>
                 </div>
               </div>
-              <div v-else-if="scope.row.projectStageName === 72">
+              <div v-else-if="scope.row.projectStageID === 72">
                 <el-input size="mini" v-model="scope.row.projectStageName"></el-input>
               </div>
               <div v-else>
@@ -107,7 +109,7 @@
         </el-table-column>
         <el-table-column label="基本工时" align="center" width="180">
           <template slot-scope="scope">
-            <div v-if="scope.row.projectStageID === 72">
+            <div v-if="scope.row.projectStageID === 72 && scope.row.editable === true">
               <el-input-number v-model="scope.row.baseWorkTime"
                                size="mini"
                                :min="0"
@@ -133,13 +135,25 @@
         </el-table-column>
         <el-table-column label="操作" align="center" width="200">
           <template slot-scope="scope">
-            <el-button v-if="scope.row.apdID !== -1"
+            <el-button v-if="scope.row.apdID !== -1 && !scope.row.editable"
                        size="mini"
                        type="primary"
                        @click="handleProjectStageEdit(scope.row)">编辑</el-button>
-            <el-button size="mini"
-                       type="danger"
-                       @click="handleProjectStageDelete(scope.row, scope.$index)">删除</el-button>
+            <el-button v-if="scope.row.apdID !== -1 && scope.row.editable"
+                       size="mini"
+                       type="warning"
+                       @click="handleSaveProjectStageEdit(scope.row)">保存</el-button>
+            <el-popconfirm
+              confirm-button-text='确定'
+              cancel-button-text='取消'
+              icon="el-icon-info"
+              icon-color="red"
+              title="确定删除？"
+              @confirm="handleProjectStageDelete(scope.row, scope.$index)">
+              <el-button slot="reference"
+                         size="mini"
+                         type="danger" style="margin-left: 10px">删除</el-button>
+            </el-popconfirm>
           </template>
         </el-table-column>
       </el-table>
@@ -147,7 +161,7 @@
         <el-button type="primary" size="mini" @click="addNewProjectStage">新增项目阶段</el-button>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="editProject = false" size="medium">保存</el-button>
+        <el-button type="primary" @click="handleSaveProjectStage">保存</el-button>
         <el-button @click="editProject = false" size="medium">取消</el-button>
       </span>
     </el-dialog>
@@ -156,7 +170,7 @@
 
 <script>
     import { getAssignProjectList, deleteAssignProject, getProjectType, getWorkTimeNew,
-      getAssignProjectStageList, getWorkTimeListOfProjectStage } from '@/config/interface'
+      getAssignProjectStageList, getWorkTimeListOfProjectStage, updateEditProjectStage } from '@/config/interface'
     export default {
       data () {
         return {
@@ -183,7 +197,9 @@
             label: 'projectName',
             expandTrigger: 'hover'
           },
-          maxProjectStageName: 50
+          maxProjectStageName: 50,
+          iniProjectStage: [],
+          aplID: null
         }
       },
       methods: {
@@ -206,6 +222,11 @@
                 this.reqFlag.getAssignProjectList = true
               })
           }
+          this.getProjectType().then(res0 => {
+            this.projectTypeOptions = res0
+          }).catch(err => {
+            this.$common.toast(err, 'error', false)
+          })
         },
         // 获取项目阶段列表
         getAssignProjectStageList (projectID) {
@@ -227,6 +248,11 @@
         },
         // 编辑项目阶段
         handleProjectStageEdit (row) {
+          row.editable = true
+        },
+        // 保存项目阶段
+        handleSaveProjectStageEdit (row) {
+          row.editable = false
         },
         // 获取申报类型
         getProjectType () {
@@ -279,7 +305,7 @@
                 row.dynamicKValue = res0[0].dynamicKValue
                 row.baseWorkTime = res0[0].workTime
                 row.kValue = 1
-                console.log(row)
+                row.projectStageName = res0[0].projectName
               }).catch(err => {
                 this.$common.toast(err, 'error', false)
               })
@@ -339,8 +365,13 @@
           this.editProject = true
           this.dialogProjectName = row.projectName
           this.assignerID = row.assignerID
+          this.aplID = row.id
           this.getAssignProjectStageList(row.id).then(res0 => {
+            for (let item of res0) {
+              item.editable = false
+            }
             this.dialogProjectData = res0
+            this.iniProjectStage = JSON.parse(JSON.stringify(res0))
           }).catch(err => {
             this.$common.toast(err, 'error', true)
           })
@@ -357,12 +388,8 @@
         },
         // 新增项目阶段
         addNewProjectStage () {
-          this.getProjectType().then(res0 => {
-            this.projectTypeOptions = res0
-          }).catch(err => {
-            this.$common.toast(err, 'error', false)
-          })
           this.dialogProjectData.push({
+            aplID: this.aplID,
             apdID: -1,
             inputProjectStageNameWord: 0,
             isProjectNameWordExceed: false,
@@ -387,10 +414,60 @@
           if (row.apdID !== -1) {
             const url = getWorkTimeListOfProjectStage
             let params = {
-              projectStageID: row.projectStageID
+              apdID: row.apdID
+            }
+            this.$http(url, params).then(res => {
+              if (res.code === 1) {
+                let recvData = res.data
+                if (recvData.length > 0) {
+                  this.$common.toast('该阶段已申报过工时，暂无法删除', 'error', true)
+                } else {
+                  this.dialogProjectData.splice(index, 1)
+                }
+              } else {
+                this.$common.toast('recv handleProjectStageDelete error!', 'error', false)
+              }
+            }).catch(err => {
+              this.$common.toast('send handleProjectStageDelete error!' + err, 'error', false)
+            })
+          }
+        },
+        // 保存按钮
+        handleSaveProjectStage () {
+          const url = updateEditProjectStage
+          let iniApdID = []
+          let curApdID = []
+          let newProjectStage = []
+          let updateProjectStage = []
+          for (let item of this.iniProjectStage) {
+            iniApdID.push(item.apdID)
+          }
+          for (let item of this.dialogProjectData) {
+            if (item.apdID !== -1) {
+              curApdID.push(item.apdID)
+              updateProjectStage.push(item)
+            } else {
+              newProjectStage.push(item)
             }
           }
-          this.dialogProjectData.splice(index, 1)
+          let deleteApdID = iniApdID.filter(x => curApdID.indexOf(x) === -1)
+            .concat(curApdID.filter(x => iniApdID.indexOf(x) === -1))
+          let params = {
+            updateProjectStage: updateProjectStage,
+            newProjectStage: newProjectStage,
+            deleteApdID: deleteApdID
+          }
+          console.log(params)
+          this.$http(url, params).then(res => {
+            if (res.code === 1) {
+              this.$common.toast('保存成功', 'success', false)
+              this.editProject = false
+            } else {
+              this.$common.toast('保存失败', 'error', false)
+            }
+          }).catch(err => {
+            this.$common.toast('提交失败' + err, 'error', false)
+          })
         }
       },
       filters: {

@@ -54,6 +54,7 @@ export const getPlanInfo = '/workStation/getPlanInfo' // 获取计划列表
 export const getAssignedProjectPlan = '/workStation/getAssignedProjectPlan' // 获取指派的项目信息(计划查询)‘
 export const getAssignProjectStageList = '/workStation/getAssignProjectStageList' // 获取指派的项目阶段
 export const getWorkTimeListOfProjectStage = '/workStation/getWorkTimeListOfProjectStage' // 获取项目阶段对应的工时申报
+export const updateEditProjectStage = '/workStation/updateEditProjectStage' // 更新项目阶段
 
 export const getUserRates = '/mutualRates/getUserRates' // 获取互评信息
 export const submitRatesResult = '/mutualRates/submitRatesResult' // 提交互评结果

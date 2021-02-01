@@ -50,16 +50,6 @@
           </template>
         </el-table-column>
         <el-table-column label="完成次数" align="center" prop="applyCofficient" width="80%"></el-table-column>
-<!--        <el-table-column label="审核完成次数" align="center" width="110%">-->
-<!--          <template slot-scope="scope">-->
-<!--            <el-form-item-->
-<!--              :prop="'workDetailTable.' + scope.$index + '.reviewCofficient'"-->
-<!--              :rules="formRules.reviewCofficient"-->
-<!--              style="margin: auto">-->
-<!--              <el-input :disabled="!(scope.row.reviewStatus === 0)" size="medium" v-model="scope.row.reviewCofficient"></el-input>-->
-<!--            </el-form-item>-->
-<!--          </template>-->
-<!--        </el-table-column>-->
         <el-table-column label="申报进展" align="center" width="80%">
           <template slot-scope="scope">
             <span>{{scope.row.applyProcess + '%'}}</span>
@@ -112,30 +102,25 @@
         </el-table-column>
         <el-table-column label="操作" align="center" width="200%" fixed="right">
           <template slot-scope="scope">
-            <el-popconfirm
-              confirm-button-text="确定"
-              cancel-button-text="取消"
-              icon="el-icon-info"
-              icon-color="green" title="确认通过？"
-              @confirm="handleReviewPass(scope.row, scope.$index)">
-              <el-button
-                slot="reference"
-                v-if="(scope.row.reviewStatus === 0) & !(info.reviewType === 'reviewed')"
-                size="small"
-                type="primary" icon="el-icon-check">通过</el-button>
-            </el-popconfirm>
+            <el-button
+              @click="handleReviewPass(scope.row, scope.$index)"
+              v-if="(scope.row.reviewStatus === 0) & !(info.reviewType === 'reviewed')"
+              size="small"
+              type="primary" icon="el-icon-check">通过</el-button>
             <el-popconfirm
               confirm-button-text="确定"
               cancel-button-text="取消"
               icon="el-icon-error"
-              icon-color="red" title="确认驳回？" @confirm="handleReviewReject(scope.row)">
+              icon-color="red" title="确认驳回？"
+              @confirm="handleReviewReject(scope.row)">
               <el-button
                 style="margin-left: 10px"
                 slot="reference"
                 v-if="!(info.reviewType === 'reviewed')"
                 :disabled="!(scope.row.reviewStatus === 0)"
                 size="small"
-                type="danger" icon="el-icon-close">驳回</el-button>
+                type="danger"
+                icon="el-icon-close">驳回</el-button>
             </el-popconfirm>
             <el-popconfirm
               confirm-button-text="确定"

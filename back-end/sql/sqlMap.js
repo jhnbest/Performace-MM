@@ -183,7 +183,13 @@ const sqlMap = {
         ' and obsoleteStatus != 1',
     assignProjectList: 'select apl.*, pjn.projectName as projectTypeName from assignprojectlist apl ' +
         'left join projecttypenew pjn on apl.projectType = pjn.projectTypeID where apl.userID = ? and ' +
-        'apl.obsoleteStatus != 1'
+        'apl.obsoleteStatus != 1',
+    getWorkTimeListOfProjectStage: 'select * from worktimelist where apdID = ? and obsoleteStatus != 1',
+    updateProjectStage: 'update assignprojectdetail set projectStageName = ?, ' +
+        'baseWorkTime = ?, kValue = ?, avaiableWorkTime = ? where id = ?',
+    insertNewProjectStage: 'insert into assignprojectdetail (aPLID, projectStage, projectStageName, baseWorkTime, kValue, ' +
+        'avaiableWorkTime) values (?, ?, ?, ?, ?, ?)',
+    deleteProjectStage: 'update assignprojectdetail set obsoleteStatus = 1 where id = ?'
   },
   mutualRates: {
     getUserRates: 'select mr.*, u.name as ratedPersionName from mutualrate mr left join users u on ' +

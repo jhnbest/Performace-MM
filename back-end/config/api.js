@@ -60,6 +60,8 @@ module.exports = {
     getPlanInfo: path + '/workStation/getPlanInfo', // 获取计划列表
     getAssignedProjectPlan: path + '/workStation/getAssignedProjectPlan', // 获取指派项目列表(计划查询)
     getAssignProjectStageList: path + '/workStation/getAssignProjectStageList', // 获取指派阶段列表
+    getWorkTimeListOfProjectStage: path + '/workStation/getWorkTimeListOfProjectStage', // 获取项目阶段对应的工时申报
+    updateEditProjectStage: path + '/workStation/updateEditProjectStage', // 更新项目阶段
 
     // 互评模块
     getUserRates: path + '/mutualRates/getUserRates', // 获取互评信息

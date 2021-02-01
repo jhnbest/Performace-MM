@@ -534,13 +534,41 @@ const workStation = {
     // 获取项目阶段列表
     getAssignProjectStageList (req, res) {
         let sendData = req.body
-        console.log(sendData)
         let sql = $sql.workStation.getAssignProjectDetail
         let arrayParams = [sendData.projectID]
         RCPDDatabase(sql, arrayParams).then(res0 => {
             return $http.writeJson(res, {code: 1, data: res0, message: 'success'})
         }).catch(err => {
             return $http.writeJson(res, {code: -2, data: err, message: 'error'})
+        })
+    },
+    // 更新项目阶段
+    updateEditProjectStage (req, res) {
+        let recvData = req.body
+        let promises = []
+        let count = 0
+        let sql = null
+        let arrayParams = []
+        for (let item of recvData.updateProjectStage) {
+            sql = $sql.workStation.updateProjectStage
+            arrayParams = [item.projectStageName, item.baseWorkTime, item.kValue, item.baseWorkTime * item.kValue, item.apdID]
+            promises[count++] = RCPDDatabase(sql, arrayParams)
+        }
+        for (let item of recvData.newProjectStage) {
+            sql = $sql.workStation.insertNewProjectStage
+            arrayParams = [item.aplID, item.projectStageID, item.projectStageName, item.baseWorkTime,
+                item.kValue, item.baseWorkTime * item.kValue]
+            promises[count++] = RCPDDatabase(sql, arrayParams)
+        }
+        for (let item of recvData.deleteApdID) {
+            sql = $sql.workStation.deleteProjectStage
+            arrayParams = [item]
+            promises[count++] = RCPDDatabase(sql, arrayParams)
+        }
+        Promise.all(promises).then(() => {
+            return $http.writeJson(res, {code: 1, data: 'success', message: 'success'})
+        }).catch(err => {
+            return $http.writeJson(res, {code: -2, err: err, message: 'error'})
         })
     },
     // 计算该阶段进展
@@ -908,6 +936,17 @@ const workStation = {
                     return $http.writeJson(res, {code: 1, data: res2, message: '成功'})
                 })
             })
+        })
+    },
+    // 获取项目阶段对应的工时申报
+    getWorkTimeListOfProjectStage (req, res) {
+        let sendData = req.body
+        let sql = $sql.workStation.getWorkTimeListOfProjectStage
+        let arrayParams = [sendData.apdID]
+        RCPDDatabase(sql, arrayParams).then(res0 => {
+            return $http.writeJson(res, {code: 1, data: res0, message: 'success'})
+        }).catch(err => {
+            return $http.writeJson(res, {code: -2, err: err, message: 'error'})
         })
     }
 }
