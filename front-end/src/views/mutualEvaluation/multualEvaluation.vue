@@ -31,7 +31,7 @@
           width="470"
           trigger="click">
           <span>1、查看评价标准，了解评价衡量标准以及分值对应的评价星级；</span><br>
-          <span>2、点击评价对象相应评价项下的星星，完成该评价项的评分(未点击默认按照4颗星计算分值)</span>；<br>
+          <span>2、点击评价对象相应评价项下的星星，完成该评价项的评分(未点击默认按照3颗星计算分值)</span>；<br>
           <span>3、完成对所有评价对象的所有评价项的评分，点击提交按钮即可；</span><br>
           <span>4、若需要更改当月的评价，则直接修改相应的星星，然后点击更新即可；</span><br>
           <span>5、每月
@@ -376,7 +376,7 @@
         descriptionContent: '1、首先查看评价标准，了解',
         rateTableData: [],
         users: [],
-        defaultStar: 4,
+        defaultStar: 3,
         scoreText: ['82.5', '85', '87.5', '90', '92.5'],
         isRated: false,
         isChanged: false,
@@ -400,7 +400,7 @@
       init () {
         let _this = this
         this.getCookie()
-        this.getCurMutualRate()
+        // this.getCurMutualRate()
         this.getUsersList().then(res1 => {
           _this.users = res1
           _this.getUserRates().then(res2 => {

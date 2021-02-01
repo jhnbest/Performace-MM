@@ -59,6 +59,7 @@ module.exports = {
     submitMonthPlanProcess: path + '/workStation/submitMonthPlanProcess', // 提交计划至计划进展表
     getPlanInfo: path + '/workStation/getPlanInfo', // 获取计划列表
     getAssignedProjectPlan: path + '/workStation/getAssignedProjectPlan', // 获取指派项目列表(计划查询)
+    getAssignProjectStageList: path + '/workStation/getAssignProjectStageList', // 获取指派阶段列表
 
     // 互评模块
     getUserRates: path + '/mutualRates/getUserRates', // 获取互评信息

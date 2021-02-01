@@ -62,7 +62,16 @@
         },
         tableData: [],
         ratesTableTmp: [],
-        usersList: []
+        usersList: [],
+        commonStaffMutualCof: this.$store.state.commonStaffMutualCof,
+        commonStaffManagerCof: this.$store.state.commonStaffManagerCof,
+        commonStaffQuantitativeCof: this.$store.state.commonStaffQuantitativeCof,
+        groupLeaderMutualCof: this.$store.state.groupLeaderMutualCof,
+        groupLeaderManagerCof: this.$store.state.groupLeaderManagerCof,
+        groupLeaderQuantitativeCof: this.$store.state.groupLeaderQuantitativeCof,
+        directorMutualCof: this.$store.state.directorMutualCof,
+        directorManagerCof: this.$store.state.directorManagerCof,
+        directorQuantitativeCof: this.$store.state.directorQuantitativeCof
       }
     },
     methods: {
@@ -71,7 +80,10 @@
         this.getCookie()
         this.getUsersList().then(res1 => {
           this.usersList = res1
-          this.getAllUserRates(res1).then(() => {
+          this.getAllUserRates(res1).then((res2) => {
+            let mutualRatesRankResult = this.calMutualRatesRank(res2)
+            console.log(mutualRatesRankResult)
+            this.tableData = res2
           })
         })
       },
@@ -95,9 +107,161 @@
           }
         }
       },
+      // 定性、定量指标得分计算
+      calGetScore (length, rank) {
+        let rankPercentage = Number((rank / length).toFixed(1))
+        if (rankPercentage < 0.1 || rankPercentage === 0.1 || rank === 1) {
+          return 92.5
+        } else if (rankPercentage < 0.3 || rankPercentage === 0.3) {
+          return 90
+        } else if (rankPercentage < 0.7 || rankPercentage === 0.7) {
+          return 87.5
+        } else if (rankPercentage < 0.9 || rankPercentage === 0.9) {
+          return 85
+        } else if (rankPercentage < 1 || rankPercentage === 1) {
+          return 82.5
+        }
+      },
+      // 获取领导评价相关信息
+      getManagerResult (id, allUsersRates) {
+        for (let item of allUsersRates) {
+          if (item.id === id) {
+            return { managerRateRank: item.managerRateRank, managerScore: item.managerScore }
+          }
+        }
+      },
+      // 计算定性评价排名与得分
+      calMutualRatesRank (allUserRates) {
+        let standAndEngineerRates = []
+        let communicationRates = []
+        for (let item of allUserRates) {
+          if (item.groupName === '技术标准组' || item.groupName === '工程组') {
+            standAndEngineerRates.push(item)
+          } else if (item.groupName === '通信组') {
+            communicationRates.push(item)
+          }
+        }
+        // =================================定性评价排序===============================================
+        // 技术标准组&工程组员工互评排序
+        for (let i = 0; i < standAndEngineerRates.length - 1; i++) {
+          for (let j = 0; j < standAndEngineerRates.length - 1 - i; j++) {
+            if (standAndEngineerRates[j].staffRate < standAndEngineerRates[j + 1].staffRate) {
+              [standAndEngineerRates[j], standAndEngineerRates[j + 1]] =
+                [standAndEngineerRates[j + 1], standAndEngineerRates[j]]
+            }
+          }
+        }
+        // 通信组员工互评排序
+        for (let i = 0; i < communicationRates.length - 1; i++) {
+          for (let j = 0; j < communicationRates.length - 1 - i; j++) {
+            if (communicationRates[j].staffRate < communicationRates[j + 1].staffRate) {
+              [communicationRates[j], communicationRates[j + 1]] =
+                [communicationRates[j + 1], communicationRates[j]]
+            }
+          }
+        }
+        // 全处员工领导评价排序
+        for (let i = 0; i < allUserRates.length - 1; i++) {
+          for (let j = 0; j < allUserRates.length - 1 - i; j++) {
+            if (allUserRates[j].managerRate < allUserRates[j + 1].managerRate) {
+              [allUserRates[j], allUserRates[j + 1]] =
+                [allUserRates[j + 1], allUserRates[j]]
+            }
+          }
+        }
+        // =================================定性评价得分计算===============================================
+        // 技术标准组与工程组互评排名&得分计算
+        let tmpStaffRate = -1
+        let count = 1
+        for (let i = 0; i < standAndEngineerRates.length; i++) {
+          if (standAndEngineerRates[i].staffRate === tmpStaffRate) {
+            standAndEngineerRates[i].staffRateRank = standAndEngineerRates[i - 1].staffRateRank
+          } else {
+            standAndEngineerRates[i].staffRateRank = count
+            tmpStaffRate = standAndEngineerRates[i].staffRate
+          }
+          count++
+          standAndEngineerRates[i].staffMutualScore =
+            this.calGetScore(standAndEngineerRates.length, standAndEngineerRates[i].staffRateRank)
+        }
+        // 通信组互评排名&得分计算
+        tmpStaffRate = -1
+        count = 1
+        for (let i = 0; i < communicationRates.length; i++) {
+          if (communicationRates[i].staffRate === tmpStaffRate) {
+            communicationRates[i].staffRateRank = communicationRates[i - 1].staffRateRank
+          } else {
+            communicationRates[i].staffRateRank = count
+            tmpStaffRate = communicationRates[i].staffRate
+          }
+          count++
+          communicationRates[i].staffMutualScore =
+            this.calGetScore(communicationRates.length, communicationRates[i].staffRateRank)
+        }
+        // 全处员工领导评价排名&得分计算
+        tmpStaffRate = -1
+        count = 1
+        for (let i = 0; i < allUserRates.length; i++) {
+          if (allUserRates[i].managerRate === tmpStaffRate) {
+            allUserRates[i].managerRateRank = allUserRates[i - 1].managerRateRank
+          } else {
+            allUserRates[i].managerRateRank = count
+            tmpStaffRate = allUserRates[i].managerRate
+          }
+          count++
+          allUserRates[i].managerScore =
+            this.calGetScore(allUserRates.length, allUserRates[i].managerRateRank)
+        }
+        let allRates = []
+        // =================================定性评价结果合并===============================================
+        // 合并三个组结果
+        for (let item of standAndEngineerRates) {
+          let managerResult = this.getManagerResult(item.id, allUserRates)
+          item.managerRateRank = managerResult.managerRateRank
+          item.managerScore = managerResult.managerScore
+          if (item.id === 7 || item.id === 11) { // 主任岗
+            item.mutualScore = item.staffMutualScore * this.directorMutualCof +
+              item.managerScore * this.directorManagerCof
+          } else if (item.id === 13 || item.id === 17) { // 组长
+            item.mutualScore = item.staffMutualScore * this.groupLeaderMutualCof +
+              item.managerScore * this.groupLeaderManagerCof
+          } else { // 普通成员
+            item.mutualScore = item.staffMutualScore * this.commonStaffMutualCof +
+              item.managerScore * this.commonStaffManagerCof
+          }
+          allRates.push(item)
+        }
+        for (let item of communicationRates) {
+          let managerResult = this.getManagerResult(item.id, allUserRates)
+          item.managerRateRank = managerResult.managerRateRank
+          item.managerScore = managerResult.managerScore
+          if (item.id === 7 || item.id === 11) { // 主任岗
+            item.mutualScore = item.staffMutualScore * this.directorMutualCof +
+              item.managerScore * this.directorManagerCof
+          } else if (item.id === 13 || item.id === 17) { // 组长
+            item.mutualScore = item.staffMutualScore * this.groupLeaderMutualCof +
+              item.managerScore * this.groupLeaderManagerCof
+          } else { // 普通成员
+            item.mutualScore = item.staffMutualScore * this.commonStaffMutualCof +
+              item.managerScore * this.commonStaffManagerCof
+          }
+          allRates.push(item)
+        }
+        let curRateResult = allRates.find((item) => {
+          return item.id === this.$store.state.userInfo.id
+        })
+        if (curRateResult) {
+          this.multualScore = curRateResult.staffMutualScore
+          this.multualRank = curRateResult.staffRateRank
+        } else {
+          this.$common.toast('暂未统计', 'error', false)
+        }
+        return allRates
+      },
       // 获取全处员工互评信息
       getAllUserRates (users) {
         const url = getAllUserRates
+        let result = []
         let params = {
           usersData: users,
           rateMonth: this.formData.title
@@ -117,15 +281,15 @@
                       groupName: item.groupName
                     }
                     let getRated = _this.getMulRated(item.ratedData)
-                    obj.staffRate = Number(getRated.staffRate.toFixed(3))
-                    obj.managerRate = Number(getRated.manageRate.toFixed(3))
+                    obj.staffRate = Number(getRated.staffRate.toFixed(4))
+                    obj.managerRate = Number(getRated.manageRate.toFixed(4))
                     obj.isRate = item.rateData.length !== 0
                     obj.totalRate = Number((obj.staffRate * 0.1 + obj.managerRate * 0.2).toFixed(3))
-                    _this.tableData.push(obj)
+                    result.push(obj)
                   }
-                  _this.reqFlag.getAllUserRates = true
-                  resolve(1)
+                  resolve(result)
                 }
+                _this.reqFlag.getAllUserRates = true
               })
           })
         }

@@ -531,6 +531,18 @@ const workStation = {
             })
         })
     },
+    // 获取项目阶段列表
+    getAssignProjectStageList (req, res) {
+        let sendData = req.body
+        console.log(sendData)
+        let sql = $sql.workStation.getAssignProjectDetail
+        let arrayParams = [sendData.projectID]
+        RCPDDatabase(sql, arrayParams).then(res0 => {
+            return $http.writeJson(res, {code: 1, data: res0, message: 'success'})
+        }).catch(err => {
+            return $http.writeJson(res, {code: -2, data: err, message: 'error'})
+        })
+    },
     // 计算该阶段进展
     projectStageProcessCal (id, year) {
         return new Promise(function (resolve, reject) {

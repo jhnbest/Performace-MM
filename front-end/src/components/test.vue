@@ -43,29 +43,120 @@
           <el-button type="danger"
                      size="mini"
                      @click="handleDelete(scope.row)"
-                     :disabled="scope.row.assignerID !== $store.state.userInfo.id || scope.row.process === 100">删除</el-button>
+                     :disabled="scope.row.process === 100">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
-    <el-dialog :visible.sync="editProject" width="90%" center>
+    <el-dialog :visible.sync="editProject" width="80%" center>
       <span slot="title" style="font-weight: bolder;font-size: 20px">{{dialogProjectName + '项目'}}</span>
       <el-table :data="dialogProjectData"
                 border
                 style="margin: auto;width: 99%"
-                size="mini">
+                size="mini"
+                :header-cell-style="{ backgroundColor: '#67d4f6', color: '#333'}">
         <el-table-column label="序号" align="center" type="index"></el-table-column>
-        <el-table-column label="项目阶段" align="center" prop="projectStage"></el-table-column>
+        <el-table-column label="项目阶段" align="center">
+          <template slot-scope="scope">
+            <div v-if="scope.row.editable">
+              <div v-if="scope.row.apdID === -1">
+                <el-cascader
+                  v-model="scope.row.selectProjectID"
+                  :options="projectTypeOptions"
+                  filterable
+                  :props="props"
+                  @change="handleProjectTypeChange(scope.row)"
+                  clearable
+                  :show-all-levels="false" size="mini">
+                  <template slot-scope="{ node, data }">
+                    <el-tooltip :disabled="data.projectName.length < 11"
+                                class="item"
+                                effect="dark"
+                                :content="data.projectName"
+                                placement="top-start">
+                      <span>{{ data.projectName }}</span>
+                    </el-tooltip>
+                  </template>
+                </el-cascader>
+                <div v-if="scope.row.projectStageID === 72" style="margin-top: 10px">
+                  <span>项目阶段名称：</span>
+                  <el-tooltip :disabled="!scope.row.isShowProjectStageNameToolTip"
+                              :content="scope.row.projectStageName"
+                              placement="top">
+                    <el-input v-model="scope.row.projectStageName"
+                              style="width: 50%"
+                              size="mini"
+                              @input="handleProjectStageNameInput(scope.row)"></el-input>
+                  </el-tooltip>
+                  <span>字数限制：
+                  <span v-if="!scope.row.isProjectNameWordExceed">
+                    {{scope.row.inputProjectStageNameWord + '/' + maxProjectStageName}}</span>
+                  <span v-else style="color: red">
+                    {{scope.row.inputProjectStageNameWord + '/' + maxProjectStageName}}</span>
+                </span>
+                </div>
+              </div>
+              <div v-else-if="scope.row.projectStageName === 72">
+                <el-input size="mini" v-model="scope.row.projectStageName"></el-input>
+              </div>
+              <div v-else>
+                {{scope.row.projectStageName}}
+              </div>
+            </div>
+            <div v-else>{{scope.row.projectStageName}}</div>
+          </template>
+        </el-table-column>
+        <el-table-column label="基本工时" align="center" width="180">
+          <template slot-scope="scope">
+            <div v-if="scope.row.projectStageID === 72">
+              <el-input-number v-model="scope.row.baseWorkTime"
+                               size="mini"
+                               :min="0"
+                               style="width: 60%"></el-input-number>
+            </div>
+            <div v-else>
+              {{scope.row.baseWorkTime}}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="K值" align="center" width="180">
+          <template slot-scope="scope">
+            <div v-if="scope.row.editable">
+              <el-input-number v-model="scope.row.kValue"
+                               size="mini"
+                               :min="0"
+                               style="width: 60%"></el-input-number>
+            </div>
+            <div v-else>
+              {{scope.row.kValue}}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" align="center" width="200">
+          <template slot-scope="scope">
+            <el-button v-if="scope.row.apdID !== -1"
+                       size="mini"
+                       type="primary"
+                       @click="handleProjectStageEdit(scope.row)">编辑</el-button>
+            <el-button size="mini"
+                       type="danger"
+                       @click="handleProjectStageDelete(scope.row, scope.$index)">删除</el-button>
+          </template>
+        </el-table-column>
       </el-table>
+      <div style="text-align: center;margin-top: 10px">
+        <el-button type="primary" size="mini" @click="addNewProjectStage">新增项目阶段</el-button>
+      </div>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="editProject = false">取 消</el-button>
-        <el-button type="primary" @click="editProject = false">确 定</el-button>
+        <el-button type="primary" @click="editProject = false" size="medium">保存</el-button>
+        <el-button @click="editProject = false" size="medium">取消</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-    import { getAssignProjectList, deleteAssignProject } from '@/config/interface'
+    import { getAssignProjectList, deleteAssignProject, getProjectType, getWorkTimeNew,
+      getAssignProjectStageList, getWorkTimeListOfProjectStage } from '@/config/interface'
     export default {
       data () {
         return {
@@ -78,11 +169,21 @@
           },
           reqFlag: {
             getAssignProjectList: true,
-            deleteProject: true
+            deleteProject: true,
+            getProjectType: true
           },
           editProject: false,
           dialogProjectName: '',
-          dialogProjectData: null
+          dialogProjectData: null,
+          projectTypeOptions: null,
+          projectType: null,
+          assignerID: null,
+          props: {
+            value: 'projectTypeID',
+            label: 'projectName',
+            expandTrigger: 'hover'
+          },
+          maxProjectStageName: 50
         }
       },
       methods: {
@@ -100,13 +201,93 @@
               .then(res => {
                 if (res.code === 1) {
                   this.formData.tableData = res.data[0]
-                  console.log(this.formData.tableData)
                   this.$emit('countFeedback', res.data[1][0].totalCount)
                 }
                 this.reqFlag.getAssignProjectList = true
               })
           }
         },
+        // 获取项目阶段列表
+        getAssignProjectStageList (projectID) {
+          const url = getAssignProjectStageList
+          let params = {
+            projectID: projectID
+          }
+          let _this = this
+          return new Promise(function (resolve, reject) {
+            _this.$http(url, params).then(res => {
+              if (res.code === 1) {
+                let recvData = res.data
+                resolve(recvData)
+              } else {
+                reject(new Error('获取项目列表失败'))
+              }
+            })
+          })
+        },
+        // 编辑项目阶段
+        handleProjectStageEdit (row) {
+        },
+        // 获取申报类型
+        getProjectType () {
+          const url = getProjectType
+          if (this.reqFlag.getProjectType) {
+            this.reqFlag.getProjectType = false
+            let params = {
+              projectParentID: this.$store.state.userInfo.groupName
+            }
+            let _this = this
+            return new Promise(function (resolve, reject) {
+              _this.$http(url, params).then(res => {
+                if (res.code === 1) {
+                  resolve(res.data)
+                } else {
+                  reject(new Error('getProjectType error!'))
+                }
+                _this.reqFlag.getProjectType = true
+              })
+            })
+          }
+        },
+        // 获取项目类型相关信息
+        getProjectTypeInfo (projectStageID, parentID) {
+          const url = getWorkTimeNew
+          let params = {
+            checkID: [projectStageID],
+            parentID: parentID
+          }
+          let _this = this
+          return new Promise(function (resolve, reject) {
+            _this.$http(url, params).then(res => {
+              if (res.code === 1) {
+                resolve(res.data)
+              } else {
+                reject(new Error('getProjectTypeInfo Error!'))
+              }
+            })
+          })
+        },
+        // 选中的项目类型变化
+        handleProjectTypeChange (row) {
+          if (row.selectProjectID.length > 0) {
+            this.resetProjectStageStatus(row)
+            row.editable = true
+            row.projectStageID = row.selectProjectID[row.selectProjectID.length - 1]
+            if (row.projectStageID !== 72) { // 非自定义项目阶段
+              this.getProjectTypeInfo(row.projectStageID, row.selectProjectID[0]).then(res0 => {
+                console.log(res0)
+                row.dynamicKValue = res0[0].dynamicKValue
+                row.baseWorkTime = res0[0].workTime
+                row.kValue = 1
+                console.log(row)
+              }).catch(err => {
+                this.$common.toast(err, 'error', false)
+              })
+            } else {
+            }
+          }
+        },
+        // 表格颜色控制
         tableRowClassName ({ row, rowIndex }) {
           if (rowIndex % 2 === 1) {
             return 'warning-row'
@@ -154,8 +335,62 @@
         },
         // 编辑项目
         handleEditProject (row) {
+          this.dialogProjectData = []
           this.editProject = true
           this.dialogProjectName = row.projectName
+          this.assignerID = row.assignerID
+          this.getAssignProjectStageList(row.id).then(res0 => {
+            this.dialogProjectData = res0
+          }).catch(err => {
+            this.$common.toast(err, 'error', true)
+          })
+        },
+        // 重置项目阶段为初始状态
+        resetProjectStageStatus (projectStage) {
+          projectStage.inputProjectStageNameWord = 0
+          projectStage.isProjectNameWordExceed = false
+          projectStage.isShowProjectNameToolTip = false
+          projectStage.editable = false
+          projectStage.baseWorkTime = null
+          projectStage.kValue = null
+          projectStage.dynamicKValue = null
+        },
+        // 新增项目阶段
+        addNewProjectStage () {
+          this.getProjectType().then(res0 => {
+            this.projectTypeOptions = res0
+          }).catch(err => {
+            this.$common.toast(err, 'error', false)
+          })
+          this.dialogProjectData.push({
+            apdID: -1,
+            inputProjectStageNameWord: 0,
+            isProjectNameWordExceed: false,
+            isShowProjectNameToolTip: false,
+            editable: true,
+            baseWorkTime: null,
+            kValue: null,
+            dynamicKValue: null
+          })
+        },
+        // 项目阶段名称监控
+        handleProjectStageNameInput (row) {
+          row.inputProjectStageNameWord = row.projectStageName.length
+          row.isProjectNameWordExceed = row.projectStageName.length > this.maxProjectStageName
+          if (row.isProjectNameWordExceed) {
+            this.$common.toast('项目阶段名称字数过多，请删减', 'error', false)
+          }
+          row.isShowProjectNameToolTip = row.projectStageName.length > 6
+        },
+        // 删除项目阶段
+        handleProjectStageDelete (row, index) {
+          if (row.apdID !== -1) {
+            const url = getWorkTimeListOfProjectStage
+            let params = {
+              projectStageID: row.projectStageID
+            }
+          }
+          this.dialogProjectData.splice(index, 1)
         }
       },
       filters: {

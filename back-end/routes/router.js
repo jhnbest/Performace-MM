@@ -66,6 +66,7 @@ router.post(api.submitPersonalProject, workStation.submitPersonalProject)
 router.post(api.submitMonthPlanProcess, workStation.submitMonthPlanProcess)
 router.post(api.getPlanInfo, workStation.getPlanInfo)
 router.post(api.getAssignedProjectPlan, workStation.getAssignedProjectPlan)
+router.post(api.getAssignProjectStageList, workStation.getAssignProjectStageList)
 
 // 互评模块
 router.post(api.getUserRates, mutualRates.getUserRates)

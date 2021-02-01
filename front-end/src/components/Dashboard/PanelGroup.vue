@@ -26,8 +26,7 @@
         <span>1、每月的绩效得分、定量和定性互评得分以及相应的排名将于
           <span style="font-weight: bolder;color: red">每月工时申报及互评截止后(每月3日0点)</span>进行统计；
         </span><br>
-        <span>2、各评价指标的得分计算请参照手册<el-link type="primary" href="http://ekp.xiamenair.com.cn/ekp/xmair/manual/xmair_manual_file_new/xmairManualFileNewIndex.do?method=view&fdId=170234705c05efcbe81ae4045b6bbabe&toType=pdfView&title=MF%2F3508-10-%E9%80%9A%E4%BF%A1%E5%B7%A5%E7%A8%8B%E5%A4%84%E7%BB%A9%E6%95%88%E7%AE%A1%E7%90%86%E5%8A%9E%E6%B3%95&s_path=%E6%89%8B%E5%86%8C%E7%AE%A1%E7%90%86%E3%80%80%3E%E3%80%80%E6%89%8B%E5%86%8C%E6%9F%A5%E9%98%85%E3%80%80%3E%E3%80%80%E6%89%8B%E5%86%8C%E7%B1%BB%E5%88%AB%E3%80%80%3E%E3%80%80%E9%83%A8%E9%97%A8%E7%BA%A7%E3%80%80%3E%E3%80%80%E5%90%84%E9%83%A8%E9%97%A8%E3%80%80%3E%E3%80%8035%E4%BF%A1%E6%81%AF%E9%83%A8%E7%AE%A1%E7%90%86%E6%89%8B%E5%86%8C%E3%80%80%3E%E3%80%80%E6%89%8B%E5%86%8C%E7%9B%AE%E5%BD%95%E3%80%80%3E%E3%80%80MF%2F3508-10-%E9%80%9A%E4%BF%A1%E5%B7%A5%E7%A8%8B%E5%A4%84%E7%BB%A9%E6%95%88%E7%AE%A1%E7%90%86%E5%8A%9E%E6%B3%95&s_css=default" target="_blank">
-          《通信工程处绩效管理办法》</el-link>。</span><br>
+        <span>2、各评价指标的计算标准参照手册《通信工程处绩效管理办法》</span><br>
         <span slot="reference" @click="dashboardAbout" class="pointer-type" style="margin-left: 20px"><i class="el-icon-warning-outline"></i>相关说明</span>
       </el-popover>
     </div>
@@ -119,25 +118,6 @@
               </div>
               <div v-if="isCount">
                 <count-to :start-val="0" :end-val="multualScore" :duration="1000" :decimals="2" class="card-panel-num" />
-              </div>
-              <div v-else>
-                <span style="font-size: 15px;color: red">暂未统计</span>
-              </div>
-            </div>
-          </div>
-        </el-col>
-        <el-col :xs="12" :sm="12" :lg="6" :xl="4" class="card-panel-col">
-          <div class="card-panel" @click="handleSetLineChartData('shoppings')">
-            <div class="card-panel-icon-wrapper icon-shopping">
-              <svg-icon icon-class="rank-yellow" class-name="card-panel-icon" />
-            </div>
-            <div class="card-panel-description">
-              <div class="card-panel-text">
-                定性互评排名
-              </div>
-              <div v-if="isCount">
-                <count-to :start-val="0" :end-val="multualRank" :duration="1000" class="card-panel-num" />
-                <span style="font-size: 19px">{{'/ ' + multualNum}}</span>
               </div>
               <div v-else>
                 <span style="font-size: 15px;color: red">暂未统计</span>
@@ -572,9 +552,10 @@ export default {
         if (standAndEngineerRates[i].staffRate === tmpStaffRate) {
           standAndEngineerRates[i].staffRateRank = standAndEngineerRates[i - 1].staffRateRank
         } else {
-          standAndEngineerRates[i].staffRateRank = count++
+          standAndEngineerRates[i].staffRateRank = count
           tmpStaffRate = standAndEngineerRates[i].staffRate
         }
+        count++
         standAndEngineerRates[i].staffMutualScore =
           this.calGetScore(standAndEngineerRates.length, standAndEngineerRates[i].staffRateRank)
       }
@@ -585,9 +566,10 @@ export default {
         if (communicationRates[i].staffRate === tmpStaffRate) {
           communicationRates[i].staffRateRank = communicationRates[i - 1].staffRateRank
         } else {
-          communicationRates[i].staffRateRank = count++
+          communicationRates[i].staffRateRank = count
           tmpStaffRate = communicationRates[i].staffRate
         }
+        count++
         communicationRates[i].staffMutualScore =
           this.calGetScore(communicationRates.length, communicationRates[i].staffRateRank)
       }
@@ -598,9 +580,10 @@ export default {
         if (allUserRates[i].managerRate === tmpStaffRate) {
           allUserRates[i].managerRateRank = allUserRates[i - 1].managerRateRank
         } else {
-          allUserRates[i].managerRateRank = count++
+          allUserRates[i].managerRateRank = count
           tmpStaffRate = allUserRates[i].managerRate
         }
+        count++
         allUserRates[i].managerScore =
           this.calGetScore(allUserRates.length, allUserRates[i].managerRateRank)
       }
