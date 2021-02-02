@@ -36,6 +36,7 @@ export const submitReviewPass = '/performance/submitReviewPass' // 审核通过
 export const getAssignWorkTime = '/performance/getAssignWorkTime' // 获取分配的工时
 export const getGroupWorkTimeList = '/performance/getGroupWorkTimeList' // 获取小组已申报工时列表
 export const getAllWorkTimeList = '/performance/getAllWorkTimeList' // 获取全处已申报工时列表
+export const getIsWorkTimeReviewFinish = '/performance/getIsWorkTimeReviewFinish' // 判断工时是否都已审核完毕
 
 export const getAssignProjectList = '/workStation/getAssignProjectList' // 获取未完成的指派项目列表
 export const getAssignProjectDetail = '/workStation/getAssignProjectDetail' // 获取未完成的指派项目明细
@@ -55,6 +56,7 @@ export const getAssignedProjectPlan = '/workStation/getAssignedProjectPlan' // �
 export const getAssignProjectStageList = '/workStation/getAssignProjectStageList' // 获取指派的项目阶段
 export const getWorkTimeListOfProjectStage = '/workStation/getWorkTimeListOfProjectStage' // 获取项目阶段对应的工时申报
 export const updateEditProjectStage = '/workStation/updateEditProjectStage' // 更新项目阶段
+export const getIsSubmitAllow = '/workStation/getIsSubmitAllow' // 获取是否可以申报工时和提交互评
 
 export const getUserRates = '/mutualRates/getUserRates' // 获取互评信息
 export const submitRatesResult = '/mutualRates/submitRatesResult' // 提交互评结果

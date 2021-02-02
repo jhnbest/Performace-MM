@@ -116,7 +116,9 @@ const sqlMap = {
         ' wl.reviewStatus = 1 and wa.obsoleteStatus != 1 and u.status != 0',
     getAllWorkTimeList: 'select u.id, u.name, u.groupName as groupID, wa.reviewWorkTime, wl.applyMonth from worktimeassign wa left join worktimelist ' +
         'wl on wa.projectID = wl.id left join users u on wa.userID = u.id where wl.applyMonth = ? and ' +
-        ' wl.reviewStatus = 1 and wa.obsoleteStatus != 1 and u.status != 0'
+        ' wl.reviewStatus = 1 and wa.obsoleteStatus != 1 and u.status != 0',
+    getIsWorkTimeReviewFinish: 'select * from worktimelist where applyMonth = ? and obsoleteStatus != 1 and reviewStatus = 0 ' +
+        'and applyType = "fact" and submitStatus = 1'
   },
   workStation: {
     getAssignProjectListUn: 'select apl.*, users.name as assigner from assignprojectlist apl left join users on apl.assignerID = users.id where ' +
@@ -189,7 +191,8 @@ const sqlMap = {
         'baseWorkTime = ?, kValue = ?, avaiableWorkTime = ? where id = ?',
     insertNewProjectStage: 'insert into assignprojectdetail (aPLID, projectStage, projectStageName, baseWorkTime, kValue, ' +
         'avaiableWorkTime) values (?, ?, ?, ?, ?, ?)',
-    deleteProjectStage: 'update assignprojectdetail set obsoleteStatus = 1 where id = ?'
+    deleteProjectStage: 'update assignprojectdetail set obsoleteStatus = 1 where id = ?',
+    getIsSubmitAllow: 'select * from globalflag where year(setTime) = ? and month(setTime) = ? and flagType = ?'
   },
   mutualRates: {
     getUserRates: 'select mr.*, u.name as ratedPersionName from mutualrate mr left join users u on ' +

@@ -49,6 +49,7 @@ router.post(api.submitReviewPass, performance.submitReviewPass)
 router.post(api.getAssignWorkTime, performance.getAssignWorkTime)
 router.post(api.getGroupWorkTimeList, performance.getGroupWorkTimeList)
 router.post(api.getAllWorkTimeList, performance.getAllWorkTimeList)
+router.post(api.getIsWorkTimeReviewFinish, performance.getIsWorkTimeReviewFinish)
 
 // workStation-个人工作台
 router.post(api.getAssignProjectList, workStation.getAssignProjectList)
@@ -69,6 +70,7 @@ router.post(api.getAssignedProjectPlan, workStation.getAssignedProjectPlan)
 router.post(api.getAssignProjectStageList, workStation.getAssignProjectStageList)
 router.post(api.getWorkTimeListOfProjectStage, workStation.getWorkTimeListOfProjectStage)
 router.post(api.updateEditProjectStage, workStation.updateEditProjectStage)
+router.post(api.getIsSubmitAllow, workStation.getIsSubmitAllow)
 
 // 互评模块
 router.post(api.getUserRates, mutualRates.getUserRates)

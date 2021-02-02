@@ -116,7 +116,20 @@
               :height="tableHeight"
               ref="rateTable">
       <el-table-column label="姓名" align="center" prop="ratedName" min-width="50"></el-table-column>
-        <el-table-column label="工作态度" align="center">
+      <el-table-column v-if="$store.state.userInfo.id === 15" label="定量评价" align="center">
+        <el-table-column v-if="$store.state.userInfo.id === 15" label="定量得分" align="center" prop="quantitativeScore" width="77"></el-table-column>
+        <el-table-column v-if="$store.state.userInfo.id === 15" label="定量排名" align="center" prop="quantitativeRank" width="77"></el-table-column>
+      </el-table-column>
+      <el-table-column v-if="$store.state.userInfo.id === 15" label="定性互评" align="center">
+        <el-table-column v-if="$store.state.userInfo.id === 15" label="互评得分" align="center" prop="multualScore" width="77"></el-table-column>
+        <el-table-column v-if="$store.state.userInfo.id === 15" label="互评排名" align="center" prop="multualRank" width="77"></el-table-column>
+      </el-table-column>
+      <el-table-column v-if="$store.state.userInfo.id === 15" label="绩效评价" align="center">
+        <el-table-column v-if="$store.state.userInfo.id === 15" label="绩效得分" align="center" prop="PerformanceScore" width="77"></el-table-column>
+        <el-table-column v-if="$store.state.userInfo.id === 15" label="绩效排名" align="center" prop="PerformanceRank" width="77"></el-table-column>
+      </el-table-column>
+      <el-table-column v-if="$store.state.userInfo.id === 15" label="领导评价得分" align="center" prop="quantitativeScore" width="77"></el-table-column>
+      <el-table-column label="工作态度" align="center">
           <el-table-column label="责任意识(15%)" align="center" min-width="110">
             <template slot-scope="scope">
 <!--              <el-popover placement="top-start" title="测试" trigger="manual" content="jsdklfjdd" v-model="visible">-->
@@ -138,7 +151,7 @@
             </template>
           </el-table-column>
         </el-table-column>
-        <el-table-column label="工作能力" align="center">
+      <el-table-column label="工作能力" align="center">
           <el-table-column label="计划能力(10%)" align="center" min-width="110">
             <template slot-scope="scope">
               <el-rate v-model="scope.row.t4Star"
@@ -158,7 +171,7 @@
             </template>
           </el-table-column>
         </el-table-column>
-      <el-table-column label="总分" align="center" prop="totalScore" min-width="50"></el-table-column>
+      <el-table-column v-if="$store.state.userInfo.id !== 15" label="总分" align="center" prop="totalScore" min-width="50"></el-table-column>
     </el-table>
     <br>
     <br>
@@ -168,7 +181,7 @@
 
 <script>
   import { getUsersName, getUserRates, submitRatesResult, updateUserRate,
-    getCurMutualRate } from '@/config/interface'
+    getCurMutualRate, getIsSubmitAllow, getIsWorkTimeReviewFinish } from '@/config/interface'
   import CountTo from 'vue-count-to'
   export default {
     data () {
@@ -406,6 +419,96 @@
           _this.getUserRates().then(res2 => {
             _this.isRated = res2.length !== 0
             _this.genRateTableData(res1, res2)
+          })
+          if (this.$store.state.userInfo.id === 15) {
+            this.getQuantitativeInfo() // 获取定量评价结果
+            this.getAllMultualEvaResult() // 获取全处互评结果
+          }
+        })
+      },
+      // 获取定量评价信息
+      getQuantitativeInfo () {
+        this.getIsWorkTimeSubmitAllow().then(getIsWorkTimeSubmitAllowRes => { // 判断工时申报是否已经截止
+          if (getIsWorkTimeSubmitAllowRes.length > 0) { // 已经截止
+            this.getIsWorkTimeReviewFinish().then(getIsWorkTimeReviewFinishRes => { // 判断工时是否都已审核完毕
+              console.log(getIsWorkTimeReviewFinishRes)
+            })
+          } else { // 尚未截止
+          }
+        })
+      },
+      // 判断工时是否都已审核完毕
+      getIsWorkTimeReviewFinish () {
+        const url = getIsWorkTimeReviewFinish
+        let params = {
+          applyMonth: this.formData.title
+        }
+        let _this = this
+        return new Promise(function (resolve, reject) {
+          _this.$http(url, params).then(res => {
+            if (res.code === 1) {
+              resolve(res.data)
+            } else {
+              this.$common.toast('getIsWorkTimeReviewFinish recv error!', 'error', true)
+              reject(new Error('getIsWorkTimeReviewFinish recv error!'))
+            }
+          }).catch(err => {
+            this.$common.toast(err, 'error', true)
+            reject(new Error(err))
+          })
+        })
+      },
+      // 获取全处互评结果
+      getAllMultualEvaResult () {
+        this.getIsSubmitMultualEvaAllow().then(getIsSubmitMultualEvaAllowRes => { // 判断互评是否已截止
+          if (getIsSubmitMultualEvaAllowRes.length > 0) { // 已截止
+          
+          } else { // 未截止
+
+          }
+        })
+      },
+      // 获取当前月份能否申报工时的标志
+      getIsWorkTimeSubmitAllow () {
+        const url = getIsSubmitAllow
+        let params = {
+          applyYear: this.$moment(this.formData.title).year(),
+          applyMonth: this.$moment(this.formData.title).month() + 1,
+          flagType: 'workTimeSubmit'
+        }
+        let _this = this
+        return new Promise(function (resolve, reject) {
+          _this.$http(url, params).then(res => {
+            if (res.code === 1) {
+              resolve(res.data)
+            } else {
+              reject(new Error('getIsSubmitAllow recv error!'))
+            }
+          }).catch(err => {
+            this.$common.toast(err, 'error', true)
+            reject(new Error('getIsSubmitAllow send error!'))
+          })
+        })
+      },
+      // 获取当前月份能否申报互评的标志
+      getIsSubmitMultualEvaAllow () {
+        const url = getIsSubmitAllow
+        let params = {
+          applyYear: this.$moment(this.formData.title).year(),
+          applyMonth: this.$moment(this.formData.title).month() + 1,
+          flagType: 'multualEvaSubmit'
+        }
+        let _this = this
+        return new Promise(function (resolve, reject) {
+          _this.$http(url, params).then(res => {
+            if (res.code === 1) {
+              resolve(res.data)
+            } else {
+              reject(new Error('getIsSubmitAllow recv error!'))
+            }
+          }).catch(err => {
+            this.$common.toast(err, 'error', true)
+            reject(new Error('getIsSubmitAllow send error!'))
           })
         })
       },
@@ -933,40 +1036,55 @@
       },
       // 提交
       submitRatesResult () {
-        const url = submitRatesResult
-        let params = {
-          data: this.rateTableData,
-          title: this.formData.title,
-          userID: this.$store.state.userInfo.id
-        }
-        let _this = this
-        this.$http(url, params)
-          .then(res => {
-            if (res.code === 1) {
-              _this.isRated = true
-              _this.isChanged = false
-              this.$common.toast('提交成功', 'success', false)
+        this.getIsSubmitMultualEvaAllow().then(getIsSubmitMultualEvaAllowRes => {
+          if (getIsSubmitMultualEvaAllowRes.length === 0 || this.$store.state.userInfo.id === 26) {
+            const url = submitRatesResult
+            let params = {
+              data: this.rateTableData,
+              title: this.formData.title,
+              userID: this.$store.state.userInfo.id
             }
-          })
+            let _this = this
+            this.$http(url, params)
+              .then(res => {
+                if (res.code === 1) {
+                  _this.isRated = true
+                  _this.isChanged = false
+                  this.$common.toast('提交成功', 'success', false)
+                }
+              })
+          } else {
+            this.$common.toast(this.formData.title + '月已截止互评', 'error', true)
+          }
+        }).catch(err => {
+          this.$common.toast(err, 'error', true)
+        })
       },
       // 更新按钮
       updateRateTableData () {
-        const url = updateUserRate
-        let params = {
-          ratesToUpdate: this.ratesToUpdate
-        }
-        if (this.reqFlag.updateRateToUpdate) {
-          this.reqFlag.updateRateToUpdate = false
-          this.$http(url, params)
-            .then(res => {
-              if (res.code === 1) {
-                this.isChanged = false
-                this.ratesToUpdate = []
-                this.$common.toast('更新成功', 'success', false)
-              }
-              this.reqFlag.updateRateToUpdate = true
-            })
-        }
+        this.getIsSubmitMultualEvaAllow().then(getIsSubmitMultualEvaAllowRes => {
+          if (getIsSubmitMultualEvaAllowRes.length === 0 || this.$store.state.userInfo.id === 26) {
+            const url = updateUserRate
+            let params = {
+              ratesToUpdate: this.ratesToUpdate
+            }
+            if (this.reqFlag.updateRateToUpdate) {
+              this.reqFlag.updateRateToUpdate = false
+              this.$http(url, params).then(res => {
+                if (res.code === 1) {
+                  this.isChanged = false
+                  this.ratesToUpdate = []
+                  this.$common.toast('更新成功', 'success', false)
+                }
+                this.reqFlag.updateRateToUpdate = true
+              })
+            }
+          } else {
+            this.$common.toast(this.formData.title + '月已截止互评', 'error', true)
+          }
+        }).catch(err => {
+          this.$common.toast(err, 'error', true)
+        })
       },
       // 刷新表格尺寸
       refreshTableSize () {

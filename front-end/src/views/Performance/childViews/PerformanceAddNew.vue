@@ -229,7 +229,7 @@
 </template>
 
 <script>
-  import { workTypeList, workTimeSubmit, getWorkTime, submitAssignWorkDetail, submitMonthPlanProcess,
+  import { workTimeSubmit, submitAssignWorkDetail, submitMonthPlanProcess, getIsSubmitAllow,
     getUsersName, getProjectType, getWorkTimeNew, workTimeTemporary, submitPersonalProject } from '@/config/interface'
   import Assign from '@/components/Cop/workTimeAssign'
     export default {
@@ -392,6 +392,28 @@
         init () {
           this.getProjectType()
           this.getCookie()
+        },
+        // 获取当前月份能否申报的标志
+        getIsSubmitAllow () {
+          const url = getIsSubmitAllow
+          let params = {
+            applyYear: this.$moment(this.formData.title).year(),
+            applyMonth: this.$moment(this.formData.title).month() + 1,
+            flagType: 'workTimeSubmit'
+          }
+          let _this = this
+          return new Promise(function (resolve, reject) {
+            _this.$http(url, params).then(res => {
+              if (res.code === 1) {
+                resolve(res.data)
+              } else {
+                reject(new Error('getIsSubmitAllow recv error!'))
+              }
+            }).catch(err => {
+              this.$common.toast(err, 'error', true)
+              reject(new Error('getIsSubmitAllow send error!'))
+            })
+          })
         },
         // 项目名称输入框监控
         handleProjectNameInput () {
@@ -571,40 +593,48 @@
         onSubmitWorkTime (formData) {
           this.$refs[formData].validate(valid => {
             if (valid) {
-              if (!this.isProjectNameWordExceed && !this.isInputCommentsWordExceed) {
-                let projectParentArray = []
-                for (let item of this.formData.projectType) {
-                  if (projectParentArray.indexOf(item[0]) === -1) {
-                    projectParentArray.push(item[0])
-                  }
-                }
-                if (projectParentArray.length > 1) {
-                  this.$common.toast('一级活动限选一种', 'error', 'false')
-                } else {
-                  if (this.reqFlag.submitOrTemporaryWorkTime) {
-                    this.reqFlag.submitOrTemporaryWorkTime = false
-                    this.onSubmitProjectList().then(() => { // 提交至项目明细表
-                      if (this.formData.applyType === 'plan') { // 如果是计划项目，则更新计划进展表
-                        this.onSubmitMonthPlanProcess().then(() => {
-                          this.onSubmitWorkTimeList(formData).then(() => { // 提交至工时明细表
-                            this.reqFlag.submitOrTemporaryWorkTime = true
-                          })
-                        })
-                      } else {
-                        this.onSubmitWorkTimeList(formData).then(() => { // 提交至工时明细表
-                          this.reqFlag.submitOrTemporaryWorkTime = true
+              this.getIsSubmitAllow().then(getIsSubmitAllowRes => {
+                if (getIsSubmitAllowRes.length === 0 || this.$store.state.userInfo.id === 26) {
+                  if (!this.isProjectNameWordExceed && !this.isInputCommentsWordExceed) {
+                    let projectParentArray = []
+                    for (let item of this.formData.projectType) {
+                      if (projectParentArray.indexOf(item[0]) === -1) {
+                        projectParentArray.push(item[0])
+                      }
+                    }
+                    if (projectParentArray.length > 1) {
+                      this.$common.toast('一级活动限选一种', 'error', 'false')
+                    } else {
+                      if (this.reqFlag.submitOrTemporaryWorkTime) {
+                        this.reqFlag.submitOrTemporaryWorkTime = false
+                        this.onSubmitProjectList().then(() => { // 提交至项目明细表
+                          if (this.formData.applyType === 'plan') { // 如果是计划项目，则更新计划进展表
+                            this.onSubmitMonthPlanProcess().then(() => {
+                              this.onSubmitWorkTimeList(formData).then(() => { // 提交至工时明细表
+                                this.reqFlag.submitOrTemporaryWorkTime = true
+                              })
+                            })
+                          } else {
+                            this.onSubmitWorkTimeList(formData).then(() => { // 提交至工时明细表
+                              this.reqFlag.submitOrTemporaryWorkTime = true
+                            })
+                          }
                         })
                       }
-                    })
+                    }
+                  } else {
+                    if (this.isProjectNameWordExceed) {
+                      this.$common.toast('项目名称过长', 'error', false)
+                    } else if (this.isInputCommentsWordExceed) {
+                      this.$common.toast('备注字数过多', 'error', false)
+                    }
                   }
+                } else {
+                  this.$common.toast(this.formData.title + '月已截止申报工时', 'error', true)
                 }
-              } else {
-                if (this.isProjectNameWordExceed) {
-                  this.$common.toast('项目名称过长', 'error', false)
-                } else if (this.isInputCommentsWordExceed) {
-                  this.$common.toast('备注字数过多', 'error', false)
-                }
-              }
+              }).catch(err => {
+                this.$common.toast(err, 'error', true)
+              })
             }
           })
         },
@@ -651,25 +681,34 @@
         // 暂存工时申报
         onTemporaryWorkTime (formData) {
           this.$refs[formData].validate(valid => {
-            if (this.reqFlag.submitOrTemporaryWorkTime) {
-              if (valid) {
-                this.reqFlag.submitOrTemporaryWorkTime = false
-                let projectParentArray = []
-                for (let item of this.formData.projectType) {
-                  if (projectParentArray.indexOf(item[0]) === -1) {
-                    projectParentArray.push(item[0])
-                  }
-                }
-                if (projectParentArray.length > 1) {
-                  this.$common.toast('一级活动限选一种', 'error', 'false')
-                } else {
-                  this.onSubmitProjectList().then(() => { // 提交至项目明细表
-                    this.onTemporaryWorkTimeList(formData).then(() => { // 暂存至工时明细表
+            if (valid) {
+              this.getIsSubmitAllow().then(getIsSubmitAllowRes => {
+                if (getIsSubmitAllowRes.length === 0 || this.$store.state.userInfo.id === 26) {
+                  if (this.reqFlag.submitOrTemporaryWorkTime) {
+                    this.reqFlag.submitOrTemporaryWorkTime = false
+                    let projectParentArray = []
+                    for (let item of this.formData.projectType) {
+                      if (projectParentArray.indexOf(item[0]) === -1) {
+                        projectParentArray.push(item[0])
+                      }
+                    }
+                    if (projectParentArray.length > 1) {
                       this.reqFlag.submitOrTemporaryWorkTime = true
-                    })
-                  })
+                      this.$common.toast('一级项目类型限选一种', 'error', 'false')
+                    } else {
+                      this.onSubmitProjectList().then(() => { // 提交至项目明细表
+                        this.onTemporaryWorkTimeList(formData).then(() => { // 暂存至工时明细表
+                          this.reqFlag.submitOrTemporaryWorkTime = true
+                        })
+                      })
+                    }
+                  }
+                } else {
+                  this.$common.toast(this.formData.title + '月已截止申报工时', 'error', true)
                 }
-              }
+              }).catch(err => {
+                this.$common.toast(err, 'error', true)
+              })
             }
           })
         },

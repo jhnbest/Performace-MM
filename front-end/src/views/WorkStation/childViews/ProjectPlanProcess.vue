@@ -267,7 +267,8 @@
     submitPlanProcess,
     updateAssignProjectFilled,
     workTimeTemporary,
-    workTimeSubmit
+    workTimeSubmit,
+    getIsSubmitAllow
   } from '@/config/interface'
   import Assign from '@/components/Cop/workTimeAssign'
   export default {
@@ -372,6 +373,28 @@
           this.formData.projectType = this.$route.query.projectType
           this.formData.projectName = this.$route.query.projectName
           this.getAssignProjectDetail(this.$route.query.projectID)
+        },
+        // 获取当前月份能否申报的标志
+        getIsSubmitAllow () {
+          const url = getIsSubmitAllow
+          let params = {
+            applyYear: this.$moment(this.dialogForm.title).year(),
+            applyMonth: this.$moment(this.dialogForm.title).month() + 1,
+            flagType: 'workTimeSubmit'
+          }
+          let _this = this
+          return new Promise(function (resolve, reject) {
+            _this.$http(url, params).then(res => {
+              if (res.code === 1) {
+                resolve(res.data)
+              } else {
+                reject(new Error('getIsSubmitAllow recv error!'))
+              }
+            }).catch(err => {
+              this.$common.toast(err, 'error', true)
+              reject(new Error('getIsSubmitAllow send error!'))
+            })
+          })
         },
         // 获取申报月份进展数据
         getMonthProcess (type) {
@@ -479,33 +502,41 @@
         handleWorkTimeApply (formData) {
           this.$refs[formData].validate((valid) => {
             if (valid) {
-              let url = workTimeSubmit
-              let _this = this
-              return new Promise(function (resolve, reject) {
-                if (_this.reqFlag.genWorkTimeApply) {
-                  _this.reqFlag.genWorkTimeApply = false
-                  _this.$http(url, _this.submitParams).then(res => {
-                    if (res.code === 1) {
-                      url = updateAssignProjectFilled
-                      let params = {
-                        assignProjectID: _this.$route.query.projectID
-                      }
-                      _this.$http(url, params)
-                        .then((res) => {
-                          if (res.code === 1) {
-                            _this.$common.toast('生成成功', 'success', false)
-                            _this.$router.push({ path: '/home/workStation' })
-                            _this.dialogFormVisible = false
-                            resolve(res.code)
-                          } else {
-                            this.$common.toast('生成失败', 'error', false)
-                            reject(res.code)
+              this.getIsSubmitAllow().then(getIsSubmitAllowRes => {
+                if (getIsSubmitAllowRes.length === 0 || this.$store.state.userInfo.id === 26) {
+                  let url = workTimeSubmit
+                  let _this = this
+                  return new Promise(function (resolve, reject) {
+                    if (_this.reqFlag.genWorkTimeApply) {
+                      _this.reqFlag.genWorkTimeApply = false
+                      _this.$http(url, _this.submitParams).then(res => {
+                        if (res.code === 1) {
+                          url = updateAssignProjectFilled
+                          let params = {
+                            assignProjectID: _this.$route.query.projectID
                           }
-                          _this.reqFlag.genWorkTimeApply = true
-                        })
+                          _this.$http(url, params)
+                            .then((res) => {
+                              if (res.code === 1) {
+                                _this.$common.toast('生成成功', 'success', false)
+                                _this.$router.push({ path: '/home/workStation' })
+                                _this.dialogFormVisible = false
+                                resolve(res.code)
+                              } else {
+                                this.$common.toast('生成失败', 'error', false)
+                                reject(res.code)
+                              }
+                              _this.reqFlag.genWorkTimeApply = true
+                            })
+                        }
+                      })
                     }
                   })
+                } else {
+                  this.$common.toast(this.dialogForm.title + '月已截止申报工时', 'error', true)
                 }
+              }).catch(err => {
+                this.$common.toast(err, 'error', true)
               })
             }
           })

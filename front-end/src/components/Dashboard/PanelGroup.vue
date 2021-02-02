@@ -23,10 +23,10 @@
         placement="bottom"
         width="500"
         trigger="click">
-        <span>1、每月的绩效得分、定量和定性互评得分以及相应的排名将于
-          <span style="font-weight: bolder;color: red">每月工时申报及互评截止后(每月3日0点)</span>进行统计；
-        </span><br>
-        <span>2、各评价指标的计算标准参照手册《通信工程处绩效管理办法》</span><br>
+<!--        <span>1、每月的绩效得分、定量和定性互评得分以及相应的排名将于-->
+<!--          <span style="font-weight: bolder;color: red">每月工时申报及互评截止后(每月3日0点)</span>进行统计；-->
+<!--        </span><br>-->
+        <span>1、各评价指标的计算标准参照手册《通信工程处绩效管理办法》</span><br>
         <span slot="reference" @click="dashboardAbout" class="pointer-type" style="margin-left: 20px"><i class="el-icon-warning-outline"></i>相关说明</span>
       </el-popover>
     </div>
@@ -182,8 +182,8 @@ export default {
       let count = 0
       if (this.reqFlag.getPerformanceScore) {
         this.reqFlag.getPerformanceScore = false
-        this.getPerformanceIsCount().then(res0 => {
-          if (res0 === 1) {
+        this.getPerformanceIsCount().then(getPerformanceIsCountRes => {
+          if (getPerformanceIsCountRes.length > 0) {
             this.getUsersList().then(res1 => {
               this.users = res1
               this.calGroupMemNum(res1)
@@ -198,7 +198,7 @@ export default {
             this.reqFlag.getPerformanceScore = true
           }
         }).catch(() => {
-          this.$common.toast('请求错误1', 'error', false)
+          this.$common.toast('请求错误', 'error', false)
           this.reqFlag.getPerformanceScore = true
         })
       }
@@ -214,9 +214,8 @@ export default {
       let _this = this
       return new Promise(function (resolve, reject) {
         _this.$http(url, params).then(res => {
-          console.log(res.data)
           if (res.code === 1) {
-            resolve(res.data.flagValue)
+            resolve(res.data)
           } else {
             reject(new Error('请求错误'))
           }
@@ -225,28 +224,33 @@ export default {
     },
     // 计算绩效得分
     calPerformanceScore (result) {
+      // ========================定量指标计算=========================
       let allQuantitativeScore = []
       let groupedWorkTimeList = this.groupedWorkTimeList(result[0]) // 对数据进行分组
       for (let item of groupedWorkTimeList) {
+        console.log(item)
         item.caledQuantitative = this.calQuantitativeScore(item.workTimeList)
         for (let itemInside of item.caledQuantitative) {
           allQuantitativeScore.push(itemInside)
         }
       }
-      let multualRestuls = this.calMutualRatesRank(result[1]) // 定性评价结果
+      // =======================定性指标计算===========================
+      let multualRestuls = this.calMutualRatesRank(result[1]) // 计算定性评价结果
+      console.log(multualRestuls)
+      // =======================绩效指标计算===========================
       let finalResult = JSON.parse(JSON.stringify(multualRestuls)) // 合并定性评价和定量评价
       for (let item of finalResult) {
         let quantitativeInfo = allQuantitativeScore.find(quantitativeInfo => {
           return item.id === quantitativeInfo.id
         })
-        if (quantitativeInfo) {
+        if (quantitativeInfo) { // 当月有工时申报
           item.quantitativeScore = quantitativeInfo.quantitativeScore
           item.quantitativeRank = quantitativeInfo.rank
           if (item.id === this.$store.state.userInfo.id) {
             this.quantitativeRank = quantitativeInfo.rank
             this.quantitativeScore = quantitativeInfo.quantitativeScore
           }
-        } else {
+        } else { // 如果当月无任何工时申报
           item.quantitativeScore = 0
           item.quantitativeRank = 0
           if (item.id === this.$store.state.userInfo.id) {
@@ -266,6 +270,7 @@ export default {
       this.performanceScore = finalResult.find(finalResultItem => {
         return finalResultItem.id === this.$store.state.userInfo.id
       }).performanceScore
+      // =========绩效排名计算==========
       let count = 0
       let prePerformanceScore = -1
       let prePerformanceRank = -1
@@ -845,8 +850,8 @@ export default {
       let promises = []
       if (this.reqFlag.getPerformanceScore) {
         this.reqFlag.getPerformanceScore = false
-        this.getPerformanceIsCount().then(res0 => {
-          if (res0 === 1) {
+        this.getPerformanceIsCount().then(getPerformanceIsCountRes => {
+          if (getPerformanceIsCountRes.length > 0) {
             this.getUsersList().then(res1 => {
               this.users = res1
               this.calGroupMemNum(res1)

@@ -159,7 +159,7 @@
 
 <script>
   import { workTimeSubmit, getProjectInfo, getUsersName, getProjectType, getWorkTimeNew, workTimeTemporary,
-    updateAssignWork, getAssignWorkDetail } from '@/config/interface'
+    updateAssignWork, getAssignWorkDetail, getIsSubmitAllow } from '@/config/interface'
   import Assign from '@/components/Cop/workTimeAssign'
     export default {
       data () {
@@ -284,7 +284,8 @@
           }, {
             value: 4,
             text: '公司重点任务'
-          }]
+          }],
+          isRejectWorkTimeSubmit: false
         }
       },
       methods: {
@@ -294,6 +295,28 @@
           this.getProjectType()
           this.getProjectInfo().then(res => {
             this.getProjectDetail(res)
+          })
+        },
+        // 获取当前月份能否申报的标志
+        getIsSubmitAllow () {
+          const url = getIsSubmitAllow
+          let params = {
+            applyYear: this.$moment(this.formData.title).year(),
+            applyMonth: this.$moment(this.formData.title).month() + 1,
+            flagType: 'workTimeSubmit'
+          }
+          let _this = this
+          return new Promise(function (resolve, reject) {
+            _this.$http(url, params).then(res => {
+              if (res.code === 1) {
+                resolve(res.data)
+              } else {
+                reject(new Error('getIsSubmitAllow recv error!'))
+              }
+            }).catch(err => {
+              this.$common.toast(err, 'error', true)
+              reject(new Error('getIsSubmitAllow send error!'))
+            })
           })
         },
         // 获取项目申报明细
@@ -324,12 +347,13 @@
               .then(res => {
                 if (res.code === 1) {
                   let data = res.data
+                  console.log(data)
                   let multipleSelect = []
                   let defaultCurrentUserWorkTime = []
                   let workTimeAssignInsertID = []
                   let tmp = []
-                  console.log(data)
                   it.formData.title = data.workTimeList[0].applyMonth
+                  it.isRejectWorkTimeSubmit = data.workTimeList[0].reviewStatus === 2
                   it.formData.projectType.push(data.projectTypeCheck) // get项目类型
                   it.formData.isShowProjectType = false
                   setTimeout(() => {
@@ -478,8 +502,16 @@
         onSubmitWorkTime (formData) {
           this.$refs[formData].validate(valid => {
             if (valid) {
-              this.onSubmitProjectList().then(() => {
-                this.onSubmitWorkTimeList(formData)
+              this.getIsSubmitAllow().then(getIsSubmitAllowRes => {
+                if (getIsSubmitAllowRes.length === 0 || this.isRejectWorkTimeSubmit || this.$store.state.userInfo.id === 26) {
+                  this.onSubmitProjectList().then(() => {
+                    this.onSubmitWorkTimeList(formData)
+                  })
+                } else {
+                  this.$common.toast(this.formData.title + '月已截止申报工时', 'error', true)
+                }
+              }).catch(err => {
+                this.$common.toast(err, 'error', true)
               })
             }
           })
@@ -526,8 +558,16 @@
         onTemporaryWorkTime (formData) {
           this.$refs[formData].validate(valid => {
             if (valid) {
-              this.onSubmitProjectList().then(() => {
-                this.onTemporaryWorkTimeList(formData)
+              this.getIsSubmitAllow().then(getIsSubmitAllowRes => {
+                if (getIsSubmitAllowRes.length === 0 || this.isRejectWorkTimeSubmit || this.$store.state.userInfo.id === 26) {
+                  this.onSubmitProjectList().then(() => {
+                    this.onTemporaryWorkTimeList(formData)
+                  })
+                } else {
+                  this.$common.toast(this.formData.title + '月已截止申报工时', 'error', true)
+                }
+              }).catch(err => {
+                this.$common.toast(err, 'error', true)
               })
             }
           })

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="$store.state.userInfo.id === 26 || $store.state.userInfo.id === 15" >
+  <div v-if="$store.state.userInfo.id === 26 || $store.state.userInfo.id === 15">
     <el-form class="main-search" :inline="true">
       <el-form-item label="互评月份：" prop="title">
       <el-button size="mini" type="danger" style="margin-right: 10px" @click="handlePreMonth">上月</el-button>
@@ -254,7 +254,7 @@
           this.multualScore = curRateResult.staffMutualScore
           this.multualRank = curRateResult.staffRateRank
         } else {
-          this.$common.toast('暂未统计', 'error', false)
+          // this.$common.toast('暂未统计', 'error', false)
         }
         return allRates
       },
@@ -391,7 +391,12 @@
       // 月份变化
       handelDateChange () {
         this.setMonthCookie(this.formData.title, 7)
-        this.getAllUserRates(this.usersList).then()
+        // this.getAllUserRates(this.usersList).then()
+        this.getAllUserRates(this.usersList).then((res2) => {
+          let mutualRatesRankResult = this.calMutualRatesRank(res2)
+          console.log(mutualRatesRankResult)
+          this.tableData = res2
+        })
       },
       // 上一月
       handlePreMonth () {

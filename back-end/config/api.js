@@ -42,6 +42,7 @@ module.exports = {
     getAssignWorkTime: path + '/performance/getAssignWorkTime', // 获取分配的工时数
     getGroupWorkTimeList: path + '/performance/getGroupWorkTimeList', // 获取小组已审工时列表
     getAllWorkTimeList: path + '/performance/getAllWorkTimeList', // 获取全处已审工时列表
+    getIsWorkTimeReviewFinish: path + '/performance/getIsWorkTimeReviewFinish', // 判断工时是否都已审核完毕
 
     // workStation-个人工作台
     getAssignProjectList: path + '/workStation/getAssignProjectList',
@@ -62,6 +63,7 @@ module.exports = {
     getAssignProjectStageList: path + '/workStation/getAssignProjectStageList', // 获取指派阶段列表
     getWorkTimeListOfProjectStage: path + '/workStation/getWorkTimeListOfProjectStage', // 获取项目阶段对应的工时申报
     updateEditProjectStage: path + '/workStation/updateEditProjectStage', // 更新项目阶段
+    getIsSubmitAllow: path + '/workStation/getIsSubmitAllow', // 获取是否可以申报工时和提交互评
 
     // 互评模块
     getUserRates: path + '/mutualRates/getUserRates', // 获取互评信息

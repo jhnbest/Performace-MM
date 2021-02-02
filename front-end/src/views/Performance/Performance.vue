@@ -179,7 +179,7 @@
     import Cop from '@/components/Cop/Cop'
     import CountTo from 'vue-count-to'
     import { getProjectType, getProjectList, changeSubmitStatus, deleteProject,
-      getAssignWorkTime, workTimeSubmit, workTimeTemporary, getWorkAssign, getGroupWorkTimeList } from '@/config/interface'
+      getAssignWorkTime, workTimeSubmit, workTimeTemporary, getWorkAssign, getGroupWorkTimeList, getIsSubmitAllow } from '@/config/interface'
     export default {
       data () {
         return {
@@ -244,6 +244,28 @@
               })
             })
           }
+        },
+        // 获取当前月份能否申报的标志
+        getIsSubmitAllow () {
+          const url = getIsSubmitAllow
+          let params = {
+            applyYear: this.$moment(this.formData.title).year(),
+            applyMonth: this.$moment(this.formData.title).month() + 1,
+            flagType: 'workTimeSubmit'
+          }
+          let _this = this
+          return new Promise(function (resolve, reject) {
+            _this.$http(url, params).then(res => {
+              if (res.code === 1) {
+                resolve(res.data)
+              } else {
+                reject(new Error('getIsSubmitAllow recv error!'))
+              }
+            }).catch(err => {
+              this.$common.toast(err, 'error', true)
+              reject(new Error('getIsSubmitAllow send error!'))
+            })
+          })
         },
         // 获取项目类型
         getProjectType () {
@@ -408,32 +430,39 @@
             }
           })
         },
+        // 表格提交工时申报
         handleSubmitStatus (row, index) {
-          if (this.reqFlag.changeSubmitStatus) {
-            this.reqFlag.changeSubmitStatus = false
-            if (row.submitStatus === 1) {
-              row.submitStatus = 0
-            } else if (row.submitStatus === 0) {
-              row.submitStatus = 1
-            }
-            const url = changeSubmitStatus
-            let params = {
-              submitStatus: row.submitStatus,
-              id: row.id
-            }
-            this.$http(url, params)
-              .then(res => {
-                if (res.code === 1) {
-                  if (row.submitStatus === 1) {
-                    row.reviewStatus = 0
-                  }
-                  this.$common.toast('操作成功', 'success', false)
-                } else {
-                  this.$common.toast('操作失败', 'warning', false)
+          console.log(row)
+          this.getIsSubmitAllow().then(getIsSubmitAllowRes => {
+            if (getIsSubmitAllowRes.length === 0 || row.reviewStatus === 2 || this.$store.state.userInfo.id === 26) {
+              if (this.reqFlag.changeSubmitStatus) {
+                this.reqFlag.changeSubmitStatus = false
+                if (row.submitStatus === 1) {
+                  row.submitStatus = 0
+                } else if (row.submitStatus === 0) {
+                  row.submitStatus = 1
                 }
-                this.reqFlag.changeSubmitStatus = true
-              })
-          }
+                const url = changeSubmitStatus
+                let params = {
+                  submitStatus: row.submitStatus,
+                  id: row.id
+                }
+                this.$http(url, params).then(res => {
+                  if (res.code === 1) {
+                    if (row.submitStatus === 1) {
+                      row.reviewStatus = 0
+                    }
+                    this.$common.toast('操作成功', 'success', false)
+                  } else {
+                    this.$common.toast('操作失败', 'warning', false)
+                  }
+                  this.reqFlag.changeSubmitStatus = true
+                })
+              }
+            } else {
+              this.$common.toast(this.formData.title + '月已截止申报工时', 'error', true)
+            }
+          })
         },
         handleDelete (row, index) {
           this.$common.msgBox('confirm', '操作提示', '确定删除？', () => {
@@ -531,47 +560,55 @@
         },
         // 已完成按钮
         handleComplete (row) {
-          this.getWorkTimeAssign(row.id).then(workTimeAssign => {
-            const url = workTimeTemporary
-            if (this.reqFlag.complete) {
-              this.reqFlag.complete = false
-              let title = this.formData.title
-              let params = {
-                submitType: 'insert',
-                submitDate: title,
-                data: [],
-                applyType: 'fact'
-              }
-              // let defaultCurrentUserWorkTime = {
-              //   id: this.$store.state.userInfo.id,
-              //   groupName: this.$store.state.userInfo.groupName,
-              //   name: this.$store.state.userInfo.name,
-              //   applyRole: '组织者',
-              //   assignWorkTime: row.avaiableWorkTime,
-              //   deleteAble: false
-              // }
-              row.workTimeAssign = []
-              for (let item of workTimeAssign) {
-                item.assignWorkTime = item.workTime
-                item.deleteAble = false
-                item.id = item.userID
-                item.applyRole = item.assignRole
-                row.workTimeAssign.push(item)
-              }
-              row.defaultCofficient = row.applyCofficient
-              row.defaultKValue = row.applyKValue
-              row.baseWorkTime = row.applyBaseWorkTime
-              params.data.push(row)
-              this.$http(url, params)
-                .then(res => {
-                  if (res.code === 1) {
-                    this.$common.toast('生成成功', 'success', false)
-                  } else {
-                    this.$common.toast('提交失败', 'error', false)
+          this.getIsSubmitAllow().then(getIsSubmitAllowRes => {
+            if (getIsSubmitAllowRes.length === 0 || this.$store.state.userInfo.id === 26) {
+              this.getWorkTimeAssign(row.id).then(workTimeAssign => {
+                const url = workTimeTemporary
+                if (this.reqFlag.complete) {
+                  this.reqFlag.complete = false
+                  let title = this.formData.title
+                  let params = {
+                    submitType: 'insert',
+                    submitDate: title,
+                    data: [],
+                    applyType: 'fact'
                   }
-                  this.reqFlag.complete = true
-                })
+                  // let defaultCurrentUserWorkTime = {
+                  //   id: this.$store.state.userInfo.id,
+                  //   groupName: this.$store.state.userInfo.groupName,
+                  //   name: this.$store.state.userInfo.name,
+                  //   applyRole: '组织者',
+                  //   assignWorkTime: row.avaiableWorkTime,
+                  //   deleteAble: false
+                  // }
+                  row.workTimeAssign = []
+                  for (let item of workTimeAssign) {
+                    item.assignWorkTime = item.workTime
+                    item.deleteAble = false
+                    item.id = item.userID
+                    item.applyRole = item.assignRole
+                    row.workTimeAssign.push(item)
+                  }
+                  row.defaultCofficient = row.applyCofficient
+                  row.defaultKValue = row.applyKValue
+                  row.baseWorkTime = row.applyBaseWorkTime
+                  params.data.push(row)
+                  this.$http(url, params)
+                    .then(res => {
+                      if (res.code === 1) {
+                        this.$common.toast('生成成功', 'success', false)
+                      } else {
+                        this.$common.toast('提交失败', 'error', false)
+                      }
+                      this.reqFlag.complete = true
+                    })
+                }
+              })
+            } else {
+              this.$common.toast(this.formData.title + '月已截止申报工时', 'error', true)
             }
+          }).catch(err => {
+            this.$common.toast(err, 'error', true)
           })
         },
         // 保存按钮

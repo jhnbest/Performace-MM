@@ -948,6 +948,17 @@ const performance = {
         }).catch(err => {
             return $http.writeJson(res, {code: -2, message: '失败', errMsg: err})
         })
+    },
+    // 判断工时是否都已审核完毕
+    getIsWorkTimeReviewFinish (req, res) {
+        let sendData = req.body
+        let sql = $sql.performance.getIsWorkTimeReviewFinish
+        let arrayParams = [sendData.applyMonth]
+        RCPDDatabase(sql, arrayParams).then(res0 => {
+            return $http.writeJson(res, {code: 1, data: res0, message: 'success'})
+        }).catch(err => {
+            return $http.writeJson(res, {code: 1, data: err, message: 'err'})
+        })
     }
 }
 

@@ -948,6 +948,19 @@ const workStation = {
         }).catch(err => {
             return $http.writeJson(res, {code: -2, err: err, message: 'error'})
         })
+    },
+    // 获取是否可以申报工时和提交互评
+    getIsSubmitAllow (req, res) {
+        let sendData = req.body
+        let sql = $sql.workStation.getIsSubmitAllow
+        let arrayParams = [sendData.applyYear, sendData.applyMonth, sendData.flagType]
+        RCPDDatabase(sql, arrayParams).then(res0 => {
+            console.log(res0)
+            return $http.writeJson(res, { code: 1, data: res0, message: 'success' })
+        }).catch(err => {
+            return $http.writeJson(res, { code: -2, data: err, message: 'err' })
+        })
+        console.log(sendData)
     }
 }
 
