@@ -228,7 +228,6 @@ export default {
       let allQuantitativeScore = []
       let groupedWorkTimeList = this.groupedWorkTimeList(result[0]) // 对数据进行分组
       for (let item of groupedWorkTimeList) {
-        console.log(item)
         item.caledQuantitative = this.calQuantitativeScore(item.workTimeList)
         for (let itemInside of item.caledQuantitative) {
           allQuantitativeScore.push(itemInside)
@@ -236,7 +235,6 @@ export default {
       }
       // =======================定性指标计算===========================
       let multualRestuls = this.calMutualRatesRank(result[1]) // 计算定性评价结果
-      console.log(multualRestuls)
       // =======================绩效指标计算===========================
       let finalResult = JSON.parse(JSON.stringify(multualRestuls)) // 合并定性评价和定量评价
       for (let item of finalResult) {
@@ -633,8 +631,6 @@ export default {
       if (curRateResult) {
         this.multualScore = curRateResult.staffMutualScore
         this.multualRank = curRateResult.staffRateRank
-      } else {
-        this.$common.toast('暂未统计', 'error', false)
       }
       return allRates
     },

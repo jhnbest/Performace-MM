@@ -125,10 +125,10 @@
         <el-table-column v-if="$store.state.userInfo.id === 15" label="互评排名" align="center" prop="multualRank" width="77"></el-table-column>
       </el-table-column>
       <el-table-column v-if="$store.state.userInfo.id === 15" label="绩效评价" align="center">
-        <el-table-column v-if="$store.state.userInfo.id === 15" label="绩效得分" align="center" prop="PerformanceScore" width="77"></el-table-column>
-        <el-table-column v-if="$store.state.userInfo.id === 15" label="绩效排名" align="center" prop="PerformanceRank" width="77"></el-table-column>
+        <el-table-column v-if="$store.state.userInfo.id === 15" label="绩效得分" align="center" prop="performanceScore" width="77"></el-table-column>
+        <el-table-column v-if="$store.state.userInfo.id === 15" label="绩效排名" align="center" prop="performanceRank" width="77"></el-table-column>
       </el-table-column>
-      <el-table-column v-if="$store.state.userInfo.id === 15" label="领导评价得分" align="center" prop="quantitativeScore" width="77"></el-table-column>
+      <el-table-column v-if="$store.state.userInfo.id === 15" label="领导评价得分" align="center" prop="totalScore" width="77"></el-table-column>
       <el-table-column label="工作态度" align="center">
           <el-table-column label="责任意识(15%)" align="center" min-width="110">
             <template slot-scope="scope">
@@ -180,8 +180,16 @@
 </template>
 
 <script>
-  import { getUsersName, getUserRates, submitRatesResult, updateUserRate,
-    getCurMutualRate, getIsSubmitAllow, getIsWorkTimeReviewFinish } from '@/config/interface'
+  import {
+    getUsersName,
+    getUserRates,
+    submitRatesResult,
+    updateUserRate,
+    getCurMutualRate,
+    getIsSubmitAllow,
+    getIsWorkTimeReviewFinish,
+    getAllWorkTimeList,
+    getAllUserRates } from '@/config/interface'
   import CountTo from 'vue-count-to'
   export default {
     data () {
@@ -397,7 +405,9 @@
         reqFlag: {
           getUserRates: true,
           getUsersList: true,
-          updateRateToUpdate: true
+          updateRateToUpdate: true,
+          getAllWorkTimeList: true,
+          getAllUserRates: true
         },
         ratesTmp: [],
         ratesToUpdate: [],
@@ -405,13 +415,24 @@
         curMutualRate: 0,
         tableHeight: null,
         realTimeShowTableData: [],
-        showInstructiongs: false
+        showInstructiongs: false,
+        commonStaffMutualCof: this.$store.state.commonStaffMutualCof,
+        commonStaffManagerCof: this.$store.state.commonStaffManagerCof,
+        commonStaffQuantitativeCof: this.$store.state.commonStaffQuantitativeCof,
+        groupLeaderMutualCof: this.$store.state.groupLeaderMutualCof,
+        groupLeaderManagerCof: this.$store.state.groupLeaderManagerCof,
+        groupLeaderQuantitativeCof: this.$store.state.groupLeaderQuantitativeCof,
+        directorMutualCof: this.$store.state.directorMutualCof,
+        directorManagerCof: this.$store.state.directorManagerCof,
+        directorQuantitativeCof: this.$store.state.directorQuantitativeCof
       }
     },
     methods: {
       // 初始化
       init () {
         let _this = this
+        let promises = []
+        let count = 0
         this.getCookie()
         // this.getCurMutualRate()
         this.getUsersList().then(res1 => {
@@ -419,22 +440,393 @@
           _this.getUserRates().then(res2 => {
             _this.isRated = res2.length !== 0
             _this.genRateTableData(res1, res2)
+            if (this.$store.state.userInfo.id === 15) {
+              promises[count++] = this.getQuantitativeInfo() // 获取定量评价结果
+              promises[count++] = this.getAllMultualEvaResult() // 获取全处互评结果
+            }
+            Promise.all(promises).then(result => {
+              if (!result[0].err) { // 工时已截止且审核完毕
+              }
+              if (!result[1].err) { // 互评已截止
+                this.genMultualEvaData(result[1].content)
+              }
+              if (!result[0].err && !result[1].err) {
+              }
+            }).catch(err => {
+              this.$common.toast(err, 'error', true)
+            })
           })
-          if (this.$store.state.userInfo.id === 15) {
-            this.getQuantitativeInfo() // 获取定量评价结果
-            this.getAllMultualEvaResult() // 获取全处互评结果
-          }
         })
       },
-      // 获取定量评价信息
-      getQuantitativeInfo () {
-        this.getIsWorkTimeSubmitAllow().then(getIsWorkTimeSubmitAllowRes => { // 判断工时申报是否已经截止
-          if (getIsWorkTimeSubmitAllowRes.length > 0) { // 已经截止
-            this.getIsWorkTimeReviewFinish().then(getIsWorkTimeReviewFinishRes => { // 判断工时是否都已审核完毕
-              console.log(getIsWorkTimeReviewFinishRes)
-            })
-          } else { // 尚未截止
+      // 生成互评数据
+      genMultualEvaData (multualData) {
+        // let multualRestuls = this.calMutualRatesRank(multualData) // 计算定性评价结果
+        console.log(multualData)
+      },
+      // 获取领导评价相关信息
+      getManagerResult (id, allUsersRates) {
+        for (let item of allUsersRates) {
+          if (item.id === id) {
+            return { managerRateRank: item.managerRateRank, managerScore: item.managerScore }
           }
+        }
+      },
+      // 定性、定量指标得分计算
+      calGetScore (length, rank) {
+        let rankPercentage = Number((rank / length).toFixed(1))
+        if (rankPercentage < 0.1 || rankPercentage === 0.1 || rank === 1) {
+          return 92.5
+        } else if (rankPercentage < 0.3 || rankPercentage === 0.3) {
+          return 90
+        } else if (rankPercentage < 0.7 || rankPercentage === 0.7) {
+          return 87.5
+        } else if (rankPercentage < 0.9 || rankPercentage === 0.9) {
+          return 85
+        } else if (rankPercentage < 1 || rankPercentage === 1) {
+          return 82.5
+        }
+      },
+      // 计算定性评价排名与得分
+      calMutualRatesRank (allUserRates) {
+        let standAndEngineerRates = []
+        let communicationRates = []
+        for (let item of allUserRates) {
+          if (item.groupName === '技术标准组' || item.groupName === '工程组') {
+            standAndEngineerRates.push(item)
+          } else if (item.groupName === '通信组') {
+            communicationRates.push(item)
+          }
+        }
+        // =================================定性评价排序===============================================
+        // 技术标准组&工程组员工互评排序
+        for (let i = 0; i < standAndEngineerRates.length - 1; i++) {
+          for (let j = 0; j < standAndEngineerRates.length - 1 - i; j++) {
+            if (standAndEngineerRates[j].staffRate < standAndEngineerRates[j + 1].staffRate) {
+              [standAndEngineerRates[j], standAndEngineerRates[j + 1]] =
+                [standAndEngineerRates[j + 1], standAndEngineerRates[j]]
+            }
+          }
+        }
+        // 通信组员工互评排序
+        for (let i = 0; i < communicationRates.length - 1; i++) {
+          for (let j = 0; j < communicationRates.length - 1 - i; j++) {
+            if (communicationRates[j].staffRate < communicationRates[j + 1].staffRate) {
+              [communicationRates[j], communicationRates[j + 1]] =
+                [communicationRates[j + 1], communicationRates[j]]
+            }
+          }
+        }
+        // 全处员工领导评价排序
+        for (let i = 0; i < allUserRates.length - 1; i++) {
+          for (let j = 0; j < allUserRates.length - 1 - i; j++) {
+            if (allUserRates[j].managerRate < allUserRates[j + 1].managerRate) {
+              [allUserRates[j], allUserRates[j + 1]] =
+                [allUserRates[j + 1], allUserRates[j]]
+            }
+          }
+        }
+        // =================================定性评价得分计算===============================================
+        // 技术标准组与工程组互评排名&得分计算
+        let tmpStaffRate = -1
+        let count = 1
+        for (let i = 0; i < standAndEngineerRates.length; i++) {
+          if (standAndEngineerRates[i].staffRate === tmpStaffRate) {
+            standAndEngineerRates[i].staffRateRank = standAndEngineerRates[i - 1].staffRateRank
+          } else {
+            standAndEngineerRates[i].staffRateRank = count
+            tmpStaffRate = standAndEngineerRates[i].staffRate
+          }
+          count++
+          standAndEngineerRates[i].staffMutualScore =
+            this.calGetScore(standAndEngineerRates.length, standAndEngineerRates[i].staffRateRank)
+        }
+        // 通信组互评排名&得分计算
+        tmpStaffRate = -1
+        count = 1
+        for (let i = 0; i < communicationRates.length; i++) {
+          if (communicationRates[i].staffRate === tmpStaffRate) {
+            communicationRates[i].staffRateRank = communicationRates[i - 1].staffRateRank
+          } else {
+            communicationRates[i].staffRateRank = count
+            tmpStaffRate = communicationRates[i].staffRate
+          }
+          count++
+          communicationRates[i].staffMutualScore =
+            this.calGetScore(communicationRates.length, communicationRates[i].staffRateRank)
+        }
+        // 全处员工领导评价排名&得分计算
+        tmpStaffRate = -1
+        count = 1
+        for (let i = 0; i < allUserRates.length; i++) {
+          if (allUserRates[i].managerRate === tmpStaffRate) {
+            allUserRates[i].managerRateRank = allUserRates[i - 1].managerRateRank
+          } else {
+            allUserRates[i].managerRateRank = count
+            tmpStaffRate = allUserRates[i].managerRate
+          }
+          count++
+          allUserRates[i].managerScore =
+            this.calGetScore(allUserRates.length, allUserRates[i].managerRateRank)
+        }
+        let allRates = []
+        // =================================定性评价结果合并===============================================
+        // 合并三个组结果
+        for (let item of standAndEngineerRates) {
+          let managerResult = this.getManagerResult(item.id, allUserRates)
+          item.managerRateRank = managerResult.managerRateRank
+          item.managerScore = managerResult.managerScore
+          if (item.id === 7 || item.id === 11) { // 主任岗
+            item.mutualScore = item.staffMutualScore * this.directorMutualCof +
+              item.managerScore * this.directorManagerCof
+          } else if (item.id === 13 || item.id === 17) { // 组长
+            item.mutualScore = item.staffMutualScore * this.groupLeaderMutualCof +
+              item.managerScore * this.groupLeaderManagerCof
+          } else { // 普通成员
+            item.mutualScore = item.staffMutualScore * this.commonStaffMutualCof +
+              item.managerScore * this.commonStaffManagerCof
+          }
+          allRates.push(item)
+        }
+        for (let item of communicationRates) {
+          let managerResult = this.getManagerResult(item.id, allUserRates)
+          item.managerRateRank = managerResult.managerRateRank
+          item.managerScore = managerResult.managerScore
+          if (item.id === 7 || item.id === 11) { // 主任岗
+            item.mutualScore = item.staffMutualScore * this.directorMutualCof +
+              item.managerScore * this.directorManagerCof
+          } else if (item.id === 13 || item.id === 17) { // 组长
+            item.mutualScore = item.staffMutualScore * this.groupLeaderMutualCof +
+              item.managerScore * this.groupLeaderManagerCof
+          } else { // 普通成员
+            item.mutualScore = item.staffMutualScore * this.commonStaffMutualCof +
+              item.managerScore * this.commonStaffManagerCof
+          }
+          allRates.push(item)
+        }
+        return allRates
+      },
+      // 将获得的信息按小组分类
+      groupedWorkTimeList (allWorkTimeList) {
+        let groupedWorkTimeList = []
+        for (let item of allWorkTimeList) {
+          if (item.id !== this.$store.state.managerID) {
+            let index = groupedWorkTimeList.findIndex(itemInside => {
+              return itemInside.groupID === item.groupID
+            })
+            if (index === -1) {
+              let obj = {
+                groupID: item.groupID,
+                workTimeList: []
+              }
+              obj.workTimeList.push(item)
+              groupedWorkTimeList.push(obj)
+            } else {
+              groupedWorkTimeList[index].workTimeList.push(item)
+            }
+          }
+        }
+        return groupedWorkTimeList
+      },
+      // 计算绩效得分
+      calPerformanceScore (result) {
+        // ========================定量指标计算=========================
+        let allQuantitativeScore = []
+        let groupedWorkTimeList = this.groupedWorkTimeList(result[0]) // 对数据进行分组
+        for (let item of groupedWorkTimeList) {
+          item.caledQuantitative = this.calQuantitativeScore(item.workTimeList)
+          for (let itemInside of item.caledQuantitative) {
+            allQuantitativeScore.push(itemInside)
+          }
+        }
+        // =======================定性指标计算===========================
+        let multualRestuls = this.calMutualRatesRank(result[1]) // 计算定性评价结果
+        // =======================绩效指标得分计算===========================
+        let finalResult = JSON.parse(JSON.stringify(multualRestuls)) // 合并定性评价和定量评价
+        for (let item of finalResult) {
+          let quantitativeInfo = allQuantitativeScore.find(quantitativeInfo => {
+            return item.id === quantitativeInfo.id
+          })
+          if (quantitativeInfo) { // 当月有工时申报
+            item.quantitativeScore = quantitativeInfo.quantitativeScore
+            item.quantitativeRank = quantitativeInfo.rank
+            if (item.id === this.$store.state.userInfo.id) {
+            }
+          } else { // 如果当月无任何工时申报
+            item.quantitativeScore = 0
+            item.quantitativeRank = 0
+            if (item.id === this.$store.state.userInfo.id) {
+            }
+          }
+          if (item.id === 7 || item.id === 11) { // 主任岗
+            item.performanceScore = item.quantitativeScore * this.directorQuantitativeCof + item.mutualScore
+          } else if (item.id === 13 || item.id === 17) { // 组长
+            item.performanceScore = item.quantitativeScore * this.groupLeaderQuantitativeCof + item.mutualScore
+          } else { // 普通成员
+            item.performanceScore = item.quantitativeScore * this.commonStaffQuantitativeCof + item.mutualScore
+          }
+          finalResult.sort(this.sortBy('performanceScore'))
+        }
+        // =========绩效排名计算==========
+        let count = 0
+        let prePerformanceScore = -1
+        let prePerformanceRank = -1
+        for (let item of finalResult) {
+          if (item.performanceScore === prePerformanceScore) {
+            item.performanceRank = prePerformanceRank
+          } else {
+            item.performanceRank = count
+            prePerformanceScore = item.performanceScore
+            prePerformanceRank = count
+          }
+          count++
+        }
+        return finalResult
+      },
+      // 排序比较函数
+      sortBy (props) {
+        return function (a, b) {
+          return b[props] - a[props]
+        }
+      },
+      // 获取全处工时信息
+      getAllWorkTimeList () {
+        const url = getAllWorkTimeList
+        if (this.reqFlag.getAllWorkTimeList) {
+          this.reqFlag.getAllWorkTimeList = false
+          let params = {
+            applyMonth: this.formData.title
+          }
+          let _this = this
+          return new Promise(function (resolve, reject) {
+            _this.$http(url, params).then(res => {
+              if (res.code === 1) {
+                let recvData = res.data
+                _this.reqFlag.getAllWorkTimeList = true
+                resolve(recvData)
+              } else {
+                _this.reqFlag.getAllWorkTimeList = true
+                reject(new Error('getAllWorkTimeList recv error'))
+              }
+            }).catch(() => {
+              _this.$common.toast('请求失败', 'error', false)
+              reject(new Error('getAllWorkTimeList send error'))
+            })
+          })
+        }
+      },
+      // 计算互评得分
+      getMulRated (ratedData) {
+        let ratesTableTmp = []
+        let manageRate = 0
+        let totalRate = 0
+        let count = 0
+        if (ratedData.length !== 0) {
+          for (let item of ratedData) {
+            let index = ratesTableTmp.findIndex((itemInside) => {
+              return item.ratePersion === itemInside.ratePersion
+            })
+            if (index === -1) {
+              let obj = {
+                ratePersion: item.ratePersion
+              }
+              obj[this.rateTypeSwitch(item.rateType)] = item.rate
+              ratesTableTmp.push(obj)
+            } else {
+              ratesTableTmp[index][this.rateTypeSwitch(item.rateType)] = item.rate
+            }
+          }
+          for (let item of ratesTableTmp) { // 计算各被评价人总分
+            item.totalScore = this.calMultualScoreByScore(item.t1Star, item.t2Star, item.t3Star, item.t4Star,
+              item.t5Star, item.t6Star)
+            if (item.ratePersion === 26) {
+              manageRate = item.totalScore
+            } else {
+              count++
+              totalRate += item.totalScore
+            }
+          }
+        }
+        if (count === 0) {
+          count = 1 // 防止NAN
+        }
+        return {
+          staffRate: totalRate / count,
+          manageRate: manageRate
+        }
+      },
+      // 获取全处员工互评信息
+      getAllUserRates (users) {
+        let allUsersRates = []
+        const url = getAllUserRates
+        let params = {
+          usersData: users,
+          rateMonth: this.formData.title
+        }
+        let _this = this
+        if (this.reqFlag.getAllUserRates) {
+          this.reqFlag.getAllUserRates = false
+          return new Promise(function (resolve, reject) {
+            _this.$http(url, params).then(res => {
+              if (res.code === 1) {
+                for (let item of res.data) {
+                  let obj = {
+                    id: item.id,
+                    name: item.name,
+                    groupName: item.groupName
+                  }
+                  let getRated = _this.getMulRated(item.ratedData)
+                  obj.staffRate = Number(getRated.staffRate.toFixed(3))
+                  obj.managerRate = Number(getRated.manageRate.toFixed(3))
+                  obj.isRate = item.rateData.length !== 0
+                  allUsersRates.push(obj)
+                }
+                _this.reqFlag.getAllUserRates = true
+                resolve(allUsersRates)
+              } else {
+                reject(new Error('getAllUserRates recv error!'))
+              }
+            }).catch(err => {
+              reject(new Error(err))
+            })
+          })
+        }
+      },
+      // 获取定量评价结果
+      getQuantitativeInfo () {
+        let _this = this
+        return new Promise(function (resolve, reject) {
+          _this.getIsWorkTimeSubmitAllow().then(getIsWorkTimeSubmitAllowRes => { // 判断工时申报是否已经截止
+            if (getIsWorkTimeSubmitAllowRes.length > 0) { // 已经截止
+              _this.getIsWorkTimeReviewFinish().then(getIsWorkTimeReviewFinishRes => { // 判断工时是否都已审核完毕
+                if (getIsWorkTimeReviewFinishRes.length > 0) { // 未审核完毕
+                  for (let item of _this.rateTableData) {
+                    item.quantitativeScore = '工时未审核完毕'
+                    item.quantitativeRank = '工时未审核完毕'
+                  }
+                  resolve({
+                    err: true
+                  })
+                } else { // 已审核完毕
+                  _this.getAllWorkTimeList().then(getAllWorkTimeListRes => {
+                    resolve({
+                      error: false,
+                      content: getAllWorkTimeListRes
+                    })
+                  }).catch(err => {
+                    reject(new Error(err))
+                  })
+                }
+              })
+            } else { // 尚未截止
+              for (let item of _this.rateTableData) {
+                item.quantitativeScore = '工时申报尚未截止'
+                item.quantitativeRank = '工时申报尚未截止'
+              }
+              resolve({
+                err: true
+              })
+            }
+          })
         })
       },
       // 判断工时是否都已审核完毕
@@ -460,12 +852,29 @@
       },
       // 获取全处互评结果
       getAllMultualEvaResult () {
-        this.getIsSubmitMultualEvaAllow().then(getIsSubmitMultualEvaAllowRes => { // 判断互评是否已截止
-          if (getIsSubmitMultualEvaAllowRes.length > 0) { // 已截止
-          
-          } else { // 未截止
-
-          }
+        let _this = this
+        return new Promise(function (resolve, reject) {
+          _this.getIsSubmitMultualEvaAllow().then(getIsSubmitMultualEvaAllowRes => { // 判断互评是否已截止
+            if (getIsSubmitMultualEvaAllowRes.length > 0) { // 已截止
+              _this.getAllUserRates(_this.users).then(getAllUserRatesRes => {
+                resolve({
+                  error: false,
+                  content: getAllUserRatesRes })
+              }).catch(getAllUserRatesResErr => {
+                reject(new Error('getAllUserRates error' + getAllUserRatesResErr))
+              })
+            } else { // 未截止
+              for (let item of _this.rateTableData) {
+                item.mutualScore = '互评尚未截止'
+                item.multualRank = '互评尚未截止'
+              }
+              resolve({
+                err: true
+              })
+            }
+          }).catch(getIsSubmitMultualEvaAllowErr => {
+            reject(new Error('getIsSubmitMultualEvaAllow error ' + getIsSubmitMultualEvaAllowErr))
+          })
         })
       },
       // 获取当前月份能否申报工时的标志
@@ -507,8 +916,7 @@
               reject(new Error('getIsSubmitAllow recv error!'))
             }
           }).catch(err => {
-            this.$common.toast(err, 'error', true)
-            reject(new Error('getIsSubmitAllow send error!'))
+            reject(new Error('getIsSubmitAllow send error!' + err))
           })
         })
       },
@@ -647,18 +1055,6 @@
             return 't1Star'
         }
       },
-      // 获取被评价人数组索引
-      getIndexOfRatedPersion (id) {
-        if (this.ratesTableTmp.length === 0) {
-          return -1
-        }
-        for (let i = 0; i < this.ratesTableTmp.length; i++) {
-          if (this.ratesTableTmp[i].ratedPersion === id) {
-            return i
-          }
-        }
-        return -1
-      },
       // 获取评分细则
       getRateDetail (rateType, star) {
         for (let item of this.tableData) {
@@ -745,7 +1141,13 @@
                     t3Star: this.defaultStar,
                     t4Star: this.defaultStar,
                     t5Star: this.defaultStar,
-                    t6Star: this.defaultStar
+                    t6Star: this.defaultStar,
+                    quantitativeScore: null,
+                    quantitativeRank: null,
+                    multualScore: null,
+                    multualRank: null,
+                    performanceScore: null,
+                    performanceRank: null
                   }
                   obj.totalScore = this.calMultualScore(obj.t1Star, obj.t2Star, obj.t3Star,
                     obj.t4Star, obj.t5Star, obj.t6Star)
@@ -780,7 +1182,13 @@
                   t3Star: this.defaultStar,
                   t4Star: this.defaultStar,
                   t5Star: this.defaultStar,
-                  t6Star: this.defaultStar
+                  t6Star: this.defaultStar,
+                  quantitativeScore: null,
+                  quantitativeRank: null,
+                  multualScore: null,
+                  multualRank: null,
+                  performanceScore: null,
+                  performanceRank: null
                 }
                 obj.totalScore = this.calMultualScore(obj.t1Star, obj.t2Star, obj.t3Star,
                   obj.t4Star, obj.t5Star, obj.t6Star)
@@ -789,26 +1197,34 @@
             }
           }
         } else {
-          this.ratesTableTmp = []
+          let ratesTableTmp = []
           this.ratesTmp = JSON.parse(JSON.stringify(rates))
           for (let item1 of rates) {
-            let index = this.getIndexOfRatedPersion(item1.ratedPersion)
+            let index = ratesTableTmp.findIndex(ratesTableTmpItem => {
+              return ratesTableTmpItem.ratedPersion === item1.ratedPersion
+            })
             if (index === -1) {
               let obj = {
                 ratedPersion: item1.ratedPersion,
-                ratedName: item1.ratedPersionName
+                ratedName: item1.ratedPersionName,
+                quantitativeScore: null,
+                quantitativeRank: null,
+                multualScore: null,
+                multualRank: null,
+                performanceScore: null,
+                performanceRank: null
               }
               obj[this.rateTypeSwitch(item1.rateType)] = this.ratesToStar(item1.rate)
-              this.ratesTableTmp.push(obj)
+              ratesTableTmp.push(obj)
             } else {
-              this.ratesTableTmp[index][this.rateTypeSwitch(item1.rateType)] = this.ratesToStar(item1.rate)
+              ratesTableTmp[index][this.rateTypeSwitch(item1.rateType)] = this.ratesToStar(item1.rate)
             }
           }
-          for (let item of this.ratesTableTmp) { // 计算各被评价人总分
+          for (let item of ratesTableTmp) { // 计算各被评价人总分
             item.totalScore = this.calMultualScore(item.t1Star, item.t2Star, item.t3Star, item.t4Star,
               item.t5Star, item.t6Star)
           }
-          this.rateTableData = JSON.parse(JSON.stringify(this.ratesTableTmp))
+          this.rateTableData = JSON.parse(JSON.stringify(ratesTableTmp))
         }
       },
       // 上一月
