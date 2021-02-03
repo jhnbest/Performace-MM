@@ -446,6 +446,7 @@
             }
             Promise.all(promises).then(result => {
               if (!result[0].err) { // 工时已截止且审核完毕
+                this.genQuantativeData(result[0].content)
               }
               if (!result[1].err) { // 互评已截止
                 this.genMultualEvaData(result[1].content)
@@ -458,10 +459,101 @@
           })
         })
       },
+      // 数据排序方法
+      compare (params) {
+        return function (o, p) {
+          let a, b
+          if (typeof o === 'object' && typeof p === 'object' && o && p) {
+            a = o[params]
+            b = p[params]
+            if (a === b) {
+              return 0
+            }
+            if (typeof a === typeof b) {
+              return a > b ? -1 : 1
+            }
+            return typeof a > typeof b ? -1 : 1
+          } else {
+            let obj = {}
+            throw (obj)
+          }
+        }
+      },
+      // 计算定量得分与排名
+      calQuantitativeScore (groupWorkTimeList) {
+        let totalWorkTimeCal = []
+        if (groupWorkTimeList.length > 0) {
+          let userID = []
+          for (let item of groupWorkTimeList) { // 插入各组员总工时信息
+            if (userID.indexOf(item.id) === -1) {
+              userID.push(item.id)
+              let obj = {
+                id: item.id,
+                name: item.name,
+                totalWorkTime: item.reviewWorkTime
+              }
+              totalWorkTimeCal.push(obj)
+            } else {
+              totalWorkTimeCal.find(function (wItem) {
+                if (wItem.id === item.id) {
+                  wItem.totalWorkTime += item.reviewWorkTime
+                  return wItem.totalWorkTime
+                }
+              })
+            }
+          }
+          totalWorkTimeCal.sort(this.compare('totalWorkTime')) // 根据总工时排序
+          let preWorkTime = -1
+          let preRank = 1
+          let count = 1
+          for (let item of totalWorkTimeCal) { // 计算排名
+            if (item.totalWorkTime === preWorkTime) {
+              item.rank = preRank
+            } else {
+              item.rank = count
+              preRank = count
+            }
+            count++
+            preWorkTime = item.totalWorkTime
+          }
+          // ==============================计算定量指标得分=======================================
+          let length = totalWorkTimeCal.length
+          for (let item of totalWorkTimeCal) { // 计算定量指标得分
+            item.quantitativeScore = this.calGetScore(length, item.rank)
+          }
+        }
+        return totalWorkTimeCal
+      },
+      // 生成定量数据
+      genQuantativeData (quantativeData) {
+        let allQuantitativeScore = []
+        let groupedWorkTimeList = this.groupedWorkTimeList(quantativeData) // 对数据进行分组
+        for (let item of groupedWorkTimeList) {
+          item.caledQuantitative = this.calQuantitativeScore(item.workTimeList)
+          for (let itemInside of item.caledQuantitative) {
+            allQuantitativeScore.push(itemInside)
+          }
+        }
+        for (let item of this.rateTableData) {
+          let allQuantitativeScoreFindResult = allQuantitativeScore.find(allQuantitativeScoreItem => {
+            return allQuantitativeScoreItem.id === item.ratedPersion
+          })
+          item.quantitativeScore = allQuantitativeScoreFindResult.quantitativeScore
+          item.quantitativeRank = allQuantitativeScoreFindResult.rank
+        }
+        return allQuantitativeScore
+      },
       // 生成互评数据
       genMultualEvaData (multualData) {
-        // let multualRestuls = this.calMutualRatesRank(multualData) // 计算定性评价结果
-        console.log(multualData)
+        let multualRestuls = this.calMutualRatesRank(multualData) // 计算定性评价结果
+        for (let item of this.rateTableData) {
+          let multualRestulsFindResult = multualRestuls.find(multualRestulsItem => {
+            return multualRestulsItem.id === item.ratedPersion
+          })
+          item.multualScore = multualRestulsFindResult.staffMutualScore
+          item.multualRank = multualRestulsFindResult.staffRateRank
+        }
+        return multualRestuls
       },
       // 获取领导评价相关信息
       getManagerResult (id, allUsersRates) {
@@ -768,6 +860,7 @@
           return new Promise(function (resolve, reject) {
             _this.$http(url, params).then(res => {
               if (res.code === 1) {
+                console.log(res.data)
                 for (let item of res.data) {
                   let obj = {
                     id: item.id,
@@ -865,7 +958,7 @@
               })
             } else { // 未截止
               for (let item of _this.rateTableData) {
-                item.mutualScore = '互评尚未截止'
+                item.multualScore = '互评尚未截止'
                 item.multualRank = '互评尚未截止'
               }
               resolve({

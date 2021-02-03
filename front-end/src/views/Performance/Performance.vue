@@ -693,13 +693,16 @@
                     }
                     totalWorkTimeCal.sort(_this.compare('totalWorkTime')) // 根据总工时排序
                     let preWorkTime = 0
-                    let preRank = 0
+                    let preRank = 1
+                    let count = 1
                     for (let item of totalWorkTimeCal) { // 计算排名
                       if (item.totalWorkTime === preWorkTime) {
                         item.rank = preRank
                       } else {
-                        item.rank = ++preRank
+                        item.rank = count
+                        preRank = count
                       }
+                      count++
                       preWorkTime = item.totalWorkTime
                     }
                     _this.formData.rank = totalWorkTimeCal.find(item => {

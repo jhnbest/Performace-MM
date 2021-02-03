@@ -332,14 +332,17 @@ export default {
           }
         }
         totalWorkTimeCal.sort(this.compare('totalWorkTime')) // 根据总工时排序
-        let preWorkTime = 0
-        let preRank = 0
+        let preWorkTime = -1
+        let preRank = 1
+        let count = 1
         for (let item of totalWorkTimeCal) { // 计算排名
           if (item.totalWorkTime === preWorkTime) {
             item.rank = preRank
           } else {
-            item.rank = ++preRank
+            item.rank = count
+            preRank = count
           }
+          count++
           preWorkTime = item.totalWorkTime
         }
         // ==============================计算定量指标得分=======================================
@@ -347,7 +350,6 @@ export default {
         for (let item of totalWorkTimeCal) { // 计算定量指标得分
           item.quantitativeScore = this.calGetScore(length, item.rank)
         }
-      } else {
       }
       return totalWorkTimeCal
     },
@@ -447,13 +449,16 @@ export default {
                 }
                 totalWorkTimeCal.sort(_this.compare('totalWorkTime')) // 根据总工时排序
                 let preWorkTime = 0
-                let preRank = 0
+                let preRank = 1
+                let count = 1
                 for (let item of totalWorkTimeCal) { // 计算排名
                   if (item.totalWorkTime === preWorkTime) {
                     item.rank = preRank
                   } else {
-                    item.rank = ++preRank
+                    item.rank = count
+                    preRank = count
                   }
+                  count++
                   preWorkTime = item.totalWorkTime
                 }
                 _this.quantitativeRank = totalWorkTimeCal.find(item => {
