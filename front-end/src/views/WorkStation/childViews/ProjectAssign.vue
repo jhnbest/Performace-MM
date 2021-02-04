@@ -201,7 +201,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="项目类型" align="center" prop="projectType"></el-table-column>
+        <el-table-column label="项目类型" align="center" prop="projectType" :filters="projectTypes" :filter-method="projectTypesFilter"></el-table-column>
         <el-table-column label="项目级别" align="center" :filters="projectLevels" :filter-method="projectLevelsFilter">
           <template slot-scope="scope">
             <div v-if="scope.row.editable">
@@ -245,7 +245,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="进展" align="center">
+        <el-table-column label="进展" align="center" :filters="progress" :filter-method="projectProgressFilter">
           <template slot-scope="scope">
             <el-progress :text-inside="true" :stroke-width="26" :percentage="scope.row.process"></el-progress>
           </template>
@@ -465,6 +465,35 @@
           }, {
             value: 4,
             text: '公司重点任务'
+          }],
+          progress: [{
+            value: 1,
+            text: '未完成'
+          }, {
+            value: 100,
+            text: '已完成'
+          }],
+          projectTypes: [{
+            value: 173,
+            text: '基建类项目'
+          }, {
+            value: 213,
+            text: '基础平台类项目(工程组)'
+          }, {
+            value: 249,
+            text: '修缮类项目'
+          }, {
+            value: 172,
+            text: '选型项目'
+          }, {
+            value: 4,
+            text: '其他标准项目'
+          }, {
+            value: 5,
+            text: '其他非标项目'
+          }, {
+            value: 275,
+            text: '基础平台类项目(通信组)'
           }],
           usersFilter: [],
           checkAssignProjectID: null,
@@ -703,6 +732,18 @@
         // 项目级别过滤方法
         projectLevelsFilter (value, row) {
           return row.projectLevel === value
+        },
+        // 项目类型过滤方法
+        projectTypesFilter (value, row) {
+          return row.projectTypeID === value
+        },
+        // 项目进展过滤方法
+        projectProgressFilter (value, row) {
+          if (value === 1) {
+            return row.process < 100
+          } else {
+            return row.process === 100
+          }
         },
         // 项目经理过滤方法
         usersFilterMethod (value, row) {

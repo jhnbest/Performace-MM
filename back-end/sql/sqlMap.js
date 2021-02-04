@@ -162,7 +162,8 @@ const sqlMap = {
         'apd.process as apdProcess, apl.id as aplID, apl.userID, apl.assignDate, apl.projectType, apl.projectName, apl.process as aplProcess, ' +
         'apl.assignerID, apl.totalWorkTime, apl.gettedWorkTime, apl.isFilled from assignprojectdetail apd left join assignprojectlist apl on ' +
         'apd.aPLID = apl.id where apd.id = ? and apd.obsoleteStatus != 1',
-    getAssignedProject: 'select apl.id, apl.assignDate, apl.projectName, apl.userID as projectManagerID, apl.process, apl.projectLevel, pjn.projectName ' +
+    getAssignedProject: 'select apl.id, apl.assignDate, apl.projectName, apl.projectType as projectTypeID, ' +
+        'apl.userID as projectManagerID, apl.process, apl.projectLevel, pjn.projectName ' +
         'as projectType, users.name as projectManager from assignprojectlist apl left join projecttypenew pjn on ' +
         'apl.projectType = pjn.projectTypeID left join users on apl.userID = users.id where apl.assignerID = ? and apl.obsoleteStatus != 1',
     updateAssignProjectList: 'update assignprojectlist set userID = ?, projectName = ?, projectLevel = ? where id = ?',
