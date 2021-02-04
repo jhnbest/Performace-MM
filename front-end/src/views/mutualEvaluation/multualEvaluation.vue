@@ -129,7 +129,6 @@
         <el-table-column v-if="$store.state.userInfo.id === 15 || $store.state.userInfo.id === 26" label="绩效排名" align="center" prop="performanceRank" width="77"></el-table-column>
       </el-table-column>
       <el-table-column v-if="$store.state.userInfo.id === 15 || $store.state.userInfo.id === 26" label="领导评价得分" align="center" prop="totalScore" width="77"></el-table-column>
-      <el-table-column v-if="$store.state.userInfo.id === 15 || $store.state.userInfo.id === 26" label="定性评价分" align="center" prop="multualScoreRaw" width="77"></el-table-column>
       <el-table-column label="工作态度" align="center">
           <el-table-column label="责任意识(15%)" align="center" min-width="110">
             <template slot-scope="scope">
@@ -478,6 +477,7 @@
       },
       // 生成绩效得分数据
       genPerformanceScore (quantativeData, multualEvaData) {
+        console.log(multualEvaData)
         let performanceData = []
         // =========绩效得分计算============
         for (let item of this.rateTableData) {
@@ -1399,9 +1399,41 @@
       // 申报月份变化
       handelDateChange () {
         let _this = this
+        let promises = []
+        let count = 0
+        this.isQuantativeFinish = false
+        this.isMultualEvaFinish = false
         this.getUserRates().then(res1 => {
           _this.isRated = res1.length !== 0
           _this.genRateTableData(_this.users, res1)
+          if (this.$store.state.userInfo.id === 15 || this.$store.state.userInfo.id === 26) {
+            promises[count++] = this.getQuantitativeInfo() // 获取定量评价结果
+            promises[count++] = this.getAllMultualEvaResult() // 获取全处互评结果
+            let genQuantativeDataResult = null
+            let genMultualEvaDataResult = null
+            Promise.all(promises).then(result => {
+              if (!result[0].err) { // 工时已截止且审核完毕
+                genQuantativeDataResult = this.genQuantativeData(result[0].content)
+                this.quantativeData = JSON.parse(JSON.stringify(genQuantativeDataResult))
+              } else {
+                this.isQuantativeFinish = false
+              }
+              if (!result[1].err) { // 互评已截止
+                genMultualEvaDataResult = this.genMultualEvaData(result[1].content)
+                this.multualEvaData = JSON.parse(JSON.stringify(genMultualEvaDataResult))
+              } else {
+                this.multualEvaData = []
+                this.isMultualEvaFinish = false
+              }
+              if (!result[0].err && !result[1].err) { // 工时已审核完毕且互评已截止
+                this.isQuantativeFinish = true
+                this.isMultualEvaFinish = true
+                this.genPerformanceScore(genQuantativeDataResult, genMultualEvaDataResult)
+              }
+            }).catch(err => {
+              this.$common.toast(err, 'error', true)
+            })
+          }
         })
       },
       // 表格合并方法
@@ -1613,8 +1645,10 @@
         this.updateRateRawRateData(1, row.ratedPersion, this.starToRates(row.t1Star))
         this.updateRealTimeShowTableData(1, row.t1Star)
         if (this.$store.state.userInfo.id === 15 || this.$store.state.userInfo.id === 26) {
-          this.updateManagerRate(row.totalScore, row.ratedPersion)
-          this.genPerformanceScore(this.quantativeData, this.multualEvaData)
+          if (this.isQuantativeFinish && this.isMultualEvaFinish) {
+            this.updateManagerRate(row.totalScore, row.ratedPersion)
+            this.genPerformanceScore(this.quantativeData, this.multualEvaData)
+          }
         }
       },
       // 评分项2星级变化
@@ -1623,8 +1657,10 @@
         this.updateRateRawRateData(2, row.ratedPersion, this.starToRates(row.t2Star))
         this.updateRealTimeShowTableData(2, row.t2Star)
         if (this.$store.state.userInfo.id === 15 || this.$store.state.userInfo.id === 26) {
-          this.updateManagerRate(row.totalScore, row.ratedPersion)
-          this.genPerformanceScore(this.quantativeData, this.multualEvaData)
+          if (this.isQuantativeFinish && this.isMultualEvaFinish) {
+            this.updateManagerRate(row.totalScore, row.ratedPersion)
+            this.genPerformanceScore(this.quantativeData, this.multualEvaData)
+          }
         }
       },
       // 评分项3星级变化
@@ -1633,8 +1669,10 @@
         this.updateRateRawRateData(3, row.ratedPersion, this.starToRates(row.t3Star))
         this.updateRealTimeShowTableData(3, row.t3Star)
         if (this.$store.state.userInfo.id === 15 || this.$store.state.userInfo.id === 26) {
-          this.updateManagerRate(row.totalScore, row.ratedPersion)
-          this.genPerformanceScore(this.quantativeData, this.multualEvaData)
+          if (this.isQuantativeFinish && this.isMultualEvaFinish) {
+            this.updateManagerRate(row.totalScore, row.ratedPersion)
+            this.genPerformanceScore(this.quantativeData, this.multualEvaData)
+          }
         }
       },
       // 评分项4星级变化
@@ -1643,8 +1681,10 @@
         this.updateRateRawRateData(4, row.ratedPersion, this.starToRates(row.t4Star))
         this.updateRealTimeShowTableData(4, row.t4Star)
         if (this.$store.state.userInfo.id === 15 || this.$store.state.userInfo.id === 26) {
-          this.updateManagerRate(row.totalScore, row.ratedPersion)
-          this.genPerformanceScore(this.quantativeData, this.multualEvaData)
+          if (this.isQuantativeFinish && this.isMultualEvaFinish) {
+            this.updateManagerRate(row.totalScore, row.ratedPersion)
+            this.genPerformanceScore(this.quantativeData, this.multualEvaData)
+          }
         }
       },
       // 评分项5星级变化
@@ -1653,8 +1693,10 @@
         this.updateRateRawRateData(5, row.ratedPersion, this.starToRates(row.t5Star))
         this.updateRealTimeShowTableData(5, row.t5Star)
         if (this.$store.state.userInfo.id === 15 || this.$store.state.userInfo.id === 26) {
-          this.updateManagerRate(row.totalScore, row.ratedPersion)
-          this.genPerformanceScore(this.quantativeData, this.multualEvaData)
+          if (this.isQuantativeFinish && this.isMultualEvaFinish) {
+            this.updateManagerRate(row.totalScore, row.ratedPersion)
+            this.genPerformanceScore(this.quantativeData, this.multualEvaData)
+          }
         }
       },
       // 评分项6星级变化
@@ -1663,8 +1705,10 @@
         this.updateRateRawRateData(6, row.ratedPersion, this.starToRates(row.t6Star))
         this.updateRealTimeShowTableData(6, row.t6Star)
         if (this.$store.state.userInfo.id === 15 || this.$store.state.userInfo.id === 26) {
-          this.updateManagerRate(row.totalScore, row.ratedPersion)
-          this.genPerformanceScore(this.quantativeData, this.multualEvaData)
+          if (this.isQuantativeFinish && this.isMultualEvaFinish) {
+            this.updateManagerRate(row.totalScore, row.ratedPersion)
+            this.genPerformanceScore(this.quantativeData, this.multualEvaData)
+          }
         }
       },
       // 提交
