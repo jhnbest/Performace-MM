@@ -57,6 +57,10 @@ export const getAssignProjectStageList = '/workStation/getAssignProjectStageList
 export const getWorkTimeListOfProjectStage = '/workStation/getWorkTimeListOfProjectStage' // 获取项目阶段对应的工时申报
 export const updateEditProjectStage = '/workStation/updateEditProjectStage' // 更新项目阶段
 export const getIsSubmitAllow = '/workStation/getIsSubmitAllow' // 获取是否可以申报工时和提交互评
+export const getCurGroupWorkTimeReviewFinish = '/workStation/getCurGroupWorkTimeReviewFinish' // 获取当前小组工时审核是否都已完毕
+export const getManagerMultualRateFinish = '/workStation/getManagerMultualRateFinish' // 当月领导者是否已经评价完毕
+export const getPerformanceIsPublish = '/workStation/getPerformanceIsPublish' // 当月互评是否已经发布
+export const performanceInfoPublish = '/workStation/performanceInfoPublish' // 是否发布首页绩效信息
 
 export const getUserRates = '/mutualRates/getUserRates' // 获取互评信息
 export const submitRatesResult = '/mutualRates/submitRatesResult' // 提交互评结果

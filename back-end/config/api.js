@@ -64,6 +64,10 @@ module.exports = {
     getWorkTimeListOfProjectStage: path + '/workStation/getWorkTimeListOfProjectStage', // 获取项目阶段对应的工时申报
     updateEditProjectStage: path + '/workStation/updateEditProjectStage', // 更新项目阶段
     getIsSubmitAllow: path + '/workStation/getIsSubmitAllow', // 获取是否可以申报工时和提交互评
+    getCurGroupWorkTimeReviewFinish: path + '/workStation/getCurGroupWorkTimeReviewFinish', // 获取当前小组工时审核是否都已完毕
+    getManagerMultualRateFinish: path + '/workStation/getManagerMultualRateFinish', // 当月领导者是否已经评价完毕
+    getPerformanceIsPublish: path + '/workStation/getPerformanceIsPublish', // 当月互评是否已经发布
+    performanceInfoPublish: path + '/workStation/performanceInfoPublish', // 是否发布首页绩效信息
 
     // 互评模块
     getUserRates: path + '/mutualRates/getUserRates', // 获取互评信息

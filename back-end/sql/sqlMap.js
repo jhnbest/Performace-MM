@@ -193,7 +193,13 @@ const sqlMap = {
     insertNewProjectStage: 'insert into assignprojectdetail (aPLID, projectStage, projectStageName, baseWorkTime, kValue, ' +
         'avaiableWorkTime) values (?, ?, ?, ?, ?, ?)',
     deleteProjectStage: 'update assignprojectdetail set obsoleteStatus = 1 where id = ?',
-    getIsSubmitAllow: 'select * from globalflag where year(setTime) = ? and month(setTime) = ? and flagType = ?'
+    getIsSubmitAllow: 'select * from globalflag where year(setTime) = ? and month(setTime) = ? and flagType = ?',
+    getCurGroupWorkTimeReviewFinish: 'select wl.* from worktimelist wl left join users u on wl.submitID = u.id where u.groupName = ? ' +
+        'and wl.applyMonth = ? and wl.obsoleteStatus != 1 and wl.reviewStatus = 0 and wl.applyType = "fact" and wl.submitStatus = 1',
+    getManagerMultualRateFinish: 'select * from mutualrate where ratePersion = 26 and rateMonth = ?',
+    getPerformanceIsPublish: 'select * from globalflag where year(setTime) = ? and month(setTime) = ? and flagType = ?',
+    updatePerformanceInfoPublish: 'update globalflag set flagValue = ? where id = ?',
+    insertPerformanceInfoPublish: 'insert into globalflag (setTime, flagType, flagValue) values (?, ?, ?)',
   },
   mutualRates: {
     getUserRates: 'select mr.*, u.name as ratedPersionName from mutualrate mr left join users u on ' +
@@ -203,7 +209,7 @@ const sqlMap = {
     updateUserRate: 'update mutualrate set rate = ?, updateTime = ? where id = ?',
     getCurMutualRate: 'select * from mutualrate where ratedPersion = ? and rateMonth = ?',
     getRateData: 'select * from mutualrate where ratePersion = ? and rateMonth = ?',
-    getPerformanceIsCount: 'select * from globalflag where year(setTime) = ? and month(setTime) = ? and flagType = ?'
+    getPerformanceIsCount: 'select * from globalflag where year(setTime) = ? and month(setTime) = ? and flagType = ?',
   }
 }
 module.exports = sqlMap;

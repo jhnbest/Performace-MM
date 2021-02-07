@@ -43,7 +43,7 @@
           <span slot="reference" @click="descriprionClick" class="pointer-type"><i class="el-icon-warning-outline"></i>填报说明</span>
         </el-popover>
       </el-col>
-      <el-col :xs="12" :sm="12" :lg="{span: 4, offset: 9 }" :xl="{span: 3, offset: 14 }">
+      <el-col :xs="12" :sm="12" :lg="{span: 4, offset: 7 }" :xl="{span: 3, offset: 12 }">
         <el-button type="primary" @click="submitRatesResult" :disabled="isRated">
           <span v-if="!isRated">提交</span>
           <span v-else>已提交</span>
@@ -65,6 +65,14 @@
       <span v-if="isRated" style="font-weight: bolder;color: green;font-size: 23px">已评价</span>
       <span v-else style="font-weight: bolder;color: red;font-size: 23px">未评价</span>
     </span>
+    <span style="font-weight: bolder;margin-left: 60px" v-if="$store.state.userInfo.id === 26">首页绩效信息发布状态:
+      <span v-if="isPerformancePublish" style="color: green;font-size: 23px">已发布</span>
+      <span v-else style="color: red;font-size: 23px">未发布</span>
+    </span>
+    <el-switch v-if="$store.state.userInfo.id === 26"
+               v-model="isPerformancePublish"
+               @change="handlePerformancePublish"
+               style="margin-left: 10px"></el-switch>
   </div>
   <br v-if="showFlag.descTableShow">
   <div v-if="showFlag.descTableShow">
@@ -114,21 +122,42 @@
               :header-cell-style="{ backgroundColor:'#48bfe5', color: '#333' }"
               v-loading="!reqFlag.getUsersList"
               :height="tableHeight"
-              ref="rateTable">
+              ref="rateTable"
+              highlight-current-row>
       <el-table-column label="姓名" align="center" prop="ratedName" min-width="50"></el-table-column>
-      <el-table-column v-if="$store.state.userInfo.id === 15 || $store.state.userInfo.id === 26" label="定量评价" align="center">
-        <el-table-column v-if="$store.state.userInfo.id === 15 || $store.state.userInfo.id === 26" label="定量得分" align="center" prop="quantitativeScore" width="77"></el-table-column>
-        <el-table-column v-if="$store.state.userInfo.id === 15 || $store.state.userInfo.id === 26" label="定量排名" align="center" prop="quantitativeRank" width="77"></el-table-column>
+      <el-table-column v-if="$store.state.userInfo.id === 26" label="定量评价" align="center">
+        <el-table-column v-if="$store.state.userInfo.id === 26" label="定量得分" align="center" prop="quantitativeScore" width="57"></el-table-column>
+        <el-table-column v-if="$store.state.userInfo.id === 26" label="工时数" align="center" prop="totalWorkTime" width="57"></el-table-column>
+        <el-table-column v-if="$store.state.userInfo.id === 26" label="定量排名" align="center" prop="quantitativeRank" width="57"></el-table-column>
       </el-table-column>
-      <el-table-column v-if="$store.state.userInfo.id === 15 || $store.state.userInfo.id === 26" label="定性互评" align="center">
-        <el-table-column v-if="$store.state.userInfo.id === 15 || $store.state.userInfo.id === 26" label="互评得分" align="center" prop="staffMutualScore" width="77"></el-table-column>
-        <el-table-column v-if="$store.state.userInfo.id === 15 || $store.state.userInfo.id === 26" label="互评排名" align="center" prop="staffRateRank" width="77"></el-table-column>
+      <el-table-column v-if="$store.state.userInfo.id === 26" label="定性互评" align="center">
+        <el-table-column v-if="$store.state.userInfo.id === 26" label="互评得分(标准化)" align="center" prop="staffMutualScore" width="77"></el-table-column>
+        <el-table-column v-if="$store.state.userInfo.id === 26" label="互评得分(未标准化)" align="center" prop="staffMutualScoreTmp" width="77"></el-table-column>
+        <el-table-column v-if="$store.state.userInfo.id === 26" label="互评排名" align="center" prop="staffRateRank" width="57"></el-table-column>
       </el-table-column>
-      <el-table-column v-if="$store.state.userInfo.id === 15 || $store.state.userInfo.id === 26" label="绩效评价" align="center">
-        <el-table-column v-if="$store.state.userInfo.id === 15 || $store.state.userInfo.id === 26" label="绩效得分" align="center" prop="performanceScore" width="77"></el-table-column>
-        <el-table-column v-if="$store.state.userInfo.id === 15 || $store.state.userInfo.id === 26" label="绩效排名" align="center" prop="performanceRank" width="77"></el-table-column>
+      <el-table-column v-if="$store.state.userInfo.id === 26" label="绩效评价" align="center">
+        <el-table-column v-if="$store.state.userInfo.id === 26" label="绩效得分(标准化)" align="center" prop="performanceScore" width="77"></el-table-column>
+        <el-table-column v-if="$store.state.userInfo.id === 26" label="绩效得分(未标准化)" align="center" prop="performanceScoreTmp" width="77"></el-table-column>
+        <el-table-column v-if="$store.state.userInfo.id === 26"
+                         label="绩效排名"
+                         align="center"
+                         prop="performanceRank"
+                         width="57">
+          <template slot-scope="scope">
+            <span style="font-weight: bolder">{{scope.row.performanceRank}}</span>
+            <i v-if="scope.row.performanceRankRise" class="el-icon-caret-top" style="color: red"></i>
+            <i v-if="scope.row.performanceRankDesc" class="el-icon-caret-bottom" style="color: green"></i>
+            <span v-if="scope.row.performanceRankRise || scope.row.performanceRankDesc" style="font-size: 10px">
+              {{scope.row.performanceRankChanges}}
+            </span>
+          </template>
+        </el-table-column>
       </el-table-column>
-      <el-table-column v-if="$store.state.userInfo.id === 15 || $store.state.userInfo.id === 26" label="领导评价得分" align="center" prop="totalScore" width="77"></el-table-column>
+      <el-table-column v-if="$store.state.userInfo.id === 26" label="领导评价" align="center">
+        <el-table-column v-if="$store.state.userInfo.id === 26" label="领导评价得分(标准化)" align="center" prop="managerScoreTmp" width="77"></el-table-column>
+        <el-table-column v-if="$store.state.userInfo.id === 26" label="领导评价得分(未标准化)" align="center" prop="totalScore" width="77"></el-table-column>
+        <el-table-column v-if="$store.state.userInfo.id === 26" label="领导评价排名" align="center" prop="mangerRateRank" width="57"></el-table-column>
+      </el-table-column>
       <el-table-column label="工作态度" align="center">
           <el-table-column label="责任意识(15%)" align="center" min-width="110">
             <template slot-scope="scope">
@@ -171,7 +200,7 @@
             </template>
           </el-table-column>
         </el-table-column>
-      <el-table-column v-if="$store.state.userInfo.id !== 15 && $store.state.userInfo.id !== 26" label="总分" align="center" prop="totalScore" min-width="50"></el-table-column>
+      <el-table-column v-if="$store.state.userInfo.id !== 26" label="总分" align="center" prop="totalScore" min-width="50"></el-table-column>
     </el-table>
     <br>
     <br>
@@ -189,7 +218,9 @@
     getIsSubmitAllow,
     getIsWorkTimeReviewFinish,
     getAllWorkTimeList,
-    getAllUserRates } from '@/config/interface'
+    getAllUserRates,
+    performanceInfoPublish,
+    getPerformanceIsPublish } from '@/config/interface'
   import CountTo from 'vue-count-to'
   export default {
     data () {
@@ -428,7 +459,9 @@
         isMultualEvaFinish: false,
         isQuantativeFinish: false,
         multualEvaData: [],
-        quantativeData: []
+        quantativeData: [],
+        isPerformancePublish: false,
+        performanceIsPublishInfo: null
       }
     },
     methods: {
@@ -444,7 +477,18 @@
           _this.getUserRates().then(res2 => {
             _this.isRated = res2.length !== 0
             _this.genRateTableData(res1, res2)
-            if (this.$store.state.userInfo.id === 15 || this.$store.state.userInfo.id === 26) {
+            if (this.$store.state.userInfo.id === 26) {
+              this.getPerformanceIsPublish().then(getPerformanceIsPublishRes => {
+                this.performanceIsPublishInfo = getPerformanceIsPublishRes
+                if (getPerformanceIsPublishRes.length > 0) {
+                  this.isPerformancePublish = getPerformanceIsPublishRes[0].flagValue === 1
+                } else {
+                  this.isPerformancePublish = false
+                }
+              }).catch(getPerformanceIsPublishErr => {
+                this.isPerformancePublish = false
+                this.$common.toast(getPerformanceIsPublishErr, 'error', false)
+              })
               promises[count++] = this.getQuantitativeInfo() // 获取定量评价结果
               promises[count++] = this.getAllMultualEvaResult() // 获取全处互评结果
               let genQuantativeDataResult = null
@@ -466,7 +510,7 @@
                 if (!result[0].err && !result[1].err) { // 工时已审核完毕且互评已截止
                   this.isQuantativeFinish = true
                   this.isMultualEvaFinish = true
-                  this.genPerformanceScore(genQuantativeDataResult, genMultualEvaDataResult)
+                  this.genPerformanceScore(genQuantativeDataResult, genMultualEvaDataResult, 'init')
                 }
               }).catch(err => {
                 this.$common.toast(err, 'error', true)
@@ -475,9 +519,30 @@
           })
         })
       },
-      // 生成绩效得分数据
-      genPerformanceScore (quantativeData, multualEvaData) {
-        console.log(multualEvaData)
+      // 获取当前月份绩效结果是否已公布
+      getPerformanceIsPublish () {
+        const url = getPerformanceIsPublish
+        let params = {
+          applyYear: this.$moment(this.formData.title).year(),
+          applyMonth: this.$moment(this.formData.title).month() + 1,
+          flagType: 'performanceInfoPublish'
+        }
+        let _this = this
+        return new Promise(function (resolve, reject) {
+          _this.$http(url, params).then(res => {
+            if (res.code === 1) {
+              resolve(res.data)
+            } else {
+              reject(new Error('getPerformanceIsPublish recv error!'))
+            }
+          }).catch(err => {
+            this.$common.toast(err, 'error', true)
+            reject(new Error('getPerformanceIsPublish send error!'))
+          })
+        })
+      },
+      // 生成绩效得分与排名数据
+      genPerformanceScore (quantativeData, multualEvaData, genType) {
         let performanceData = []
         // =========绩效得分计算============
         for (let item of this.rateTableData) {
@@ -488,33 +553,78 @@
             return multualEvaDataItem.id === item.ratedPersion
           })
           if (itemQuantativeScore && itemMultualEvaScore) {
-            if (item.ratedPersion === 7 || item.ratedPersion === 11) { // 主任岗
+            if (item.ratedPersion === 7 || item.ratedPersion === 11 || item.ratedPersion === 31) { // 主任岗
               item.performanceScoreTmp = itemQuantativeScore.quantitativeScore * this.directorQuantitativeCof +
                 itemMultualEvaScore.mutualScore
-            } else if (item.ratedPersion === 13 || item.ratedPersion === 17) { // 组长
+              item.staffMutualScoreTmp = itemMultualEvaScore.staffRate
+              item.managerScoreTmp = itemMultualEvaScore.managerScore
+              item.mangerRateRank = itemMultualEvaScore.managerRateRank
+              item.totalWorkTime = Number(itemQuantativeScore.totalWorkTime.toFixed(2))
+            } else if (item.ratedPersion === 13 || item.ratedPersion === 17 || item.ratedPersion === 33) { // 组长
               item.performanceScoreTmp = itemQuantativeScore.quantitativeScore * this.groupLeaderQuantitativeCof +
                 itemMultualEvaScore.mutualScore
+              item.staffMutualScoreTmp = itemMultualEvaScore.staffRate
+              item.managerScoreTmp = itemMultualEvaScore.managerScore
+              item.mangerRateRank = itemMultualEvaScore.managerRateRank
+              item.totalWorkTime = Number(itemQuantativeScore.totalWorkTime.toFixed(2))
             } else { // 普通成员
               item.performanceScoreTmp = itemQuantativeScore.quantitativeScore * this.commonStaffQuantitativeCof +
                 itemMultualEvaScore.mutualScore
+              item.staffMutualScoreTmp = itemMultualEvaScore.staffRate
+              item.managerScoreTmp = itemMultualEvaScore.managerScore
+              item.mangerRateRank = itemMultualEvaScore.managerRateRank
+              item.totalWorkTime = Number(itemQuantativeScore.totalWorkTime.toFixed(2))
             }
           }
         }
-        this.rateTableData.sort(this.sortBy('performanceScoreTmp'))
+        let rateTableDataTmp = JSON.parse(JSON.stringify(this.rateTableData))
+        rateTableDataTmp.sort(this.sortBy('performanceScoreTmp'))
         // =========绩效排名与标准化绩效得分计算============
         let count = 1
         let prePerformanceScoreTmp = -1
         let prePerformanceRank = -1
-        for (let item of this.rateTableData) {
+        for (let item of rateTableDataTmp) {
           if (item.performanceScoreTmp === prePerformanceScoreTmp) {
             item.performanceRank = prePerformanceRank
+            if (genType === 'init') {
+              item.initPerformanceRank = item.performanceRank
+            } else if (genType === 'update') {
+              let performanceRankChanges = item.initPerformanceRank - item.performanceRank
+              item.performanceRankRise = performanceRankChanges > 0
+              item.performanceRankDesc = performanceRankChanges < 0
+              item.performanceRankChanges = Math.abs(performanceRankChanges)
+            }
           } else {
             item.performanceRank = count
             prePerformanceScoreTmp = item.performanceScoreTmp
             prePerformanceRank = count
+            if (genType === 'init') {
+              item.initPerformanceRank = item.performanceRank
+            } else if (genType === 'update') {
+              let performanceRankChanges = item.initPerformanceRank - item.performanceRank
+              item.performanceRankRise = performanceRankChanges > 0
+              item.performanceRankDesc = performanceRankChanges < 0
+              item.performanceRankChanges = Math.abs(performanceRankChanges)
+            }
           }
           count++
-          item.performanceScore = this.calGetScore(this.rateTableData.length, item.performanceRank)
+          item.performanceScore = this.calGetScore(rateTableDataTmp.length, item.performanceRank)
+        }
+        for (let item of this.rateTableData) {
+          let rateTableDataTmpFindResult = rateTableDataTmp.find(rateTableDataTmpItem => {
+            return rateTableDataTmpItem.ratedPersion === item.ratedPersion
+          })
+          if (rateTableDataTmpFindResult) {
+            item.performanceRank = rateTableDataTmpFindResult.performanceRank
+            item.initPerformanceRank = rateTableDataTmpFindResult.initPerformanceRank
+            item.performanceRankRise = rateTableDataTmpFindResult.performanceRankRise
+            item.performanceRankDesc = rateTableDataTmpFindResult.performanceRankDesc
+            item.performanceRankChanges = rateTableDataTmpFindResult.performanceRankChanges
+            item.performanceScore = rateTableDataTmpFindResult.performanceScore
+          }
+        }
+        if (genType === 'init') {
+          this.rateTableData.sort(this.sortAddBy('performanceRank'))
         }
       },
       // 数据排序方法
@@ -628,21 +738,30 @@
       },
       // 定性、定量指标得分计算
       calGetScore (length, rank) {
-        let rankPercentage = Number((rank / length).toFixed(1))
-        if (rankPercentage < 0.1 || rankPercentage === 0.1 || rank === 1) {
+        if (rank === 1) {
           return 92.5
-        } else if (rankPercentage < 0.3 || rankPercentage === 0.3) {
+        }
+        if (rank < Number((length * 0.1).toFixed(0)) || rank === Number((length * 0.1).toFixed(0))) {
+          return 92.5
+        } else if (rank < Number((length * 0.3).toFixed(0)) || rank === Number((length * 0.3).toFixed(0))) {
           return 90
-        } else if (rankPercentage < 0.7 || rankPercentage === 0.7) {
+        } else if (rank < Number((length * 0.7).toFixed(0)) || rank === Number((length * 0.7).toFixed(0))) {
           return 87.5
-        } else if (rankPercentage < 0.9 || rankPercentage === 0.9) {
+        } else if (rank < Number((length * 0.9).toFixed(0)) || rank === Number((length * 0.9).toFixed(0))) {
           return 85
-        } else if (rankPercentage < 1 || rankPercentage === 1) {
+        } else if (rank < Number((length * 1).toFixed(0)) || rank === Number((length * 1).toFixed(0))) {
           return 82.5
         }
       },
       // 计算定性评价排名与得分
-      calMutualRatesRank (allUserRates) {
+      calMutualRatesRank (allUserRatesTmp) {
+        let allUserRates = JSON.parse(JSON.stringify(allUserRatesTmp))
+        let managerIndex = allUserRates.findIndex(allUserRatesItem => {
+          return allUserRatesItem.id === 26
+        })
+        if (managerIndex !== -1) {
+          allUserRates.splice(managerIndex, 1)
+        }
         let standAndEngineerRates = []
         let communicationRates = []
         for (let item of allUserRates) {
@@ -730,10 +849,10 @@
           let managerResult = this.getManagerResult(item.id, allUserRates)
           item.managerRateRank = managerResult.managerRateRank
           item.managerScore = managerResult.managerScore
-          if (item.id === 7 || item.id === 11) { // 主任岗
+          if (item.id === 7 || item.id === 11 || item.id === 31) { // 主任岗
             item.mutualScore = item.staffMutualScore * this.directorMutualCof +
               item.managerScore * this.directorManagerCof
-          } else if (item.id === 13 || item.id === 17) { // 组长
+          } else if (item.id === 13 || item.id === 17 || item.id === 33) { // 组长
             item.mutualScore = item.staffMutualScore * this.groupLeaderMutualCof +
               item.managerScore * this.groupLeaderManagerCof
           } else { // 普通成员
@@ -746,10 +865,10 @@
           let managerResult = this.getManagerResult(item.id, allUserRates)
           item.managerRateRank = managerResult.managerRateRank
           item.managerScore = managerResult.managerScore
-          if (item.id === 7 || item.id === 11) { // 主任岗
+          if (item.id === 7 || item.id === 11 || item.id === 31) { // 主任岗
             item.mutualScore = item.staffMutualScore * this.directorMutualCof +
               item.managerScore * this.directorManagerCof
-          } else if (item.id === 13 || item.id === 17) { // 组长
+          } else if (item.id === 13 || item.id === 17 || item.id === 33) { // 组长
             item.mutualScore = item.staffMutualScore * this.groupLeaderMutualCof +
               item.managerScore * this.groupLeaderManagerCof
           } else { // 普通成员
@@ -812,9 +931,9 @@
             if (item.id === this.$store.state.userInfo.id) {
             }
           }
-          if (item.id === 7 || item.id === 11) { // 主任岗
+          if (item.id === 7 || item.id === 11 || item.id === 31) { // 主任岗
             item.performanceScore = item.quantitativeScore * this.directorQuantitativeCof + item.mutualScore
-          } else if (item.id === 13 || item.id === 17) { // 组长
+          } else if (item.id === 13 || item.id === 17 || item.id === 33) { // 组长
             item.performanceScore = item.quantitativeScore * this.groupLeaderQuantitativeCof + item.mutualScore
           } else { // 普通成员
             item.performanceScore = item.quantitativeScore * this.commonStaffQuantitativeCof + item.mutualScore
@@ -841,6 +960,12 @@
       sortBy (props) {
         return function (a, b) {
           return b[props] - a[props]
+        }
+      },
+      // 排序比较函数(升序)
+      sortAddBy (props) {
+        return function (a, b) {
+          return a[props] - b[props]
         }
       },
       // 获取全处工时信息
@@ -1304,7 +1429,11 @@
                     staffMutualScore: null,
                     staffRateRank: null,
                     performanceScore: null,
-                    performanceRank: null
+                    performanceRank: null,
+                    performanceRankRise: false,
+                    performanceRankDesc: false,
+                    performanceRankChanges: 0,
+                    initPerformanceRank: null
                   }
                   obj.totalScore = this.calMultualScore(obj.t1Star, obj.t2Star, obj.t3Star,
                     obj.t4Star, obj.t5Star, obj.t6Star)
@@ -1345,7 +1474,11 @@
                   staffMutualScore: null,
                   staffRateRank: null,
                   performanceScore: null,
-                  performanceRank: null
+                  performanceRank: null,
+                  performanceRankRise: false,
+                  performanceRankDesc: false,
+                  performanceRankChanges: null,
+                  initPerformanceRank: null
                 }
                 obj.totalScore = this.calMultualScore(obj.t1Star, obj.t2Star, obj.t3Star,
                   obj.t4Star, obj.t5Star, obj.t6Star)
@@ -1369,7 +1502,11 @@
                 staffMutualScore: null,
                 staffRateRank: null,
                 performanceScore: null,
-                performanceRank: null
+                performanceRank: null,
+                performanceRankRise: false,
+                performanceRankDesc: false,
+                performanceRankChanges: null,
+                initPerformanceRank: null
               }
               obj[this.rateTypeSwitch(item1.rateType)] = this.ratesToStar(item1.rate)
               ratesTableTmp.push(obj)
@@ -1406,7 +1543,18 @@
         this.getUserRates().then(res1 => {
           _this.isRated = res1.length !== 0
           _this.genRateTableData(_this.users, res1)
-          if (this.$store.state.userInfo.id === 15 || this.$store.state.userInfo.id === 26) {
+          if (this.$store.state.userInfo.id === 26) {
+            this.getPerformanceIsPublish().then(getPerformanceIsPublishRes => {
+              this.performanceIsPublishInfo = getPerformanceIsPublishRes
+              if (getPerformanceIsPublishRes.length > 0) {
+                this.isPerformancePublish = getPerformanceIsPublishRes[0].flagValue === 1
+              } else {
+                this.isPerformancePublish = false
+              }
+            }).catch(getPerformanceIsPublishErr => {
+              this.isPerformancePublish = false
+              this.$common.toast(getPerformanceIsPublishErr, 'error', false)
+            })
             promises[count++] = this.getQuantitativeInfo() // 获取定量评价结果
             promises[count++] = this.getAllMultualEvaResult() // 获取全处互评结果
             let genQuantativeDataResult = null
@@ -1428,7 +1576,7 @@
               if (!result[0].err && !result[1].err) { // 工时已审核完毕且互评已截止
                 this.isQuantativeFinish = true
                 this.isMultualEvaFinish = true
-                this.genPerformanceScore(genQuantativeDataResult, genMultualEvaDataResult)
+                this.genPerformanceScore(genQuantativeDataResult, genMultualEvaDataResult, 'init')
               }
             }).catch(err => {
               this.$common.toast(err, 'error', true)
@@ -1625,10 +1773,10 @@
               }
               count++
               item.managerScore = this.calGetScore(this.multualEvaData.length, item.managerRateRank)
-              if (item.id === 7 || item.id === 11) { // 主任岗
+              if (item.id === 7 || item.id === 11 || item.id === 31) { // 主任岗
                 item.mutualScore = item.staffMutualScore * this.directorMutualCof +
                   item.managerScore * this.directorManagerCof
-              } else if (item.id === 13 || item.id === 17) { // 组长
+              } else if (item.id === 13 || item.id === 17 || item.id === 33) { // 组长
                 item.mutualScore = item.staffMutualScore * this.groupLeaderMutualCof +
                   item.managerScore * this.groupLeaderManagerCof
               } else { // 普通成员
@@ -1644,10 +1792,10 @@
         row.totalScore = this.calMultualScore(row.t1Star, row.t2Star, row.t3Star, row.t4Star, row.t5Star, row.t6Star)
         this.updateRateRawRateData(1, row.ratedPersion, this.starToRates(row.t1Star))
         this.updateRealTimeShowTableData(1, row.t1Star)
-        if (this.$store.state.userInfo.id === 15 || this.$store.state.userInfo.id === 26) {
+        if (this.$store.state.userInfo.id === 26) {
           if (this.isQuantativeFinish && this.isMultualEvaFinish) {
             this.updateManagerRate(row.totalScore, row.ratedPersion)
-            this.genPerformanceScore(this.quantativeData, this.multualEvaData)
+            this.genPerformanceScore(this.quantativeData, this.multualEvaData, 'update')
           }
         }
       },
@@ -1656,10 +1804,10 @@
         row.totalScore = this.calMultualScore(row.t1Star, row.t2Star, row.t3Star, row.t4Star, row.t5Star, row.t6Star)
         this.updateRateRawRateData(2, row.ratedPersion, this.starToRates(row.t2Star))
         this.updateRealTimeShowTableData(2, row.t2Star)
-        if (this.$store.state.userInfo.id === 15 || this.$store.state.userInfo.id === 26) {
+        if (this.$store.state.userInfo.id === 26) {
           if (this.isQuantativeFinish && this.isMultualEvaFinish) {
             this.updateManagerRate(row.totalScore, row.ratedPersion)
-            this.genPerformanceScore(this.quantativeData, this.multualEvaData)
+            this.genPerformanceScore(this.quantativeData, this.multualEvaData, 'update')
           }
         }
       },
@@ -1668,10 +1816,10 @@
         row.totalScore = this.calMultualScore(row.t1Star, row.t2Star, row.t3Star, row.t4Star, row.t5Star, row.t6Star)
         this.updateRateRawRateData(3, row.ratedPersion, this.starToRates(row.t3Star))
         this.updateRealTimeShowTableData(3, row.t3Star)
-        if (this.$store.state.userInfo.id === 15 || this.$store.state.userInfo.id === 26) {
+        if (this.$store.state.userInfo.id === 26) {
           if (this.isQuantativeFinish && this.isMultualEvaFinish) {
             this.updateManagerRate(row.totalScore, row.ratedPersion)
-            this.genPerformanceScore(this.quantativeData, this.multualEvaData)
+            this.genPerformanceScore(this.quantativeData, this.multualEvaData, 'update')
           }
         }
       },
@@ -1680,10 +1828,10 @@
         row.totalScore = this.calMultualScore(row.t1Star, row.t2Star, row.t3Star, row.t4Star, row.t5Star, row.t6Star)
         this.updateRateRawRateData(4, row.ratedPersion, this.starToRates(row.t4Star))
         this.updateRealTimeShowTableData(4, row.t4Star)
-        if (this.$store.state.userInfo.id === 15 || this.$store.state.userInfo.id === 26) {
+        if (this.$store.state.userInfo.id === 26) {
           if (this.isQuantativeFinish && this.isMultualEvaFinish) {
             this.updateManagerRate(row.totalScore, row.ratedPersion)
-            this.genPerformanceScore(this.quantativeData, this.multualEvaData)
+            this.genPerformanceScore(this.quantativeData, this.multualEvaData, 'update')
           }
         }
       },
@@ -1692,10 +1840,10 @@
         row.totalScore = this.calMultualScore(row.t1Star, row.t2Star, row.t3Star, row.t4Star, row.t5Star, row.t6Star)
         this.updateRateRawRateData(5, row.ratedPersion, this.starToRates(row.t5Star))
         this.updateRealTimeShowTableData(5, row.t5Star)
-        if (this.$store.state.userInfo.id === 15 || this.$store.state.userInfo.id === 26) {
+        if (this.$store.state.userInfo.id === 26) {
           if (this.isQuantativeFinish && this.isMultualEvaFinish) {
             this.updateManagerRate(row.totalScore, row.ratedPersion)
-            this.genPerformanceScore(this.quantativeData, this.multualEvaData)
+            this.genPerformanceScore(this.quantativeData, this.multualEvaData, 'update')
           }
         }
       },
@@ -1704,10 +1852,10 @@
         row.totalScore = this.calMultualScore(row.t1Star, row.t2Star, row.t3Star, row.t4Star, row.t5Star, row.t6Star)
         this.updateRateRawRateData(6, row.ratedPersion, this.starToRates(row.t6Star))
         this.updateRealTimeShowTableData(6, row.t6Star)
-        if (this.$store.state.userInfo.id === 15 || this.$store.state.userInfo.id === 26) {
+        if (this.$store.state.userInfo.id === 26) {
           if (this.isQuantativeFinish && this.isMultualEvaFinish) {
             this.updateManagerRate(row.totalScore, row.ratedPersion)
-            this.genPerformanceScore(this.quantativeData, this.multualEvaData)
+            this.genPerformanceScore(this.quantativeData, this.multualEvaData, 'update')
           }
         }
       },
@@ -1722,14 +1870,13 @@
               userID: this.$store.state.userInfo.id
             }
             let _this = this
-            this.$http(url, params)
-              .then(res => {
-                if (res.code === 1) {
-                  _this.isRated = true
-                  _this.isChanged = false
-                  this.$common.toast('提交成功', 'success', false)
-                }
-              })
+            this.$http(url, params).then(res => {
+              if (res.code === 1) {
+                _this.isRated = true
+                _this.isChanged = false
+                this.$common.toast('提交成功', 'success', false)
+              }
+            })
           } else {
             this.$common.toast(this.formData.title + '月已截止互评', 'error', true)
           }
@@ -1781,6 +1928,56 @@
       },
       // 填报说明显示
       descriprionClick () {
+      },
+      // 是否发布首页绩效信息
+      handlePerformancePublish () {
+        let flagValue = null
+        let flagID = -1
+        if (this.isPerformancePublish) { // 发布绩效
+          if (this.performanceIsPublishInfo.length > 0) { // 已存在发布绩效信息
+            flagID = this.performanceIsPublishInfo[0].id
+          }
+          flagValue = 1
+        } else { // 不发布绩效
+          if (this.performanceIsPublishInfo.length > 0) { // 已存在发布绩效信息
+            flagID = this.performanceIsPublishInfo[0].id
+          }
+          flagValue = 0
+        }
+        const url = performanceInfoPublish
+        let params = {
+          flagID: flagID,
+          applyYear: this.$moment(this.formData.title).year(),
+          applyMonth: this.$moment(this.formData.title).month() + 1,
+          flagType: 'performanceInfoPublish',
+          flagValue: flagValue
+        }
+        let _this = this
+        return new Promise(function (resolve, reject) {
+          _this.$http(url, params).then(res => {
+            if (res.code === 1) {
+              _this.getPerformanceIsPublish().then(getPerformanceIsPublishRes => {
+                _this.performanceIsPublishInfo = getPerformanceIsPublishRes
+                if (getPerformanceIsPublishRes.length > 0) {
+                  _this.isPerformancePublish = getPerformanceIsPublishRes[0].flagValue === 1
+                } else {
+                  _this.isPerformancePublish = false
+                }
+                _this.$common.toast('操作成功', 'success', false)
+                resolve(res.data)
+              }).catch(getPerformanceIsPublishErr => {
+                _this.isPerformancePublish = false
+                _this.$common.toast(getPerformanceIsPublishErr, 'error', false)
+              })
+            } else {
+              _this.$common.toast('操作失败' + res.data, 'error', false)
+              reject(new Error('getIsSubmitAllow recv error!'))
+            }
+          }).catch(err => {
+            _this.$common.toast('发布失败' + err, 'error', true)
+            reject(new Error('getIsSubmitAllow send error!'))
+          })
+        })
       }
     },
     components: {

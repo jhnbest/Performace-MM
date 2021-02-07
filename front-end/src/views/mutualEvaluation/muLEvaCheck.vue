@@ -1,5 +1,5 @@
 <template>
-  <div v-if="$store.state.userInfo.id === 26 || $store.state.userInfo.id === 15">
+  <div v-if="$store.state.userInfo.id === 26">
     <el-form class="main-search" :inline="true">
       <el-form-item label="互评月份：" prop="title">
       <el-button size="mini" type="danger" style="margin-right: 10px" @click="handlePreMonth">上月</el-button>
@@ -109,16 +109,18 @@
       },
       // 定性、定量指标得分计算
       calGetScore (length, rank) {
-        let rankPercentage = Number((rank / length).toFixed(1))
-        if (rankPercentage < 0.1 || rankPercentage === 0.1 || rank === 1) {
+        if (rank === 1) {
           return 92.5
-        } else if (rankPercentage < 0.3 || rankPercentage === 0.3) {
+        }
+        if (rank < Number((length * 0.1).toFixed(0)) || rank === Number((length * 0.1).toFixed(0))) {
+          return 92.5
+        } else if (rank < Number((length * 0.3).toFixed(0)) || rank === Number((length * 0.3).toFixed(0))) {
           return 90
-        } else if (rankPercentage < 0.7 || rankPercentage === 0.7) {
+        } else if (rank < Number((length * 0.7).toFixed(0)) || rank === Number((length * 0.7).toFixed(0))) {
           return 87.5
-        } else if (rankPercentage < 0.9 || rankPercentage === 0.9) {
+        } else if (rank < Number((length * 0.9).toFixed(0)) || rank === Number((length * 0.9).toFixed(0))) {
           return 85
-        } else if (rankPercentage < 1 || rankPercentage === 1) {
+        } else if (rank < Number((length * 1).toFixed(0)) || rank === Number((length * 1).toFixed(0))) {
           return 82.5
         }
       },
@@ -131,7 +133,14 @@
         }
       },
       // 计算定性评价排名与得分
-      calMutualRatesRank (allUserRates) {
+      calMutualRatesRank (allUserRatesTmp) {
+        let allUserRates = JSON.parse(JSON.stringify(allUserRatesTmp))
+        let managerIndex = allUserRates.findIndex(allUserRatesItem => {
+          return allUserRatesItem.id === 26
+        })
+        if (managerIndex !== -1) {
+          allUserRates.splice(managerIndex, 1)
+        }
         let standAndEngineerRates = []
         let communicationRates = []
         for (let item of allUserRates) {
@@ -219,10 +228,10 @@
           let managerResult = this.getManagerResult(item.id, allUserRates)
           item.managerRateRank = managerResult.managerRateRank
           item.managerScore = managerResult.managerScore
-          if (item.id === 7 || item.id === 11) { // 主任岗
+          if (item.id === 7 || item.id === 11 || item.id === 31) { // 主任岗
             item.mutualScore = item.staffMutualScore * this.directorMutualCof +
               item.managerScore * this.directorManagerCof
-          } else if (item.id === 13 || item.id === 17) { // 组长
+          } else if (item.id === 13 || item.id === 17 || item.id === 33) { // 组长
             item.mutualScore = item.staffMutualScore * this.groupLeaderMutualCof +
               item.managerScore * this.groupLeaderManagerCof
           } else { // 普通成员
@@ -235,10 +244,10 @@
           let managerResult = this.getManagerResult(item.id, allUserRates)
           item.managerRateRank = managerResult.managerRateRank
           item.managerScore = managerResult.managerScore
-          if (item.id === 7 || item.id === 11) { // 主任岗
+          if (item.id === 7 || item.id === 11 || item.id === 31) { // 主任岗
             item.mutualScore = item.staffMutualScore * this.directorMutualCof +
               item.managerScore * this.directorManagerCof
-          } else if (item.id === 13 || item.id === 17) { // 组长
+          } else if (item.id === 13 || item.id === 17 || item.id === 33) { // 组长
             item.mutualScore = item.staffMutualScore * this.groupLeaderMutualCof +
               item.managerScore * this.groupLeaderManagerCof
           } else { // 普通成员

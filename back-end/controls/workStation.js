@@ -2,6 +2,7 @@ const $sql = require('../sql/sqlMap')
 const $http = require('../sql/http')
 const $time = require('../utils/time')
 const $user = require('./user.js')
+const moment = require('moment')
 
 function formatData(rows) {
     return rows.map(row => {
@@ -955,12 +956,64 @@ const workStation = {
         let sql = $sql.workStation.getIsSubmitAllow
         let arrayParams = [sendData.applyYear, sendData.applyMonth, sendData.flagType]
         RCPDDatabase(sql, arrayParams).then(res0 => {
-            console.log(res0)
             return $http.writeJson(res, { code: 1, data: res0, message: 'success' })
         }).catch(err => {
             return $http.writeJson(res, { code: -2, data: err, message: 'err' })
         })
-        console.log(sendData)
+    },
+    // 获取当前小组工时审核是否都已完毕
+    getCurGroupWorkTimeReviewFinish (req, res) {
+        let sendData = req.body
+        let sql = $sql.workStation.getCurGroupWorkTimeReviewFinish
+        let arrayParams = [sendData.groupID, sendData.applyMonth]
+        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+            return $http.writeJson(res, { code: 1, data: RCPDDatabaseRes, message: 'success' })
+        }).catch(RCPDDatabaseErr => {
+            return $http.writeJson(res, { code: -2, data: RCPDDatabaseErr, message: 'error' })
+        })
+    },
+    // 当月领导者是否已经评价完毕
+    getManagerMultualRateFinish (req, res) {
+        let sendData = req.body
+        let sql = $sql.workStation.getManagerMultualRateFinish
+        let arrayParams = [sendData.applyMonth]
+        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+            return $http.writeJson(res, { code: 1, data: RCPDDatabaseRes, message: 'success' })
+        }).catch(RCPDDatabaseErr => {
+            return $http.writeJson(res, { code: -2, data: RCPDDatabaseErr, message: 'error' })
+        })
+    },
+    // 当月互评是否已经发布
+    getPerformanceIsPublish (req, res) {
+        let sendData = req.body
+        let sql = $sql.workStation.getPerformanceIsPublish
+        let arrayParams = [sendData.applyYear, sendData.applyMonth, sendData.flagType]
+        RCPDDatabase(sql, arrayParams).then(res0 => {
+            return $http.writeJson(res, { code: 1, data: res0, message: 'success' })
+        }).catch(err => {
+            return $http.writeJson(res, { code: -2, data: err, message: 'err' })
+        })
+    },
+    // 是否发布首页绩效信息
+    performanceInfoPublish (req, res) {
+        let sendData = req.body
+        let sql = null
+        let arrayParams = null
+        let applyDateTime = null
+        if (sendData.flagID !== -1) {
+            sql = $sql.workStation.updatePerformanceInfoPublish
+            arrayParams = [sendData.flagValue, sendData.flagID]
+        } else {
+            sql = $sql.workStation.insertPerformanceInfoPublish
+            applyDateTime = moment().set({'year': sendData.applyYear, 'month': sendData.applyMonth - 1})
+                .format('YYYY-MM-DD HH:mm:ss')
+            arrayParams = [applyDateTime, sendData.flagType, sendData.flagValue]
+        }
+        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+            return $http.writeJson(res, { code: 1, data: RCPDDatabaseRes, message: 'success' })
+        }).catch(RCPDDatabaseErr => {
+            return $http.writeJson(res, { code: -2, data: RCPDDatabaseErr, message: 'error' })
+        })
     }
 }
 

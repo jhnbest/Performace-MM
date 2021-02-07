@@ -6,7 +6,7 @@
 <!--      </el-row>-->
     </div>
     <div v-else>
-      <h2>开发完善中...</h2>
+      <h2>完善中...</h2>
     </div>
 </template>
 

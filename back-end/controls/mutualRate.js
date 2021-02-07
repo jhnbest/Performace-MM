@@ -75,7 +75,7 @@ const mutualRate = {
             for (let item2 of rateTypes) {
                 let rate = starToRates(item1[item2.rateTypeName])
                 let rateType = item2.id
-                let ratedPersion = item1.ratedID
+                let ratedPersion = item1.ratedPersion
                 let ratePersion = sendData.userID
                 let rateMonth = sendData.title
                 let sql = $sql.mutualRates.submitRatesResult

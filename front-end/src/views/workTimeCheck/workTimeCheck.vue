@@ -88,6 +88,23 @@
           }
         }
       },
+      // 定性、定量指标得分计算
+      calGetScore (length, rank) {
+        if (rank === 1) {
+          return 92.5
+        }
+        if (rank < Number((length * 0.1).toFixed(0)) || rank === Number((length * 0.1).toFixed(0))) {
+          return 92.5
+        } else if (rank < Number((length * 0.3).toFixed(0)) || rank === Number((length * 0.3).toFixed(0))) {
+          return 90
+        } else if (rank < Number((length * 0.7).toFixed(0)) || rank === Number((length * 0.7).toFixed(0))) {
+          return 87.5
+        } else if (rank < Number((length * 0.9).toFixed(0)) || rank === Number((length * 0.9).toFixed(0))) {
+          return 85
+        } else if (rank < Number((length * 1).toFixed(0)) || rank === Number((length * 1).toFixed(0))) {
+          return 82.5
+        }
+      },
       // 获取已审项目列表
       getGroupWorkTimeList (groupID) {
         const url = getGroupWorkTimeList
@@ -138,21 +155,7 @@
                 }
                 let length = totalWorkTimeCal.length
                 for (let item of totalWorkTimeCal) { // 计算定量指标得分
-                  let rankPercentage = Number((item.rank / length).toFixed(1))
-                  if (rankPercentage < 0.1 || rankPercentage === 0.1) {
-                    item.quantitativeScore = 92.5
-                  } else if (rankPercentage < 0.3 || rankPercentage === 0.3) {
-                    item.quantitativeScore = 90
-                  } else if (rankPercentage < 0.7 || rankPercentage === 0.7) {
-                    item.quantitativeScore = 87.5
-                  } else if (rankPercentage < 0.9 || rankPercentage === 0.9) {
-                    item.quantitativeScore = 85
-                  } else if (rankPercentage < 1 || rankPercentage === 1) {
-                    item.quantitativeScore = 82.5
-                  }
-                  if (item.rank === 1) {
-                    item.quantitativeScore = 92.5
-                  }
+                  item.quantitativeScore = this.calGetScore(length, item.rank)
                 }
                 this.tableData = totalWorkTimeCal
               }
