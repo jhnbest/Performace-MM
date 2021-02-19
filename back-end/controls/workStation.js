@@ -507,16 +507,13 @@ const workStation = {
                 sql = $sql.workStation.getAssignProjectListed + ';' + $sql.workStation.getAssignProjectListedCount
             }
             let arrayParams = [data.id, data.projectType, data.id, data.projectType]
-            $http.connPool(sql, arrayParams, (err, result) => {
-                if (err) {
-                    return $http.writeJson(res, {code: -2, message: '失败', errMsg: err})
-                } else {
-                    result[0] = JSON.parse(JSON.stringify(result[0]))
-                    result[1] = JSON.parse(JSON.stringify(result[1]))
-                    result[0] = formatData(result[0])
-                    return $http.writeJson(res, {code: 1, data: result, message: '成功'})
-
-                }
+            RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+                RCPDDatabaseRes[0] = JSON.parse(JSON.stringify(RCPDDatabaseRes[0]))
+                RCPDDatabaseRes[1] = JSON.parse(JSON.stringify(RCPDDatabaseRes[1]))
+                RCPDDatabaseRes[0] = formatData(RCPDDatabaseRes[0])
+                return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: '成功'})
+            }).catch(RCPDDatabaseResErr => {
+                return $http.writeJson(res, {code: -2, data: RCPDDatabaseResErr, message: '失败'})
             })
         })
     },
@@ -1008,6 +1005,24 @@ const workStation = {
             applyDateTime = moment().set({'year': sendData.applyYear, 'month': sendData.applyMonth - 1})
                 .format('YYYY-MM-DD HH:mm:ss')
             arrayParams = [applyDateTime, sendData.flagType, sendData.flagValue]
+        }
+        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+            return $http.writeJson(res, { code: 1, data: RCPDDatabaseRes, message: 'success' })
+        }).catch(RCPDDatabaseErr => {
+            return $http.writeJson(res, { code: -2, data: RCPDDatabaseErr, message: 'error' })
+        })
+    },
+    // 获取未填报的项目列表
+    getUnFilledProjectList (req, res) {
+        let sendData = req.body
+        let sql = null
+        let arrayParams = [sendData.userID]
+        if (sendData.searchType === 'unFilled') {
+            sql = $sql.workStation.getUnFilledProjectList
+        } else if (sendData.searchType === 'Filled') {
+            sql = $sql.workStation.getFilledProjectList
+        } else if (sendData.searchType === 'completed') {
+            sql = $sql.workStation.getCompleteProjectList
         }
         RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
             return $http.writeJson(res, { code: 1, data: RCPDDatabaseRes, message: 'success' })

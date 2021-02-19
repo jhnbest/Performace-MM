@@ -118,7 +118,8 @@ const sqlMap = {
         'wl on wa.projectID = wl.id left join users u on wa.userID = u.id where wl.applyMonth = ? and ' +
         ' wl.reviewStatus = 1 and wa.obsoleteStatus != 1 and u.status != 0',
     getIsWorkTimeReviewFinish: 'select * from worktimelist where applyMonth = ? and obsoleteStatus != 1 and reviewStatus = 0 ' +
-        'and applyType = "fact" and submitStatus = 1'
+        'and applyType = "fact" and submitStatus = 1',
+    getCurApplyAbleMonth: 'select * from globalflag where flagType = "curApplyMonth"'
   },
   workStation: {
     getAssignProjectListUn: 'select apl.*, users.name as assigner from assignprojectlist apl left join users on apl.assignerID = users.id where ' +
@@ -200,6 +201,9 @@ const sqlMap = {
     getPerformanceIsPublish: 'select * from globalflag where year(setTime) = ? and month(setTime) = ? and flagType = ?',
     updatePerformanceInfoPublish: 'update globalflag set flagValue = ? where id = ?',
     insertPerformanceInfoPublish: 'insert into globalflag (setTime, flagType, flagValue) values (?, ?, ?)',
+    getUnFilledProjectList: 'select * from assignprojectlist where userID = ? and isFilled = 0 and obsoleteStatus != 1 and process != 100.0',
+    getFilledProjectList: 'select * from assignprojectlist where userID = ? and isFilled = 1 and obsoleteStatus != 1 and process != 100.0',
+    getCompleteProjectList: 'select * from assignprojectlist where userID = ? and obsoleteStatus != 1 and process = 100.0'
   },
   mutualRates: {
     getUserRates: 'select mr.*, u.name as ratedPersionName from mutualrate mr left join users u on ' +

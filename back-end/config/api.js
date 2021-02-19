@@ -43,6 +43,7 @@ module.exports = {
     getGroupWorkTimeList: path + '/performance/getGroupWorkTimeList', // 获取小组已审工时列表
     getAllWorkTimeList: path + '/performance/getAllWorkTimeList', // 获取全处已审工时列表
     getIsWorkTimeReviewFinish: path + '/performance/getIsWorkTimeReviewFinish', // 判断工时是否都已审核完毕
+    getCurApplyAbleMonth: path + '/performance/getCurApplyAbleMonth', // 获取当前可申报的月份
 
     // workStation-个人工作台
     getAssignProjectList: path + '/workStation/getAssignProjectList',
@@ -68,6 +69,7 @@ module.exports = {
     getManagerMultualRateFinish: path + '/workStation/getManagerMultualRateFinish', // 当月领导者是否已经评价完毕
     getPerformanceIsPublish: path + '/workStation/getPerformanceIsPublish', // 当月互评是否已经发布
     performanceInfoPublish: path + '/workStation/performanceInfoPublish', // 是否发布首页绩效信息
+    getUnFilledProjectList: path + '/workStation/getUnFilledProjectList', // 获取未填报的项目列表
 
     // 互评模块
     getUserRates: path + '/mutualRates/getUserRates', // 获取互评信息

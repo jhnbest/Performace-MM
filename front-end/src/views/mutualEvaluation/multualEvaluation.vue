@@ -25,7 +25,7 @@
                      :disabled="!reqFlag.getUserRates">下月</el-button>
         </el-form-item>
       </el-col>
-      <el-col :xs="2" :sm="2" :lg="2" :xl="2" style="margin-top: 10px">
+      <el-col :xs="2" :sm="2" :lg="{span: 3, pull: 1}" :xl="{span: 3, pull: 0}" style="margin-top: 10px">
         <el-popover
           placement="bottom"
           width="470"
@@ -43,7 +43,7 @@
           <span slot="reference" @click="descriprionClick" class="pointer-type"><i class="el-icon-warning-outline"></i>填报说明</span>
         </el-popover>
       </el-col>
-      <el-col :xs="12" :sm="12" :lg="{span: 4, offset: 7 }" :xl="{span: 3, offset: 12 }">
+      <el-col :xs="12" :sm="12" :lg="{span: 4, offset: 8 }" :xl="{span: 3, offset: 12 }">
         <el-button type="primary" @click="submitRatesResult" :disabled="isRated">
           <span v-if="!isRated">提交</span>
           <span v-else>已提交</span>

@@ -37,6 +37,7 @@ export const getAssignWorkTime = '/performance/getAssignWorkTime' // 获取分�
 export const getGroupWorkTimeList = '/performance/getGroupWorkTimeList' // 获取小组已申报工时列表
 export const getAllWorkTimeList = '/performance/getAllWorkTimeList' // 获取全处已申报工时列表
 export const getIsWorkTimeReviewFinish = '/performance/getIsWorkTimeReviewFinish' // 判断工时是否都已审核完毕
+export const getCurApplyAbleMonth = '/performance/getCurApplyAbleMonth' // 获取当前可申报的月份
 
 export const getAssignProjectList = '/workStation/getAssignProjectList' // 获取未完成的指派项目列表
 export const getAssignProjectDetail = '/workStation/getAssignProjectDetail' // 获取未完成的指派项目明细
@@ -61,6 +62,7 @@ export const getCurGroupWorkTimeReviewFinish = '/workStation/getCurGroupWorkTime
 export const getManagerMultualRateFinish = '/workStation/getManagerMultualRateFinish' // 当月领导者是否已经评价完毕
 export const getPerformanceIsPublish = '/workStation/getPerformanceIsPublish' // 当月互评是否已经发布
 export const performanceInfoPublish = '/workStation/performanceInfoPublish' // 是否发布首页绩效信息
+export const getUnFilledProjectList = '/workStation/getUnFilledProjectList' // 获取未填报的项目列表
 
 export const getUserRates = '/mutualRates/getUserRates' // 获取互评信息
 export const submitRatesResult = '/mutualRates/submitRatesResult' // 提交互评结果

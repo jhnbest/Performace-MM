@@ -58,84 +58,132 @@
         <el-table-column label="项目进度" align="center">
           <el-table-column label="1月" align="center" width="73%">
             <template slot-scope="scope">
-              <el-input v-if="scope.row.editable" v-model.number="scope.row.January" size="mini" type="number"></el-input>
+              <el-input v-if="scope.row.editable"
+                        v-model.number="scope.row.January"
+                        size="mini"
+                        type="number"
+                        :disabled="monthIsEditable(scope.row, 'January')"></el-input>
               <span v-else>{{scope.row.January}}</span>
               <span v-if="!scope.row.editable && scope.row.January !== null && scope.row.January !== ''">%</span>
             </template>
           </el-table-column>
           <el-table-column label="2月" align="center" prop="February" width="73%">
             <template slot-scope="scope">
-              <el-input v-if="scope.row.editable" v-model.number="scope.row.February" size="mini" type="number"></el-input>
+              <el-input v-if="scope.row.editable"
+                        v-model.number="scope.row.February"
+                        size="mini"
+                        type="number"
+                        :disabled="monthIsEditable(scope.row, 'February')"></el-input>
               <span v-else>{{scope.row.February}}</span>
               <span v-if="!scope.row.editable && scope.row.February !== null && scope.row.February !== ''">%</span>
             </template>
           </el-table-column>
           <el-table-column label="3月" align="center" prop="March" width="73%">
             <template slot-scope="scope">
-              <el-input v-if="scope.row.editable" v-model.number="scope.row.March" size="mini" type="number"></el-input>
+              <el-input v-if="scope.row.editable"
+                        v-model.number="scope.row.March"
+                        size="mini"
+                        type="number"
+                        :disabled="monthIsEditable(scope.row, 'March')"></el-input>
               <span v-else>{{scope.row.March}}</span>
               <span v-if="!scope.row.editable && scope.row.March !== null && scope.row.March !== ''">%</span>
             </template>
           </el-table-column>
           <el-table-column label="4月" align="center" prop="April" width="73%">
             <template slot-scope="scope">
-              <el-input v-if="scope.row.editable" v-model.number="scope.row.April" size="mini" type="number"></el-input>
+              <el-input v-if="scope.row.editable"
+                        v-model.number="scope.row.April"
+                        size="mini"
+                        type="number"
+                        :disabled="monthIsEditable(scope.row, 'April')"></el-input>
               <span v-else>{{scope.row.April}}</span>
               <span v-if="!scope.row.editable && scope.row.April !== null && scope.row.April !== ''">%</span>
             </template>
           </el-table-column>
           <el-table-column label="5月" align="center" prop="May" width="73%">
             <template slot-scope="scope">
-              <el-input v-if="scope.row.editable" v-model.number="scope.row.May" size="mini" type="number"></el-input>
+              <el-input v-if="scope.row.editable"
+                        v-model.number="scope.row.May"
+                        size="mini"
+                        type="number"
+                        :disabled="monthIsEditable(scope.row, 'May')"></el-input>
               <span v-else>{{scope.row.May}}</span>
               <span v-if="!scope.row.editable && scope.row.May !== null && scope.row.May !== ''">%</span>
             </template>
           </el-table-column>
           <el-table-column label="6月" align="center" prop="June" width="73%">
             <template slot-scope="scope">
-              <el-input v-if="scope.row.editable" v-model.number="scope.row.June" size="mini" type="number"></el-input>
+              <el-input v-if="scope.row.editable"
+                        v-model.number="scope.row.June"
+                        size="mini"
+                        type="number"
+                        :disabled="monthIsEditable(scope.row, 'June')"></el-input>
               <span v-else>{{scope.row.June}}</span>
               <span v-if="!scope.row.editable && scope.row.June !== null && scope.row.June !== ''">%</span>
             </template>
           </el-table-column>
           <el-table-column label="7月" align="center" prop="July" width="73%">
             <template slot-scope="scope">
-              <el-input v-if="scope.row.editable" v-model.number="scope.row.July" size="mini" type="number"></el-input>
+              <el-input v-if="scope.row.editable"
+                        v-model.number="scope.row.July"
+                        size="mini"
+                        type="number"
+                        :disabled="monthIsEditable(scope.row, 'July')"></el-input>
               <span v-else>{{scope.row.July}}</span>
               <span v-if="!scope.row.editable && scope.row.July !== null && scope.row.July !== ''">%</span>
             </template>
           </el-table-column>
           <el-table-column label="8月" align="center" prop="August" width="73%">
             <template slot-scope="scope">
-              <el-input v-if="scope.row.editable" v-model.number="scope.row.August" size="mini" type="number"></el-input>
+              <el-input v-if="scope.row.editable"
+                        v-model.number="scope.row.August"
+                        size="mini"
+                        type="number"
+                        :disabled="monthIsEditable(scope.row, 'August')"></el-input>
               <span v-else>{{scope.row.August}}</span>
               <span v-if="!scope.row.editable && scope.row.August !== null && scope.row.August !== ''">%</span>
             </template>
           </el-table-column>
           <el-table-column label="9月" align="center" prop="September" width="73%">
             <template slot-scope="scope">
-              <el-input v-if="scope.row.editable" v-model.number="scope.row.September" size="mini" type="number"></el-input>
+              <el-input v-if="scope.row.editable"
+                        v-model.number="scope.row.September"
+                        size="mini"
+                        type="number"
+                        :disabled="monthIsEditable(scope.row, 'September')"></el-input>
               <span v-else>{{scope.row.September}}</span>
               <span v-if="!scope.row.editable && scope.row.September !== null && scope.row.September !== ''">%</span>
             </template>
           </el-table-column>
           <el-table-column label="10月" align="center" prop="October" width="73%">
             <template slot-scope="scope">
-              <el-input v-if="scope.row.editable" v-model.number="scope.row.October" size="mini" type="number"></el-input>
+              <el-input v-if="scope.row.editable"
+                        v-model.number="scope.row.October"
+                        size="mini"
+                        type="number"
+                        :disabled="monthIsEditable(scope.row, 'October')"></el-input>
               <span v-else>{{scope.row.October}}</span>
               <span v-if="!scope.row.editable && scope.row.October !== null && scope.row.October !== ''">%</span>
             </template>
           </el-table-column>
           <el-table-column label="11月" align="center" prop="November" width="73%">
             <template slot-scope="scope">
-              <el-input v-if="scope.row.editable" v-model.number="scope.row.November" size="mini" type="number"></el-input>
+              <el-input v-if="scope.row.editable"
+                        v-model.number="scope.row.November"
+                        size="mini"
+                        type="number"
+                        :disabled="monthIsEditable(scope.row, 'November')"></el-input>
               <span v-else>{{scope.row.November}}</span>
               <span v-if="!scope.row.editable && scope.row.November !== null && scope.row.November !== ''">%</span>
             </template>
           </el-table-column>
           <el-table-column label="12月" align="center" prop="December" width="73%">
             <template slot-scope="scope">
-              <el-input v-if="scope.row.editable" v-model.number="scope.row.December" size="mini" type="number"></el-input>
+              <el-input v-if="scope.row.editable"
+                        v-model.number="scope.row.December"
+                        size="mini"
+                        type="number"
+                        :disabled="monthIsEditable(scope.row, 'December')"></el-input>
               <span v-else>{{scope.row.December}}</span>
               <span v-if="!scope.row.editable && scope.row.December !== null && scope.row.December !== ''">%</span>
             </template>
@@ -158,52 +206,56 @@
       <br>
     </el-form>
     <!-----------------------------------------------生成工时申报对话框---------------------------------------------------->
-    <el-dialog :visible.sync="dialogFormVisible" width="65%" :title="formData.projectName + '工时预览'">
+    <el-dialog :visible.sync="dialogFormVisible"
+               width="65%"
+               :title="formData.projectName + '工时预览'">
       <div>
-        <el-form ref="dialogForm" :model="dialogForm" :rules="formRules" style="margin-top: -20px" :inline="true">
-          <el-form-item label="申报月份" prop="title">
-            <el-date-picker
-              v-model="dialogForm.title"
-              type="month"
-              format="yyyy 第 MM 月"
-              value-format="yyyy-MM"
-              placeholder="选择月"
-              :picker-options="pickerOptions"
-              style="width: 150px" @change="handleApplyDateChange">
-            </el-date-picker>
-          </el-form-item>
-          <el-form-item>
-            <span style="margin-left: 20px;font-size: 15px">总工时：</span>
-            <span style="color: red;font-weight: bolder;font-size: 20px">{{totalGetWorkTime}}</span>
-          </el-form-item>
-        </el-form>
-      </div>
-      <div>
-        <el-table :data="submitParams.data" height="250">
-          <el-table-column label="序号" align="center" type="index"></el-table-column>
-          <el-table-column label="项目阶段" align="center" prop="projectStageName"></el-table-column>
-          <el-table-column label="上月进展" align="center" prop="lastMonthProcess">
-            <template slot-scope="scope">
-              <span>{{scope.row.lastMonthProcess + '%'}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="本月进展" align="center" prop="applyMonthProcess">
-            <template slot-scope="scope">
-              <span>{{scope.row.applyMonthProcess + '%'}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="预计可获得工时" align="center" prop="avaiableWorkTime"></el-table-column>
-          <el-table-column label="备注" align="center">
-            <template slot-scope="scope">
-              <el-input size="mini" v-model="scope.row.submitComments"></el-input>
-            </template>
-          </el-table-column>
-          <el-table-column label="工时分配" align="center">
-            <template slot-scope="scope">
-              <span class="link-type" @click="handleWorkTimeAssign(scope.row, scope.$index)">点击分配</span>
-            </template>
-          </el-table-column>
-        </el-table>
+        <div>
+          <el-form ref="dialogForm" :model="dialogForm" :rules="formRules" style="margin-top: -20px" :inline="true">
+            <el-form-item label="申报月份" prop="title">
+              <el-date-picker
+                v-model="dialogForm.title"
+                type="month"
+                format="yyyy 第 MM 月"
+                value-format="yyyy-MM"
+                placeholder="选择月"
+                :picker-options="pickerOptions"
+                style="width: 150px" @change="handleApplyDateChange">
+              </el-date-picker>
+            </el-form-item>
+            <el-form-item>
+              <span style="margin-left: 20px;font-size: 15px">总工时：</span>
+              <span style="color: red;font-weight: bolder;font-size: 20px">{{totalGetWorkTime}}</span>
+            </el-form-item>
+          </el-form>
+        </div>
+        <div>
+          <el-table :data="submitParams.data">
+            <el-table-column label="序号" align="center" type="index"></el-table-column>
+            <el-table-column label="项目阶段" align="center" prop="projectStageName"></el-table-column>
+            <el-table-column label="上月进展" align="center" prop="lastMonthProcess">
+              <template slot-scope="scope">
+                <span>{{scope.row.lastMonthProcess + '%'}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="本月进展" align="center" prop="applyMonthProcess">
+              <template slot-scope="scope">
+                <span>{{scope.row.applyMonthProcess + '%'}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="预计可获得工时" align="center" prop="avaiableWorkTime"></el-table-column>
+            <el-table-column label="备注" align="center">
+              <template slot-scope="scope">
+                <el-input size="mini" v-model="scope.row.submitComments"></el-input>
+              </template>
+            </el-table-column>
+            <el-table-column label="工时分配" align="center">
+              <template slot-scope="scope">
+                <span class="link-type" @click="handleWorkTimeAssign(scope.row, scope.$index)">点击分配</span>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
       </div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取消</el-button>
@@ -268,7 +320,8 @@
     updateAssignProjectFilled,
     workTimeTemporary,
     workTimeSubmit,
-    getIsSubmitAllow
+    getIsSubmitAllow,
+    getCurApplyAbleMonth
   } from '@/config/interface'
   import Assign from '@/components/Cop/workTimeAssign'
   export default {
@@ -364,7 +417,8 @@
           showFlag: {
             workTimeAssign: false
           },
-          tableHeight: null
+          tableHeight: null,
+          curApplyMonth: null
         }
       },
       methods: {
@@ -373,6 +427,9 @@
           this.formData.projectType = this.$route.query.projectType
           this.formData.projectName = this.$route.query.projectName
           this.getAssignProjectDetail(this.$route.query.projectID)
+          this.getCurApplyAbleMonth().then(getCurApplyAbleMonthRes => {
+            this.curApplyMonth = this.$moment(getCurApplyAbleMonthRes[0]).format('YYYY-MM')
+          })
         },
         // 获取当前月份能否申报的标志
         getIsSubmitAllow () {
@@ -434,67 +491,66 @@
                 data: searchData,
                 type: type
               }
-              it.$http(url, params)
-                .then(res => {
-                  if (res.code === 1) {
-                    params = {
-                      submitType: 'insert',
-                      submitDate: it.dialogForm.title,
-                      applyType: '',
-                      data: []
-                    }
-                    if (type === 'fact') {
-                      params.applyType = 'fact'
-                    } else if (type === 'plan') {
-                      params.applyType = 'plan'
-                    }
-                    for (let item of res.data) {
-                      let applyMonthProcess = item.processDiff.applyMonthProcess
-                      let lastMonthProcess = item.processDiff.lastMonthProcess
-                      let obj = {
-                        projectTypeID: item.projectStage,
-                        projectName: item.projectName,
-                        workType: item.projectStage,
-                        baseWorkTime: item.baseWorkTime,
-                        defaultKValue: item.kValue,
-                        dynamicKValue: item.sendParams.dynamicKValue,
-                        defaultCofficient: item.coefficient,
-                        workTimeAssign: [],
-                        submitComments: '',
-                        multipleAssign: false,
-                        multipleSelect: [],
-                        avaiableWorkTime: 0,
-                        isConference: item.sendParams.isConference,
-                        defaultAssignWorkTime: item.sendParams.defaultAssignWorkTime,
-                        projectStage: item.sendParams.projectStage,
-                        applyMonthProcess: applyMonthProcess,
-                        lastMonthProcess: lastMonthProcess,
-                        processDiff: applyMonthProcess - lastMonthProcess,
-                        applyProcess: applyMonthProcess,
-                        lastProcess: lastMonthProcess,
-                        apdID: item.sendParams.aPDID,
-                        aplID: item.aplID,
-                        monthID: item.sendParams.id,
-                        projectStageName: item.projectStageName
-                      }
-                      obj.avaiableWorkTime = obj.baseWorkTime * obj.defaultKValue * obj.defaultCofficient *
-                        (applyMonthProcess - lastMonthProcess) * 0.01
-                      obj.avaiableWorkTime = Number(Number(obj.avaiableWorkTime).toFixed(1))
-                      let defaultCurrentUserWorkTime = {
-                        id: it.$store.state.userInfo.id,
-                        groupName: it.$store.state.userInfo.groupName,
-                        name: it.$store.state.userInfo.name,
-                        applyRole: '组织者',
-                        assignWorkTime: obj.avaiableWorkTime,
-                        deleteAble: false
-                      }
-                      obj.workTimeAssign.push(defaultCurrentUserWorkTime)
-                      params.data.push(obj)
-                      it.applyMonthPlanProcessTableData.push(obj)
-                    }
-                    resolve(params)
+              it.$http(url, params).then(res => {
+                if (res.code === 1) {
+                  params = {
+                    submitType: 'insert',
+                    submitDate: it.dialogForm.title,
+                    applyType: '',
+                    data: []
                   }
-                })
+                  if (type === 'fact') {
+                    params.applyType = 'fact'
+                  } else if (type === 'plan') {
+                    params.applyType = 'plan'
+                  }
+                  for (let item of res.data) {
+                    let applyMonthProcess = item.processDiff.applyMonthProcess
+                    let lastMonthProcess = item.processDiff.lastMonthProcess
+                    let obj = {
+                      projectTypeID: item.projectStage,
+                      projectName: item.projectName,
+                      workType: item.projectStage,
+                      baseWorkTime: item.baseWorkTime,
+                      defaultKValue: item.kValue,
+                      dynamicKValue: item.sendParams.dynamicKValue,
+                      defaultCofficient: item.coefficient,
+                      workTimeAssign: [],
+                      submitComments: '',
+                      multipleAssign: false,
+                      multipleSelect: [],
+                      avaiableWorkTime: 0,
+                      isConference: item.sendParams.isConference,
+                      defaultAssignWorkTime: item.sendParams.defaultAssignWorkTime,
+                      projectStage: item.sendParams.projectStage,
+                      applyMonthProcess: applyMonthProcess,
+                      lastMonthProcess: lastMonthProcess,
+                      processDiff: applyMonthProcess - lastMonthProcess,
+                      applyProcess: applyMonthProcess,
+                      lastProcess: lastMonthProcess,
+                      apdID: item.sendParams.aPDID,
+                      aplID: item.aplID,
+                      monthID: item.sendParams.id,
+                      projectStageName: item.projectStageName
+                    }
+                    obj.avaiableWorkTime = obj.baseWorkTime * obj.defaultKValue * obj.defaultCofficient *
+                      (applyMonthProcess - lastMonthProcess) * 0.01
+                    obj.avaiableWorkTime = Number(Number(obj.avaiableWorkTime).toFixed(1))
+                    let defaultCurrentUserWorkTime = {
+                      id: it.$store.state.userInfo.id,
+                      groupName: it.$store.state.userInfo.groupName,
+                      name: it.$store.state.userInfo.name,
+                      applyRole: '组织者',
+                      assignWorkTime: obj.avaiableWorkTime,
+                      deleteAble: false
+                    }
+                    obj.workTimeAssign.push(defaultCurrentUserWorkTime)
+                    params.data.push(obj)
+                    it.applyMonthPlanProcessTableData.push(obj)
+                  }
+                  resolve(params)
+                }
+              })
             }
           })
         },
@@ -515,19 +571,18 @@
                           let params = {
                             assignProjectID: _this.$route.query.projectID
                           }
-                          _this.$http(url, params)
-                            .then((res) => {
-                              if (res.code === 1) {
-                                _this.$common.toast('生成成功', 'success', false)
-                                _this.$router.push({ path: '/home/workStation' })
-                                _this.dialogFormVisible = false
-                                resolve(res.code)
-                              } else {
-                                this.$common.toast('生成失败', 'error', false)
-                                reject(res.code)
-                              }
-                              _this.reqFlag.genWorkTimeApply = true
-                            })
+                          _this.$http(url, params).then((res) => {
+                            if (res.code === 1) {
+                              _this.$common.toast('生成成功', 'success', false)
+                              _this.$router.push({ path: '/home/workStation' })
+                              _this.dialogFormVisible = false
+                              resolve(res.code)
+                            } else {
+                              this.$common.toast('生成失败', 'error', false)
+                              reject(res.code)
+                            }
+                            _this.reqFlag.genWorkTimeApply = true
+                          })
                         }
                       })
                     }
@@ -567,11 +622,21 @@
         // 生成工时申报
         genWorkTimeApply () {
           let year = this.$moment(this.dialogForm.title).format('YYYY')
-          this.httpGetAssignProjectDetail(this.$route.query.projectID, year).then(res => {
+          this.httpGetAssignProjectDetail(this.$route.query.projectID, year).then(res => { // 获取项目的所有阶段信息
             this.dialogFormVisible = true
             this.applyMonthPlanProcess = res
+            let searchData = []
+            let applyMonth = this.$moment(this.dialogForm.title).toObject()
+            let applyMonthString = this.$common.MonthToString(String(applyMonth.months + 1))
+            for (let item of this.applyMonthPlanProcess) {
+              if (item.isFinish !== 1 && item.type === 'fact' && item[applyMonthString] !== null) {
+                searchData.push(item)
+              }
+            }
             this.getMonthProcess('fact').then(res1 => {
               this.submitParams = res1
+              console.log('this.submitParams')
+              console.log(this.submitParams)
             })
           })
         },
@@ -659,7 +724,7 @@
                   row.monthID = data.monthID
                   this.getAssignProjectDetail(this.$route.query.projectID)
                   this.reqFlag.savePlanProcess = true
-                  this.$common.toast('保存成功', 'success', 'false')
+                  this.$common.toast('保存成功', 'success', false)
                 }
               })
           }
@@ -732,6 +797,31 @@
               }
             }
           })
+        },
+        // 获取当前可申报的月份
+        getCurApplyAbleMonth () {
+          const url = getCurApplyAbleMonth
+          let params = {}
+          let _this = this
+          return new Promise(function (resolve, reject) {
+            _this.$http(url, params).then(res => {
+              if (res.code === 1) {
+                resolve(res.data)
+              } else {
+                reject(res.data)
+              }
+            }).catch(err => {
+              reject(err)
+            })
+          })
+        },
+        // 月份是否可编辑进度
+        monthIsEditable (row, month) {
+          if (row.type === 'plan') {
+            return false
+          } else if (row.type === 'fact') {
+            return this.$moment(this.formData.yearNum + '-' + this.$common.mStringToNumber(month)).isBefore(this.curApplyMonth)
+          }
         }
       },
       computed: {
@@ -768,11 +858,33 @@
       mounted () {
         this.refreshTableSize()
       },
-    destroyed () {
+      destroyed () {
       },
       name: 'ProjectPlanProcess'
     }
 </script>
 
 <style scoped>
+  .abow_dialog {
+    display: flex;
+    justify-content: center;
+    align-items: Center;
+    overflow: hidden;
+    .el-dialog {
+      margin: 0 auto !important;
+      height: 50%;
+      overflow: hidden;
+      .el-dialog__body {
+        position: absolute;
+        left: 0;
+        top: 54px;
+        bottom: 0;
+        right: 0;
+        padding: 0;
+        z-index: 1;
+        overflow: hidden;
+        overflow-y: auto;
+      }
+    }
+  }
 </style>

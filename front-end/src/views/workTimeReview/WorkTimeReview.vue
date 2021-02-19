@@ -302,17 +302,9 @@
         isShowCount () {
           return function (groupUser) {
             if (this.formData.reviewType === 'unReview') {
-              if (groupUser.unReviewProjectCount === 0) {
-                return false
-              } else {
-                return true
-              }
+              return groupUser.unReviewProjectCount !== 0
             } else if (this.formData.reviewType === 'reviewed') {
-              if (groupUser.reviewedProjectCount === 0) {
-                return false
-              } else {
-                return true
-              }
+              return groupUser.reviewedProjectCount !== 0
             }
           }
         }

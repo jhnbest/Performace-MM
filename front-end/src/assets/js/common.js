@@ -1,7 +1,8 @@
 /* eslint-disable */
 import { Message, MessageBox } from 'element-ui'
 import router from '../../router'
-import { getUsersName } from '@/config/interface'
+import { getCurApplyAbleMonth } from '@/config/interface'
+import el from "element-ui/src/locale/lang/el";
 
 const commonFn = {
 	toast (str, type, showClose, onCloseFn) {
@@ -44,6 +45,37 @@ const commonFn = {
         return 'November'
       case '12':
         return 'December'
+      default:
+        return 'error'
+    }
+  },
+  // 月份转换成英文
+  mStringToNumber (mString) {
+    switch (mString) {
+      case 'January':
+        return '01'
+      case 'February':
+        return '02'
+      case 'March':
+        return '03'
+      case 'April':
+        return '04'
+      case 'May':
+        return '05'
+      case 'June':
+        return '06'
+      case 'July':
+        return '07'
+      case 'August':
+        return '08'
+      case 'September':
+        return '09'
+      case 'October':
+        return '10'
+      case 'November':
+        return '11'
+      case 'December':
+        return '12'
       default:
         return 'error'
     }

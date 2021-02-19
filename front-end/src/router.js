@@ -122,7 +122,7 @@ export default new Router({
         {
           path: 'test',
           name: 'test',
-          component: () => import(/* webpackChunkName: "user" */ './components/test.vue'),
+          component: () => import(/* webpackChunkName: "user" */ './components/workStation/projectOverview.vue'),
           meta: { pagePath: '/home/test' }
         }
       ]

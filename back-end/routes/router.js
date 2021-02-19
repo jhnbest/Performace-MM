@@ -50,6 +50,7 @@ router.post(api.getAssignWorkTime, performance.getAssignWorkTime)
 router.post(api.getGroupWorkTimeList, performance.getGroupWorkTimeList)
 router.post(api.getAllWorkTimeList, performance.getAllWorkTimeList)
 router.post(api.getIsWorkTimeReviewFinish, performance.getIsWorkTimeReviewFinish)
+router.post(api.getCurApplyAbleMonth, performance.getCurApplyAbleMonth)
 
 // workStation-个人工作台
 router.post(api.getAssignProjectList, workStation.getAssignProjectList)
@@ -75,6 +76,7 @@ router.post(api.getCurGroupWorkTimeReviewFinish, workStation.getCurGroupWorkTime
 router.post(api.getManagerMultualRateFinish, workStation.getManagerMultualRateFinish)
 router.post(api.getPerformanceIsPublish, workStation.getPerformanceIsPublish)
 router.post(api.performanceInfoPublish, workStation.performanceInfoPublish)
+router.post(api.getUnFilledProjectList, workStation.getUnFilledProjectList)
 
 // 互评模块
 router.post(api.getUserRates, mutualRates.getUserRates)

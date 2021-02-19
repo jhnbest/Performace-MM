@@ -954,10 +954,20 @@ const performance = {
         let sendData = req.body
         let sql = $sql.performance.getIsWorkTimeReviewFinish
         let arrayParams = [sendData.applyMonth]
-        RCPDDatabase(sql, arrayParams).then(res0 => {
-            return $http.writeJson(res, {code: 1, data: res0, message: 'success'})
-        }).catch(err => {
-            return $http.writeJson(res, {code: 1, data: err, message: 'err'})
+        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+            return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
+        }).catch(RCPDDatabaseErr => {
+            return $http.writeJson(res, {code: 1, data: RCPDDatabaseErr, message: 'err'})
+        })
+    },
+    // 获取当前可申报的月份
+    getCurApplyAbleMonth (req, res) {
+        let sql = $sql.performance.getCurApplyAbleMonth
+        let arrayParams = []
+        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+            return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
+        }).catch(RCPDDatabaseErr => {
+            return $http.writeJson(res, {code: 1, data: RCPDDatabaseErr, message: 'err'})
         })
     }
 }
