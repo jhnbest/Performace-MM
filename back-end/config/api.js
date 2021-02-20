@@ -70,6 +70,7 @@ module.exports = {
     getPerformanceIsPublish: path + '/workStation/getPerformanceIsPublish', // 当月互评是否已经发布
     performanceInfoPublish: path + '/workStation/performanceInfoPublish', // 是否发布首页绩效信息
     getUnFilledProjectList: path + '/workStation/getUnFilledProjectList', // 获取未填报的项目列表
+    projectDetailIsApplyWorkTime: path + '/workStation/projectDetailIsApplyWorkTime', // 查看项目阶段当月是否已填报工时
 
     // 互评模块
     getUserRates: path + '/mutualRates/getUserRates', // 获取互评信息

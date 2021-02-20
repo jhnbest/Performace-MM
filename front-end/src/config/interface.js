@@ -63,6 +63,7 @@ export const getManagerMultualRateFinish = '/workStation/getManagerMultualRateFi
 export const getPerformanceIsPublish = '/workStation/getPerformanceIsPublish' // 当月互评是否已经发布
 export const performanceInfoPublish = '/workStation/performanceInfoPublish' // 是否发布首页绩效信息
 export const getUnFilledProjectList = '/workStation/getUnFilledProjectList' // 获取未填报的项目列表
+export const projectDetailIsApplyWorkTime = '/workStation/projectDetailIsApplyWorkTime' // 查看项目阶段当月是否已填报工时
 
 export const getUserRates = '/mutualRates/getUserRates' // 获取互评信息
 export const submitRatesResult = '/mutualRates/submitRatesResult' // 提交互评结果

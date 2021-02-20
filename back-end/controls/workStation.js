@@ -1029,6 +1029,24 @@ const workStation = {
         }).catch(RCPDDatabaseErr => {
             return $http.writeJson(res, { code: -2, data: RCPDDatabaseErr, message: 'error' })
         })
+    },
+    // 查看项目阶段当月是否已填报工时
+    projectDetailIsApplyWorkTime (req, res) {
+        let sendData = req.body
+        let applyMonth = sendData.applyMonth
+        let type = sendData.type
+        let promises = []
+        let count = 0
+        let sql = $sql.workStation.projectDetailIsApplyWorkTime
+        for (let sendDataItem of sendData.projectDetailID) {
+            let arrayParams = [sendDataItem, applyMonth, type]
+            promises[count++] = RCPDDatabase(sql, arrayParams)
+        }
+        Promise.all(promises).then(result => {
+            return $http.writeJson(res, { code: 1, data: result, message: 'success' })
+        }).catch(error => {
+            return $http.writeJson(res, { code: -2, data: error, message: 'error' })
+        })
     }
 }
 

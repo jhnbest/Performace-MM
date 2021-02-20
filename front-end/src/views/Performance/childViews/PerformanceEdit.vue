@@ -343,85 +343,84 @@
           }
           let it = this
           return new Promise(function (resolve, reject) {
-            it.$http(url, params)
-              .then(res => {
-                if (res.code === 1) {
-                  let data = res.data
-                  console.log(data)
-                  let multipleSelect = []
-                  let defaultCurrentUserWorkTime = []
-                  let workTimeAssignInsertID = []
-                  let tmp = []
-                  it.formData.title = data.workTimeList[0].applyMonth
-                  it.isRejectWorkTimeSubmit = data.workTimeList[0].reviewStatus === 2
-                  it.formData.projectType.push(data.projectTypeCheck) // get项目类型
-                  it.formData.isShowProjectType = false
-                  setTimeout(() => {
-                    it.formData.isShowProjectType = true
-                  }, it.$store.state.refreshInterval)
-                  // 遍历工时分配信息
-                  for (let item of data.workTimeAssign) {
-                    if (item.userID !== it.$store.state.userInfo.id) {
-                      multipleSelect.push(item.userID)
+            it.$http(url, params).then(res => {
+              if (res.code === 1) {
+                let data = res.data
+                console.log(data)
+                let multipleSelect = []
+                let defaultCurrentUserWorkTime = []
+                let workTimeAssignInsertID = []
+                let tmp = []
+                it.formData.title = data.workTimeList[0].applyMonth
+                it.isRejectWorkTimeSubmit = data.workTimeList[0].reviewStatus === 2
+                it.formData.projectType.push(data.projectTypeCheck) // get项目类型
+                it.formData.isShowProjectType = false
+                setTimeout(() => {
+                  it.formData.isShowProjectType = true
+                }, it.$store.state.refreshInterval)
+                // 遍历工时分配信息
+                for (let item of data.workTimeAssign) {
+                  if (item.userID !== it.$store.state.userInfo.id) {
+                    multipleSelect.push(item.userID)
+                  }
+                  workTimeAssignInsertID.push(item.id)
+                  // 插入填报人信息
+                  if (item.userID === it.$store.state.userInfo.id) {
+                    let obj = {
+                      id: item.userID,
+                      groupName: it.$store.state.userInfo.groupName,
+                      name: it.$store.state.userInfo.name,
+                      applyRole: item.assignRole,
+                      assignWorkTime: item.workTime,
+                      deleteAble: false
                     }
-                    workTimeAssignInsertID.push(item.id)
-                    // 插入填报人信息
-                    if (item.userID === it.$store.state.userInfo.id) {
+                    defaultCurrentUserWorkTime.push(obj)
+                  }
+                  // 插入协作者信息
+                  tmp = it.formData.usersList[1].options.find((iItem) => {
+                    if (iItem.id === item.userID) {
                       let obj = {
-                        id: item.userID,
-                        groupName: it.$store.state.userInfo.groupName,
-                        name: it.$store.state.userInfo.name,
+                        id: iItem.id,
+                        groupName: iItem.groupName,
+                        name: iItem.name,
                         applyRole: item.assignRole,
                         assignWorkTime: item.workTime,
                         deleteAble: false
                       }
                       defaultCurrentUserWorkTime.push(obj)
+                      return 0
                     }
-                    // 插入协作者信息
-                    tmp = it.formData.usersList[1].options.find((iItem) => {
-                      if (iItem.id === item.userID) {
-                        let obj = {
-                          id: iItem.id,
-                          groupName: iItem.groupName,
-                          name: iItem.name,
-                          applyRole: item.assignRole,
-                          assignWorkTime: item.workTime,
-                          deleteAble: false
-                        }
-                        defaultCurrentUserWorkTime.push(obj)
-                        return 0
-                      }
-                    })
-                  }
-                  let obj = {
-                    projectTypeID: data.workTimeList[0].projectTypeID,
-                    projectName: data.workTimeList[0].projectName,
-                    baseWorkTime: data.workTime,
-                    defaultKValue: data.workTimeList[0].applyKValue,
-                    dynamicKValue: data.dynamicKValue,
-                    defaultCofficient: data.workTimeList[0].applyCofficient,
-                    workTimeAssign: [],
-                    submitComments: data.workTimeList[0].submitComments,
-                    multipleAssign: data.workTimeAssign.length > 1,
-                    multipleSelect: multipleSelect,
-                    workTimeAssignInsertID: workTimeAssignInsertID,
-                    avaiableWorkTime: data.workTimeList[0].avaiableWorkTime,
-                    isConference: data.isConference,
-                    defaultAssignWorkTime: data.defaultAssignWorkTime,
-                    defaultAssignWorkTimeIni: data.defaultAssignWorkTime,
-                    applyProcess: data.workTimeList[0].applyProcess,
-                    apdID: data.workTimeList[0].apdID,
-                    workType: data.workTimeList[0].projectStageName,
-                    lastProcess: data.workTimeList[0].lastProcess,
-                    applyBaseWorkTime: data.workTimeList[0].applyBaseWorkTime
-                  }
-                  // obj.avaiableWorkTime = obj.baseWorkTime * obj.defaultKValue * obj.defaultCofficient
-                  obj.defaultAssignWorkTime = obj.defaultAssignWorkTimeIni * obj.defaultKValue * obj.defaultCofficient * obj.applyProcess * 0.01
-                  obj.workTimeAssign = defaultCurrentUserWorkTime
-                  it.formData.workTypeTimeDetail.push(obj)
-                  resolve(obj)
+                  })
                 }
-              })
+                let obj = {
+                  projectTypeID: data.workTimeList[0].projectTypeID,
+                  projectName: data.workTimeList[0].projectName,
+                  baseWorkTime: data.workTime,
+                  defaultKValue: data.workTimeList[0].applyKValue,
+                  dynamicKValue: data.dynamicKValue,
+                  defaultCofficient: data.workTimeList[0].applyCofficient,
+                  workTimeAssign: [],
+                  submitComments: data.workTimeList[0].submitComments,
+                  multipleAssign: data.workTimeAssign.length > 1,
+                  multipleSelect: multipleSelect,
+                  workTimeAssignInsertID: workTimeAssignInsertID,
+                  avaiableWorkTime: data.workTimeList[0].avaiableWorkTime,
+                  isConference: data.isConference,
+                  defaultAssignWorkTime: data.defaultAssignWorkTime,
+                  defaultAssignWorkTimeIni: data.defaultAssignWorkTime,
+                  applyProcess: data.workTimeList[0].applyProcess,
+                  apdID: data.workTimeList[0].apdID,
+                  workType: data.workTimeList[0].projectStageName,
+                  lastProcess: data.workTimeList[0].lastProcess,
+                  applyBaseWorkTime: data.workTimeList[0].applyBaseWorkTime
+                }
+                // obj.avaiableWorkTime = obj.baseWorkTime * obj.defaultKValue * obj.defaultCofficient
+                obj.defaultAssignWorkTime = obj.defaultAssignWorkTimeIni * obj.defaultKValue * obj.defaultCofficient * obj.applyProcess * 0.01
+                obj.workTimeAssign = defaultCurrentUserWorkTime
+                it.formData.workTypeTimeDetail.push(obj)
+                resolve(obj)
+              }
+            })
           })
         },
         // 提交至工时明细列表
@@ -444,17 +443,18 @@
                 submitDate: title,
                 data: tableDataCopy
               }
-              this.$http(url, params)
-                .then(res => {
-                  if (res.code === 1) {
-                    this.$common.toast('提交成功', 'success', false)
-                    this.onCancel(formData)
-                  } else {
-                    this.$common.toast('提交失败', 'success', false)
-                    this.onCancel(formData)
-                  }
-                  this.reqFlag.edit = true
-                })
+              console.log('params')
+              console.log(params)
+              this.$http(url, params).then(res => {
+                if (res.code === 1) {
+                  this.$common.toast('提交成功', 'success', false)
+                  this.onCancel(formData)
+                } else {
+                  this.$common.toast('提交失败', 'success', false)
+                  this.onCancel(formData)
+                }
+                this.reqFlag.edit = true
+              })
             } else {
               this.reqFlag.edit = true
               this.$common.toast('申报工时为0，请修改,', 'info', false)

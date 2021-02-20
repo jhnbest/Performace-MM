@@ -126,7 +126,8 @@
               <el-input-number v-model="scope.row.kValue"
                                size="mini"
                                :min="0"
-                               style="width: 60%"></el-input-number>
+                               style="width: 60%"
+                               :disabled="scope.row.dynamicKValue !== 1"></el-input-number>
             </div>
             <div v-else>
               {{scope.row.kValue}}
@@ -135,30 +136,35 @@
         </el-table-column>
         <el-table-column label="操作" align="center" width="200">
           <template slot-scope="scope">
-            <el-button v-if="scope.row.apdID !== -1 && !scope.row.editable"
-                       size="mini"
-                       type="primary"
-                       @click="handleProjectStageEdit(scope.row)">编辑</el-button>
-            <el-button v-if="scope.row.apdID !== -1 && scope.row.editable"
-                       size="mini"
-                       type="warning"
-                       @click="handleSaveProjectStageEdit(scope.row)">保存</el-button>
-            <el-popconfirm
-              confirm-button-text='确定'
-              cancel-button-text='取消'
-              icon="el-icon-info"
-              icon-color="red"
-              title="确定删除？"
-              @confirm="handleProjectStageDelete(scope.row, scope.$index)">
-              <el-button slot="reference"
+            <div v-if="scope.row.process !== 100">
+              <el-button v-if="scope.row.apdID !== -1 && !scope.row.editable"
                          size="mini"
-                         type="danger" style="margin-left: 10px">删除</el-button>
-            </el-popconfirm>
+                         type="primary"
+                         @click="handleProjectStageEdit(scope.row)">编辑</el-button>
+              <el-button v-if="scope.row.apdID !== -1 && scope.row.editable"
+                         size="mini"
+                         type="warning"
+                         @click="handleSaveProjectStageEdit(scope.row)">保存</el-button>
+              <el-popconfirm
+                confirm-button-text='确定'
+                cancel-button-text='取消'
+                icon="el-icon-info"
+                icon-color="red"
+                title="确定删除？"
+                @confirm="handleProjectStageDelete(scope.row, scope.$index)">
+                <el-button slot="reference"
+                           size="mini"
+                           type="danger" style="margin-left: 10px">删除</el-button>
+              </el-popconfirm>
+            </div>
+            <div v-else>
+              <el-button type="info" :disabled="true" size="mini">该阶段已完成</el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>
       <div style="text-align: center;margin-top: 10px">
-        <el-button type="primary" size="mini" @click="addNewProjectStage">新增项目阶段</el-button>
+        <el-button type="primary" size="mini" @click="addNewProjectStage" :disabled="projectIsFinish">新增项目阶段</el-button>
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="handleSaveProjectStage">保存</el-button>
@@ -205,7 +211,8 @@
           },
           maxProjectStageName: 50,
           iniProjectStage: [],
-          aplID: null
+          aplID: null,
+          projectIsFinish: true
         }
       },
       methods: {
@@ -325,7 +332,6 @@
             row.projectStageID = row.selectProjectID[row.selectProjectID.length - 1]
             if (row.projectStageID !== 72) { // 非自定义项目阶段
               this.getProjectTypeInfo(row.projectStageID, row.selectProjectID[0]).then(res0 => {
-                console.log(res0)
                 row.dynamicKValue = res0[0].dynamicKValue
                 row.baseWorkTime = res0[0].workTime
                 row.kValue = 1
@@ -334,6 +340,7 @@
                 this.$common.toast(err, 'error', false)
               })
             } else {
+              row.dynamicKValue = 1
             }
           }
         },
@@ -385,6 +392,7 @@
         },
         // 编辑项目
         handleEditProject (row) {
+          this.projectIsFinish = row.process === 100.0
           this.dialogProjectData = []
           this.editProject = true
           this.dialogProjectName = row.projectName
@@ -421,7 +429,7 @@
             editable: true,
             baseWorkTime: null,
             kValue: null,
-            dynamicKValue: null
+            dynamicKValue: 1
           })
         },
         // 项目阶段名称监控

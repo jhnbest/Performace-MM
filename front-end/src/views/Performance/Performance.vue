@@ -422,6 +422,7 @@
             this.$refs.cop.init(row)
           })
         },
+        // 编辑按钮
         handleEdit (row, index) {
           this.$router.push({
             path: '/home/PerformanceEdit',

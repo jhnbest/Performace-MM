@@ -77,6 +77,7 @@ router.post(api.getManagerMultualRateFinish, workStation.getManagerMultualRateFi
 router.post(api.getPerformanceIsPublish, workStation.getPerformanceIsPublish)
 router.post(api.performanceInfoPublish, workStation.performanceInfoPublish)
 router.post(api.getUnFilledProjectList, workStation.getUnFilledProjectList)
+router.post(api.projectDetailIsApplyWorkTime, workStation.projectDetailIsApplyWorkTime)
 
 // 互评模块
 router.post(api.getUserRates, mutualRates.getUserRates)

@@ -192,36 +192,36 @@ function workTimeInsertOP(params, i, operate) {
     });
 }
 
-async function workTimeInsert(data, res, operate) {
+async function workTimeInsert(sendData, res, operate) {
     let workTimeInsertResult = null
     let workTimeAssignResult = null
-    for (let i = 0; i < data.data.length; i++) { // 逐条插入工时项目
-        workTimeInsertResult = await workTimeInsertOP(data, i, operate)
+    for (let i = 0; i < sendData.data.length; i++) { // 逐条插入工时项目
+        workTimeInsertResult = await workTimeInsertOP(sendData, i, operate)
         if (workTimeInsertResult.err) {
             return $http.writeJson(res, {code: -2, message: '失败', errMsg: workTimeInsertResult.err})
-        } else if (workTimeInsertResult.result.affectedRows !== 1 && data.submitType === 'insert') {
+        } else if (workTimeInsertResult.result.affectedRows !== 1 && sendData.submitType === 'insert') {
             return $http.writeJson(res, {code: 2, message: '添加工时记录失败'})
         }
         // 插入/更新工时分配信息
-        for (let j = 0;j < data.data[i].workTimeAssign.length; j++) {
+        for (let j = 0;j < sendData.data[i].workTimeAssign.length; j++) {
             let insertID = null
-            if (data.submitType === 'insert') {
+            if (sendData.submitType === 'insert') {
                 insertID = workTimeInsertResult.result.insertId
-            } else if (data.submitType === 'update') {
-                insertID = data.projectID
+            } else if (sendData.submitType === 'update') {
+                insertID = sendData.projectID
             }
-            workTimeAssignResult = await workTimeAssign(insertID, data, i, j)
+            workTimeAssignResult = await workTimeAssign(insertID, sendData, i, j)
             if (workTimeAssignResult.err) {
                 return $http.writeJson(res, {code: -2, message: '失败', errMsg: workTimeInsertResult.err})
-            } else if (workTimeAssignResult.result.affectedRows !== 1 && data.submitType === 'insert') {
+            } else if (workTimeAssignResult.result.affectedRows !== 1 && sendData.submitType === 'insert') {
                 return $http.writeJson(res, {code: 2, message: '添加协作记录失败'})
             }
-            if (i === data.data.length - 1 && j === data.data[i].workTimeAssign.length - 1) {
+            if (i === sendData.data.length - 1 && j === sendData.data[i].workTimeAssign.length - 1) {
                 // 更新的工时分配信息小于修改前处理
-                if (data.submitType === 'update') {
-                    if (data.data[i].workTimeAssign.length < data.data[i].workTimeAssignInsertID.length) {  //更新的工时分配信息条数小于修改前，删除多余的条目
-                        for (let k = 0; k < data.data[i].workTimeAssignInsertID.length - data.data[i].workTimeAssign.length; k++) {
-                            await workTimeAssignDelete(data.data[i].workTimeAssignInsertID[data.data[i].workTimeAssign.length + k])
+                if (sendData.submitType === 'update') {
+                    if (sendData.data[i].workTimeAssign.length < sendData.data[i].workTimeAssignInsertID.length) {  //更新的工时分配信息条数小于修改前，删除多余的条目
+                        for (let k = 0; k < sendData.data[i].workTimeAssignInsertID.length - sendData.data[i].workTimeAssign.length; k++) {
+                            await workTimeAssignDelete(sendData.data[i].workTimeAssignInsertID[sendData.data[i].workTimeAssign.length + k])
                         }
                     }
                 }
