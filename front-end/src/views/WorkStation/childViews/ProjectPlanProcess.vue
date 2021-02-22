@@ -444,6 +444,24 @@
             this.curApplyMonth = this.$moment(getCurApplyAbleMonthRes[0]).format('YYYY-MM')
           })
         },
+        // 临时填充2021-01月份的进展
+        fillProcessOfJanuary (year, projectStageDetail) {
+          let count = 0
+          if (year === 2021) {
+            for (let projectStageDetailItem of projectStageDetail) {
+              if (projectStageDetailItem.type === 'fact') {
+                if (projectStageDetailItem.January === null &&
+                  projectStageDetailItem.process !== 0 &&
+                  projectStageDetailItem.process !== 100.0) {
+                  // this.$common.toast(projectStageDetailItem.projectStageName + '2021-01月份未填报进度，已设置为2020-12月份进度', 'warning', true)
+                  projectStageDetailItem.January = projectStageDetailItem.process
+                  this.handleSaveTmp(projectStageDetailItem, count)
+                }
+              }
+              count++
+            }
+          }
+        },
         // 获取当前月份能否申报的标志
         getIsSubmitAllow () {
           const url = getIsSubmitAllow
@@ -476,6 +494,8 @@
                   let _this = this
                   for (let i = 0; i < this.submitParams.data.length; i++) { // 删除当月已经申报工时
                     if (this.submitParams.data[i].isApplyWorkTime > 0) {
+                      console.log('this.submitParams.data')
+                      console.log(this.submitParams.data)
                     }
                   }
                   return new Promise(function (resolve, reject) {
@@ -754,6 +774,7 @@
             }
             this.formData.tableData = res
             this.formData.tableDataCache = JSON.parse(JSON.stringify(this.formData.tableData))
+            this.fillProcessOfJanuary(this.formData.yearNum, res)
             console.log('this.formData.tableData')
             console.log(this.formData.tableData)
           })
@@ -773,16 +794,40 @@
           let params = row
           if (this.reqFlag.savePlanProcess) {
             this.reqFlag.savePlanProcess = false
-            this.$http(url, params)
-              .then(res => {
-                if (res.code === 1) {
-                  let data = res.data
-                  row.monthID = data.monthID
-                  this.getAssignProjectDetail(this.$route.query.projectID)
-                  this.reqFlag.savePlanProcess = true
-                  this.$common.toast('保存成功', 'success', false)
-                }
-              })
+            this.$http(url, params).then(res => {
+              if (res.code === 1) {
+                let data = res.data
+                row.monthID = data.monthID
+                this.getAssignProjectDetail(this.$route.query.projectID)
+                this.reqFlag.savePlanProcess = true
+                this.$common.toast('保存成功', 'success', false)
+              }
+            })
+          }
+          row.editable = false
+          for (let item in row) {
+            this.formData.tableDataCache[index][item] = row[item]
+          }
+        },
+        // 表格保存按钮临时
+        handleSaveTmp (row, index) {
+          const url = submitPlanProcess
+          for (let item in row) {
+            if (row[item] === '') {
+              row[item] = null
+            }
+          }
+          let params = row
+          if (this.reqFlag.savePlanProcess) {
+            this.reqFlag.savePlanProcess = false
+            this.$http(url, params).then(res => {
+              if (res.code === 1) {
+                let data = res.data
+                row.monthID = data.monthID
+                this.getAssignProjectDetail(this.$route.query.projectID)
+                this.reqFlag.savePlanProcess = true
+              }
+            })
           }
           row.editable = false
           for (let item in row) {
@@ -876,7 +921,8 @@
           if (row.type === 'plan') {
             return false
           } else if (row.type === 'fact') {
-            return this.$moment(this.formData.yearNum + '-' + this.$common.mStringToNumber(month)).isBefore(this.curApplyMonth)
+            return this.$moment(this.formData.yearNum + '-' + this.$common.mStringToNumber(month)).isBefore(this.curApplyMonth) ||
+              this.$moment(this.formData.yearNum + '-' + this.$common.mStringToNumber(month)).isAfter(this.curApplyMonth)
           }
         }
       },
