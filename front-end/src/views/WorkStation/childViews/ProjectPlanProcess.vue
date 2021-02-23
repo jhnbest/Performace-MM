@@ -281,7 +281,7 @@
                           style="cursor: pointer" @click="handleSubmitedClick(scope.row)">当月已申报</el-tag>
                 </el-popover>
                 <br v-if="scope.row.isApplyWorkTime > 0">
-                <span v-if="scope.row.isApplyWorkTime > 0">覆盖已有工时申报</span>
+                <span v-if="scope.row.isApplyWorkTime > 0">替换：</span>
                 <el-switch v-if="scope.row.isApplyWorkTime > 0"></el-switch>
                 <el-tag v-if="scope.row.isApplyWorkTime === 0" type="primary">当月未申报</el-tag>
               </template>
@@ -330,7 +330,7 @@
         </el-form>
       </div>
       <div>
-        <el-table :data="submitParams.data" height="250">
+        <el-table :data="submitParams.data">
           <el-table-column label="序号" align="center" type="index"></el-table-column>
           <el-table-column label="项目阶段" align="center" prop="projectStageName"></el-table-column>
           <el-table-column label="计划进展" align="center">
@@ -648,22 +648,30 @@
               promises[count++] = this.projectDetailIsApplyWorkTime(searchData, 'fact')
               promises[count++] = this.getMonthProcess('fact', searchData)
               Promise.all(promises).then(result => {
-                this.applyMonthPlanProcessTableData = result[1].data
-                this.submitParams = result[1]
+                let submitParamsTmp = result[1]
                 for (let i = 0; i < result[0].length; i++) {
-                  this.submitParams.data[i].isApplyWorkTime = result[0][i].length
                   if (result[0][i].length > 0) {
-                    this.submitParams.data[i].id = []
-                    this.submitParams.data[i].submitedData = []
-                    for (let resultItem of result[0][i]) {
-                      this.submitParams.data[i].id.push(resultItem.id)
-                      resultItem.projectStageName = ''
-                      this.submitParams.data[i].submitedData.push(resultItem)
+                    if (result[0][i][0].applyProcess !== submitParamsTmp.data[i].applyMonthProcess) { // 现申报进展与已申报进展不等
+                      submitParamsTmp.data[i].isApplyWorkTime = result[0][i].length
+                      submitParamsTmp.data[i].id = []
+                      submitParamsTmp.data[i].submitedData = []
+                      for (let resultItem of result[0][i]) {
+                        submitParamsTmp.data[i].id.push(resultItem.id)
+                        resultItem.projectStageName = ''
+                        submitParamsTmp.data[i].submitedData.push(resultItem)
+                      }
+                    } else {
+                      submitParamsTmp.data[i] = []
                     }
                   } else {
-                    this.submitParams.data[i].id = null
+                    submitParamsTmp.data[i].isApplyWorkTime = result[0][i].length
+                    submitParamsTmp.data[i].id = null
                   }
                 }
+                console.log('submitParamsTmp')
+                console.log(submitParamsTmp)
+                // this.applyMonthPlanProcessTableData = result[1].data
+                this.submitParams = result[1]
               })
             }
           })
