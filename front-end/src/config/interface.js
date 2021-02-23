@@ -38,6 +38,7 @@ export const getGroupWorkTimeList = '/performance/getGroupWorkTimeList' // 获�
 export const getAllWorkTimeList = '/performance/getAllWorkTimeList' // 获取全处已申报工时列表
 export const getIsWorkTimeReviewFinish = '/performance/getIsWorkTimeReviewFinish' // 判断工时是否都已审核完毕
 export const getCurApplyAbleMonth = '/performance/getCurApplyAbleMonth' // 获取当前可申报的月份
+export const submitProjectWorkTimeApply = '/performance/submitProjectWorkTimeApply' // 提交项目工时申报
 
 export const getAssignProjectList = '/workStation/getAssignProjectList' // 获取未完成的指派项目列表
 export const getAssignProjectDetail = '/workStation/getAssignProjectDetail' // 获取未完成的指派项目明细

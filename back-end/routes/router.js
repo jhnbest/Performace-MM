@@ -51,6 +51,7 @@ router.post(api.getGroupWorkTimeList, performance.getGroupWorkTimeList)
 router.post(api.getAllWorkTimeList, performance.getAllWorkTimeList)
 router.post(api.getIsWorkTimeReviewFinish, performance.getIsWorkTimeReviewFinish)
 router.post(api.getCurApplyAbleMonth, performance.getCurApplyAbleMonth)
+router.post(api.submitProjectWorkTimeApply, performance.submitProjectWorkTimeApply)
 
 // workStation-个人工作台
 router.post(api.getAssignProjectList, workStation.getAssignProjectList)

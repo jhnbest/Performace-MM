@@ -102,6 +102,21 @@
             <span class="link-type" @click="handleCoopInfo(scope.row)">点击查看</span>
           </template>
         </el-table-column>
+        <el-table-column label="备注" align="center" width="100%">
+          <template slot-scope="scope">
+            <div v-if="scope.row.submitComments !== ''">
+              <el-popover
+                placement="top-start"
+                trigger="hover"
+                :content="scope.row.submitComments">
+                <span slot="reference" class="link-type">查看</span>
+              </el-popover>
+            </div>
+            <div v-else>
+              <span>无</span>
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column label="提交状态" align="center" class-name="status-col" width="100%">
           <template slot-scope="scope">
             <el-tag :type="scope.row.submitStatus | submitStatusFilter" size="medium">
@@ -416,6 +431,7 @@
         handleAddNew () {
           this.$router.push({ path: '/home/PerformanceAddNew' })
         },
+        // 查看工时分配情况
         handleCoopInfo (row) {
           this.showFlag.cop = true
           this.$nextTick(() => {

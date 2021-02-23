@@ -204,7 +204,7 @@ const sqlMap = {
     getUnFilledProjectList: 'select * from assignprojectlist where userID = ? and isFilled = 0 and obsoleteStatus != 1 and process != 100.0',
     getFilledProjectList: 'select * from assignprojectlist where userID = ? and isFilled = 1 and obsoleteStatus != 1 and process != 100.0',
     getCompleteProjectList: 'select * from assignprojectlist where userID = ? and obsoleteStatus != 1 and process = 100.0',
-    projectDetailIsApplyWorkTime: 'select count(*) as totalCount from worktimelist where apdID = ? and applyMonth = ? and applyType = ? and obsoleteStatus != 1'
+    projectDetailIsApplyWorkTime: 'select * from worktimelist where apdID = ? and applyMonth = ? and applyType = ? and obsoleteStatus != 1'
   },
   mutualRates: {
     getUserRates: 'select mr.*, u.name as ratedPersionName from mutualrate mr left join users u on ' +

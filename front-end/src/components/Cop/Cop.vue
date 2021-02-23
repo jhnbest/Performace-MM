@@ -1,5 +1,10 @@
 <template>
-  <el-dialog title="工时详情" :visible.sync="showFlag" custom-class="dialog-small" @close="closeDialog" width="60%">
+  <el-dialog title="工时详情"
+             :visible.sync="showFlag"
+             custom-class="dialog-small"
+             @close="closeDialog"
+             width="60%"
+             append-to-body>
     <div>
       <el-table
         height="400"
@@ -58,7 +63,6 @@ export default {
     // 初始化
     init (row) {
       this.$nextTick(() => {
-        console.log(row)
         this.changeShowFlag()
         this.getWorkTimeAssign(row.id)
       })
@@ -79,7 +83,6 @@ export default {
               for (let item of this.formData.copInfoTable) { // 插入审核状态
                 item.reviewStatus = data[1][0].reviewStatus
               }
-              console.log(this.formData.copInfoTable)
               this.reqFlag.getWorkTimeAssign = true
             }
           })

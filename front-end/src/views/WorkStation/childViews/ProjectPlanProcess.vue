@@ -252,7 +252,37 @@
             <el-table-column label="预计可获得工时" align="center" prop="avaiableWorkTime"></el-table-column>
             <el-table-column label="工时申报状态" align="center">
               <template slot-scope="scope">
-                <el-tag v-if="scope.row.isApplyWorkTime > 0" type="danger">当月已申报</el-tag>
+                <el-popover
+                  title="已申报工时信息"
+                  placement="right"
+                  trigger="click">
+                  <el-table :data="scope.row.submitedData">
+                    <el-table-column label="项目阶段" align="center" prop="projectStageName"></el-table-column>
+                    <el-table-column label="上月进展" align="center">
+                      <template slot-scope="scope">
+                        <span>{{scope.row.lastProcess + '%'}}</span>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="本月进展" align="center" prop="applyProcess">
+                      <template slot-scope="scope">
+                        <span>{{scope.row.applyProcess + '%'}}</span>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="预计可获得工时" align="center" prop="avaiableWorkTime"></el-table-column>
+                    <el-table-column label="工时分配" align="center">
+                      <template slot-scope="scope">
+                        <span class="link-type" @click="handleSubmitedWorkTimeAssignCheck(scope.row)">点击查看</span>
+                      </template>
+                    </el-table-column>
+                  </el-table>
+                  <el-tag v-if="scope.row.isApplyWorkTime > 0"
+                          type="danger"
+                          slot="reference"
+                          style="cursor: pointer" @click="handleSubmitedClick(scope.row)">当月已申报</el-tag>
+                </el-popover>
+                <br v-if="scope.row.isApplyWorkTime > 0">
+                <span v-if="scope.row.isApplyWorkTime > 0">覆盖已有工时申报</span>
+                <el-switch v-if="scope.row.isApplyWorkTime > 0"></el-switch>
                 <el-tag v-if="scope.row.isApplyWorkTime === 0" type="primary">当月未申报</el-tag>
               </template>
             </el-table-column>
@@ -277,6 +307,7 @@
       </div>
       <Assign v-if="showFlag.workTimeAssign" ref="workTimeAssign" @assignDetail="handleAssign"/>
     </el-dialog>
+    <Cop v-if="showFlag.cop" ref="cop"/>
     <!-----------------------------------------------生成项目计划对话框---------------------------------------------------->
     <el-dialog :visible.sync="dialogPlanFormVisible" width="65%" :title="formData.projectName + '项目计划'">
       <div>
@@ -334,9 +365,11 @@
     workTimeSubmit,
     getIsSubmitAllow,
     getCurApplyAbleMonth,
-    projectDetailIsApplyWorkTime
+    projectDetailIsApplyWorkTime,
+    submitProjectWorkTimeApply
   } from '@/config/interface'
   import Assign from '@/components/Cop/workTimeAssign'
+  import Cop from '@/components/Cop/Cop'
   export default {
       data () {
         return {
@@ -428,7 +461,8 @@
           applyMonthPlanProcessTableData: [],
           submitParams: {},
           showFlag: {
-            workTimeAssign: false
+            workTimeAssign: false,
+            cop: false
           },
           tableHeight: null,
           curApplyMonth: null
@@ -490,35 +524,45 @@
             if (valid) {
               this.getIsSubmitAllow().then(getIsSubmitAllowRes => {
                 if (getIsSubmitAllowRes.length === 0 || this.$store.state.userInfo.id === 26) {
-                  let url = workTimeSubmit
-                  let _this = this
-                  for (let i = 0; i < this.submitParams.data.length; i++) { // 删除当月已经申报工时
-                    if (this.submitParams.data[i].isApplyWorkTime > 0) {
-                      console.log('this.submitParams.data')
-                      console.log(this.submitParams.data)
-                    }
+                  let url = submitProjectWorkTimeApply
+                  let params = {
+                    workTimeInfo: this.submitParams,
+                    projectID: Number(this.$route.query.projectID)
                   }
+                  let _this = this
+                  // for (let i = 0; i < this.submitParams.data.length; i++) { // 删除当月已经申报工时
+                  //   if (this.submitParams.data[i].isApplyWorkTime > 0) {
+                  //     console.log('this.submitParams.data')
+                  //     console.log(this.submitParams.data)
+                  //   }
+                  // }
                   return new Promise(function (resolve, reject) {
                     if (_this.reqFlag.genWorkTimeApply) {
                       _this.reqFlag.genWorkTimeApply = false
-                      _this.$http(url, _this.submitParams).then(res => {
+                      _this.$http(url, params).then(res => {
                         if (res.code === 1) {
-                          url = updateAssignProjectFilled
-                          let params = {
-                            assignProjectID: _this.$route.query.projectID
-                          }
-                          _this.$http(url, params).then((res) => {
-                            if (res.code === 1) {
-                              _this.$common.toast('生成成功', 'success', false)
-                              _this.$router.push({ path: '/home/workStation' })
-                              _this.dialogFormVisible = false
-                              resolve(res.code)
-                            } else {
-                              this.$common.toast('生成失败', 'error', false)
-                              reject(res.code)
-                            }
-                            _this.reqFlag.genWorkTimeApply = true
-                          })
+                          _this.$common.toast('生成成功', 'success', false)
+                          _this.$router.push({ path: '/home/workStation' })
+                          _this.dialogFormVisible = false
+                          // url = updateAssignProjectFilled
+                          // let params = {
+                          //   assignProjectID: _this.$route.query.projectID
+                          // }
+                          // _this.$http(url, params).then((res) => {
+                          //   if (res.code === 1) {
+                          //     _this.$common.toast('生成成功', 'success', false)
+                          //     _this.$router.push({ path: '/home/workStation' })
+                          //     _this.dialogFormVisible = false
+                          //     resolve(res.code)
+                          //   } else {
+                          //     this.$common.toast('生成失败', 'error', false)
+                          //     reject(res.code)
+                          //   }
+                          //   _this.reqFlag.genWorkTimeApply = true
+                          // })
+                        } else {
+                          this.$common.toast('生成失败', 'error', false)
+                          reject(res.code)
                         }
                       })
                     }
@@ -607,7 +651,18 @@
                 this.applyMonthPlanProcessTableData = result[1].data
                 this.submitParams = result[1]
                 for (let i = 0; i < result[0].length; i++) {
-                  this.submitParams.data[i].isApplyWorkTime = result[0][i][0].totalCount
+                  this.submitParams.data[i].isApplyWorkTime = result[0][i].length
+                  if (result[0][i].length > 0) {
+                    this.submitParams.data[i].id = []
+                    this.submitParams.data[i].submitedData = []
+                    for (let resultItem of result[0][i]) {
+                      this.submitParams.data[i].id.push(resultItem.id)
+                      resultItem.projectStageName = ''
+                      this.submitParams.data[i].submitedData.push(resultItem)
+                    }
+                  } else {
+                    this.submitParams.data[i].id = null
+                  }
                 }
               })
             }
@@ -641,7 +696,14 @@
                 this.applyMonthPlanProcessTableData = result[1].data
                 this.submitParams = result[1]
                 for (let i = 0; i < result[0].length; i++) {
-                  this.submitParams.data[i].isApplyWorkTime = result[0][i][0].totalCount
+                  if (result[0][i].length > 0) {
+                    this.submitParams.data[i].id = []
+                    for (let resultItem of result[0][i]) {
+                      this.submitParams.data[i].id.push(resultItem.id)
+                    }
+                  } else {
+                    this.submitParams.data[i].id = null
+                  }
                 }
               })
             }
@@ -924,6 +986,19 @@
             return this.$moment(this.formData.yearNum + '-' + this.$common.mStringToNumber(month)).isBefore(this.curApplyMonth) ||
               this.$moment(this.formData.yearNum + '-' + this.$common.mStringToNumber(month)).isAfter(this.curApplyMonth)
           }
+        },
+        // 当月已申报点击事件
+        handleSubmitedClick (row) {
+          for (let item of row.submitedData) {
+            item.projectStageName = row.projectStageName
+          }
+        },
+        // 已申报的工时分配情况
+        handleSubmitedWorkTimeAssignCheck (row) {
+          this.showFlag.cop = true
+          this.$nextTick(() => {
+            this.$refs.cop.init(row)
+          })
         }
       },
       computed: {
@@ -940,7 +1015,8 @@
         }
       },
       components: {
-        Assign
+        Assign,
+        Cop
       },
       filters: {
         processTypeFilter (type) {
@@ -967,26 +1043,4 @@
 </script>
 
 <style scoped>
-  .abow_dialog {
-    display: flex;
-    justify-content: center;
-    align-items: Center;
-    overflow: hidden;
-    .el-dialog {
-      margin: 0 auto !important;
-      height: 50%;
-      overflow: hidden;
-      .el-dialog__body {
-        position: absolute;
-        left: 0;
-        top: 54px;
-        bottom: 0;
-        right: 0;
-        padding: 0;
-        z-index: 1;
-        overflow: hidden;
-        overflow-y: auto;
-      }
-    }
-  }
 </style>

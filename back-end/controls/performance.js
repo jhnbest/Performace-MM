@@ -231,6 +231,37 @@ async function workTimeInsert(sendData, res, operate) {
     }
 }
 
+function workTimeInsertTmp(sendData, operate) {
+    let promises1 = []
+    let promises2 = []
+    let count1 = 0
+    let count2 = 0
+    return new Promise(function (resolve, reject) {
+        for (let i = 0; i < sendData.data.length; i++) { // 逐条插入工时项目
+            promises1[count1++] = workTimeInsertOP(sendData, i, operate)
+        }
+        Promise.all(promises1).then(result1 => {
+            // 插入/更新工时分配信息
+            for (let i = 0; i < sendData.data.length; i++) {
+                for (let j = 0;j < sendData.data[i].workTimeAssign.length; j++) {
+                    let insertID = null
+                    if (sendData.submitType === 'insert') {
+                        insertID = result1[i].result.insertId
+                    } else if (sendData.submitType === 'update') {
+                        insertID = sendData.projectID
+                    }
+                    promises2[count2++] = workTimeAssign(insertID, sendData, i, j)
+                }
+            }
+            Promise.all(promises2).then(result2 => {
+                resolve(result2)
+            }).catch(err2 => {
+                reject(new Error(err2))
+            })
+        })
+    })
+}
+
 function getGroupID(groupName) {
     switch (groupName) {
         case '技术标准组':
@@ -561,6 +592,49 @@ function RCPDDatabase(sql, arrayParams) {
                 resolve(result)
             }
         })
+    })
+}
+
+ // 更新项目月工时申报状态
+function updateAssignProjectFilled (assignProjectID) {
+    let sql = $sql.workStation.updateAssignProjectFilled
+    let arrayParams = [assignProjectID]
+    return new Promise(function (resolve, reject) {
+        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+            RCPDDatabaseRes = JSON.parse(JSON.stringify(RCPDDatabaseRes))
+            resolve(RCPDDatabaseRes)
+        }).catch(RCPDDatabaseErr => {
+            reject(RCPDDatabaseErr)
+        })
+    })
+}
+
+function deleteExistWorkTimeSubmit(workTimeSubmitData) {
+    let promises = []
+    let count = 0
+    return new Promise(function (resolve, reject) {
+        console.log('workTimeSubmitData')
+        console.log(workTimeSubmitData)
+        for (let workTimeSubmitDataItem of workTimeSubmitData) {
+            if (workTimeSubmitDataItem.isApplyWorkTime > 0) {
+                for (let workTimeSubmitDataItemID of workTimeSubmitDataItem.id) {
+                    let sqlDeleteProject = $sql.performance.deleteProject
+                    let deleteWorkTimeAssign = $sql.performance.deleteWorkTimeAssign
+                    let arrayParams = [workTimeSubmitDataItemID, workTimeSubmitDataItemID]
+                    let sql = sqlDeleteProject + ';' + deleteWorkTimeAssign
+                    promises[count++] = RCPDDatabase(sql, arrayParams)
+                }
+            }
+        }
+        if (count > 0) {
+            Promise.all(promises).then(result => {
+                resolve(result)
+            }).catch(error => {
+                reject(new Error(error))
+            })
+        } else {
+            resolve()
+        }
     })
 }
 
@@ -957,7 +1031,7 @@ const performance = {
         RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
             return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
         }).catch(RCPDDatabaseErr => {
-            return $http.writeJson(res, {code: 1, data: RCPDDatabaseErr, message: 'err'})
+            return $http.writeJson(res, {code: -2, data: RCPDDatabaseErr, message: 'err'})
         })
     },
     // 获取当前可申报的月份
@@ -967,7 +1041,25 @@ const performance = {
         RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
             return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
         }).catch(RCPDDatabaseErr => {
-            return $http.writeJson(res, {code: 1, data: RCPDDatabaseErr, message: 'err'})
+            return $http.writeJson(res, {code: -2, data: RCPDDatabaseErr, message: 'err'})
+        })
+    },
+    // 提交项目工时申报
+    submitProjectWorkTimeApply (req, res) {
+        let sendData = req.body
+        sendData.workTimeInfo.userId = sendData.userId
+        workTimeInsertTmp(sendData.workTimeInfo, '1').then(() => {
+            deleteExistWorkTimeSubmit(sendData.workTimeInfo.data).then(() => {
+                updateAssignProjectFilled(sendData.projectID).then((updateAssignProjectFilledRes) => {
+                    return $http.writeJson(res, {code: 1, data: updateAssignProjectFilledRes, message: 'success'})
+                }).catch(updateAssignProjectFilledErr => {
+                    return $http.writeJson(res, {code: -2, data: updateAssignProjectFilledErr, message: 'err'})
+                })
+            }).catch(deleteExistWorkTimeSubmitErr => {
+                return $http.writeJson(res, {code: -2, data: deleteExistWorkTimeSubmitErr, message: 'err'})
+            })
+        }).catch(workTimeInsertTmpErr => {
+            return $http.writeJson(res, {code: -2, data: workTimeInsertTmpErr, message: 'err'})
         })
     }
 }

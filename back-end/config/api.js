@@ -44,6 +44,7 @@ module.exports = {
     getAllWorkTimeList: path + '/performance/getAllWorkTimeList', // 获取全处已审工时列表
     getIsWorkTimeReviewFinish: path + '/performance/getIsWorkTimeReviewFinish', // 判断工时是否都已审核完毕
     getCurApplyAbleMonth: path + '/performance/getCurApplyAbleMonth', // 获取当前可申报的月份
+    submitProjectWorkTimeApply: path + '/performance/submitProjectWorkTimeApply', // 提交项目工时申报
 
     // workStation-个人工作台
     getAssignProjectList: path + '/workStation/getAssignProjectList',

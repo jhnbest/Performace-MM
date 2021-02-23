@@ -661,12 +661,9 @@
         },
         // 工时分配子组件回调
         handleAssign (params) {
-          console.log('===PerformanceAddNew.vue handleAssign')
-          console.log(params)
           this.formData.workTypeTimeDetail[params.index].workTimeAssign = params.workTimeAssignDetail
           this.formData.workTypeTimeDetail[params.index].multipleAssign = params.multipleAssign
           this.formData.workTypeTimeDetail[params.index].multipleSelect = params.multipleSelect
-          console.log(this.formData.workTypeTimeDetail)
         },
         // 删除工时明细数据
         participantDelete (account) {
