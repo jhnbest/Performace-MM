@@ -72,3 +72,4 @@ export const updateUserRate = '/mutualRates/updateUserRate' // 更新互评结�
 export const getCurMutualRate = '/mutualRates/getCurMutualRate' // 获取本人互评得分
 export const getAllUserRates = '/mutualRates/getAllUserRates' // 获取本处员工互评得分
 export const getPerformanceIsCount = '/mutualRates/getPerformanceIsCount' // 获取绩效信息统计标志
+export const getPreMonthEva = '/mutualRates/getPreMonthEva' // 提取上月互评结果

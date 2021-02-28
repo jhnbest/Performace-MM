@@ -79,5 +79,6 @@ module.exports = {
     updateUserRate: path + '/mutualRates/updateUserRate', // 更新互评结果
     getCurMutualRate: path + '/mutualRates/getCurMutualRate', // 获取本人互评得分
     getAllUserRates: path + '/mutualRates/getAllUserRates', // 获取本处员工互评得分
-    getPerformanceIsCount: path + '/mutualRates/getPerformanceIsCount' // 获取绩效信息统计标志
+    getPerformanceIsCount: path + '/mutualRates/getPerformanceIsCount', // 获取绩效信息统计标志
+    getPreMonthEva: path + '/mutualRates/getPreMonthEva' // 提取上月互评结果
 };

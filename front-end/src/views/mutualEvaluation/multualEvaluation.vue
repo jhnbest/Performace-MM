@@ -65,6 +65,7 @@
       <span v-if="isRated" style="font-weight: bolder;color: green;font-size: 23px">已评价</span>
       <span v-else style="font-weight: bolder;color: red;font-size: 23px">未评价</span>
     </span>
+    <el-button size="medium" type="success" style="margin-left: 20px" @click="getPreMonthEva" :disabled="!reqFlag.getPreMonthEva">提取上月评价</el-button>
     <span style="font-weight: bolder;margin-left: 60px" v-if="$store.state.userInfo.id === 26">首页绩效信息发布状态:
       <span v-if="isPerformancePublish" style="color: green;font-size: 23px">已发布</span>
       <span v-else style="color: red;font-size: 23px">未发布</span>
@@ -220,7 +221,9 @@
     getAllWorkTimeList,
     getAllUserRates,
     performanceInfoPublish,
-    getPerformanceIsPublish } from '@/config/interface'
+    getPerformanceIsPublish,
+    getPreMonthEva,
+    getCurApplyAbleMonth } from '@/config/interface'
   import CountTo from 'vue-count-to'
   export default {
     data () {
@@ -438,7 +441,8 @@
           getUsersList: true,
           updateRateToUpdate: true,
           getAllWorkTimeList: true,
-          getAllUserRates: true
+          getAllUserRates: true,
+          getPreMonthEva: true
         },
         ratesTmp: [],
         ratesToUpdate: [],
@@ -470,8 +474,11 @@
         let _this = this
         let promises = []
         let count = 0
-        this.getCookie()
+        // this.getCookie()
         // this.getCurMutualRate()
+        this.getCurApplyAbleMonth().then(getCurApplyAbleMonthRes => {
+          this.formData.title = this.$moment(getCurApplyAbleMonthRes[0].setTime).format('YYYY-MM')
+        })
         this.getUsersList().then(res1 => {
           _this.users = res1
           _this.getUserRates().then(res2 => {
@@ -516,6 +523,23 @@
                 this.$common.toast(err, 'error', true)
               })
             }
+          })
+        })
+      },
+      // 获取当前可申报的月份
+      getCurApplyAbleMonth () {
+        const url = getCurApplyAbleMonth
+        let params = {}
+        let _this = this
+        return new Promise(function (resolve, reject) {
+          _this.$http(url, params).then(res => {
+            if (res.code === 1) {
+              resolve(res.data)
+            } else {
+              reject(res.data)
+            }
+          }).catch(err => {
+            reject(err)
           })
         })
       },
@@ -1978,6 +2002,70 @@
             reject(new Error('getIsSubmitAllow send error!'))
           })
         })
+      },
+      // 提取上月互评结果
+      getPreMonthEva () {
+        let promises = []
+        let count = 0
+        const url = getPreMonthEva
+        let params = {
+          userID: this.$store.state.userInfo.id,
+          rateMonth: this.$moment(this.formData.title).subtract(1, 'months').format('YYYY-MM')
+        }
+        if (this.reqFlag.getPreMonthEva) {
+          this.reqFlag.getPreMonthEva = false
+          this.$http(url, params).then(res => {
+            if (res.code === 1) {
+              if (res.data.length === 0) {
+                this.$common.toast('上月未评价', 'error', false)
+              } else {
+                this.genRateTableData(this.users, res.data)
+                this.reqFlag.getPreMonthEva = true
+                if (this.$store.state.userInfo.id === 26) {
+                  this.getPerformanceIsPublish().then(getPerformanceIsPublishRes => {
+                    this.performanceIsPublishInfo = getPerformanceIsPublishRes
+                    if (getPerformanceIsPublishRes.length > 0) {
+                      this.isPerformancePublish = getPerformanceIsPublishRes[0].flagValue === 1
+                    } else {
+                      this.isPerformancePublish = false
+                    }
+                  }).catch(getPerformanceIsPublishErr => {
+                    this.isPerformancePublish = false
+                    this.$common.toast(getPerformanceIsPublishErr, 'error', false)
+                  })
+                  promises[count++] = this.getQuantitativeInfo() // 获取定量评价结果
+                  promises[count++] = this.getAllMultualEvaResult() // 获取全处互评结果
+                  let genQuantativeDataResult = null
+                  let genMultualEvaDataResult = null
+                  Promise.all(promises).then(result => {
+                    if (!result[0].err) { // 工时已截止且审核完毕
+                      genQuantativeDataResult = this.genQuantativeData(result[0].content)
+                      this.quantativeData = JSON.parse(JSON.stringify(genQuantativeDataResult))
+                    } else {
+                      this.isQuantativeFinish = false
+                    }
+                    if (!result[1].err) { // 互评已截止
+                      genMultualEvaDataResult = this.genMultualEvaData(result[1].content)
+                      this.multualEvaData = JSON.parse(JSON.stringify(genMultualEvaDataResult))
+                    } else {
+                      this.multualEvaData = []
+                      this.isMultualEvaFinish = false
+                    }
+                    if (!result[0].err && !result[1].err) { // 工时已审核完毕且互评已截止
+                      this.isQuantativeFinish = true
+                      this.isMultualEvaFinish = true
+                      this.genPerformanceScore(genQuantativeDataResult, genMultualEvaDataResult, 'init')
+                    }
+                    this.reqFlag.getPreMonthEva = true
+                  }).catch(err => {
+                    this.$common.toast(err, 'error', true)
+                    this.reqFlag.getPreMonthEva = true
+                  })
+                }
+              }
+            }
+          })
+        }
       }
     },
     components: {

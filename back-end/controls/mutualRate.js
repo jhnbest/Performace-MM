@@ -171,10 +171,21 @@ const mutualRate = {
         let sql = $sql.mutualRates.getPerformanceIsCount
         let arrayParams = [sendData.year, sendData.month, sendData.flagType]
         RCPDDatabase(sql, arrayParams).then(res0 => {
-            console.log(res0)
             return $http.writeJson(res, {code: 1, data: res0, message: 'success'})
         }).catch(err => {
-            return $http.writeJson(res, {code: -1, err: err, message: 'false'})
+            return $http.writeJson(res, {code: -2, err: err, message: 'false'})
+        })
+    },
+    // 提取上月互评结果
+    getPreMonthEva (req, res) {
+        let sendData = req.body
+        let sql = $sql.mutualRates.getPreMonthEva
+        console.log(sendData)
+        let arrayParams = [sendData.rateMonth, sendData.userID]
+        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+            return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
+        }).catch(RCPDDatabaseErr => {
+            return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
         })
     }
 }

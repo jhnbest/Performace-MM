@@ -215,6 +215,8 @@ const sqlMap = {
     getCurMutualRate: 'select * from mutualrate where ratedPersion = ? and rateMonth = ?',
     getRateData: 'select * from mutualrate where ratePersion = ? and rateMonth = ?',
     getPerformanceIsCount: 'select * from globalflag where year(setTime) = ? and month(setTime) = ? and flagType = ?',
+    getPreMonthEva: 'select mr.*, u.name as ratedPersionName from mutualrate mr left join users u on mr.ratedPersion = ' +
+        'u.id where mr.rateMonth = ? and mr.ratePersion = ?'
   }
 }
 module.exports = sqlMap;

@@ -73,7 +73,7 @@
                         v-model.number="scope.row.February"
                         size="mini"
                         type="number"
-                        :disabled="monthIsEditable(scope.row, 'February')"></el-input>
+                        :disabled="monthIsEditable(scope.row, 'February')" @mouseover="test"></el-input>
               <span v-else>{{scope.row.February}}</span>
               <span v-if="!scope.row.editable && scope.row.February !== null && scope.row.February !== ''">%</span>
             </template>
@@ -255,9 +255,9 @@
                 <el-popover
                   title="已申报工时信息"
                   placement="right"
-                  trigger="click">
+                  trigger="hover">
                   <el-table :data="scope.row.submitedData">
-                    <el-table-column label="项目阶段" align="center" prop="projectStageName"></el-table-column>
+<!--                    <el-table-column label="项目阶段" align="center" prop="projectStageName"></el-table-column>-->
                     <el-table-column label="上月进展" align="center">
                       <template slot-scope="scope">
                         <span>{{scope.row.lastProcess + '%'}}</span>
@@ -278,11 +278,9 @@
                   <el-tag v-if="scope.row.isApplyWorkTime > 0"
                           type="danger"
                           slot="reference"
-                          style="cursor: pointer" @click="handleSubmitedClick(scope.row)">当月已申报</el-tag>
+                          style="cursor: pointer"
+                          @mouseover="handleSubmitedClick(scope.row)">当月已申报</el-tag>
                 </el-popover>
-                <br v-if="scope.row.isApplyWorkTime > 0">
-                <span v-if="scope.row.isApplyWorkTime > 0">替换：</span>
-                <el-switch v-if="scope.row.isApplyWorkTime > 0"></el-switch>
                 <el-tag v-if="scope.row.isApplyWorkTime === 0" type="primary">当月未申报</el-tag>
               </template>
             </el-table-column>
@@ -303,7 +301,7 @@
         <el-button @click="dialogFormVisible = false">取消</el-button>
         <el-button type="primary"
                    @click="handleWorkTimeApply('dialogForm')"
-                   :disabled="!reqFlag.genWorkTimeApply">生成</el-button>
+                   :disabled="!reqFlag.genWorkTimeApply || this.submitParams.data.length === 0">生成</el-button>
       </div>
       <Assign v-if="showFlag.workTimeAssign" ref="workTimeAssign" @assignDetail="handleAssign"/>
     </el-dialog>
@@ -443,7 +441,7 @@
             ]
           },
           dialogForm: {
-            title: this.$moment().subtract(1, 'months').format('YYYY-MM')
+            title: this.$moment().format('YYYY-MM')
           },
           reqFlag: {
             getAssignProjectDetail: true,
@@ -459,7 +457,9 @@
           },
           applyMonthPlanProcess: [],
           applyMonthPlanProcessTableData: [],
-          submitParams: {},
+          submitParams: {
+            data: []
+          },
           showFlag: {
             workTimeAssign: false,
             cop: false
@@ -469,6 +469,9 @@
         }
       },
       methods: {
+        test () {
+          console.log('1111111')
+        },
         // 初始化
         init () {
           this.formData.projectType = this.$route.query.projectType
@@ -486,8 +489,8 @@
               if (projectStageDetailItem.type === 'fact') {
                 if (projectStageDetailItem.January === null &&
                   projectStageDetailItem.process !== 0 &&
-                  projectStageDetailItem.process !== 100.0) {
-                  // this.$common.toast(projectStageDetailItem.projectStageName + '2021-01月份未填报进度，已设置为2020-12月份进度', 'warning', true)
+                  projectStageDetailItem.process !== 100.0 &&
+                  projectStageDetailItem.February === null) {
                   projectStageDetailItem.January = projectStageDetailItem.process
                   this.handleSaveTmp(projectStageDetailItem, count)
                 }
@@ -600,11 +603,11 @@
           })
         },
         // 查看项目阶段当月是否已填报工时
-        projectDetailIsApplyWorkTime (searchData, type) {
+        projectDetailIsApplyWorkTime (searchData, type, applyMonth) {
           const url = projectDetailIsApplyWorkTime
           let params = {
             projectDetailID: [],
-            applyMonth: this.dialogForm.title,
+            applyMonth: applyMonth,
             type: type
           }
           for (let searchDataItem of searchData) {
@@ -639,13 +642,15 @@
                 searchData.push(item)
               }
             }
+            this.submitParams = {
+              data: []
+            }
             if (searchData.length === 0) {
               this.reqFlag.genWorkTimeApply = false
-              this.submitParams = []
               this.applyMonthPlanProcessTableData = []
               this.$common.toast(this.dialogForm.title + '月份未填报实际进展', 'error', 'true')
             } else {
-              promises[count++] = this.projectDetailIsApplyWorkTime(searchData, 'fact')
+              promises[count++] = this.projectDetailIsApplyWorkTime(searchData, 'fact', this.dialogForm.title)
               promises[count++] = this.getMonthProcess('fact', searchData)
               Promise.all(promises).then(result => {
                 let submitParamsTmp = result[1]
@@ -668,10 +673,16 @@
                     submitParamsTmp.data[i].id = null
                   }
                 }
+                for (let i = 0; i < submitParamsTmp.data.length; i++) {
+                  if (submitParamsTmp.data[i].length === 0) {
+                    submitParamsTmp.data.splice(i, 1)
+                    i--
+                  }
+                }
                 console.log('submitParamsTmp')
                 console.log(submitParamsTmp)
-                // this.applyMonthPlanProcessTableData = result[1].data
-                this.submitParams = result[1]
+                this.applyMonthPlanProcessTableData = submitParamsTmp.data
+                this.submitParams = submitParamsTmp
               })
             }
           })
@@ -692,13 +703,15 @@
                 searchData.push(item)
               }
             }
+            this.submitParams = {
+              data: []
+            }
             if (searchData.length === 0) {
               this.reqFlag.genWorkTimeApply = false
-              this.submitParams = []
               this.applyMonthPlanProcessTableData = []
               this.$common.toast(this.dialogForm.title + '月份未填报计划进展', 'error', 'true')
             } else {
-              promises[count++] = this.projectDetailIsApplyWorkTime(searchData, 'plan')
+              promises[count++] = this.projectDetailIsApplyWorkTime(searchData, 'plan', this.dialogForm.title)
               promises[count++] = this.getMonthProcess('plan', searchData)
               Promise.all(promises).then(result => {
                 this.applyMonthPlanProcessTableData = result[1].data
@@ -844,14 +857,23 @@
             }
             this.formData.tableData = res
             this.formData.tableDataCache = JSON.parse(JSON.stringify(this.formData.tableData))
-            this.fillProcessOfJanuary(this.formData.yearNum, res)
-            console.log('this.formData.tableData')
-            console.log(this.formData.tableData)
+            this.fillProcessOfJanuary(this.formData.yearNum, res) // 临时填充2021-01月份的进展
           })
         },
         // 表格编辑按钮
         handleEdit (row, index) {
-          row.editable = true
+          console.log('row')
+          console.log(row)
+          if (row.type === 'fact') {
+            this.projectDetailIsApplyWorkTime([row], 'fact', this.curApplyMonth).then(projectDetailIsApplyWorkTimeRes => {
+              console.log('projectDetailIsApplyWorkTimeRes')
+              console.log(projectDetailIsApplyWorkTimeRes)
+              row.isApplyWorkTime = projectDetailIsApplyWorkTimeRes[0].length
+              row.editable = true
+            })
+          } else {
+            row.editable = true
+          }
         },
         // 表格保存按钮
         handleSave (row, index) {
@@ -992,11 +1014,12 @@
             return false
           } else if (row.type === 'fact') {
             return this.$moment(this.formData.yearNum + '-' + this.$common.mStringToNumber(month)).isBefore(this.curApplyMonth) ||
-              this.$moment(this.formData.yearNum + '-' + this.$common.mStringToNumber(month)).isAfter(this.curApplyMonth)
+              this.$moment(this.formData.yearNum + '-' + this.$common.mStringToNumber(month)).isAfter(this.curApplyMonth) || row.isApplyWorkTime > 0
           }
         },
         // 当月已申报点击事件
         handleSubmitedClick (row) {
+          this.$common.toast('111', 'error', false)
           for (let item of row.submitedData) {
             item.projectStageName = row.projectStageName
           }
