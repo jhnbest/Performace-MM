@@ -229,8 +229,17 @@
 </template>
 
 <script>
-  import { workTimeSubmit, submitAssignWorkDetail, submitMonthPlanProcess, getIsSubmitAllow,
-    getUsersName, getProjectType, getWorkTimeNew, workTimeTemporary, submitPersonalProject } from '@/config/interface'
+  import {
+    workTimeSubmit,
+    submitAssignWorkDetail,
+    submitMonthPlanProcess,
+    getIsSubmitAllow,
+    getUsersName,
+    getProjectType,
+    getWorkTimeNew,
+    workTimeTemporary,
+    submitPersonalProject,
+    getCurApplyAbleMonth } from '@/config/interface'
   import Assign from '@/components/Cop/workTimeAssign'
     export default {
       data () {
@@ -391,7 +400,12 @@
         // 初始化
         init () {
           this.getProjectType()
-          this.getCookie()
+          // this.getCookie()
+          this.getCurApplyAbleMonth().then(getCurApplyAbleMonthRes => {
+            this.formData.title = this.$moment(getCurApplyAbleMonthRes[0].setTime).format('YYYY-MM')
+            console.log('this.formData.title')
+            console.log(this.formData.title)
+          })
         },
         // 获取当前月份能否申报的标志
         getIsSubmitAllow () {
@@ -1085,6 +1099,23 @@
         // 申报月份变化
         handleDataChange () {
           this.setCookie(this.formData.title, 7)
+        },
+        // 获取当前可申报的月份
+        getCurApplyAbleMonth () {
+          const url = getCurApplyAbleMonth
+          let params = {}
+          let _this = this
+          return new Promise(function (resolve, reject) {
+            _this.$http(url, params).then(res => {
+              if (res.code === 1) {
+                resolve(res.data)
+              } else {
+                reject(res.data)
+              }
+            }).catch(err => {
+              reject(err)
+            })
+          })
         }
       },
       computed: {

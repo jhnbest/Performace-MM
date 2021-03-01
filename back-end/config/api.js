@@ -72,6 +72,8 @@ module.exports = {
     performanceInfoPublish: path + '/workStation/performanceInfoPublish', // 是否发布首页绩效信息
     getUnFilledProjectList: path + '/workStation/getUnFilledProjectList', // 获取未填报的项目列表
     projectDetailIsApplyWorkTime: path + '/workStation/projectDetailIsApplyWorkTime', // 查看项目阶段当月是否已填报工时
+    repairErrorData: path + '/workStation/repairErrorData', // 修复错误数据
+    repairErrorData2: path + '/workStation/repairErrorData2', // 修复错误数据2
 
     // 互评模块
     getUserRates: path + '/mutualRates/getUserRates', // 获取互评信息

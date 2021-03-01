@@ -24,9 +24,9 @@
         <el-col :xs="9" :sm="9" :lg="{span: 9, offset: 2}" :xl="{span: 10, offset: 2}">
           <span style="font-size: 22px">{{formData.projectName  + '计划&实际进展填报'}}</span>
         </el-col>
-        <el-col :xs="3" :sm="3" :lg="{span: 3, offset: 1}" :xl="{span: 2, offset: 3}">
-          <el-button size="medium" type="warning" @click="genWorkTimePlanApply">生成项目计划</el-button>
-        </el-col>
+<!--        <el-col :xs="3" :sm="3" :lg="{span: 3, offset: 1}" :xl="{span: 2, offset: 3}">-->
+<!--          <el-button size="medium" type="warning" @click="genWorkTimePlanApply">生成项目计划</el-button>-->
+<!--        </el-col>-->
         <el-col :xs="3" :sm="3" :lg="{span: 3}" :xl="{span: 2}">
           <el-button size="medium" type="primary" @click="genWorkTimeApply">生成工时申报</el-button>
         </el-col>
@@ -73,7 +73,7 @@
                         v-model.number="scope.row.February"
                         size="mini"
                         type="number"
-                        :disabled="monthIsEditable(scope.row, 'February')" @mouseover="test"></el-input>
+                        :disabled="monthIsEditable(scope.row, 'February')"></el-input>
               <span v-else>{{scope.row.February}}</span>
               <span v-if="!scope.row.editable && scope.row.February !== null && scope.row.February !== ''">%</span>
             </template>
@@ -469,16 +469,13 @@
         }
       },
       methods: {
-        test () {
-          console.log('1111111')
-        },
         // 初始化
         init () {
           this.formData.projectType = this.$route.query.projectType
           this.formData.projectName = this.$route.query.projectName
           this.getAssignProjectDetail(this.$route.query.projectID)
           this.getCurApplyAbleMonth().then(getCurApplyAbleMonthRes => {
-            this.curApplyMonth = this.$moment(getCurApplyAbleMonthRes[0]).format('YYYY-MM')
+            this.curApplyMonth = this.$moment(getCurApplyAbleMonthRes[0].setTime).format('YYYY-MM')
           })
         },
         // 临时填充2021-01月份的进展
@@ -679,8 +676,6 @@
                     i--
                   }
                 }
-                console.log('submitParamsTmp')
-                console.log(submitParamsTmp)
                 this.applyMonthPlanProcessTableData = submitParamsTmp.data
                 this.submitParams = submitParamsTmp
               })
@@ -866,8 +861,6 @@
           console.log(row)
           if (row.type === 'fact') {
             this.projectDetailIsApplyWorkTime([row], 'fact', this.curApplyMonth).then(projectDetailIsApplyWorkTimeRes => {
-              console.log('projectDetailIsApplyWorkTimeRes')
-              console.log(projectDetailIsApplyWorkTimeRes)
               row.isApplyWorkTime = projectDetailIsApplyWorkTimeRes[0].length
               row.editable = true
             })

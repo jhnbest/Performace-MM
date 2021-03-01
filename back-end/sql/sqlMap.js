@@ -204,7 +204,15 @@ const sqlMap = {
     getUnFilledProjectList: 'select * from assignprojectlist where userID = ? and isFilled = 0 and obsoleteStatus != 1 and process != 100.0',
     getFilledProjectList: 'select * from assignprojectlist where userID = ? and isFilled = 1 and obsoleteStatus != 1 and process != 100.0',
     getCompleteProjectList: 'select * from assignprojectlist where userID = ? and obsoleteStatus != 1 and process = 100.0',
-    projectDetailIsApplyWorkTime: 'select * from worktimelist where apdID = ? and applyMonth = ? and applyType = ? and obsoleteStatus != 1'
+    projectDetailIsApplyWorkTime: 'select * from worktimelist where apdID = ? and applyMonth = ? and applyType = ? and obsoleteStatus != 1',
+    repairErrorDataCheck: 'select mp.*, wl.applyProcess from monthprocess mp left join worktimelist wl on mp.aPDID = wl.apdID where ' +
+        'ISNULL(mp.January) and wl.applyMonth = "2021-01" and wl.obsoleteStatus != 1 and wl.applyType = "fact" and ' +
+        'mp.type = "fact" and mp.year = 2021',
+    repairErrorData2Check: 'select mp.*, wl.applyProcess from monthprocess mp left join worktimelist wl on mp.aPDID = wl.apdID where ' +
+        'wl.applyMonth = "2021-01" and wl.obsoleteStatus != 1 and wl.applyType = "fact" and mp.type = "fact" and mp.year = ' +
+        '2021 and wl.applyProcess != mp.January and wl.reviewStatus = 1',
+    repairErrorDataModify: 'update monthprocess set January = ? where id = ?',
+    repairErrorData2Modify: 'update monthprocess set January = ? where id = ?'
   },
   mutualRates: {
     getUserRates: 'select mr.*, u.name as ratedPersionName from mutualrate mr left join users u on ' +

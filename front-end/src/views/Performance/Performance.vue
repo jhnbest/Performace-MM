@@ -50,7 +50,7 @@
           style="color: #F56C6C;margin-left: 10px;font-size: 25px"/></span>
       </el-form-item>
       <el-radio-group v-model="formData.selectType" @change="handleSelectTypeChange" style="margin-left: 50px">
-        <el-radio-button label="计划查询"></el-radio-button>
+        <el-radio-button label="计划查询" :disabled="true"></el-radio-button>
         <el-radio-button label="工时查询"></el-radio-button>
       </el-radio-group>
     </el-form>

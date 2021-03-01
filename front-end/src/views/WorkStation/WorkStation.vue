@@ -29,12 +29,14 @@
           <el-button type="primary"
                      size="medium" @click="handleAddNew">工时申报(新增项目)</el-button>
         </el-col>
-        <el-col :xs="{span: 5, offset: 3}" :sm="{span: 4, offset: 6}" :lg="{span: 1, offset: 1}" :xl="{span: 1, offset: 1}">
-          <el-button type="warning"
-                     size="medium" @click="handlePlanAdd">计划申报(新增项目)</el-button>
-        </el-col>
+<!--        <el-col :xs="{span: 5, offset: 3}" :sm="{span: 4, offset: 6}" :lg="{span: 1, offset: 1}" :xl="{span: 1, offset: 1}">-->
+<!--          <el-button type="warning"-->
+<!--                     size="medium" @click="handlePlanAdd">计划申报(新增项目)</el-button>-->
+<!--        </el-col>-->
       </el-row>
     </div>
+<!--    <el-button v-if="$store.state.userInfo.id === 15" @click="repairErrorData">修正按钮</el-button>-->
+<!--    <el-button v-if="$store.state.userInfo.id === 15" @click="repairErrorData2">修正按钮2</el-button>-->
     <!-- 分割线 start -->
     <div class="hr-10" style="margin-top: 20px"></div>
     <!-- 分割线 end -->
@@ -100,7 +102,7 @@
 
 <script>
   import POverview from '@/components/workStation/projectOverview.vue'
-  import { getUnFilledProjectList } from '@/config/interface'
+  import { getUnFilledProjectList, repairErrorData, repairErrorData2 } from '@/config/interface'
   export default {
     data () {
       return {
@@ -190,6 +192,26 @@
       }
     },
     methods: {
+      // 修复错误数据
+      repairErrorData () {
+        const url = repairErrorData
+        let params = {}
+        this.$http(url, params).then(res => {
+          if (res.code === 1) {
+            this.$common.toast('修复成功', 'success', false)
+          }
+        })
+      },
+      // 修复错误数据2
+      repairErrorData2 () {
+        const url = repairErrorData2
+        let params = {}
+        this.$http(url, params).then(res => {
+          if (res.code === 1) {
+            this.$common.toast('修复成功', 'success', false)
+          }
+        })
+      },
       // 初始化
       init () {
         this.unFilledTotalCount = 0

@@ -2018,6 +2018,7 @@
             if (res.code === 1) {
               if (res.data.length === 0) {
                 this.$common.toast('上月未评价', 'error', false)
+                this.reqFlag.getPreMonthEva = true
               } else {
                 this.genRateTableData(this.users, res.data)
                 this.reqFlag.getPreMonthEva = true

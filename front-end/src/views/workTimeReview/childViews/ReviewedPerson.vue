@@ -290,16 +290,15 @@
             reviewStatus: 1,
             reviewer: this.$store.state.userInfo.id
           }
-          this.$http(url, params)
-            .then(res => {
-              if (res.code === 1) {
-                this.getProjectList(this.info)
-                this.$emit('reviewPass')
-                this.$common.toast('通过成功', 'success', false)
-              } else {
-                this.$common.toast('失败', 'error', false)
-              }
-            })
+          this.$http(url, params).then(res => {
+            if (res.code === 1) {
+              this.getProjectList(this.info)
+              this.$emit('reviewPass')
+              this.$common.toast('通过成功', 'success', false)
+            } else {
+              this.$common.toast('失败', 'error', false)
+            }
+          })
         } else {
           this.$common.toast('请先审核工时分配', 'error', true)
         }

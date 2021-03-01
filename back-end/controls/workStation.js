@@ -1048,6 +1048,46 @@ const workStation = {
         }).catch(error => {
             return $http.writeJson(res, { code: -2, data: error, message: 'error' })
         })
+    },
+    // 修复错误数据
+    repairErrorData (req, res) {
+        let sendData = req.body
+        let sql = $sql.workStation.repairErrorDataCheck
+        let arrayParams = []
+        let promises = []
+        let count = 0
+        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+            for (let item of RCPDDatabaseRes) {
+                sql = $sql.workStation.repairErrorDataModify
+                arrayParams = [item.applyProcess, item.id]
+                promises[count++] = RCPDDatabase(sql, arrayParams)
+            }
+            Promise.all(promises).then(result => {
+                return $http.writeJson(res, { code: 1, data: result, message: 'success' })
+            })
+        }).catch(RCPDDatabaseErr => {
+            return $http.writeJson(res, { code: -2, data: RCPDDatabaseErr, message: 'error' })
+        })
+    },
+    // 修复错误数据
+    repairErrorData2 (req, res) {
+        let sendData = req.body
+        let sql = $sql.workStation.repairErrorData2Check
+        let arrayParams = []
+        let promises = []
+        let count = 0
+        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+            for (let item of RCPDDatabaseRes) {
+                sql = $sql.workStation.repairErrorData2Modify
+                arrayParams = [item.applyProcess, item.id]
+                promises[count++] = RCPDDatabase(sql, arrayParams)
+            }
+            Promise.all(promises).then(result => {
+                return $http.writeJson(res, { code: 1, data: result, message: 'success' })
+            })
+        }).catch(RCPDDatabaseErr => {
+            return $http.writeJson(res, { code: -2, data: RCPDDatabaseErr, message: 'error' })
+        })
     }
 }
 
