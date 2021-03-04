@@ -575,7 +575,7 @@
             }
           })
         },
-        // 已完成按钮
+        // 生成工时申报按钮
         handleComplete (row) {
           this.getIsSubmitAllow().then(getIsSubmitAllowRes => {
             if (getIsSubmitAllowRes.length === 0 || this.$store.state.userInfo.id === 26) {
@@ -609,6 +609,7 @@
                   row.defaultCofficient = row.applyCofficient
                   row.defaultKValue = row.applyKValue
                   row.baseWorkTime = row.applyBaseWorkTime
+                  row.monthID = null
                   params.data.push(row)
                   this.$http(url, params)
                     .then(res => {

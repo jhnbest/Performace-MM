@@ -1,5 +1,5 @@
 <template>
-  <div v-if="$store.state.userInfo.id === 26">
+  <div v-if="$store.state.userInfo.id === 26 || $store.state.userInfo.id === 15">
     <el-form class="main-search" :inline="true">
       <el-form-item label="互评月份：" prop="title">
       <el-button size="mini" type="danger" style="margin-right: 10px" @click="handlePreMonth">上月</el-button>

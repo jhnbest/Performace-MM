@@ -345,7 +345,7 @@
         </el-table>
       </div>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取消</el-button>
+        <el-button @click="dialogPlanFormVisible = false">取消</el-button>
         <el-button type="primary" @click="handleWorkTimePlanApply('dialogForm')">提交计划</el-button>
       </div>
       <Assign v-if="showFlag.workTimeAssign" ref="workTimeAssign" @assignDetail="handleAssign"/>
@@ -709,18 +709,34 @@
               promises[count++] = this.projectDetailIsApplyWorkTime(searchData, 'plan', this.dialogForm.title)
               promises[count++] = this.getMonthProcess('plan', searchData)
               Promise.all(promises).then(result => {
-                this.applyMonthPlanProcessTableData = result[1].data
-                this.submitParams = result[1]
+                let submitParamsTmp = result[1]
                 for (let i = 0; i < result[0].length; i++) {
                   if (result[0][i].length > 0) {
-                    this.submitParams.data[i].id = []
-                    for (let resultItem of result[0][i]) {
-                      this.submitParams.data[i].id.push(resultItem.id)
+                    if (result[0][i][0].applyProcess !== submitParamsTmp.data[i].applyMonthProcess) { // 现申报进展与已申报进展不等
+                      submitParamsTmp.data[i].isApplyWorkTime = result[0][i].length
+                      submitParamsTmp.data[i].id = []
+                      submitParamsTmp.data[i].submitedData = []
+                      for (let resultItem of result[0][i]) {
+                        submitParamsTmp.data[i].id.push(resultItem.id)
+                        resultItem.projectStageName = ''
+                        submitParamsTmp.data[i].submitedData.push(resultItem)
+                      }
+                    } else {
+                      submitParamsTmp.data[i] = []
                     }
                   } else {
-                    this.submitParams.data[i].id = null
+                    submitParamsTmp.data[i].isApplyWorkTime = result[0][i].length
+                    submitParamsTmp.data[i].id = null
                   }
                 }
+                for (let i = 0; i < submitParamsTmp.data.length; i++) {
+                  if (submitParamsTmp.data[i].length === 0) {
+                    submitParamsTmp.data.splice(i, 1)
+                    i--
+                  }
+                }
+                this.applyMonthPlanProcessTableData = submitParamsTmp.data
+                this.submitParams = submitParamsTmp
               })
             }
           })

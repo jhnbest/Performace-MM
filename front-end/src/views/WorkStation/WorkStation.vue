@@ -37,6 +37,7 @@
     </div>
 <!--    <el-button v-if="$store.state.userInfo.id === 15" @click="repairErrorData">修正按钮</el-button>-->
 <!--    <el-button v-if="$store.state.userInfo.id === 15" @click="repairErrorData2">修正按钮2</el-button>-->
+<!--    <el-button v-if="$store.state.userInfo.id === 15" @click="repairErrorData3">修正按钮3</el-button>-->
     <!-- 分割线 start -->
     <div class="hr-10" style="margin-top: 20px"></div>
     <!-- 分割线 end -->
@@ -102,7 +103,7 @@
 
 <script>
   import POverview from '@/components/workStation/projectOverview.vue'
-  import { getUnFilledProjectList, repairErrorData, repairErrorData2 } from '@/config/interface'
+  import { getUnFilledProjectList, repairErrorData, repairErrorData2, repairErrorData3 } from '@/config/interface'
   export default {
     data () {
       return {
@@ -208,6 +209,17 @@
         let params = {}
         this.$http(url, params).then(res => {
           if (res.code === 1) {
+            this.$common.toast('修复成功', 'success', false)
+          }
+        })
+      },
+      // 修复错误数据3
+      repairErrorData3 () {
+        const url = repairErrorData3
+        let params = {}
+        this.$http(url, params).then(res => {
+          if (res.code === 1) {
+            console.log(res.data)
             this.$common.toast('修复成功', 'success', false)
           }
         })

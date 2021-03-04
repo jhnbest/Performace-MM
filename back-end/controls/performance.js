@@ -1061,6 +1061,54 @@ const performance = {
         }).catch(workTimeInsertTmpErr => {
             return $http.writeJson(res, {code: -2, data: workTimeInsertTmpErr, message: 'err'})
         })
+    },
+    // 修复错误数据
+    repairErrorData3 (req, res) {
+        let sendData = req.body
+        let sql = $sql.workStation.repairErrorData3Check
+        let arrayParams = []
+        let promises = []
+        let promises2 = []
+        let promise3 = []
+        let count = 0
+        let count2 = 0
+        let count3 = 0
+        let finalResult = []
+        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+            for (let RCPDDatabaseItem of RCPDDatabaseRes) {
+                sql = $sql.workStation.repairErrorData3Check2
+                arrayParams = [2021, RCPDDatabaseItem.apdID]
+                promises[count++] = RCPDDatabase(sql, arrayParams)
+            }
+            Promise.all(promises).then(result => {
+                result = JSON.parse(JSON.stringify(result))
+                for (let i = 0; i < result.length; i++) {
+                    if (result[i][0].totalCount === 0) {
+                        result[i][0].apdID = RCPDDatabaseRes[i].apdID
+                        finalResult.push(result[i])
+                    }
+                }
+                for (let finalResultItem of finalResult) {
+                    sql = $sql.workStation.repairErrorData3Check3
+                    arrayParams = [finalResultItem[0].apdID]
+                    promises2[count2++] = RCPDDatabase(sql, arrayParams)
+                }
+                Promise.all(promises2).then(result2 => {
+                    for (let i = 0; i < result2.length; i++) {
+                        result2[i][0].totalCount = finalResult[i][0].totalCount
+                        result2[i][0].applyYear = 2021
+                        result2[i][0].applyMonthString = 'January'
+                        // promise3[count3++] = updateProjectProcess(result2[i][0], null)
+                    }
+                    return $http.writeJson(res, { code: 1, data: result2, message: 'success' })
+                    // Promise.all(promise3).then(result3 => {
+                    //     return $http.writeJson(res, { code: 1, data: result3, message: 'success' })
+                    // })
+                })
+            })
+        }).catch(RCPDDatabaseErr => {
+            return $http.writeJson(res, { code: -2, data: RCPDDatabaseErr, message: 'error' })
+        })
     }
 }
 

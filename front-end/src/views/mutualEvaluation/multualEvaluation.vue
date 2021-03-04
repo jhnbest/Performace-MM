@@ -66,6 +66,7 @@
       <span v-else style="font-weight: bolder;color: red;font-size: 23px">未评价</span>
     </span>
     <el-button size="medium" type="success" style="margin-left: 20px" @click="getPreMonthEva" :disabled="!reqFlag.getPreMonthEva">提取上月评价</el-button>
+    <el-button size="medium" type="warning" @click="handleFillMul" v-if="$store.state.userInfo.id === 15">一键填充定性评价</el-button>
     <span style="font-weight: bolder;margin-left: 60px" v-if="$store.state.userInfo.id === 26">首页绩效信息发布状态:
       <span v-if="isPerformancePublish" style="color: green;font-size: 23px">已发布</span>
       <span v-else style="color: red;font-size: 23px">未发布</span>
@@ -223,7 +224,8 @@
     performanceInfoPublish,
     getPerformanceIsPublish,
     getPreMonthEva,
-    getCurApplyAbleMonth } from '@/config/interface'
+    getCurApplyAbleMonth,
+    handleFillMul } from '@/config/interface'
   import CountTo from 'vue-count-to'
   export default {
     data () {
@@ -2067,6 +2069,20 @@
             }
           })
         }
+      },
+      // 一键填充定性评价
+      handleFillMul () {
+        const url = handleFillMul
+        let params = {
+          rateMonth: '2021-02',
+          users: this.users
+        }
+        this.$http(url, params).then(res => {
+          if (res.code === 1) {
+            console.log(res.data)
+            this.$common.toast('填充成功', 'success', false)
+          }
+        })
       }
     },
     components: {

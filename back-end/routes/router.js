@@ -52,6 +52,7 @@ router.post(api.getAllWorkTimeList, performance.getAllWorkTimeList)
 router.post(api.getIsWorkTimeReviewFinish, performance.getIsWorkTimeReviewFinish)
 router.post(api.getCurApplyAbleMonth, performance.getCurApplyAbleMonth)
 router.post(api.submitProjectWorkTimeApply, performance.submitProjectWorkTimeApply)
+router.post(api.repairErrorData3, performance.repairErrorData3)
 
 // workStation-个人工作台
 router.post(api.getAssignProjectList, workStation.getAssignProjectList)
@@ -90,5 +91,6 @@ router.post(api.getCurMutualRate, mutualRates.getCurMutualRate)
 router.post(api.getAllUserRates, mutualRates.getAllUserRates)
 router.post(api.getPerformanceIsCount, mutualRates.getPerformanceIsCount)
 router.post(api.getPreMonthEva, mutualRates.getPreMonthEva)
+router.post(api.handleFillMul, mutualRates.handleFillMul)
 
 module.exports = router;

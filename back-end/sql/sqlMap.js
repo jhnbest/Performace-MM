@@ -212,7 +212,12 @@ const sqlMap = {
         'wl.applyMonth = "2021-01" and wl.obsoleteStatus != 1 and wl.applyType = "fact" and mp.type = "fact" and mp.year = ' +
         '2021 and wl.applyProcess != mp.January and wl.reviewStatus = 1',
     repairErrorDataModify: 'update monthprocess set January = ? where id = ?',
-    repairErrorData2Modify: 'update monthprocess set January = ? where id = ?'
+    repairErrorData2Modify: 'update monthprocess set January = ? where id = ?',
+    repairErrorData3Check: 'select * from worktimelist where applyMonth = "2021-01" and applyType = "fact" and reviewStatus = 1',
+    repairErrorData3Check2: 'select count(*) as totalCount from monthprocess where year = ? and aPDID = ? and type = "fact"',
+    repairErrorData3Check3: 'select u.name, apl.projectName, wl.* from assignprojectdetail apd left join assignprojectlist apl ' +
+        'on apd.aPLID = apl.id left join users u on apl.userID = u.id left join worktimelist wl on wl.apdID = apd.id where apd.id = ? ' +
+        'and wl.applyMonth = "2021-01" and wl.applyType = "fact"'
   },
   mutualRates: {
     getUserRates: 'select mr.*, u.name as ratedPersionName from mutualrate mr left join users u on ' +
@@ -224,7 +229,11 @@ const sqlMap = {
     getRateData: 'select * from mutualrate where ratePersion = ? and rateMonth = ?',
     getPerformanceIsCount: 'select * from globalflag where year(setTime) = ? and month(setTime) = ? and flagType = ?',
     getPreMonthEva: 'select mr.*, u.name as ratedPersionName from mutualrate mr left join users u on mr.ratedPersion = ' +
-        'u.id where mr.rateMonth = ? and mr.ratePersion = ?'
+        'u.id where mr.rateMonth = ? and mr.ratePersion = ?',
+    handleFillMul: 'select count(*) as totalCount from mutualrate where ratePersion = ? and rateMonth = ?',
+    handleFillMulCheck: 'select * from mutualrate where ratePersion = ? and rateMonth = "2021-01"',
+    handleFillMulFill: 'insert into mutualrate (ratePersion, ratedPersion, rateMonth, rate, rateType, rateTime, updateTime) ' +
+        'values (?, ?, ?, ?, ?, ?, ?)'
   }
 }
 module.exports = sqlMap;
