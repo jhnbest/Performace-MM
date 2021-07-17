@@ -652,7 +652,7 @@
               Promise.all(promises).then(result => {
                 let submitParamsTmp = result[1]
                 for (let i = 0; i < result[0].length; i++) {
-                  if (result[0][i].length > 0) {
+                  if (result[0][i].length > 0) { // 申报阶段在当月已申报工时
                     if (result[0][i][0].applyProcess !== submitParamsTmp.data[i].applyMonthProcess) { // 现申报进展与已申报进展不等
                       submitParamsTmp.data[i].isApplyWorkTime = result[0][i].length
                       submitParamsTmp.data[i].id = []
@@ -668,6 +668,12 @@
                   } else {
                     submitParamsTmp.data[i].isApplyWorkTime = result[0][i].length
                     submitParamsTmp.data[i].id = null
+                  }
+                }
+                for (let i = 0; i < submitParamsTmp.data.length; i++) {
+                  if (submitParamsTmp.data[i].lastMonthProcess ===
+                    submitParamsTmp.data[i].applyMonthProcess) {
+                    submitParamsTmp.data[i] = []
                   }
                 }
                 for (let i = 0; i < submitParamsTmp.data.length; i++) {
@@ -868,7 +874,7 @@
             }
             this.formData.tableData = res
             this.formData.tableDataCache = JSON.parse(JSON.stringify(this.formData.tableData))
-            this.fillProcessOfJanuary(this.formData.yearNum, res) // 临时填充2021-01月份的进展
+            // this.fillProcessOfJanuary(this.formData.yearNum, res) // 临时填充2021-01月份的进展
           })
         },
         // 表格编辑按钮

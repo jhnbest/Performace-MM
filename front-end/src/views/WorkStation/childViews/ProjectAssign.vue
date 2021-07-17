@@ -773,25 +773,24 @@
         },
         // 获取指派项目计划&进展明细
         getAssignProjectDetail (id) {
-          let it = this
+          let _this = this
           return new Promise(function (resolve, reject) {
-            if (it.reqFlag.getAssignProjectDetail) {
-              it.reqFlag.getAssignProjectDetail = false
+            if (_this.reqFlag.getAssignProjectDetail) {
+              _this.reqFlag.getAssignProjectDetail = false
               const url = getAssignProjectDetail
               let params = {
                 id: id,
-                year: it.formData.yearNum
+                year: _this.formData.yearNum
               }
-              it.$http(url, params)
-                .then(res => {
-                  if (res.code === 1) {
-                    for (let item of res.data) {
-                      item.editable = false
-                    }
-                    it.formData.tableData = res.data
-                    it.reqFlag.getAssignProjectDetail = true
+              _this.$http(url, params).then(res => {
+                if (res.code === 1) {
+                  for (let item of res.data) {
+                    item.editable = false
                   }
-                })
+                  _this.formData.tableData = res.data
+                  _this.reqFlag.getAssignProjectDetail = true
+                }
+              })
             }
           })
         },

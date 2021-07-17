@@ -146,7 +146,7 @@
                          prop="performanceRank"
                          width="57">
           <template slot-scope="scope">
-            <span style="font-weight: bolder">{{scope.row.performanceRank}}</span>
+            <span style="font-weight: bolder;color: red">{{scope.row.performanceRank}}</span>
             <i v-if="scope.row.performanceRankRise" class="el-icon-caret-top" style="color: red"></i>
             <i v-if="scope.row.performanceRankDesc" class="el-icon-caret-bottom" style="color: green"></i>
             <span v-if="scope.row.performanceRankRise || scope.row.performanceRankDesc" style="font-size: 10px">
@@ -488,6 +488,8 @@
             _this.genRateTableData(res1, res2)
             if (this.$store.state.userInfo.id === 26) {
               this.getPerformanceIsPublish().then(getPerformanceIsPublishRes => {
+                console.log('this.performanceIsPublishInfo')
+                console.log(this.performanceIsPublishInfo)
                 this.performanceIsPublishInfo = getPerformanceIsPublishRes
                 if (getPerformanceIsPublishRes.length > 0) {
                   this.isPerformancePublish = getPerformanceIsPublishRes[0].flagValue === 1
@@ -569,13 +571,12 @@
       },
       // 生成绩效得分与排名数据
       genPerformanceScore (quantativeData, multualEvaData, genType) {
-        let performanceData = []
         // =========绩效得分计算============
         for (let item of this.rateTableData) {
-          let itemQuantativeScore = quantativeData.find(quantativeDataItem => {
+          let itemQuantativeScore = quantativeData.find(quantativeDataItem => { // 找出定量数据
             return quantativeDataItem.id === item.ratedPersion
           })
-          let itemMultualEvaScore = multualEvaData.find(multualEvaDataItem => {
+          let itemMultualEvaScore = multualEvaData.find(multualEvaDataItem => { // 找出定性数据
             return multualEvaDataItem.id === item.ratedPersion
           })
           if (itemQuantativeScore && itemMultualEvaScore) {
@@ -606,34 +607,40 @@
         let rateTableDataTmp = JSON.parse(JSON.stringify(this.rateTableData))
         rateTableDataTmp.sort(this.sortBy('performanceScoreTmp'))
         // =========绩效排名与标准化绩效得分计算============
-        let count = 1
+        let count = 0
         let prePerformanceScoreTmp = -1
-        let prePerformanceRank = -1
-        for (let item of rateTableDataTmp) {
-          if (item.performanceScoreTmp === prePerformanceScoreTmp) {
-            item.performanceRank = prePerformanceRank
-            if (genType === 'init') {
-              item.initPerformanceRank = item.performanceRank
-            } else if (genType === 'update') {
-              let performanceRankChanges = item.initPerformanceRank - item.performanceRank
-              item.performanceRankRise = performanceRankChanges > 0
-              item.performanceRankDesc = performanceRankChanges < 0
-              item.performanceRankChanges = Math.abs(performanceRankChanges)
-            }
+        let rankTmp = []
+        let count1 = -1
+        let count2 = 1
+        for (let i = 0; i < rateTableDataTmp.length; i++) { // 把绩效得分相同的人员存进对象数组同一个元素里面
+          if (rateTableDataTmp[i].performanceScoreTmp === prePerformanceScoreTmp) {
+            rankTmp[count1].push(rateTableDataTmp[i])
           } else {
-            item.performanceRank = count
-            prePerformanceScoreTmp = item.performanceScoreTmp
-            prePerformanceRank = count
-            if (genType === 'init') {
-              item.initPerformanceRank = item.performanceRank
-            } else if (genType === 'update') {
-              let performanceRankChanges = item.initPerformanceRank - item.performanceRank
-              item.performanceRankRise = performanceRankChanges > 0
-              item.performanceRankDesc = performanceRankChanges < 0
-              item.performanceRankChanges = Math.abs(performanceRankChanges)
+            count1++
+            if (!rankTmp[count1]) {
+              rankTmp[count1] = []
             }
+            rankTmp[count1].push(rateTableDataTmp[i])
+            prePerformanceScoreTmp = rateTableDataTmp[i].performanceScoreTmp
           }
-          count++
+        }
+        rateTableDataTmp = []
+        for (let i = 0; i < rankTmp.length; i++) {
+          rankTmp[i].sort(this.sortBy('totalWorkTime')) // 绩效得分相同的人员根据工时多少进行排序
+          for (let j = 0; j < rankTmp[i].length; j++) {
+            rateTableDataTmp[count++] = rankTmp[i][j]
+          }
+        }
+        for (let item of rateTableDataTmp) {
+          item.performanceRank = count2++ // 绩效排名计算
+          if (genType === 'init') {
+            item.initPerformanceRank = item.performanceRank
+          } else if (genType === 'update') {
+            let performanceRankChanges = item.initPerformanceRank - item.performanceRank
+            item.performanceRankRise = performanceRankChanges > 0
+            item.performanceRankDesc = performanceRankChanges < 0
+            item.performanceRankChanges = Math.abs(performanceRankChanges)
+          }
           item.performanceScore = this.calGetScore(rateTableDataTmp.length, item.performanceRank)
         }
         for (let item of this.rateTableData) {
@@ -712,7 +719,7 @@
           }
           // ==============================计算定量指标得分=======================================
           let length = totalWorkTimeCal.length
-          for (let item of totalWorkTimeCal) { // 计算定量指标得分
+          for (let item of totalWorkTimeCal) { // 根据排名计算定量指标得分
             item.quantitativeScore = this.calGetScore(length, item.rank)
           }
         }
@@ -721,7 +728,8 @@
       // 生成定量数据
       genQuantativeData (quantativeData) {
         let allQuantitativeScore = []
-        let groupedWorkTimeList = this.groupedWorkTimeList(quantativeData) // 对数据进行分组
+        let groupedWorkTimeList = this.groupedWorkTimeList(quantativeData) // 对数据按照小组进行分组
+        // ---------计算小组内每个人的工时数、排名和得分---------------
         for (let item of groupedWorkTimeList) {
           item.caledQuantitative = this.calQuantitativeScore(item.workTimeList)
           for (let itemInside of item.caledQuantitative) {
@@ -1020,14 +1028,14 @@
           })
         }
       },
-      // 计算互评得分
+      // 计算个人互评得分
       getMulRated (ratedData) {
         let ratesTableTmp = []
         let manageRate = 0
         let totalRate = 0
         let count = 0
         if (ratedData.length !== 0) {
-          for (let item of ratedData) {
+          for (let item of ratedData) { // 根据评价人将评价项归类
             let index = ratesTableTmp.findIndex((itemInside) => {
               return item.ratePersion === itemInside.ratePersion
             })
@@ -1545,6 +1553,7 @@
               item.t5Star, item.t6Star)
           }
           this.rateTableData = JSON.parse(JSON.stringify(ratesTableTmp))
+          return ratesTableTmp
         }
       },
       // 上一月
@@ -2022,7 +2031,7 @@
                 this.$common.toast('上月未评价', 'error', false)
                 this.reqFlag.getPreMonthEva = true
               } else {
-                this.genRateTableData(this.users, res.data)
+                let rateResult = this.genRateTableData(this.users, res.data)
                 this.reqFlag.getPreMonthEva = true
                 if (this.$store.state.userInfo.id === 26) {
                   this.getPerformanceIsPublish().then(getPerformanceIsPublishRes => {
@@ -2048,6 +2057,14 @@
                       this.isQuantativeFinish = false
                     }
                     if (!result[1].err) { // 互评已截止
+                      for (let rateResultItem of rateResult) {
+                        let contentFindResult = result[1].content.find(contentItem => {
+                          return rateResultItem.ratedPersion === contentItem.id
+                        })
+                        if (contentFindResult) {
+                          contentFindResult.managerRate = rateResultItem.totalScore
+                        }
+                      }
                       genMultualEvaDataResult = this.genMultualEvaData(result[1].content)
                       this.multualEvaData = JSON.parse(JSON.stringify(genMultualEvaDataResult))
                     } else {
@@ -2074,12 +2091,11 @@
       handleFillMul () {
         const url = handleFillMul
         let params = {
-          rateMonth: '2021-02',
+          rateMonth: '2021-06',
           users: this.users
         }
         this.$http(url, params).then(res => {
           if (res.code === 1) {
-            console.log(res.data)
             this.$common.toast('填充成功', 'success', false)
           }
         })

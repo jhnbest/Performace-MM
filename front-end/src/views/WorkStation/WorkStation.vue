@@ -57,6 +57,7 @@
         </el-tab-pane>
       </el-tabs>
     </div>
+<!--    <el-button type="primary" @click="repairErrorData">测试按钮</el-button>-->
     <!-- 分割线 end -->
 <!--    <div v-if="showFlag">-->
 <!--      <el-row>-->
@@ -199,6 +200,8 @@
         let params = {}
         this.$http(url, params).then(res => {
           if (res.code === 1) {
+            console.log('res.data')
+            console.log(res.data)
             this.$common.toast('修复成功', 'success', false)
           }
         })

@@ -61,7 +61,7 @@
           </el-cascader>
         </el-form-item>
         <br>
-        <el-form-item label="项目名称" prop="projectName">
+        <el-form-item v-if="selectProjectStageID !== 400" label="项目名称" prop="projectName" >
           <el-tooltip :disabled="!isShowProjectNameToolTip" :content="formData.projectName" placement="top">
             <el-input v-model="formData.projectName"
                       placeholder="请输入"
@@ -69,14 +69,31 @@
                       @input="handleProjectNameInput"></el-input>
           </el-tooltip>
         </el-form-item>
-        <el-form-item style="margin-left: 310px">
+        <el-form-item v-if="selectProjectStageID !== 400" style="margin-left: 310px">
           <span>字数限制：
             <span v-if="!isProjectNameWordExceed">{{inputProjectNameWord + '/' + maxProjectName}}</span>
             <span v-else style="color: red">{{inputProjectNameWord + '/' + maxProjectName}}</span>
           </span>
         </el-form-item>
+<!--        <el-form-item v-if="selectProjectStageID === 400" label="项目经理">-->
+<!--          <el-select v-model="selectPersion"-->
+<!--                     size="medium"-->
+<!--                     placeholder="请选择"-->
+<!--                     clearable-->
+<!--                     filterable-->
+<!--                     collapse-tags-->
+<!--                     @change="handlePersionChange" style="width: 90%">-->
+<!--            <el-option-->
+<!--              v-for="item in usersList"-->
+<!--              :key="item.id"-->
+<!--              :label="item.name"-->
+<!--              :value="item.id"-->
+<!--              :disabled="item.disabled">-->
+<!--            </el-option>-->
+<!--          </el-select>-->
+<!--        </el-form-item>-->
         <br>
-        <el-form-item label="项目级别" prop="projectLevel">
+        <el-form-item v-if="selectProjectStageID !== 400" label="项目级别" prop="projectLevel">
           <el-select v-model="formData.projectLevel" placeholder="请选择">
             <el-option v-for="item in projectLevels"
                        :key="item.value"
@@ -125,7 +142,6 @@
                                  v-model="scope.row.defaultKValue"
                                  :step="0.1"
                                  :disabled="!scope.row.dynamicKValue"
-                                 :min="1.0"
                                  :precision="1"
                                  @change="handleKValueCoffChange(scope.row, scope.$index)"
                                  style="width: 70%">
@@ -239,7 +255,8 @@
     getWorkTimeNew,
     workTimeTemporary,
     submitPersonalProject,
-    getCurApplyAbleMonth } from '@/config/interface'
+    getCurApplyAbleMonth,
+    getAssignProjectList } from '@/config/interface'
   import Assign from '@/components/Cop/workTimeAssign'
     export default {
       data () {
@@ -361,7 +378,8 @@
             usersName: true,
             getProjectType: true,
             getWorkTimeNew: true,
-            submitOrTemporaryWorkTime: true
+            submitOrTemporaryWorkTime: true,
+            getAssignProjectList: true
           },
           showFlag: {
             workTimeAssign: false,
@@ -393,7 +411,10 @@
           }, {
             value: 'fact',
             text: '实际'
-          }]
+          }],
+          selectProjectStageID: null,
+          selectPersion: null,
+          usersList: null
         }
       },
       methods: {
@@ -403,9 +424,8 @@
           // this.getCookie()
           this.getCurApplyAbleMonth().then(getCurApplyAbleMonthRes => {
             this.formData.title = this.$moment(getCurApplyAbleMonthRes[0].setTime).format('YYYY-MM')
-            console.log('this.formData.title')
-            console.log(this.formData.title)
           })
+          // this.getUsersName()
         },
         // 获取当前月份能否申报的标志
         getIsSubmitAllow () {
@@ -750,42 +770,42 @@
           }
         },
         // 获取用户姓名
-        getUsersName (isOpen) {
-          if (isOpen) {
-            const url = getUsersName
-            if (this.reqFlag.usersName) {
-              this.reqFlag.usersName = false
-              let params = {}
-              let objList = []
-              let options = []
-              this.$http(url, params)
-                .then(res => {
-                  if (res.code === 1) {
-                    let data = res.data
-                    let list = data.list
-                    list.map((item) => {
-                      let disabled = false
-                      if (item.account !== this.$store.state.userInfo.account) {
-                        let obj = {
-                          id: item.account,
-                          dept: item.dept,
-                          name: item.name,
-                          groupName: item.groupName,
-                          disabled: disabled
-                        }
-                        objList.push(obj)
+        getUsersName () {
+          const url = getUsersName
+          if (this.reqFlag.usersName) {
+            this.reqFlag.usersName = false
+            let params = {}
+            let objList = []
+            this.$http(url, params).then(res => {
+                if (res.code === 1) {
+                  let data = res.data
+                  let list = data.list
+                  list.map((item) => {
+                    let disabled = false
+                    if (item.account !== this.$store.state.userInfo.account && item.account !== '03515') {
+                      let obj = {
+                        id: item.account,
+                        dept: item.dept,
+                        name: item.name,
+                        groupName: item.groupName,
+                        disabled: disabled
                       }
-                    })
-                    this.userListOptions[1].options = objList
-                  }
-                  this.reqFlag.usersName = true
-                  this.formData.usersList = this.userListOptions
-                })
-            }
+                      objList.push(obj)
+                    }
+                  })
+                  this.usersList = objList
+                  this.userListOptions[1].options = objList
+                }
+                this.reqFlag.usersName = true
+                this.formData.usersList = this.userListOptions
+              })
           }
         },
         // 获取项目明细
         handleProjectTypeChange (selectItem) {
+          if (selectItem[0]) {
+            this.selectProjectStageID = selectItem[0][selectItem[0].length - 1]
+          }
           let selectLen = selectItem.length
           let selectItems = []
           let tableItems = []
@@ -1116,6 +1136,40 @@
               reject(err)
             })
           })
+        },
+        // 人员选择变化处理
+        handlePersionChange () {
+          this.getAssignProjectList().then(getAssignProjectListRes => { // 获取项目列表
+            this.formData.tableData = getAssignProjectListRes
+          }).catch(getAssignProjectListErr => {
+            this.$common.toast('初始化失败' + getAssignProjectListErr, 'error', true)
+          })
+        },
+        // 获取指派的项目列表
+        getAssignProjectList () {
+          if (this.reqFlag.getAssignProjectList) {
+            this.reqFlag.getAssignProjectList = false
+            let params = {
+              id: this.$store.state.userInfo.id,
+              projectType: this.fatherParams.projectTypeID,
+              searchType: 'all'
+            }
+            const url = getAssignProjectList
+            let _this = this
+            return new Promise(function (resolve, reject) {
+              _this.$http(url, params).then(res => {
+                if (res.code === 1) {
+                  resolve(res.data[0])
+                } else {
+                  reject(new Error(res.data))
+                }
+                _this.reqFlag.getAssignProjectList = true
+              }).catch(err => {
+                _this.reqFlag.getAssignProjectList = true
+                reject(new Error(err))
+              })
+            })
+          }
         }
       },
       computed: {
@@ -1131,9 +1185,7 @@
         Assign
       },
       created () {
-        console.log('===PerformanceAdd.vue created')
         // this.formData.applyType = this.$route.query.type
-        console.log(this.$store.state.userInfo)
         this.init()
       },
       name: 'PerformanceAdd.vue'

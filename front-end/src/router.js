@@ -124,6 +124,11 @@ export default new Router({
           name: 'test',
           component: () => import(/* webpackChunkName: "user" */ './components/workStation/projectOverview.vue'),
           meta: { pagePath: '/home/test' }
+        },{
+          path: 'monthConclusion',
+          name: 'monthConclusion',
+          component: () => import(/* webpackChunkName: "weekly" */ './views/monthConclusion/monthConclusion.vue'),
+          meta: { pagePath: '/home/monthConclusion' }
         }
       ]
     },

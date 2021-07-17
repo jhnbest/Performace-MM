@@ -33,7 +33,110 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="项目名称" align="center" prop="projectName" show-overflow-tooltip></el-table-column>
+        <el-table-column label="项目名称" align="center">
+          <template slot-scope="scope">
+            <el-popover
+              placement="bottom"
+              trigger="click">
+              <div>
+                <el-button icon="el-icon-minus"
+                           circle
+                           size="mini"
+                           type="danger"
+                           @click="handleDescYearNum(scope.row)"
+                           :disabled="!reqFlag.getAssignProjectDetail"></el-button>
+                <span style="font-size: 25px;color: red;font-weight: bolder">{{ formData.yearNum + '年' }}</span>
+                <el-button icon="el-icon-plus"
+                           circle
+                           size="mini"
+                           type="primary"
+                           @click="handleAddYearNum(scope.row)"
+                           :disabled="!reqFlag.getAssignProjectDetail"></el-button>
+              </div>
+              <br>
+              <el-table :data="scope.row.tableData"
+                        stripe
+                        border
+                        size="mini"
+                        resizable>
+                <el-table-column label="项目阶段" align="center" fixed show-overflow-tooltip>
+                  <template slot-scope="scope">
+                    <span v-if="scope.row.process === 100">
+                      {{scope.row.projectStageName}}
+                      <span style="color: red">(已完成)</span></span>
+                    <span v-else>{{scope.row.projectStageName}}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column label="基本工时" align="center" prop="baseWorkTime" width="50%"></el-table-column>
+                <el-table-column label="K值" align="center" prop="kValue" width="50%"></el-table-column>
+                <el-table-column label="项目进度" align="center">
+                  <el-table-column label="1月" align="center" width="73%">
+                    <template slot-scope="scope">
+                      <span v-if="scope.row.January != null">{{scope.row.January + '%'}}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="2月" align="center" prop="February" width="73%">
+                    <template slot-scope="scope">
+                      <span v-if="scope.row.February != null">{{scope.row.February + '%'}}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="3月" align="center" prop="March" width="73%">
+                    <template slot-scope="scope">
+                      <span v-if="scope.row.March != null">{{scope.row.March + '%'}}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="4月" align="center" prop="April" width="73%">
+                    <template slot-scope="scope">
+                      <span v-if="scope.row.April != null">{{scope.row.April + '%'}}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="5月" align="center" prop="May" width="73%">
+                    <template slot-scope="scope">
+                      <span v-if="scope.row.May != null">{{scope.row.May + '%'}}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="6月" align="center" prop="June" width="73%">
+                    <template slot-scope="scope">
+                      <span v-if="scope.row.June != null">{{scope.row.June + '%'}}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="7月" align="center" prop="July" width="73%">
+                    <template slot-scope="scope">
+                      <span v-if="scope.row.July != null">{{scope.row.July + '%'}}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="8月" align="center" prop="August" width="73%">
+                    <template slot-scope="scope">
+                      <span v-if="scope.row.August != null">{{scope.row.August + '%'}}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="9月" align="center" prop="September" width="73%">
+                    <template slot-scope="scope">
+                      <span v-if="scope.row.September != null">{{scope.row.September + '%'}}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="10月" align="center" prop="October" width="73%">
+                    <template slot-scope="scope">
+                      <span v-if="scope.row.October != null">{{scope.row.October + '%'}}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="11月" align="center" prop="November" width="73%">
+                    <template slot-scope="scope">
+                      <span v-if="scope.row.November != null">{{scope.row.November + '%'}}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="12月" align="center" prop="December" width="73%">
+                    <template slot-scope="scope">
+                      <span v-if="scope.row.December != null">{{scope.row.December + '%'}}</span>
+                    </template>
+                  </el-table-column>
+                </el-table-column>
+              </el-table>
+              <span class="link-type" slot="reference" @click="getAssignProjectInfo(scope.row, formData.yearNum)">{{scope.row.projectName}}</span>
+            </el-popover>
+          </template>
+        </el-table-column>
+        <el-table-column label="指派人" align="center" width="70%" prop="assigner"></el-table-column>
         <el-table-column label="项目阶段" align="center" prop="projectStageName" show-overflow-tooltip></el-table-column>
         <el-table-column label="基本工时" align="center" prop="applyBaseWorkTime" width="80%"></el-table-column>
         <el-table-column label="申报K值" align="center" prop="applyKValue" width="80%"></el-table-column>
@@ -144,12 +247,17 @@
 
 <script>
   import CopReview from '@/components/Cop/CopReview'
-  import { getProjectList, submitReviewPass, getWorkAssign } from '@/config/interface'
+  import {
+    getProjectList,
+    submitReviewPass,
+    getWorkAssign,
+    getAssignProjectDetail } from '@/config/interface'
   export default {
     data () {
       return {
         formData: {
-          workDetailTable: []
+          workDetailTable: [],
+          yearNum: this.$moment().year()
         },
         formRules: {
           reviewKValue: [
@@ -163,7 +271,8 @@
           CopReview: true
         },
         reqFlag: {
-          getProjectList: true
+          getProjectList: true,
+          getAssignProjectDetail: true
         },
         pageNum: 1, // 请求第几页
         pageSize: this.$store.state.pageSize, // 每页请求多少条
@@ -198,7 +307,10 @@
               if (res.code === 1) {
                 let data = res.data
                 let reviewTable = []
+                console.log('data.list')
+                console.log(data.list)
                 for (let item of data.list) {
+                  item.tableData = []
                   if (item.reviewKValue === null) {
                     item.reviewKValue = item.applyKValue
                   }
@@ -350,7 +462,6 @@
       },
       // 审核K值修改
       handleReviewKValueChange (row) {
-        console.log(row)
         row.scale = (row.reviewKValue - row.applyKValue) / row.applyKValue
         row.scale = Number(Number(row.scale).toFixed(5))
         row.avaiableWorkTime = row.avaiableWorkTimeTmp * (1 + row.scale)
@@ -360,14 +471,14 @@
       // 表格合并方法
       objectSpanMethod ({ row, column, rowIndex, columnIndex }) {
         if (this.info.reviewType !== 'reviewed') {
-          if (columnIndex === 1 || columnIndex === 2) {
+          if (columnIndex === 1 || columnIndex === 2 || columnIndex === 3) {
             return {
               rowspan: row.rowSpan,
               colspan: row.colSpan
             }
           }
         } else {
-          if (columnIndex === 2 || columnIndex === 3) {
+          if (columnIndex === 2 || columnIndex === 3 || columnIndex === 4) {
             return {
               rowspan: row.rowSpan,
               colspan: row.colSpan
@@ -394,6 +505,43 @@
             throw (obj)
           }
         }
+      },
+      // 获取项目进展数据
+      getAssignProjectInfo (row, yearNum) {
+        let _this = this
+        return new Promise(function (resolve, reject) {
+          if (_this.reqFlag.getAssignProjectDetail) {
+            _this.reqFlag.getAssignProjectDetail = false
+            const url = getAssignProjectDetail
+            let params = {
+              id: row.aplID,
+              year: yearNum
+            }
+            _this.$http(url, params).then(res => {
+              if (res.code === 1) {
+                let projectDetail = []
+                for (let item of res.data) {
+                  if (item.type === 'fact') {
+                    projectDetail.push(item)
+                  }
+                }
+                row.tableData = projectDetail
+                _this.reqFlag.getAssignProjectDetail = true
+                resolve(projectDetail)
+              }
+            })
+          }
+        })
+      },
+      // 年份减
+      handleDescYearNum (row) {
+        this.formData.yearNum--
+        this.getAssignProjectInfo(row, this.formData.yearNum)
+      },
+      // 年份加
+      handleAddYearNum (row) {
+        this.formData.yearNum++
+        this.getAssignProjectInfo(row, this.formData.yearNum)
       }
     },
     props: {
@@ -402,16 +550,11 @@
       }
     },
     created () {
-      console.log('===ReviewedPerson.vue created')
       this.getProjectList(this.info)
     },
     mounted () {
-      console.log('===ReviewedPerson.vue mounted')
-      console.log(this.info)
     },
     destroyed () {
-      console.log('===ReviewedPerson.vue destroyed')
-      console.log(this.info)
     },
     components: {
       CopReview

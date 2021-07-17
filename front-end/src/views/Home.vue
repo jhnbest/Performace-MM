@@ -115,7 +115,7 @@ export default {
     },
     // 解决element导航中，当前导航路由标识和当前路由一致时，点击当前导航，页面不刷新问题
     handleSelect (indexPath) {
-      if (indexPath == this.$route.path) {
+      if (indexPath === this.$route.path) {
         this.$common.shallowRefresh(this.$route.name)
       }
     }

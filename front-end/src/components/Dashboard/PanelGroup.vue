@@ -32,6 +32,34 @@
     </div>
     <div class="hr-10" style="margin-top: 20px; margin-bottom: 20px"></div>
     <div>
+      <el-row class="panel-group">
+        <el-col :xs="24" :sm="24" :lg="12" :xl="8" class="card-panel-col">
+          <div class="card-panel-large">
+            <div class="card-panel-icon-wrapper icon-people">
+              <span style="font-weight: bolder;font-size: 30px;margin-left: -10px">{{selectQuarterNum}}季度</span>
+              <br>
+              <span style="font-weight: bolder;font-size: 30px">之星</span>
+            </div>
+            <div class="card-panel-description">
+              <div class="card-panel-text icon-quarter" slot="reference">{{quarterStar.name}}</div>
+            </div>
+          </div>
+        </el-col>
+        <el-col :xs="24" :sm="24" :lg="6" :xl="6" class="card-panel-col">
+          <div class="card-panel-large">
+            <div class="card-panel-icon-wrapper icon-month">
+              <span style="font-weight: bolder;font-size: 30px">月度</span>
+              <br>
+              <span style="font-weight: bolder;font-size: 30px">之星</span>
+            </div>
+            <div class="card-panel-description">
+              <div class="card-panel-text">{{monthStar.name}}</div>
+            </div>
+          </div>
+        </el-col>
+      </el-row>
+    </div>
+    <div>
       <el-row :gutter="40" class="panel-group">
         <el-col :xs="12" :sm="12" :lg="6" :xl="4" class="card-panel-col">
           <div class="card-panel" @click="handleSetLineChartData('newVisitis')">
@@ -180,7 +208,14 @@ export default {
       workTimeNum: null,
       workTime: null,
       workTimeRank: null,
-      performanceScoreTmp: null
+      performanceScoreTmp: null,
+      monthStar: {
+        name: '暂未统计'
+      },
+      quarterStar: {
+        name: '暂未统计'
+      },
+      selectQuarterNum: null
     }
   },
   components: {
@@ -193,54 +228,130 @@ export default {
       let allUsersRates = []
       let promises = []
       let count = 0
+      this.monthStar = {
+        name: '加载中...'
+      }
+      this.quarterStar = {
+        name: '加载中...'
+      }
+      this.selectQuarterNum = this.smallNumToL(this.$moment(this.formData.title).quarter())
       if (this.reqFlag.getPerformanceScore) {
         this.reqFlag.getPerformanceScore = false
-        this.getPerformanceIsPublish().then(getPerformanceIsPublishRes => {
-          if (getPerformanceIsPublishRes.length > 0) {
-            if (getPerformanceIsPublishRes[0].flagValue === 1) {
-              this.getPerformanceIsCount().then(getPerformanceIsCountRes => {
-                if (getPerformanceIsCountRes === 1) {
-                  this.getUsersList().then(res1 => {
-                    this.users = res1
-                    this.calGroupMemNum(res1)
-                    promises[count++] = this.getAllWorkTimeList()
-                    promises[count++] = this.getAllUserRates(res1, allUsersRates)
+        this.getUsersList().then(getUsersListRes => {
+          this.users = getUsersListRes
+          this.calGroupMemNum(this.users)
+          this.getPerformanceIsPublish(this.$moment(this.formData.title).year(),
+            this.$moment(this.formData.title).month() + 1).then(getPerformanceIsPublishRes => {
+            if (getPerformanceIsPublishRes.length > 0) {
+              if (getPerformanceIsPublishRes[0].flagValue === 1) {
+                // this.getPerformanceIsCount().then(getPerformanceIsCountRes => {
+                //   if (getPerformanceIsCountRes === 1) {
+                    promises[count++] = this.getAllWorkTimeList(this.formData.title)
+                    promises[count++] = this.getAllUserRates(this.users, allUsersRates, this.formData.title)
                     Promise.all(promises).then((result) => {
-                      this.calPerformanceScore(result)
+                      let performanceScoreResult = this.calPerformanceScore(result)
+                      let finalResultFindResult = performanceScoreResult.find(finalResultItem => {
+                        return finalResultItem.id === this.$store.state.userInfo.id
+                      })
+                      console.log('finalResultFindResult')
+                      console.log(finalResultFindResult)
+                      if (finalResultFindResult) {
+                        this.quantitativeRank = finalResultFindResult.quantitativeRank
+                        this.quantitativeScore = finalResultFindResult.quantitativeScore
+                        this.workTimeNum = finalResultFindResult.totalWorkTime
+                        this.performanceRank = finalResultFindResult.performanceRank
+                        this.performanceScore = finalResultFindResult.performanceScore
+                        this.performanceScoreTmp = finalResultFindResult.performanceScoreTmp
+                        let curID = this.$store.state.userInfo.id
+                        if (curID === 7 || curID === 11 || curID === 31) { // 主任岗
+                          this.multualScore = finalResultFindResult.mutualScore /
+                            (this.directorMutualCof + this.directorManagerCof)
+                        } else if (curID === 13 || curID === 17 || curID === 33) { // 组长
+                          this.multualScore = finalResultFindResult.mutualScore /
+                            (this.groupLeaderMutualCof + this.groupLeaderManagerCof)
+                        } else { // 普通成员
+                          this.multualScore = finalResultFindResult.mutualScore /
+                            (this.commonStaffMutualCof + this.commonStaffManagerCof)
+                        }
+                      } else {
+                        this.quantitativeRank = 0
+                        this.quantitativeScore = 0
+                        this.workTimeNum = 0
+                        this.performanceRank = 0
+                        this.performanceScore = 0
+                        this.performanceScoreTmp = 0
+                        this.multualScore = 0
+                      }
+                      this.getMonStar(performanceScoreResult) // 月度之星数据计算
+                      this.getQuarStar(this.$moment(this.formData.title).year(),
+                        this.$moment(this.formData.title).quarter()) // 季度之星数据计算
                       this.isCount = true
                       this.reqFlag.getPerformanceScore = true
                     })
-                  })
-                } else {
-                  this.isCount = false
-                  this.reqFlag.getPerformanceScore = true
+                //   } else {
+                //     this.isCount = false
+                //     this.reqFlag.getPerformanceScore = true
+                //   }
+                // }).catch(err => {
+                //   this.isCount = false
+                //   this.$common.toast(err, 'error', false)
+                //   this.reqFlag.getPerformanceScore = true
+                // })
+              } else {
+                this.monthStar = {
+                  name: '暂未统计'
                 }
-              }).catch(err => {
+                this.quarterStar = {
+                  name: '暂未统计'
+                }
                 this.isCount = false
-                this.$common.toast(err, 'error', false)
                 this.reqFlag.getPerformanceScore = true
-              })
+              }
             } else {
+              this.monthStar = {
+                name: '暂未统计'
+              }
+              this.quarterStar = {
+                name: '暂未统计'
+              }
               this.isCount = false
               this.reqFlag.getPerformanceScore = true
             }
-          } else {
+          }).catch(err => {
+            this.monthStar = {
+              name: '暂未统计'
+            }
+            this.quarterStar = {
+              name: '暂未统计'
+            }
             this.isCount = false
+            this.$common.toast(err, 'error', false)
             this.reqFlag.getPerformanceScore = true
-          }
-        }).catch(err => {
-          this.isCount = false
-          this.$common.toast(err, 'error', false)
-          this.reqFlag.getPerformanceScore = true
+          })
         })
       }
     },
+    // 小写阿拉伯数字转大写
+    smallNumToL (num) {
+      switch (num) {
+        case 1:
+          return '一'
+        case 2:
+          return '二'
+        case 3:
+          return '三'
+        case 4:
+          return '四'
+        default:
+          return '错误'
+      }
+    },
     // 获取当前月份绩效结果是否已公布
-    getPerformanceIsPublish () {
+    getPerformanceIsPublish (applyYear, applyMonth) {
       const url = getPerformanceIsPublish
       let params = {
-        applyYear: this.$moment(this.formData.title).year(),
-        applyMonth: this.$moment(this.formData.title).month() + 1,
+        applyYear: applyYear,
+        applyMonth: applyMonth,
         flagType: 'performanceInfoPublish'
       }
       let _this = this
@@ -393,18 +504,19 @@ export default {
         if (quantitativeInfo) { // 当月有工时申报
           item.quantitativeScore = quantitativeInfo.quantitativeScore
           item.quantitativeRank = quantitativeInfo.rank
+          item.totalWorkTime = quantitativeInfo.totalWorkTime
           if (item.id === this.$store.state.userInfo.id) {
-            this.quantitativeRank = quantitativeInfo.rank
-            this.quantitativeScore = quantitativeInfo.quantitativeScore
-            this.workTimeNum = quantitativeInfo.totalWorkTime
+            // this.quantitativeRank = quantitativeInfo.rank
+            // this.quantitativeScore = quantitativeInfo.quantitativeScore
+            // this.workTimeNum = quantitativeInfo.totalWorkTime
           }
         } else { // 如果当月无任何工时申报
           item.quantitativeScore = 0
           item.quantitativeRank = 0
           if (item.id === this.$store.state.userInfo.id) {
-            this.quantitativeRank = 0
-            this.quantitativeScore = 0
-            this.workTimeNum = 0
+            // this.quantitativeRank = 0
+            // this.quantitativeScore = 0
+            // this.workTimeNum = 0
           }
         }
         if (item.id === 7 || item.id === 11 || item.id === 31) { // 主任岗
@@ -417,32 +529,187 @@ export default {
         finalResult.sort(this.sortBy('performanceScoreTmp'))
       }
       // =========绩效排名计算==========
-      let count = 1
+      let count = 0
       let prePerformanceScoreTmp = -1
-      let prePerformanceRank = -1
+      let count1 = -1
+      let count2 = 1
+      let rankTmp = []
+      // for (let item of finalResult) {
+      //   if (item.performanceScoreTmp === prePerformanceScoreTmp) {
+      //     item.performanceRank = prePerformanceRank
+      //   } else {
+      //     item.performanceRank = count
+      //     prePerformanceScoreTmp = item.performanceScoreTmp
+      //     prePerformanceRank = count
+      //   }
+      //   item.performanceScore = this.calGetScore(finalResult.length, item.performanceRank)
+      //   count++
+      // }
+      // 把绩效得分相同的人员存进对象数组同一个元素里面
       for (let item of finalResult) {
         if (item.performanceScoreTmp === prePerformanceScoreTmp) {
-          item.performanceRank = prePerformanceRank
+          rankTmp[count1].push(item)
         } else {
-          item.performanceRank = count
+          count1++
+          if (!rankTmp[count1]) {
+            rankTmp[count1] = []
+          }
+          rankTmp[count1].push(item)
           prePerformanceScoreTmp = item.performanceScoreTmp
-          prePerformanceRank = count
         }
-        item.performanceScore = this.calGetScore(finalResult.length, item.performanceRank)
-        count++
       }
-      let finalResultFindResult = finalResult.find(finalResultItem => {
-        return finalResultItem.id === this.$store.state.userInfo.id
+      finalResult = []
+      for (let i = 0; i < rankTmp.length; i++) {
+        rankTmp[i].sort(this.sortBy('totalWorkTime')) // 绩效得分相同的人员根据工时多少进行排序
+        for (let j = 0; j < rankTmp[i].length; j++) {
+          finalResult[count] = rankTmp[i][j]
+          finalResult[count].performanceRank = count2++
+          finalResult[count].performanceScore = this.calGetScore(finalResult.length, finalResult[count].performanceRank)
+          count++
+        }
+      }
+      return JSON.parse(JSON.stringify(finalResult))
+    },
+    // 月度之星数据获取
+    getMonStar (finalResult) {
+      let monthStarNum = this.$store.state.monthStarNum
+      let monthStarPerson = ''
+      for (let i = 0; i < monthStarNum; i++) {
+        monthStarPerson += finalResult[i].name
+        if (i !== monthStarNum - 1) {
+          monthStarPerson += ','
+        }
+      }
+      this.monthStar.name = monthStarPerson
+    },
+    // 季度之星数据获取
+    getQuarStar (year, quarter) {
+      let quarterStarNum = this.$store.state.quarterStarNum
+      let promises1 = []
+      let promises2 = []
+      let quarterMonth = []
+      let count = 0
+      let allUsersRates = []
+      let performanceScoreResult = []
+      switch (quarter) {
+        case 1:
+          quarterMonth = [year + '-' + '01', year + '-' + '02', year + '-' + '03']
+          break
+        case 2:
+          quarterMonth = [year + '-' + '04', year + '-' + '05', year + '-' + '06']
+          break
+        case 3:
+          quarterMonth = [year + '-' + '07', year + '-' + '08', year + '-' + '09']
+          break
+        case 4:
+          quarterMonth = [year + '-' + '10', year + '-' + '11', year + '-' + '12']
+          break
+        default:
+          quarterMonth = []
+      }
+      for (let i = 0; i < 3; i++) { // 请求季度所有月份的绩效发布情况
+        promises1[i] = this.getPerformanceIsPublish(year,
+          this.$moment(quarterMonth[i]).month() + 1)
+      }
+      Promise.all(promises1).then(result => {
+        let lengthFlag = 0
+        for (let resultItem of result) {
+          if (resultItem.length === 0) { // 该月绩效尚未发布
+            lengthFlag = 1
+            break
+          } else {
+            if (resultItem[0].flagValue !== 1) { // 该月绩效尚未发布
+              lengthFlag = 1
+              break
+            }
+          }
+        }
+        if (lengthFlag !== 1) { // 该季度所有月份绩效已经发布
+          for (let i = 0; i < 3; i++) {
+            promises2[count++] = this.getAllWorkTimeList(quarterMonth[i])
+            promises2[count++] = this.getAllUserRates(this.users, allUsersRates[i], quarterMonth[i])
+          }
+          Promise.all(promises2).then((result) => {
+            let count = 0
+            let comResult = []
+            let finalResult = []
+            for (let i = 0; i < result.length; i = i + 2) { // 合并查询的每月工时以及定性互评结果，然后计算当月绩效评价
+              if (!comResult[count]) {
+                comResult[count] = []
+              }
+              comResult[count].push(result[i])
+              comResult[count].push(result[i + 1])
+              performanceScoreResult[count] = this.calPerformanceScore(comResult[count])
+              count++
+            }
+            let firstMonthPerformance = performanceScoreResult[0]
+            let secondMonthPerformance = performanceScoreResult[1]
+            let thirdMonthPerformance = performanceScoreResult[2]
+            for (let firstMonthPerformanceItem of firstMonthPerformance) {
+              let secondFindResult1 = secondMonthPerformance.find(secondMonthPerformanceItem => {
+                return secondMonthPerformanceItem.id === firstMonthPerformanceItem.id
+              })
+              let thirdFindResult1 = thirdMonthPerformance.find(secondMonthPerformanceItem => {
+                return secondMonthPerformanceItem.id === firstMonthPerformanceItem.id
+              })
+              let obj = {
+                id: firstMonthPerformanceItem.id,
+                name: firstMonthPerformanceItem.name,
+                totalWorkTime: firstMonthPerformanceItem.totalWorkTime +
+                  secondFindResult1.totalWorkTime + thirdFindResult1.totalWorkTime,
+                averagePerformance: (firstMonthPerformanceItem.performanceScoreTmp +
+                  secondFindResult1.performanceScoreTmp + thirdFindResult1.performanceScoreTmp) / 3
+              }
+              finalResult.push(obj)
+            }
+            finalResult = this.sortObjectMethod(finalResult, 'averagePerformance', 'totalWorkTime')
+            let quarterStarPerson = ''
+            this.quarterStar = {
+              name: ''
+            }
+            for (let i = 0; i < quarterStarNum; i++) {
+              quarterStarPerson += finalResult[i].name
+              if (i !== quarterStarNum - 1) {
+                quarterStarPerson += ','
+              }
+            }
+            this.quarterStar.name = quarterStarPerson
+          })
+        } else { // 尚有月份未发布绩效
+          this.quarterStar = {
+            name: '暂未统计'
+          }
+        }
       })
-      if (finalResultFindResult) {
-        this.performanceRank = finalResultFindResult.performanceRank
-        this.performanceScore = finalResultFindResult.performanceScore
-        this.performanceScoreTmp = finalResultFindResult.performanceScoreTmp
-      } else {
-        this.performanceRank = 0
-        this.performanceScore = 0
-        this.performanceScoreTmp = 0
+    },
+    // 排序方法
+    sortObjectMethod (sortArray, firstSortEle, secondSortEle) {
+      sortArray.sort(this.sortBy(firstSortEle))
+      let count = 0
+      let preFirstEle = -1
+      let rankTmp = []
+      let count1 = -1
+      let count2 = 1
+      for (let i = 0; i < sortArray.length; i++) { // 第一个排队元素相同的人员存进对象数组同一个元素里面
+        if (sortArray[i][firstSortEle] === preFirstEle) {
+          rankTmp[count1].push(sortArray[i])
+        } else {
+          count1++
+          if (!rankTmp[count1]) {
+            rankTmp[count1] = []
+          }
+          rankTmp[count1].push(sortArray[i])
+          preFirstEle = sortArray[i][firstSortEle]
+        }
       }
+      let finalResult = []
+      for (let i = 0; i < rankTmp.length; i++) {
+        rankTmp[i].sort(this.sortBy(secondSortEle)) // 绩效得分相同的人员根据工时多少进行排序
+        for (let j = 0; j < rankTmp[i].length; j++) {
+          finalResult[count++] = rankTmp[i][j]
+        }
+      }
+      return finalResult
     },
     // 将获得的信息按小组分类
     groupedWorkTimeList (allWorkTimeList) {
@@ -550,25 +817,25 @@ export default {
       }
     },
     // 获取全处工时信息
-    getAllWorkTimeList () {
+    getAllWorkTimeList (applyMonth) {
       const url = getAllWorkTimeList
-      if (this.reqFlag.getAllWorkTimeList) {
-        this.reqFlag.getAllWorkTimeList = false
+      // if (this.reqFlag.getAllWorkTimeList) {
+      //   this.reqFlag.getAllWorkTimeList = false
         let params = {
-          applyMonth: this.formData.title
+          applyMonth: applyMonth
         }
         let _this = this
         return new Promise(function (resolve, reject) {
           _this.$http(url, params).then(res => {
             let recvData = res.data
-            _this.reqFlag.getAllWorkTimeList = true
+            // _this.reqFlag.getAllWorkTimeList = true
             resolve(recvData)
           }).catch(() => {
             _this.$common.toast('请求失败', 'error', false)
             reject(new Error('请求失败'))
           })
         })
-      }
+      // }
     },
     // 获取小组工时信息
     getGroupWorkTimeList (groupID) {
@@ -788,21 +1055,6 @@ export default {
         }
         allRates.push(item)
       }
-      let curRateResult = allRates.find((item) => {
-        return item.id === this.$store.state.userInfo.id
-      })
-      let curID = this.$store.state.userInfo.id
-      if (curRateResult) {
-        if (curID === 7 || curID === 11 || curID === 31) { // 主任岗
-          this.multualScore = curRateResult.mutualScore / (this.directorMutualCof + this.directorManagerCof)
-        } else if (curID === 13 || curID === 17 || curID === 33) { // 组长
-          this.multualScore = curRateResult.mutualScore / (this.groupLeaderMutualCof + this.groupLeaderManagerCof)
-        } else { // 普通成员
-          this.multualScore = curRateResult.mutualScore / (this.commonStaffMutualCof + this.commonStaffManagerCof)
-        }
-      } else {
-        this.multualScore = 0
-      }
       return allRates
     },
     // 定性、定量指标得分计算
@@ -904,15 +1156,15 @@ export default {
         })
     },
     // 获取全处员工互评信息
-    getAllUserRates (users, allUsersRates) {
+    getAllUserRates (users, allUsersRates, rateMonth) {
       const url = getAllUserRates
       let params = {
         usersData: users,
-        rateMonth: this.formData.title
+        rateMonth: rateMonth
       }
       let _this = this
-      if (this.reqFlag.getAllUserRates) {
-        this.reqFlag.getAllUserRates = false
+      // if (this.reqFlag.getAllUserRates) {
+      //   this.reqFlag.getAllUserRates = false
         return new Promise(function (resolve, reject) {
           _this.$http(url, params)
             .then(res => {
@@ -927,14 +1179,17 @@ export default {
                   obj.staffRate = Number(getRated.staffRate.toFixed(3))
                   obj.managerRate = Number(getRated.manageRate.toFixed(3))
                   obj.isRate = item.rateData.length !== 0
+                  if (!allUsersRates) {
+                    allUsersRates = []
+                  }
                   allUsersRates.push(obj)
                 }
-                _this.reqFlag.getAllUserRates = true
+                // _this.reqFlag.getAllUserRates = true
                 resolve(allUsersRates)
               }
             })
         })
-      }
+      // }
     },
     // 评分类型转换
     rateTypeSwitch (rateType) {
@@ -1022,7 +1277,6 @@ export default {
     },
     // 上一月
     handlePreMonth () {
-      console.log(window.document.cookie)
       this.formData.title = this.$moment(this.formData.title).subtract(1, 'months').format('YYYY-MM')
       this.setMonthCookie(this.formData.title, 7)
       this.handelDateChange()
@@ -1038,25 +1292,87 @@ export default {
       let allUsersRates = []
       let promises = []
       let count = 0
+      this.monthStar = {
+        name: '加载中...'
+      }
+      this.quarterStar = {
+        name: '加载中...'
+      }
+      this.selectQuarterNum = this.smallNumToL(this.$moment(this.formData.title).quarter())
       if (this.reqFlag.getPerformanceScore) {
         this.reqFlag.getPerformanceScore = false
-        this.getPerformanceIsCount().then(getPerformanceIsCountRes => {
-          if (getPerformanceIsCountRes === 1) {
-            this.getUsersList().then(res1 => {
-              this.users = res1
-              this.calGroupMemNum(res1)
-              let start = this.$moment().valueOf()
-              promises[count++] = this.getAllWorkTimeList()
-              promises[count++] = this.getAllUserRates(res1, allUsersRates)
-              Promise.all(promises).then((result) => {
-                this.calPerformanceScore(result)
-                this.isCount = true
+        this.getPerformanceIsPublish(this.$moment(this.formData.title).year(),
+          this.$moment(this.formData.title).month() + 1).then(getPerformanceIsPublishRes => {
+          if (getPerformanceIsPublishRes.length > 0) {
+            if (getPerformanceIsPublishRes[0].flagValue === 1) {
+              this.getPerformanceIsCount().then(getPerformanceIsCountRes => {
+                if (getPerformanceIsCountRes === 1) {
+                  promises[count++] = this.getAllWorkTimeList(this.formData.title)
+                  promises[count++] = this.getAllUserRates(this.users, allUsersRates, this.formData.title)
+                  Promise.all(promises).then((result) => {
+                    let performanceScoreResult = this.calPerformanceScore(result)
+                    let finalResultFindResult = performanceScoreResult.find(finalResultItem => {
+                      return finalResultItem.id === this.$store.state.userInfo.id
+                    })
+                    if (finalResultFindResult) {
+                      this.quantitativeRank = finalResultFindResult.quantitativeRank
+                      this.quantitativeScore = finalResultFindResult.quantitativeScore
+                      this.workTimeNum = finalResultFindResult.totalWorkTime
+                      this.performanceRank = finalResultFindResult.performanceRank
+                      this.performanceScore = finalResultFindResult.performanceScore
+                      this.performanceScoreTmp = finalResultFindResult.performanceScoreTmp
+                      let curID = this.$store.state.userInfo.id
+                      if (curID === 7 || curID === 11 || curID === 31) { // 主任岗
+                        this.multualScore = finalResultFindResult.mutualScore /
+                          (this.directorMutualCof + this.directorManagerCof)
+                      } else if (curID === 13 || curID === 17 || curID === 33) { // 组长
+                        this.multualScore = finalResultFindResult.mutualScore /
+                          (this.groupLeaderMutualCof + this.groupLeaderManagerCof)
+                      } else { // 普通成员
+                        this.multualScore = finalResultFindResult.mutualScore /
+                          (this.commonStaffMutualCof + this.commonStaffManagerCof)
+                      }
+                    } else {
+                      this.quantitativeRank = 0
+                      this.quantitativeScore = 0
+                      this.workTimeNum = 0
+                      this.performanceRank = 0
+                      this.performanceScore = 0
+                      this.performanceScoreTmp = 0
+                      this.multualScore = 0
+                    }
+                    this.getMonStar(performanceScoreResult) // 月度之星数据计算
+                    this.getQuarStar(this.$moment(this.formData.title).year(),
+                      this.$moment(this.formData.title).quarter()) // 季度之星数据计算
+                    this.isCount = true
+                    this.reqFlag.getPerformanceScore = true
+                  })
+                } else {
+                  this.isCount = false
+                  this.reqFlag.getPerformanceScore = true
+                }
+              }).catch(err => {
+                this.isCount = false
+                this.$common.toast(err, 'error', false)
                 this.reqFlag.getPerformanceScore = true
-                let end = this.$moment().valueOf()
-                console.log(end - start + 'ms')
               })
-            })
+            } else {
+              this.monthStar = {
+                name: '暂未统计'
+              }
+              this.quarterStar = {
+                name: '暂未统计'
+              }
+              this.isCount = false
+              this.reqFlag.getPerformanceScore = true
+            }
           } else {
+            this.monthStar = {
+              name: '暂未统计'
+            }
+            this.quarterStar = {
+              name: '暂未统计'
+            }
             this.isCount = false
             this.reqFlag.getPerformanceScore = true
           }
@@ -1162,6 +1478,98 @@ export default {
         font-size: 17px;
         margin-bottom: 12px;
         text-align: center;
+        cursor: pointer;
+      }
+
+      .card-panel-num {
+        font-size: 19px;
+      }
+    }
+  }
+
+  .card-panel-large {
+    height: 150px;
+    width: 500px;
+    font-size: 12px;
+    position: relative;
+    overflow: hidden;
+    color: #666;
+    background: #fff;
+    box-shadow: 4px 4px 40px rgba(0, 0, 0, .05);
+    border-color: rgba(0, 0, 0, .05);
+
+    &:hover {
+      .card-panel-icon-wrapper {
+        color: #fff;
+      }
+
+      .icon-people {
+        background: #40c9c6;
+      }
+
+      .icon-message {
+        background: #36a3f7;
+      }
+
+      .icon-money {
+        background: #f4516c;
+      }
+
+      .icon-shopping {
+        background: #34bfa3;
+      }
+
+      .icon-month {
+        background: #34bfa3;
+      }
+    }
+
+    .icon-people {
+      color: #e50000;
+    }
+
+    .icon-month {
+      color: rgba(229, 179, 0, 0.99);
+    }
+
+    .icon-message {
+      color: #36a3f7;
+    }
+
+    .icon-money {
+      color: #f4516c;
+    }
+
+    .icon-shopping {
+      color: #34bfa3
+    }
+
+    .card-panel-icon-wrapper {
+      float: left;
+      margin: 24px 0 0 24px;
+      padding: 16px;
+      transition: all 0.38s ease-out;
+      border-radius: 6px;
+    }
+
+    .card-panel-icon {
+      float: left;
+      font-size: 48px;
+    }
+
+    .card-panel-description {
+      float: center;
+      font-weight: bold;
+      margin: 26px;
+      margin-left: 0px;
+      margin-top: 60px;
+
+      .card-panel-text {
+        line-height: 30px;
+        color: rgba(0, 0, 0, 1);
+        font-size: 27px;
+        text-align: center;
+        cursor: pointer;
       }
 
       .card-panel-num {

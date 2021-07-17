@@ -449,7 +449,6 @@
         },
         // 表格提交工时申报
         handleSubmitStatus (row, index) {
-          console.log(row)
           this.getIsSubmitAllow().then(getIsSubmitAllowRes => {
             if (getIsSubmitAllowRes.length === 0 || row.reviewStatus === 2 || this.$store.state.userInfo.id === 26) {
               if (this.reqFlag.changeSubmitStatus) {

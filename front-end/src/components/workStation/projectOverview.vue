@@ -10,11 +10,15 @@
       v-loading="!reqFlag.getAssignProjectList">
       <el-table-column type="index" label="序号" width="60" align="center"></el-table-column>
       <el-table-column label="指派时间" align="center" prop="assignDate"  width="100"></el-table-column>
-      <el-table-column label="项目名称" align="center">
+      <el-table-column label="项目名称" align="center" show-overflow-tooltip>
         <template slot-scope="scope">
           <span class="link-type" @click="handleEditProject(scope.row)">{{scope.row.projectName}}</span>
         </template>
       </el-table-column>
+      <el-table-column v-if="$store.state.userInfo.role === '管理员'"
+                       label="项目经理"
+                       align="center"
+                       prop="projectManager" width="100"></el-table-column>
       <el-table-column label="项目级别" align="center" prop="projectName" width="120">
         <template slot-scope="scope">
           <div>
@@ -24,11 +28,18 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="完成度" align="center" width="80">
+<!--      <el-table-column v-if="$store.state.userInfo.role === '管理员'" label="当前阶段完成度" align="center" width="80">-->
+<!--        <template slot-scope="scope">-->
+<!--          <el-progress :text-inside="true" :stroke-width="26" :percentage="scope.row.process"></el-progress>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
+      <el-table-column label="总完成度" align="center" width="80">
         <template slot-scope="scope">
           <el-progress :text-inside="true" :stroke-width="26" :percentage="scope.row.process"></el-progress>
         </template>
       </el-table-column>
+      <el-table-column label="当前阶段" align="center" width="80"></el-table-column>
+      <el-table-column label="计划阶段" align="center" width="80"></el-table-column>
       <el-table-column label="指派人" align="center" prop="assigner" width="100"></el-table-column>
       <el-table-column label="操作" align="center" width="180">
         <template slot-scope="scope">
@@ -489,7 +500,6 @@
             newProjectStage: newProjectStage,
             deleteApdID: deleteApdID
           }
-          console.log(params)
           this.$http(url, params).then(res => {
             if (res.code === 1) {
               this.$common.toast('保存成功', 'success', false)

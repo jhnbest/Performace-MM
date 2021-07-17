@@ -217,7 +217,7 @@ const mutualRate = {
             }
             for (let resultItem of result) {
                 if (resultItem[0].totalCount === 0) {
-                    sql = $sql.mutualRates.handleFillMulCheck
+                    sql = $sql.mutualRates.handleFillMulCheck // 找上上月份的评价数据
                     arrayParams = [resultItem[0].userID]
                     promises2[count2++] = RCPDDatabase(sql, arrayParams)
                 }
@@ -227,7 +227,7 @@ const mutualRate = {
                 for (let result2Item of result2) {
                     for (let result2ItemItem of result2Item) {
                         sql = $sql.mutualRates.handleFillMulFill
-                        arrayParams = [result2ItemItem.ratePersion, result2ItemItem.ratedPersion, '2021-02', result2ItemItem.rate,
+                        arrayParams = [result2ItemItem.ratePersion, result2ItemItem.ratedPersion, '2021-06', result2ItemItem.rate,
                             result2ItemItem.rateType, rateTime, rateTime]
                         promise3[count3++] = RCPDDatabase(sql, arrayParams)
                     }

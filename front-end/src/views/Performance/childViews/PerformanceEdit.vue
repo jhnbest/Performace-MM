@@ -328,7 +328,6 @@
           this.$http(url, params)
             .then(res => {
               if (res.code === 1) {
-                console.log(res.data)
                 this.apdID = res.data.apdID
                 this.aplID = res.data.aplID
                 this.formData.projectLevel = res.data.projectLevel
@@ -346,7 +345,6 @@
             it.$http(url, params).then(res => {
               if (res.code === 1) {
                 let data = res.data
-                console.log(data)
                 let multipleSelect = []
                 let defaultCurrentUserWorkTime = []
                 let workTimeAssignInsertID = []
@@ -443,8 +441,6 @@
                 submitDate: title,
                 data: tableDataCopy
               }
-              console.log('params')
-              console.log(params)
               this.$http(url, params).then(res => {
                 if (res.code === 1) {
                   this.$common.toast('提交成功', 'success', false)
@@ -542,7 +538,6 @@
                     this.$common.toast('暂存成功', 'success', false)
                     this.onCancel(formData)
                   } else {
-                    console.log(res.code)
                     this.$common.toast('暂存失败', 'success', false)
                     this.onCancel(formData)
                   }
@@ -597,8 +592,6 @@
         },
         // 获取用户姓名
         getUsersName () {
-          console.log('===PerformanceEdit.vue getUsersName')
-          console.log(this.userListOptions)
           const url = getUsersName
           if (this.reqFlag.usersName) {
             this.reqFlag.usersName = false
@@ -630,19 +623,15 @@
         },
         // 删除工时明细记录
         handleDeleteWorkDetail (row, index) {
-          console.log('===PerformanceAddNew.vue handleDeleteWorkDetail')
-          console.log(row)
           let deleteIndex = null
           this.formData.workTypeTimeDetail.splice(index, 1)
           for (let i = 0; i < this.formData.projectType.length; i++) {
             let arrayLen = this.formData.projectType[i].length
-            console.log(this.formData.projectType[i][arrayLen - 1])
             if (this.formData.projectType[i][arrayLen - 1] === row.projectTypeID) {
               deleteIndex = i
               break
             }
           }
-          console.log(deleteIndex)
           this.$nextTick(() => {
             this.formData.projectType.splice(deleteIndex, 1)
           })
@@ -667,8 +656,6 @@
         },
         // 删除工时明细数据
         participantDelete (account) {
-          console.log(account)
-          console.log(this.formData.partTableData[account.$index])
           this.formData.partTableData.splice(account.$index, 1)
           /* let tableLen = this.formData.partTableData.length
           for (let i = 0; i < tableLen; i++) {
@@ -683,7 +670,6 @@
           row.avaiableWorkTime = Number(Number(row.avaiableWorkTime).toFixed(1))
           row.workTimeAssign[0].assignWorkTime = row.avaiableWorkTime
           row.defaultAssignWorkTime = row.defaultAssignWorkTimeIni * row.defaultKValue * row.defaultCofficient * row.applyProcess * 0.01
-          console.log(row)
         },
         // 新增一行
         addNewLine () {
@@ -694,7 +680,6 @@
           obj = JSON.parse(JSON.stringify(this.formData.projectType[selectLength - 1]))
           this.formData.projectType.push(obj)
           this.refreshSelectProjectType()
-          console.log(this.formData.workTypeTimeDetail)
         },
         // 表格删除按钮
         handleDelete (row, index) {
@@ -717,8 +702,6 @@
         Assign
       },
       created () {
-        console.log('===PerformanceEdit.vue created')
-        console.log(this.$store.state.userInfo)
         this.id = this.$route.query.id
         this.init()
       },

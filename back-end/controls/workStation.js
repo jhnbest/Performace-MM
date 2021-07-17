@@ -505,6 +505,8 @@ const workStation = {
                 sql = $sql.workStation.getAssignProjectList + ';' + $sql.workStation.getAssignProjectListCount
             } else if (data.searchType === 'Filled') {
                 sql = $sql.workStation.getAssignProjectListed + ';' + $sql.workStation.getAssignProjectListedCount
+            } else if (data.searchType === 'all') {
+                sql = $sql.workStation.getAssignProjectListed + ';' + $sql.workStation.getAssignProjectListedCount
             }
             let arrayParams = [data.id, data.projectType, data.id, data.projectType]
             RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
@@ -846,8 +848,8 @@ const workStation = {
                     result[2] = JSON.parse(JSON.stringify(result[2]))
                     result[3] = JSON.parse(JSON.stringify(result[3]))
                     result[4] = JSON.parse(JSON.stringify(result[4]))
-                    updateMonthProcessObsoleteStatus(result[2]).then(res1 => {
-                        updateWorkTimeAssignObsoleteStatus(result[4]).then(res2 => {
+                    updateMonthProcessObsoleteStatus(result[2]).then(() => {
+                        updateWorkTimeAssignObsoleteStatus(result[4]).then(() => {
                             return $http.writeJson(res, { code: 1, message: '成功' })
                         })
                     })
@@ -1055,18 +1057,20 @@ const workStation = {
         let sql = $sql.workStation.repairErrorDataCheck
         let arrayParams = []
         let promises = []
+        let ErrResult = []
         let count = 0
-        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
-            for (let item of RCPDDatabaseRes) {
-                sql = $sql.workStation.repairErrorDataModify
-                arrayParams = [item.applyProcess, item.id]
-                promises[count++] = RCPDDatabase(sql, arrayParams)
+        for (let i = 1; i < 3332; i++) {
+            arrayParams = [i, i]
+            promises[count++] = RCPDDatabase(sql, arrayParams)
+        }
+        Promise.all(promises).then(result => {
+            for (let resultItem of result) {
+                if (resultItem[0][0].totalCount > 1) {
+                    console.log(resultItem[1])
+                    ErrResult.push(resultItem[1])
+                }
             }
-            Promise.all(promises).then(result => {
-                return $http.writeJson(res, { code: 1, data: result, message: 'success' })
-            })
-        }).catch(RCPDDatabaseErr => {
-            return $http.writeJson(res, { code: -2, data: RCPDDatabaseErr, message: 'error' })
+            return $http.writeJson(res, { code: 1, data: ErrResult, message: 'success' })
         })
     },
     // 修复错误数据

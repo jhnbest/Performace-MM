@@ -12,6 +12,7 @@ export default new Vuex.Store({
       { name: '个人工作台', url: '/home/workStation', icon: 'el-icon-s-data' },
       // { name: '工作计划', url: '/home/weekly', icon: 'el-icon-s-grid' },
       { name: '计划/工时查询', url: '/home/performance', icon: 'el-icon-s-order' },
+      { name: '月总结', url: '/home/monthConclusion', icon: 'el-icon-s-finance' },
       { name: '定性评价', url: '/home/mutualEvaluation', icon: 'el-icon-s-finance' }
     ],
     workTimeManagerList: [
@@ -32,7 +33,9 @@ export default new Vuex.Store({
     directorMutualCof: 0.2,
     directorManagerCof: 0.3,
     directorQuantitativeCof: 0.5,
-    managerID: 26
+    managerID: 26,
+    monthStarNum: 2,
+    quarterStarNum: 2
   },
   mutations: {
     [types.SAVE_USERINFO] (state, data) {

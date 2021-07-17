@@ -3,7 +3,7 @@
              :visible.sync="formData.showFlag"
              custom-class="dialog-small"
              @close="closeDialog"
-             width="50%"
+             width="60%"
              append-to-body>
     <div style ="margin-top: -20px">
       <el-form ref="formData" :model="formData" :rules="formRules" :inline="true">
@@ -60,10 +60,16 @@
           :data="formData.copInfoTable"
           style="width: 100%;margin: auto">
           <el-table-column type="index" label="序号" align="center"></el-table-column>
-          <el-table-column label="小组" prop="groupName" align="center"></el-table-column>
+          <el-table-column label="小组" prop="groupName" align="center">
+            <template slot-scope="scope">
+              <el-tag :type="scope.row.groupName | groupNameFilter">
+                {{scope.row.groupName}}
+              </el-tag>
+            </template>
+          </el-table-column>
           <el-table-column label="姓名" prop="name" align="center"></el-table-column>
           <el-table-column label="角色" prop="applyRole" align="center"></el-table-column>
-          <el-table-column label="工时" align="center">
+          <el-table-column label="工时" align="center" width="200">
             <template slot-scope="scope">
               <el-form-item
                 :prop="'copInfoTable.' + scope.$index + '.assignWorkTime'"
@@ -76,6 +82,14 @@
                                  @change="handleAssignWorkTimeChange(scope.row)">
                 </el-input-number>
               </el-form-item>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" align="center">
+            <template slot-scope="scope">
+              <el-button type="danger"
+                         size="mini"
+                         @click="handleDelAssist(scope.row, scope.$index)"
+                         :disabled="scope.row.applyRole === '组织者'">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -155,21 +169,15 @@ export default {
   components: {
   },
   created () {
-    console.log('===workTimeAssign.vue created')
   },
   mounted () {
-    console.log('===workTimeAssign.vue mounted')
-    console.log(this.formData.copInfoTable)
   },
   destroyed () {
-    console.log('===workTimeAssign.vue destroyed')
   },
   methods: {
     // 初始化
     init (params) {
       this.$nextTick(() => {
-        console.log('workTimeAssign.vue init' + params)
-        console.log(params)
         this.getUsersName()
         this.formData.isConference = params.rowCop.isConference
         this.formData.defaultAssignWorkTime = params.rowCop.defaultAssignWorkTime
@@ -188,8 +196,6 @@ export default {
     },
     // 分配工时变化
     handleAssignWorkTimeChange (row) {
-      console.log('workTimeAssign.vue handleAssignWorkTimeChange')
-      console.log(row)
     },
     // 获取用户姓名
     getUsersName () {
@@ -236,21 +242,17 @@ export default {
               multipleSelect: this.formData.participant
             }
             params = JSON.parse(JSON.stringify(params)) // 深拷贝
-            console.log('workTimeAssign.vue onSave')
-            console.log(params)
             this.$emit('assignDetail', params)
             this.onCancel(formData)
             this.$common.toast('保存成功', 'success', false)
           }
         } else {
-          console.log('error submit!!')
           return false
         }
       })
     },
     // 取消
     onCancel (formName) {
-      console.log('===workTimeAssign onCancel')
       this.changeShowFlag()
       this.$nextTick(() => {
         this.$refs[formName].resetFields()
@@ -295,15 +297,11 @@ export default {
         }
         if (this.formData.participant.length > 1) {
           for (let item of this.formData.participant) {
-            console.log('===Performance.vue handlePartChange')
-            console.log(item)
-            console.log(tableUsers)
             if (selectUsers.indexOf(item) === -1 && item !== '1' && item !== '2' && item !== '3' && item !== '0') {
               selectUsers.push(item)
             }
           }
         }
-        console.log(selectUsers)
       } else if (this.formData.participant.indexOf('2') !== -1) { // 是否选了工程组
         for (let user of this.formData.usersList[1].options) {
           if (user.groupName === '工程组') {
@@ -326,16 +324,11 @@ export default {
         }
         if (this.formData.participant.length > 1) {
           for (let item of this.formData.participant) {
-            console.log('===Performance.vue handlePartChange')
-            console.log(item)
-            console.log(tableUsers)
             if (selectUsers.indexOf(item) === -1 && item !== '2') {
-              console.log('push')
               selectUsers.push(item)
             }
           }
         }
-        console.log(selectUsers)
       } else if (this.formData.participant.indexOf('3') !== -1) { // 是否选了通信组
         for (let user of this.formData.usersList[1].options) {
           if (user.groupName === '通信组') {
@@ -358,28 +351,18 @@ export default {
         }
         if (this.formData.participant.length > 1) {
           for (let item of this.formData.participant) {
-            console.log('===Performance.vue handlePartChange')
-            console.log(item)
-            console.log(tableUsers)
             if (selectUsers.indexOf(item) === -1 && item !== '3') {
-              console.log('push')
               selectUsers.push(item)
             }
           }
         }
-        console.log(selectUsers)
       } else {
         selectUsers = this.formData.participant
       }
       selectUsersLen = selectUsers.length
       let tableUsersLen = tableUsers.length
-      console.log(selectUsers)
-      console.log(tableUsers)
       let difference = selectUsers.filter(x => tableUsers.indexOf(x) === -1)
         .concat(tableUsers.filter(x => selectUsers.indexOf(x) === -1))
-      console.log(difference)
-      console.log(selectUsersLen)
-      console.log(tableUsersLen)
       if (selectUsersLen > tableUsersLen) {
         for (let index of difference) {
           tmp = this.formData.usersList[1].options.find((item) => {
@@ -402,7 +385,6 @@ export default {
           let index = tableUsers.indexOf(diff)
           let newArr = this.formData.copInfoTable.splice(index + 1, 1)
           tableUsers.splice(index, 1)
-          console.log(newArr)
         }
       }
     },
@@ -411,6 +393,10 @@ export default {
       this.$nextTick(() => {
         // this.$refs['formData'].resetFields()
       })
+    },
+    // 删除协助者按钮
+    handleDelAssist (row, index) {
+      this.formData.copInfoTable.splice(index, 1)
     }
   },
   computed: {
@@ -423,6 +409,20 @@ export default {
         assignedWorkTime += item.assignWorkTime
       }
       return assignedWorkTime
+    }
+  },
+  filters: {
+    groupNameFilter (groupName) {
+      switch (groupName) {
+        case '技术标准组':
+          return 'success'
+        case '工程组':
+          return 'warning'
+        case '通信组':
+          return 'primary'
+        default:
+          return 'danger'
+      }
     }
   }
 }
