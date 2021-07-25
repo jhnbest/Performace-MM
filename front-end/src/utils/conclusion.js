@@ -8,6 +8,7 @@ import {
   urlSubmitMonthConclusionData
 } from '../config/interface'
 
+// 获取月总结概览信息
 export function getCurMonthConclusionOverviewData (submitMonth, submitYear, submitter) {
   const url = urlGetCurMonthConclusionOverviewData
   let params = {
@@ -32,6 +33,7 @@ export function submitMonthConclusionData (submitYear, submitMonth, submitter, t
                                            curConclusion, nextPlan, curAdvice, managerRateStar) {
   const url = urlSubmitMonthConclusionData
   let params = {
+    conclusionType: 1,
     submitYear: submitYear,
     submitMonth: submitMonth,
     submitter: submitter,
@@ -54,4 +56,8 @@ export function submitMonthConclusionData (submitYear, submitMonth, submitter, t
       reject(err)
     })
   })
+}
+
+// 获取月总结数据
+export function getConclusionData () {
 }

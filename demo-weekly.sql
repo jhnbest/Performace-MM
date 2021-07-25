@@ -1,17 +1,17 @@
 /*
  Navicat Premium Data Transfer
 
- Source Server         : root_MySQL
+ Source Server         : root
  Source Server Type    : MySQL
- Source Server Version : 80020
+ Source Server Version : 80022
  Source Host           : localhost:3306
  Source Schema         : worktimemm
 
  Target Server Type    : MySQL
- Target Server Version : 80020
+ Target Server Version : 80022
  File Encoding         : 65001
 
- Date: 25/07/2021 21:47:45
+ Date: 26/07/2021 00:50:49
 */
 
 SET NAMES utf8mb4;
@@ -6477,8 +6477,9 @@ INSERT INTO `assignprojectlist` VALUES (2228, 31, '2021-06-18 16:12:37', 4, 'ACA
 DROP TABLE IF EXISTS `conclusion`;
 CREATE TABLE `conclusion`  (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+  `conclusionType` tinyint UNSIGNED NOT NULL COMMENT '总结类型',
   `submitter` int NOT NULL COMMENT '提交者',
-  `title` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '标题',
+  `conclusionTitle` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '标题',
   `submitTime` datetime(0) NOT NULL COMMENT '提交时间',
   `updateTime` datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
   `submitYear` year NOT NULL COMMENT '提交的年份',
@@ -6491,12 +6492,12 @@ CREATE TABLE `conclusion`  (
   `curAdvice` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '建议',
   `obsoleteStatus` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '废弃状态',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of conclusion
 -- ----------------------------
-INSERT INTO `conclusion` VALUES (1, 15, '一月份总结', '2021-07-23 11:21:48', '2021-07-23 11:21:48', 2021, 1, 1, NULL, NULL, '<p><strong>总结测试</strong></p>', '<p>计划测试</p>', '<p><span style=\"color: #e03e2d;\">建议测试</span></p>', 0);
+INSERT INTO `conclusion` VALUES (1, 1, 15, '一月份总结', '2021-07-23 11:21:48', '2021-07-23 11:21:48', 2021, 1, 1, NULL, NULL, '<p><strong>总结测试</strong></p>', '<p>计划测试</p>', '<p><span style=\"color: #e03e2d;\">建议测试</span></p>', 0);
 
 -- ----------------------------
 -- Table structure for globalflag
@@ -6556,7 +6557,7 @@ CREATE TABLE `monthprocess`  (
   `PreMonth` float(6, 1) UNSIGNED NOT NULL DEFAULT 0.0 COMMENT '上一月份进展',
   `obsoleteStatus` tinyint NOT NULL DEFAULT 0 COMMENT '废弃状态 ',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 3499 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 3500 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of monthprocess
@@ -20975,7 +20976,7 @@ CREATE TABLE `projecttype`  (
   `defaultKValue` double(255, 1) NOT NULL COMMENT '默认K值',
   `defaultCofficient` double(255, 1) NOT NULL COMMENT '默认系数',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 14 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 15 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of projecttype
@@ -21430,7 +21431,7 @@ CREATE TABLE `projecttypenew_copy1`  (
   `defaultAssignWorkTime` double(255, 1) NOT NULL DEFAULT 0.0 COMMENT '默认协助工时',
   `obsoleteStatus` tinyint NOT NULL DEFAULT 0 COMMENT '是否废弃',
   PRIMARY KEY (`projectTypeID`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 172 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 173 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of projecttypenew_copy1
@@ -21623,7 +21624,7 @@ CREATE TABLE `projecttypenew_copy2`  (
   `defaultAssignWorkTime` double(255, 1) NOT NULL DEFAULT 0.0 COMMENT '默认协助工时',
   `obsoleteStatus` tinyint NOT NULL DEFAULT 0 COMMENT '是否废弃',
   PRIMARY KEY (`projectTypeID`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 172 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 173 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of projecttypenew_copy2
@@ -21816,7 +21817,7 @@ CREATE TABLE `user`  (
   `status` char(1) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '1' COMMENT '状态',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `name`(`name`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 38 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 39 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of user
@@ -21899,7 +21900,7 @@ CREATE TABLE `users_copy1`  (
   `state` char(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `partyMember` tinyint NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 29 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 30 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of users_copy1
@@ -21949,7 +21950,7 @@ CREATE TABLE `weekly`  (
   `update_time` datetime(0) NOT NULL COMMENT '更新时间',
   `state` char(1) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '1' COMMENT '状态',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 26 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci COMMENT = '周报表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 27 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci COMMENT = '周报表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of weekly

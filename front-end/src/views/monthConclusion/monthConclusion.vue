@@ -67,9 +67,15 @@
               :height="tableHeight"
               ref="rateTable"
               highlight-current-row>
-      <el-table-column label="类型" align="center" prop="type" min-width="50"></el-table-column>
-      <el-table-column label="月份" align="center" prop="month" min-width="50"></el-table-column>
-      <el-table-column label="标题" align="center" prop="title"></el-table-column>
+      <el-table-column label="类型" align="center" min-width="50">
+        <template slot-scope="scope">
+          <el-tag :type="scope.row.conclusionType | conclusionTypeFilter" size="medium">
+            <span>{{scope.row.conclusionType | conclusionTypeTextFilter}}</span>
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column label="时间" align="center" prop="month" min-width="50"></el-table-column>
+      <el-table-column label="标题" align="center" prop="conclusionTitle"></el-table-column>
       <el-table-column label="状态" align="center">
         <template slot-scope="scope">
           <el-tag :type="scope.row.submitStatus | submitStatusFilter" size="medium">
@@ -147,103 +153,7 @@
           descTableShow: false
         },
         descriptionContent: '1、首先查看评价标准，了解',
-        rateTableData: [{
-          type: '月总结',
-          month: '一月份',
-          monthNum: 1,
-          title: '一月份总结',
-          submitStatus: 2,
-          getEvaStar: 3,
-          getWorkTime: 100
-        }, {
-          type: '月总结',
-          month: '二月份',
-          monthNum: 2,
-          title: '二月份总结',
-          submitStatus: 2,
-          getEvaStar: 3,
-          getWorkTime: 100
-        }, {
-          type: '月总结',
-          month: '三月份',
-          monthNum: 3,
-          title: '三月份总结',
-          submitStatus: 2,
-          getEvaStar: 3,
-          getWorkTime: 100
-        }, {
-          type: '月总结',
-          month: '四月份',
-          monthNum: 4,
-          title: '四月份总结',
-          submitStatus: 2,
-          getEvaStar: 3,
-          getWorkTime: 100
-        }, {
-          type: '月总结',
-          month: '五月份',
-          monthNum: 5,
-          title: '五月份总结',
-          submitStatus: 2,
-          getEvaStar: 3,
-          getWorkTime: 100
-        }, {
-          type: '月总结',
-          month: '六月份',
-          monthNum: 6,
-          title: '六月份总结',
-          submitStatus: 2,
-          getEvaStar: 3,
-          getWorkTime: 100
-        }, {
-          type: '月总结',
-          month: '七月份',
-          monthNum: 7,
-          title: '七月份总结',
-          submitStatus: 2,
-          getEvaStar: 3,
-          getWorkTime: 100
-        }, {
-          type: '月总结',
-          month: '八月份',
-          monthNum: 8,
-          title: '八月份总结',
-          submitStatus: 2,
-          getEvaStar: 3,
-          getWorkTime: 100
-        }, {
-          type: '月总结',
-          month: '九月份',
-          monthNum: 9,
-          title: '九月份总结',
-          submitStatus: 2,
-          getEvaStar: 3,
-          getWorkTime: 100
-        }, {
-          type: '月总结',
-          month: '十月份',
-          monthNum: 10,
-          title: '十月份总结',
-          submitStatus: 2,
-          getEvaStar: 3,
-          getWorkTime: 100
-        }, {
-          type: '月总结',
-          month: '十一月份',
-          monthNum: 11,
-          title: '十一月份总结',
-          submitStatus: 2,
-          getEvaStar: 3,
-          getWorkTime: 100
-        }, {
-          type: '月总结',
-          month: '十二月份',
-          monthNum: 12,
-          title: '十二月份总结',
-          submitStatus: 2,
-          getEvaStar: 3,
-          getWorkTime: 100
-        }],
+        rateTableData: [],
         curUser: this.$store.state.userInfo.id,
         users: [],
         defaultStar: 3,
@@ -278,7 +188,23 @@
     methods: {
       // 初始化
       init () {
+        this.initDefaultData()
         this.getCurYearConclusionOverviewData(this.formData.title, this.curUser)
+      },
+      // 初始化默认数据
+      initDefaultData () {
+        for (let i = 0; i < 12; i++) {
+          let obj = {
+            conclusionType: 1,
+            month: i + 1 + '月份',
+            submitMonth: i + 1,
+            conclusionTitle: i + 1 + '月份总结',
+            submitStatus: 2,
+            getEvaStar: 3,
+            getWorkTime: -1
+          }
+          this.rateTableData.push(obj)
+        }
       },
       // 获取本年份总结概览数据
       getCurYearConclusionOverviewData (submitYear, submitter) {
@@ -294,6 +220,12 @@
               _this.reqFlag.getCurYearConclusionOverviewData = true
               console.log('result')
               console.log(result)
+              for (let i = 0; i < result.length; i++) {
+                if (result[i].data.length !== 0) {
+                  _this.rateTableData[i].conclusionTitle = result[i].data.conclusionTitle
+                  _this.rateTableData[i].submitMonth = result[i].data.submitMonth
+                }
+              }
             })
           })
         }
@@ -306,9 +238,9 @@
         this.$router.push({
           path: '/home/monthConclusionTable',
           query: {
-            title: row.title,
+            conclusionTitle: row.conclusionTitle,
             submitYear: this.formData.title,
-            submitMonth: row.monthNum,
+            submitMonth: row.submitMonth,
             submitter: this.$store.state.userInfo.id
           }
         })
@@ -1906,10 +1838,8 @@
           return '未提交'
         }
       },
-      reviewStatusFilter (status) {
+      conclusionTypeFilter (status) {
         switch (status) {
-          case 0:
-            return 'info'
           case 1:
             return 'success'
           case 2:
@@ -1918,14 +1848,14 @@
             return 'danger'
         }
       },
-      reviewStatusTextFilter (status) {
+      conclusionTypeTextFilter (status) {
         switch (status) {
-          case 0:
-            return '未审核'
           case 1:
-            return '已通过'
+            return '月总结'
           case 2:
-            return '驳回'
+            return '年度总结'
+          case 3:
+            return '年中总结'
           default:
             return '错误'
         }

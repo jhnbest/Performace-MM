@@ -59,7 +59,7 @@ const conclusion = {
         let sql = $sql.conclusion.submitMonthConclusionData
         let submitTime = $time.formatTime()
         let updateTime = submitTime
-        let arrayParams = [sendData.submitter, sendData.title, submitTime, updateTime, sendData.submitYear, sendData.submitMonth,
+        let arrayParams = [sendData.conclusionType, sendData.submitter, sendData.conclusionTitle, submitTime, updateTime, sendData.submitYear, sendData.submitMonth,
             sendData.submitStatus, sendData.managerRateStar, sendData.curConclusion, sendData.nextPlan, sendData.curAdvice]
 
         RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
@@ -79,59 +79,6 @@ const conclusion = {
         }).catch(RCPDDatabaseErr => {
             return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
         })
-    },
-    // 一键填充定性评价
-    handleFillMul (req, res) {
-        let sendData = req.body
-        let sql = $sql.mutualRates.handleFillMul
-        let arrayParams = []
-        let promises = []
-        let promises2 = []
-        let promise3 = []
-        let count = 0
-        let count2 = 0
-        let count3 = 0
-        for (let i = 0; i < sendData.users.length; i++) {
-            if (sendData.users[i].id === 26) {
-                sendData.users.splice(i, 1)
-            }
-        }
-        for (let usersItem of sendData.users) {
-            if (usersItem.id !== 26) {
-                arrayParams = [usersItem.id, sendData.rateMonth]
-                promises[count++] = RCPDDatabase(sql, arrayParams)
-            }
-        }
-        Promise.all(promises).then(result => {
-            for (let i = 0; i < result.length; i++) {
-                result[i][0].userName = sendData.users[i].name
-                result[i][0].userID = sendData.users[i].id
-            }
-            for (let resultItem of result) {
-                if (resultItem[0].totalCount === 0) {
-                    sql = $sql.mutualRates.handleFillMulCheck // 找上上月份的评价数据
-                    arrayParams = [resultItem[0].userID]
-                    promises2[count2++] = RCPDDatabase(sql, arrayParams)
-                }
-            }
-            Promise.all(promises2).then(result2 => {
-                let rateTime = $time.formatTime()
-                for (let result2Item of result2) {
-                    for (let result2ItemItem of result2Item) {
-                        sql = $sql.mutualRates.handleFillMulFill
-                        arrayParams = [result2ItemItem.ratePersion, result2ItemItem.ratedPersion, '2021-06', result2ItemItem.rate,
-                            result2ItemItem.rateType, rateTime, rateTime]
-                        promise3[count3++] = RCPDDatabase(sql, arrayParams)
-                    }
-                }
-                Promise.all(promise3).then(result3 => {
-                    return $http.writeJson(res, {code: 1, data: result3, message: 'success'})
-                })
-            })
-        }).catch(error => {
-            return $http.writeJson(res, {code: -2, err: error, message: 'false'})
-        })
-
     }
 }
 

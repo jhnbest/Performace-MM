@@ -75,7 +75,7 @@
   export default {
     data () {
       return {
-        title: '',
+        conclusionTitle: '',
         tableData1: [{}],
         tableData2: [{}],
         tableData3: [{}],
@@ -96,7 +96,7 @@
     methods: {
       // 初始化
       init () {
-        this.title = this.$route.query.title
+        this.conclusionTitle = this.$route.query.conclusionTitle
         this.submitYear = this.$route.query.submitYear
         this.submitMonth = this.$route.query.submitMonth
         this.submitter = this.$route.query.submitter
@@ -104,7 +104,7 @@
       // 提交月总结
       handleSubmit () {
         let submitStatus = 1
-        submitMonthConclusionData(this.submitYear, this.submitMonth, this.submitter, this.title, submitStatus,
+        submitMonthConclusionData(this.submitYear, this.submitMonth, this.submitter, this.conclusionTitle, submitStatus,
           this.conclusionText.curConclusion, this.conclusionText.nextPlan, this.conclusionText.curAdvice).then(() => {
             this.$common.toast('提交成功', 'success', false)
         }).catch(() => {
