@@ -77,3 +77,6 @@ export const getAllUserRates = '/mutualRates/getAllUserRates' // 获取本处员
 export const getPerformanceIsCount = '/mutualRates/getPerformanceIsCount' // 获取绩效信息统计标志
 export const getPreMonthEva = '/mutualRates/getPreMonthEva' // 提取上月互评结果
 export const handleFillMul = '/mutualRates/handleFillMul' // 一键填充定性评价
+
+export const urlGetCurMonthConclusionOverviewData = '/conclusion/getCurMonthConclusionOverviewData' // 获取总结数据
+export const urlSubmitMonthConclusionData = '/conclusion/submitMonthConclusionData' // 提交月总结

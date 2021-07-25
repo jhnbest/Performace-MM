@@ -8,8 +8,8 @@
     ></editor>
   </div>
 </template>
+
 <script>
-  import axios from 'axios'
   import tinymce from 'tinymce'
   import Editor from '@tinymce/tinymce-vue'
   import 'tinymce/themes/silver'
@@ -30,6 +30,10 @@
         type: String,
         default: ''
       },
+      baseUrl: {
+        type: String,
+        default: window.location.origin ? window.location.origin : ''
+      },
       disabled: {
         type: Boolean,
         default: false
@@ -37,22 +41,28 @@
       plugins: {
         type: [String, Array],
         default:
-          'link lists image code table wordcount'
+          'link lists table wordcount'
       },
       toolbar: {
         type: [String, Array],
         default:
-          'bold italic underline strikethrough | fontsizeselect fontselect | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | outdent indent blockquote | undo redo | link unlink code | removeformat'
+          'bold italic underline | ' +
+          'fontsizeselect fontselect | ' +
+          'forecolor backcolor | ' +
+          'alignleft aligncenter alignright alignjustify | ' +
+          'bullist numlist | ' +
+          'outdent indent blockquote | ' +
+          'undo redo | ' +
+          'removeformat'
       }
     },
     data () {
       return {
         init: {
-          // language_url: './zh_CN.js', // 如果语言包不存在，指定一个语言包路径
-          // language: 'zh_CN', // 语言
-          skin_url: './skins/ui/oxide', // 如果主题不存在，指定一个主题路径
-          height: '400px',
-          width: this.calcWidth(),
+          language_url: `${this.baseUrl}/tinymce/langs/zh_CN.js`, // 如果语言包不存在，指定一个语言包路径
+          language: 'zh_CN', // 语言
+          skin_url: `${this.baseUrl}/tinymce/skins/ui/oxide`, // 如果主题不存在，指定一个主题路径
+          height: '300px',
           plugins: this.plugins, // 插件
           toolbar: this.toolbar, // 工具栏
           branding: false, // 技术支持(Powered by Tiny || 由Tiny驱动)

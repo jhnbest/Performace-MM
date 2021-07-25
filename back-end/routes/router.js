@@ -5,6 +5,7 @@ let weekly = require('../controls/weekly');
 let performance = require('../controls/performance');
 let workStation = require('../controls/workStation');
 let mutualRates = require('../controls/mutualRate');
+let conclusion = require('../controls/conclusion');
 let api = require('../config/api');
 
 let router = express.Router();
@@ -92,5 +93,9 @@ router.post(api.getAllUserRates, mutualRates.getAllUserRates)
 router.post(api.getPerformanceIsCount, mutualRates.getPerformanceIsCount)
 router.post(api.getPreMonthEva, mutualRates.getPreMonthEva)
 router.post(api.handleFillMul, mutualRates.handleFillMul)
+
+// 总结模块
+router.post(api.getCurMonthConclusionOverviewData, conclusion.getCurMonthConclusionOverviewData)
+router.post(api.submitMonthConclusionData, conclusion.submitMonthConclusionData)
 
 module.exports = router;

@@ -84,5 +84,9 @@ module.exports = {
     getAllUserRates: path + '/mutualRates/getAllUserRates', // 获取本处员工互评得分
     getPerformanceIsCount: path + '/mutualRates/getPerformanceIsCount', // 获取绩效信息统计标志
     getPreMonthEva: path + '/mutualRates/getPreMonthEva', // 提取上月互评结果
-    handleFillMul: path + '/mutualRates/handleFillMul' // 一键填充定性评价
+    handleFillMul: path + '/mutualRates/handleFillMul', // 一键填充定性评价
+
+    // 总结模块
+    getCurMonthConclusionOverviewData: path + '/conclusion/getCurMonthConclusionOverviewData', // 获取总结数据
+    submitMonthConclusionData: path + '/conclusion/submitMonthConclusionData' // 提交月总结
 };

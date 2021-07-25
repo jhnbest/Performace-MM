@@ -27,7 +27,7 @@
         </el-form-item>
       </el-col>
 <!--      填报说明-->
-      <el-col :xs="2" :sm="2" :lg="{span: 3, pull: 1}" :xl="{span: 3, pull: 0}" style="margin-top: 10px">
+      <el-col :xs="2" :sm="2" :lg="{span: 6, pull: 1}" :xl="{span: 6, pull: 0}" style="margin-top: 10px">
         <el-popover
           placement="bottom"
           width="470"
@@ -45,16 +45,9 @@
           <span slot="reference" class="pointer-type"><i class="el-icon-warning-outline"></i>填报说明</span>
         </el-popover>
       </el-col>
-<!--      提交和更新按钮-->
-<!--      <el-col :xs="12" :sm="12" :lg="{span: 4, offset: 8 }" :xl="{span: 3, offset: 12 }">-->
-<!--        <el-button type="primary" @click="submitRatesResult" :disabled="isRated">-->
-<!--          <span v-if="!isRated">提交</span>-->
-<!--          <span v-else>已提交</span>-->
-<!--        </el-button>-->
-<!--        <el-button type="success"-->
-<!--                   :disabled="!isRated || !isChanged || !reqFlag.updateRateToUpdate"-->
-<!--                   @click="updateRateTableData">更新</el-button>-->
-<!--      </el-col>-->
+      <el-col>
+        <el-button type="success" @click="init">测试按钮</el-button>
+      </el-col>
     </el-row>
   </el-form>
   <!-- 分割线 start -->
@@ -74,8 +67,9 @@
               :height="tableHeight"
               ref="rateTable"
               highlight-current-row>
+      <el-table-column label="类型" align="center" prop="type" min-width="50"></el-table-column>
       <el-table-column label="月份" align="center" prop="month" min-width="50"></el-table-column>
-      <el-table-column label="总结名称" align="center" prop="conclusionName"></el-table-column>
+      <el-table-column label="标题" align="center" prop="title"></el-table-column>
       <el-table-column label="状态" align="center">
         <template slot-scope="scope">
           <el-tag :type="scope.row.submitStatus | submitStatusFilter" size="medium">
@@ -92,15 +86,14 @@
       <el-table-column label="操作" align="center" width="250">
         <template slot-scope="scope">
 <!--          点击预览-->
-          <el-popover
-            placement="left"
-            trigger="click">
-            <month-conclusion-table ref="monthConclusionTable"></month-conclusion-table>
-            <el-button slot="reference"
-                       type="primary"
-                       size="mini"
-                       @click="handlePreview(scope.row, scope.$index)">点击预览</el-button>
-          </el-popover>
+<!--          <el-popover-->
+<!--            placement="left"-->
+<!--            trigger="click">-->
+<!--          </el-popover>-->
+          <el-button slot="reference"
+                     type="primary"
+                     size="mini"
+                     @click="handlePreview(scope.row, scope.$index)">点击预览</el-button>
 <!--          编辑-->
           <el-button v-if="!(scope.row.submitStatus === 1)"
                      :disabled="(scope.row.reviewStatus === 1)"
@@ -143,25 +136,115 @@
     getPreMonthEva,
     getCurApplyAbleMonth,
     handleFillMul } from '@/config/interface'
-  import CountTo from 'vue-count-to'
-  import monthConclusionTable from './childViews/monthConclusionTable'
+  import { getCurMonthConclusionOverviewData } from '@/utils/conclusion'
   export default {
     data () {
       return {
         formData: {
-          title: this.$moment().format('YYYY-MM')
+          title: this.$moment().format('YYYY')
         },
         showFlag: {
           descTableShow: false
         },
         descriptionContent: '1、首先查看评价标准，了解',
         rateTableData: [{
+          type: '月总结',
           month: '一月份',
-          conclusionName: '一月份总结',
+          monthNum: 1,
+          title: '一月份总结',
+          submitStatus: 2,
+          getEvaStar: 3,
+          getWorkTime: 100
+        }, {
+          type: '月总结',
+          month: '二月份',
+          monthNum: 2,
+          title: '二月份总结',
+          submitStatus: 2,
+          getEvaStar: 3,
+          getWorkTime: 100
+        }, {
+          type: '月总结',
+          month: '三月份',
+          monthNum: 3,
+          title: '三月份总结',
+          submitStatus: 2,
+          getEvaStar: 3,
+          getWorkTime: 100
+        }, {
+          type: '月总结',
+          month: '四月份',
+          monthNum: 4,
+          title: '四月份总结',
+          submitStatus: 2,
+          getEvaStar: 3,
+          getWorkTime: 100
+        }, {
+          type: '月总结',
+          month: '五月份',
+          monthNum: 5,
+          title: '五月份总结',
+          submitStatus: 2,
+          getEvaStar: 3,
+          getWorkTime: 100
+        }, {
+          type: '月总结',
+          month: '六月份',
+          monthNum: 6,
+          title: '六月份总结',
+          submitStatus: 2,
+          getEvaStar: 3,
+          getWorkTime: 100
+        }, {
+          type: '月总结',
+          month: '七月份',
+          monthNum: 7,
+          title: '七月份总结',
+          submitStatus: 2,
+          getEvaStar: 3,
+          getWorkTime: 100
+        }, {
+          type: '月总结',
+          month: '八月份',
+          monthNum: 8,
+          title: '八月份总结',
+          submitStatus: 2,
+          getEvaStar: 3,
+          getWorkTime: 100
+        }, {
+          type: '月总结',
+          month: '九月份',
+          monthNum: 9,
+          title: '九月份总结',
+          submitStatus: 2,
+          getEvaStar: 3,
+          getWorkTime: 100
+        }, {
+          type: '月总结',
+          month: '十月份',
+          monthNum: 10,
+          title: '十月份总结',
+          submitStatus: 2,
+          getEvaStar: 3,
+          getWorkTime: 100
+        }, {
+          type: '月总结',
+          month: '十一月份',
+          monthNum: 11,
+          title: '十一月份总结',
+          submitStatus: 2,
+          getEvaStar: 3,
+          getWorkTime: 100
+        }, {
+          type: '月总结',
+          month: '十二月份',
+          monthNum: 12,
+          title: '十二月份总结',
           submitStatus: 2,
           getEvaStar: 3,
           getWorkTime: 100
         }],
+        curUser: this.$store.state.userInfo.id,
         users: [],
         defaultStar: 3,
         scoreText: ['82.5', '85', '87.5', '90', '92.5'],
@@ -174,7 +257,8 @@
           updateRateToUpdate: true,
           getAllWorkTimeList: true,
           getAllUserRates: true,
-          getPreMonthEva: true
+          getPreMonthEva: true,
+          getCurYearConclusionOverviewData: true
         },
         ratesTmp: [],
         ratesToUpdate: [],
@@ -183,15 +267,6 @@
         tableHeight: null,
         realTimeShowTableData: [],
         showInstructiongs: false,
-        commonStaffMutualCof: this.$store.state.commonStaffMutualCof,
-        commonStaffManagerCof: this.$store.state.commonStaffManagerCof,
-        commonStaffQuantitativeCof: this.$store.state.commonStaffQuantitativeCof,
-        groupLeaderMutualCof: this.$store.state.groupLeaderMutualCof,
-        groupLeaderManagerCof: this.$store.state.groupLeaderManagerCof,
-        groupLeaderQuantitativeCof: this.$store.state.groupLeaderQuantitativeCof,
-        directorMutualCof: this.$store.state.directorMutualCof,
-        directorManagerCof: this.$store.state.directorManagerCof,
-        directorQuantitativeCof: this.$store.state.directorQuantitativeCof,
         isMultualEvaFinish: false,
         isQuantativeFinish: false,
         multualEvaData: [],
@@ -203,13 +278,40 @@
     methods: {
       // 初始化
       init () {
+        this.getCurYearConclusionOverviewData(this.formData.title, this.curUser)
+      },
+      // 获取本年份总结概览数据
+      getCurYearConclusionOverviewData (submitYear, submitter) {
+        let promise = []
         let _this = this
+        if (this.reqFlag.getCurYearConclusionOverviewData) {
+          this.reqFlag.getCurYearConclusionOverviewData = false
+          return new Promise(function (resolve, reject) {
+            for (let i = 0; i < 12; i++) {
+              promise[i] = getCurMonthConclusionOverviewData(i + 1, submitYear, submitter)
+            }
+            Promise.all(promise).then(result => {
+              _this.reqFlag.getCurYearConclusionOverviewData = true
+              console.log('result')
+              console.log(result)
+            })
+          })
+        }
       },
       // 点击预览
       handlePreview () {
       },
       // 编辑月总结
-      handleEdit () {
+      handleEdit (row, index) {
+        this.$router.push({
+          path: '/home/monthConclusionTable',
+          query: {
+            title: row.title,
+            submitYear: this.formData.title,
+            submitMonth: row.monthNum,
+            submitter: this.$store.state.userInfo.id
+          }
+        })
       },
       // 提交月总结
       handleSubmit () {
@@ -1831,7 +1933,7 @@
     },
     components: {
       // CountTo
-      monthConclusionTable
+      // monthConclusionTable
     },
     created () {
       this.init()

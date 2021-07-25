@@ -238,6 +238,12 @@ const sqlMap = {
     handleFillMulCheck: 'select * from mutualrate where ratePersion = ? and rateMonth = "2021-05"',
     handleFillMulFill: 'insert into mutualrate (ratePersion, ratedPersion, rateMonth, rate, rateType, rateTime, updateTime) ' +
         'values (?, ?, ?, ?, ?, ?, ?)'
+  },
+  conclusion: {
+    getCurMonthConclusionOverviewData: 'select * from conclusion where submitYear = ? and submitMonth = ? and submitter = ? ' +
+        'and obsoleteStatus != 1',
+    submitMonthConclusionData: 'insert into conclusion (submitter, title, submitTime, updateTime, submitYear, submitMonth, ' +
+        'submitStatus, managerRateStar, curConclusion, nextPlan, curAdvice) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
   }
 }
 module.exports = sqlMap;
