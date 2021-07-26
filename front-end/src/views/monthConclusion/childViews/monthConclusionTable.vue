@@ -7,7 +7,7 @@
           <span>{{conclusionTitle}}</span>
         </div>
       </el-col>
-      <el-col :xs="12" :sm="12" :lg="{span: 6, offset: 7 }" :xl="{span: 6, offset: 7 }">
+      <el-col :xs="12" :sm="12" :lg="{span: 6, offset: 7 }" :xl="{span: 6, offset: 9 }">
         <el-button type="primary" @click="handleSubmit" :disabled="isSubmit" size="medium">提交</el-button>
         <el-button type="warning" @click="handleTemporary" size="medium">暂存</el-button>
         <el-button type="danger" @click="handleBack" size="medium">返回</el-button>

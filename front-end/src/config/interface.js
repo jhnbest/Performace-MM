@@ -82,3 +82,4 @@ export const urlGetCurMonthConclusionOverviewData = '/conclusion/getCurMonthConc
 export const urlSubmitMonthConclusionData = '/conclusion/submitMonthConclusionData' // 提交月总结
 export const urlGetConclusionDataById = '/conclusion/getConclusionDataById' // 提交月总结
 export const urlUpdateMonthConclusionData = '/conclusion/updateMonthConclusionData' // 更新月总结
+export const urlUpdateMonthConclusionStatus = '/conclusion/updateMonthConclusionStatus' // 更新月总结状态

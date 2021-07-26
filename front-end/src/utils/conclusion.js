@@ -1,13 +1,10 @@
-import axios from 'axios'
-import store from '../store'
-import router from '../router'
-import common from '../assets/js/common.js'
 import { http } from '../config/http'
 import {
   urlGetCurMonthConclusionOverviewData,
   urlSubmitMonthConclusionData,
   urlGetConclusionDataById,
-  urlUpdateMonthConclusionData
+  urlUpdateMonthConclusionData,
+  urlUpdateMonthConclusionStatus
 } from '../config/interface'
 
 // 获取月总结概览信息
@@ -88,7 +85,28 @@ export function updateMonthConclusionData (id, submitYear, submitMonth, submitte
   })
 }
 
-// 获取月总结数据
+// 更新月总结状态
+export function updateMonthConclusionStatus (id, submitStatus) {
+  const url = urlUpdateMonthConclusionStatus
+  let params = {
+    id: id,
+    conclusionType: 1,
+    submitStatus: submitStatus,
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(res => {
+      if (res.code === 1) {
+        resolve(res)
+      } else {
+        reject(res)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
+// 根据id获取月总结数据
 export function getConclusionDataById (id) {
   const url = urlGetConclusionDataById
   let params = {

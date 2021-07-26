@@ -45,9 +45,6 @@
           <span slot="reference" class="pointer-type"><i class="el-icon-warning-outline"></i>填报说明</span>
         </el-popover>
       </el-col>
-      <el-col>
-        <el-button type="success" @click="init">测试按钮</el-button>
-      </el-col>
     </el-row>
   </el-form>
   <!-- 分割线 start -->
@@ -78,8 +75,11 @@
       <el-table-column label="标题" align="center" prop="conclusionTitle"></el-table-column>
       <el-table-column label="状态" align="center">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.submitStatus | submitStatusFilter" size="medium">
+          <el-tag v-if="scope.row.id !== null" :type="scope.row.submitStatus | submitStatusFilter" size="medium">
             <span>{{scope.row.submitStatus | submitStatusTextFilter}}</span>
+          </el-tag>
+          <el-tag v-else type="info" size="medium">
+            <span>{{'未提交'}}</span>
           </el-tag>
         </template>
       </el-table-column>
@@ -101,7 +101,7 @@
                      size="mini"
                      @click="handlePreview(scope.row, scope.$index)">点击预览</el-button>
 <!--          编辑-->
-          <el-button :disabled="(scope.row.reviewStatus === 1)"
+          <el-button :disabled="(scope.row.managerRateStar)"
                      size="mini"
                      type="warning"
                      @click="handleEdit(scope.row, scope.$index)"
@@ -141,7 +141,9 @@
     getPreMonthEva,
     getCurApplyAbleMonth,
     handleFillMul } from '@/config/interface'
-  import { getCurMonthConclusionOverviewData } from '@/utils/conclusion'
+  import {
+    getCurMonthConclusionOverviewData,
+    updateMonthConclusionStatus } from '@/utils/conclusion'
   export default {
     data () {
       return {
@@ -261,10 +263,12 @@
         })
       },
       // 提交月总结
-      handleSubmit () {
+      handleSubmit (row, index) {
+        let submitStatus = 1
       },
       // 暂存月总结
-      handleTemporary () {
+      handleTemporary (row, index) {
+        let submitStatus = 2
       },
       // 获取当前可申报的月份
       getCurApplyAbleMonth () {
@@ -1836,18 +1840,18 @@
     },
     filters: {
       submitStatusFilter (status) {
-        if (status === 2) {
+        if (status === 1) {
           return 'success'
-        } else if (status === 1) {
+        } else if (status === 2) {
           return 'warning'
         } else if (status === 0) {
           return 'info'
         }
       },
       submitStatusTextFilter (status) {
-        if (status === 2) {
+        if (status === 1) {
           return '已提交'
-        } else if (status === 1) {
+        } else if (status === 2) {
           return '暂存'
         } else if (status === 0) {
           return '未提交'
