@@ -65,7 +65,21 @@ const conclusion = {
         RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
             return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
         }).catch(RCPDDatabaseErr => {
-            console.log('err')
+            return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+        })
+    },
+    // 更新月总结
+    updateMonthConclusionData (req, res) {
+        let sendData = req.body
+        let sql = $sql.conclusion.updateMonthConclusionData
+        let updateTime = $time.formatTime()
+        let arrayParams = [sendData.conclusionType, sendData.conclusionTitle, updateTime, sendData.submitYear,
+            sendData.submitMonth, sendData.submitStatus, sendData.curConclusion, sendData.nextPlan, sendData.curAdvice,
+            sendData.id]
+
+        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+            return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
+        }).catch(RCPDDatabaseErr => {
             return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
         })
     },

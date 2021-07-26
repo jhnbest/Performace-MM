@@ -101,8 +101,7 @@
                      size="mini"
                      @click="handlePreview(scope.row, scope.$index)">点击预览</el-button>
 <!--          编辑-->
-          <el-button v-if="!(scope.row.submitStatus === 1)"
-                     :disabled="(scope.row.reviewStatus === 1)"
+          <el-button :disabled="(scope.row.reviewStatus === 1)"
                      size="mini"
                      type="warning"
                      @click="handleEdit(scope.row, scope.$index)"
@@ -201,7 +200,11 @@
             conclusionTitle: i + 1 + '月份总结',
             submitStatus: 2,
             getEvaStar: 3,
-            getWorkTime: -1
+            getWorkTime: -1,
+            id: null,
+            curConclusion: null,
+            nextPlan: null,
+            curAdvice: null
           }
           this.rateTableData.push(obj)
         }
@@ -222,8 +225,16 @@
               console.log(result)
               for (let i = 0; i < result.length; i++) {
                 if (result[i].data.length !== 0) {
-                  _this.rateTableData[i].conclusionTitle = result[i].data.conclusionTitle
-                  _this.rateTableData[i].submitMonth = result[i].data.submitMonth
+                  _this.rateTableData[i].conclusionTitle = result[i].data[0].conclusionTitle
+                  _this.rateTableData[i].submitMonth = result[i].data[0].submitMonth
+                  _this.rateTableData[i].submitStatus = result[i].data[0].submitStatus
+                  _this.rateTableData[i].getEvaStar = result[i].data[0].getEvaStar
+                  _this.rateTableData[i].getWorkTime = result[i].data[0].getWorkTime
+                  _this.rateTableData[i].conclusionType = result[i].data[0].conclusionType
+                  _this.rateTableData[i].id = result[i].data[0].id
+                  _this.rateTableData[i].curConclusion = result[i].data[0].curConclusion
+                  _this.rateTableData[i].nextPlan = result[i].data[0].nextPlan
+                  _this.rateTableData[i].curAdvice = result[i].data[0].curAdvice
                 }
               }
             })
@@ -238,10 +249,14 @@
         this.$router.push({
           path: '/home/monthConclusionTable',
           query: {
+            id: row.id,
             conclusionTitle: row.conclusionTitle,
             submitYear: this.formData.title,
             submitMonth: row.submitMonth,
-            submitter: this.$store.state.userInfo.id
+            submitter: this.$store.state.userInfo.id,
+            curConclusion: row.curConclusion,
+            nextPlan: row.nextPlan,
+            curAdvice: row.curAdvice
           }
         })
       },

@@ -4,13 +4,12 @@
     <el-row type="flex">
       <el-col :xs="12" :sm="12" :lg="{span: 5, offset: 7 }" :xl="{span: 4, offset: 9 }">
         <div style="margin-top: 5px;text-align: center;font-size: 25px;font-weight: bolder">
-          <span>{{title}}</span>
+          <span>{{conclusionTitle}}</span>
         </div>
       </el-col>
-      <el-col :xs="12" :sm="12" :lg="{span: 7, offset: 5 }" :xl="{span: 6, offset: 7 }">
+      <el-col :xs="12" :sm="12" :lg="{span: 6, offset: 7 }" :xl="{span: 6, offset: 7 }">
         <el-button type="primary" @click="handleSubmit" :disabled="isSubmit" size="medium">提交</el-button>
         <el-button type="warning" @click="handleTemporary" size="medium">暂存</el-button>
-        <el-button type="success" :disabled="!isSubmit" @click="updateData" size="medium">更新</el-button>
         <el-button type="danger" @click="handleBack" size="medium">返回</el-button>
       </el-col>
     </el-row>
@@ -71,7 +70,10 @@
 
 <script>
   import editorVue from '../../../components/monthConclusion/editor'
-  import { submitMonthConclusionData } from '@/utils/conclusion'
+  import {
+    submitMonthConclusionData,
+    getConclusionDataById,
+    updateMonthConclusionData } from '@/utils/conclusion'
   export default {
     data () {
       return {
@@ -90,32 +92,71 @@
           nextPlan: '',
           curAdvice: ''
         },
-        isSubmit: false
+        isSubmit: false,
+        id: null
       }
     },
     methods: {
       // 初始化
       init () {
+        this.id = this.$route.query.id
         this.conclusionTitle = this.$route.query.conclusionTitle
         this.submitYear = this.$route.query.submitYear
         this.submitMonth = this.$route.query.submitMonth
         this.submitter = this.$route.query.submitter
+        this.conclusionText.curConclusion = this.$route.query.curConclusion
+        this.conclusionText.nextPlan = this.$route.query.nextPlan
+        this.conclusionText.curAdvice = this.$route.query.curAdvice
       },
       // 提交月总结
       handleSubmit () {
         let submitStatus = 1
-        submitMonthConclusionData(this.submitYear, this.submitMonth, this.submitter, this.conclusionTitle, submitStatus,
-          this.conclusionText.curConclusion, this.conclusionText.nextPlan, this.conclusionText.curAdvice).then(() => {
+        if (this.id !== null) {
+          updateMonthConclusionData(this.id, this.submitYear, this.submitMonth, this.submitter, this.conclusionTitle, submitStatus,
+            this.conclusionText.curConclusion, this.conclusionText.nextPlan, this.conclusionText.curAdvice).then(() => {
             this.$common.toast('提交成功', 'success', false)
-        }).catch(() => {
-          this.$common.toast('提交失败', 'error', false)
-        })
+            this.$router.push({
+              path: '/home/monthConclusion'
+            })
+          }).catch(() => {
+            this.$common.toast('提交失败', 'error', false)
+          })
+        } else {
+          submitMonthConclusionData(this.submitYear, this.submitMonth, this.submitter, this.conclusionTitle, submitStatus,
+            this.conclusionText.curConclusion, this.conclusionText.nextPlan, this.conclusionText.curAdvice).then(() => {
+            this.$common.toast('提交成功', 'success', false)
+            this.$router.push({
+              path: '/home/monthConclusion'
+            })
+          }).catch(() => {
+            this.$common.toast('提交失败', 'error', false)
+          })
+        }
       },
       // 暂存月总结
       handleTemporary () {
-      },
-      // 更新月总结
-      updateData () {
+        let submitStatus = 2
+        if (this.id !== null) {
+          updateMonthConclusionData(this.id, this.submitYear, this.submitMonth, this.submitter, this.conclusionTitle, submitStatus,
+            this.conclusionText.curConclusion, this.conclusionText.nextPlan, this.conclusionText.curAdvice).then(() => {
+            this.$common.toast('暂存成功', 'success', false)
+            this.$router.push({
+              path: '/home/monthConclusion'
+            })
+          }).catch(() => {
+            this.$common.toast('暂存失败', 'error', false)
+          })
+        } else {
+          submitMonthConclusionData(this.submitYear, this.submitMonth, this.submitter, this.conclusionTitle, submitStatus,
+            this.conclusionText.curConclusion, this.conclusionText.nextPlan, this.conclusionText.curAdvice).then(() => {
+            this.$common.toast('暂存成功', 'success', false)
+            this.$router.push({
+              path: '/home/monthConclusion'
+            })
+          }).catch(() => {
+            this.$common.toast('暂存失败', 'error', false)
+          })
+        }
       },
       // 返回
       handleBack () {

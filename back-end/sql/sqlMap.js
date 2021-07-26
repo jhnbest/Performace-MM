@@ -240,10 +240,14 @@ const sqlMap = {
         'values (?, ?, ?, ?, ?, ?, ?)'
   },
   conclusion: {
-    getCurMonthConclusionOverviewData: 'select * from conclusion where submitYear = ? and submitMonth = ? and submitter = ? ' +
-        'and obsoleteStatus != 1',
-    submitMonthConclusionData: 'insert into conclusion (conclusionType, submitter, conclusionTitle, submitTime, updateTime, submitYear, submitMonth, ' +
-        'submitStatus, managerRateStar, curConclusion, nextPlan, curAdvice) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+    getCurMonthConclusionOverviewData: 'select * from conclusion where submitYear = ? ' +
+        'and submitMonth = ? and submitter = ? and obsoleteStatus != 1' +
+        ' and obsoleteStatus != 1',
+    submitMonthConclusionData: 'insert into conclusion (conclusionType, submitter, conclusionTitle, submitTime, ' +
+        'updateTime, submitYear, submitMonth, submitStatus, managerRateStar, curConclusion, nextPlan, curAdvice) ' +
+        'values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    updateMonthConclusionData: 'update conclusion set conclusionType = ?, conclusionTitle = ?, updateTime = ?, ' +
+        'submitYear = ?, submitMonth = ?, submitStatus = ?, curConclusion = ?, nextPlan = ?, curAdvice = ? where id = ?'
   }
 }
 module.exports = sqlMap;

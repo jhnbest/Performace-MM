@@ -80,3 +80,5 @@ export const handleFillMul = '/mutualRates/handleFillMul' // 一键填充定性�
 
 export const urlGetCurMonthConclusionOverviewData = '/conclusion/getCurMonthConclusionOverviewData' // 获取总结数据
 export const urlSubmitMonthConclusionData = '/conclusion/submitMonthConclusionData' // 提交月总结
+export const urlGetConclusionDataById = '/conclusion/getConclusionDataById' // 提交月总结
+export const urlUpdateMonthConclusionData = '/conclusion/updateMonthConclusionData' // 更新月总结
