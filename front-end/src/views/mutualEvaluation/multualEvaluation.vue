@@ -224,7 +224,7 @@
     performanceInfoPublish,
     getPerformanceIsPublish,
     getPreMonthEva,
-    getCurApplyAbleMonth,
+    urlGetCurApplyAbleMonth,
     handleFillMul } from '@/config/interface'
   import CountTo from 'vue-count-to'
   export default {
@@ -532,7 +532,7 @@
       },
       // 获取当前可申报的月份
       getCurApplyAbleMonth () {
-        const url = getCurApplyAbleMonth
+        const url = urlGetCurApplyAbleMonth
         let params = {}
         let _this = this
         return new Promise(function (resolve, reject) {

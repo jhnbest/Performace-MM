@@ -368,6 +368,7 @@
   } from '@/config/interface'
   import Assign from '@/components/Cop/workTimeAssign'
   import Cop from '@/components/Cop/Cop'
+  import { urlGetCurApplyAbleMonth } from '../../../config/interface'
   export default {
       data () {
         return {
@@ -1008,7 +1009,7 @@
         },
         // 获取当前可申报的月份
         getCurApplyAbleMonth () {
-          const url = getCurApplyAbleMonth
+          const url = urlGetCurApplyAbleMonth
           let params = {}
           let _this = this
           return new Promise(function (resolve, reject) {

@@ -90,8 +90,7 @@ export function updateMonthConclusionStatus (id, submitStatus) {
   const url = urlUpdateMonthConclusionStatus
   let params = {
     id: id,
-    conclusionType: 1,
-    submitStatus: submitStatus,
+    submitStatus: submitStatus
   }
   return new Promise(function (resolve, reject) {
     http(url, params).then(res => {

@@ -89,5 +89,6 @@ module.exports = {
     // 总结模块
     getCurMonthConclusionOverviewData: path + '/conclusion/getCurMonthConclusionOverviewData', // 获取总结数据
     submitMonthConclusionData: path + '/conclusion/submitMonthConclusionData', // 提交月总结
-    updateMonthConclusionData: path + '/conclusion/updateMonthConclusionData' // 更新月总结
+    updateMonthConclusionData: path + '/conclusion/updateMonthConclusionData', // 更新月总结
+    updateMonthConclusionStatus: path + '/conclusion/updateMonthConclusionStatus' // 更新月总结状态
 };

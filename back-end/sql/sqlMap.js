@@ -247,7 +247,8 @@ const sqlMap = {
         'updateTime, submitYear, submitMonth, submitStatus, managerRateStar, curConclusion, nextPlan, curAdvice) ' +
         'values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
     updateMonthConclusionData: 'update conclusion set conclusionType = ?, conclusionTitle = ?, updateTime = ?, ' +
-        'submitYear = ?, submitMonth = ?, submitStatus = ?, curConclusion = ?, nextPlan = ?, curAdvice = ? where id = ?'
+        'submitYear = ?, submitMonth = ?, submitStatus = ?, curConclusion = ?, nextPlan = ?, curAdvice = ? where id = ?',
+    updateMonthConclusionStatus: 'update conclusion set submitStatus = ?, updateTime = ? where id = ?'
   }
 }
 module.exports = sqlMap;

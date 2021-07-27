@@ -134,6 +134,11 @@ export default new Router({
           name: 'monthConclusionTable',
           component: () => import(/* webpackChunkName: "weekly" */ './views/monthConclusion/childViews/monthConclusionTable.vue'),
           meta: { pagePath: '/home/monthConclusion' }
+        },{
+          path: 'conclusionEva',
+          name: 'conclusionEva',
+          component: () => import(/* webpackChunkName: "weekly" */ './views/monthConclusion/conclusionEva.vue'),
+          meta: { pagePath: '/home/monthConclusion' }
         }
       ]
     },

@@ -98,5 +98,6 @@ router.post(api.handleFillMul, mutualRates.handleFillMul)
 router.post(api.getCurMonthConclusionOverviewData, conclusion.getCurMonthConclusionOverviewData)
 router.post(api.submitMonthConclusionData, conclusion.submitMonthConclusionData)
 router.post(api.updateMonthConclusionData, conclusion.updateMonthConclusionData)
+router.post(api.updateMonthConclusionStatus, conclusion.updateMonthConclusionStatus)
 
 module.exports = router;

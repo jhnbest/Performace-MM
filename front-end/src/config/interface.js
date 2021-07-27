@@ -37,7 +37,7 @@ export const getAssignWorkTime = '/performance/getAssignWorkTime' // 获取分�
 export const getGroupWorkTimeList = '/performance/getGroupWorkTimeList' // 获取小组已申报工时列表
 export const getAllWorkTimeList = '/performance/getAllWorkTimeList' // 获取全处已申报工时列表
 export const getIsWorkTimeReviewFinish = '/performance/getIsWorkTimeReviewFinish' // 判断工时是否都已审核完毕
-export const getCurApplyAbleMonth = '/performance/getCurApplyAbleMonth' // 获取当前可申报的月份
+export const urlGetCurApplyAbleMonth = '/performance/getCurApplyAbleMonth' // 获取当前可申报的月份
 export const submitProjectWorkTimeApply = '/performance/submitProjectWorkTimeApply' // 提交项目工时申报
 export const repairErrorData3 = '/performance/repairErrorData3' // 修复错误数据3
 

@@ -255,7 +255,7 @@
     getWorkTimeNew,
     workTimeTemporary,
     submitPersonalProject,
-    getCurApplyAbleMonth,
+    urlGetCurApplyAbleMonth,
     getAssignProjectList } from '@/config/interface'
   import Assign from '@/components/Cop/workTimeAssign'
     export default {
@@ -1122,7 +1122,7 @@
         },
         // 获取当前可申报的月份
         getCurApplyAbleMonth () {
-          const url = getCurApplyAbleMonth
+          const url = urlGetCurApplyAbleMonth
           let params = {}
           let _this = this
           return new Promise(function (resolve, reject) {

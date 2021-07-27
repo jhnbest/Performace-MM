@@ -19,6 +19,7 @@ export default new Vuex.Store({
       { name: '工时审核', url: '/home/workTimeReview', icon: 'el-icon-s-claim' },
       { name: '工时查询', url: '/home/workTimeCheck', icon: 'el-icon-s-claim' },
       { name: '计划查询', url: '/home/workPlanCheck', icon: 'el-icon-s-opportunity' },
+      { name: '月总结评价', url: '/home/conclusionEva', icon: 'el-icon-check' },
       { name: '定性评价管理', url: '/home/mulEvaCheck', icon: 'el-icon-s-opportunity' },
       { name: '用户管理', url: '/home/users', icon: 'el-icon-user-solid' }
     ],
