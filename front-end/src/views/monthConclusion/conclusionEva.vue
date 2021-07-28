@@ -175,10 +175,11 @@
             getAllUsersInfo().then(getAllUsersInfoRes => {
               this.allUsers = getAllUsersInfoRes.list
               // 获取全处员工月总结信息
-              let getAllUsersConclusionRes = this.getAllUsersConclusion(this.allUsers, this.curApplyYear, this.curApplyMonth)
-              this.fillConclusionTableData(getAllUsersConclusionRes)
-            }).catch((err) => {
-              console.log(err)
+              this.getAllUsersConclusion(this.allUsers, this.curApplyYear, this.curApplyMonth).then(getAllUsersConclusionRes => {
+                // 填充总结表格数据
+                this.fillConclusionTableData(getAllUsersConclusionRes)
+              })
+            }).catch(() => {
               this.$common.toast('获取全处员工信息失败', 'error', false)
             })
             this.reqFlag.getCurApplyAbleMonth = true
@@ -194,21 +195,26 @@
       getAllUsersConclusion (allUsers, submitYear, submitMonth) {
         let promise = []
         let count = 0
-        for (let user of allUsers) {
-          promise[count++] = getCurMonthConclusionOverviewData(submitMonth, submitYear, user.id)
-        }
-        Promise.all(promise).then(result => {
-          return result
+        return new Promise(function (resolve, reject) {
+          for (let user of allUsers) {
+            promise[count++] = getCurMonthConclusionOverviewData(submitMonth, submitYear, user.id)
+          }
+          Promise.all(promise).then(result => {
+            resolve(result)
+          })
         })
       },
       // 填充表格数据
       fillConclusionTableData (getAllUsersConclusionRes) {
+        console.log('getAllUsersConclusionRes')
+        console.log(getAllUsersConclusionRes)
         this.conclusionTableData = []
+        let count = 0
         for (let getAllUsersConclusionResItem of getAllUsersConclusionRes) {
           let obj = {
             id: null,
             conclusionType: 1,
-            name: null,
+            name: this.allUsers[count++].name,
             conclusionTitle: this.$moment(this.formData.title).month() + 1 + '月份总结',
             month: this.$moment(this.formData.title).month() + 1 + '月份',
             submitMonth: this.$moment(this.formData.title).month() + 1,
@@ -221,7 +227,7 @@
           }
           if (getAllUsersConclusionResItem.data.length !== 0) {
           } else {
-
+            this.conclusionTableData.push(obj)
           }
         }
       },
@@ -423,7 +429,6 @@
       // monthConclusionTable
     },
     created () {
-      console.log('created')
       this.init()
     },
     watch: {
