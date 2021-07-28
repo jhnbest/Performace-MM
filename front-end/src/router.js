@@ -138,7 +138,7 @@ export default new Router({
           path: 'conclusionEva',
           name: 'conclusionEva',
           component: () => import(/* webpackChunkName: "weekly" */ './views/monthConclusion/conclusionEva.vue'),
-          meta: { pagePath: '/home/monthConclusion' }
+          meta: { pagePath: '/home/conclusionEva' }
         }
       ]
     },

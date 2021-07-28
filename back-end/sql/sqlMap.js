@@ -240,9 +240,8 @@ const sqlMap = {
         'values (?, ?, ?, ?, ?, ?, ?)'
   },
   conclusion: {
-    getCurMonthConclusionOverviewData: 'select * from conclusion where submitYear = ? ' +
-        'and submitMonth = ? and submitter = ? and obsoleteStatus != 1' +
-        ' and obsoleteStatus != 1',
+    getCurMonthConclusionOverviewData: 'select c.*, u.name from conclusion c left join users u on c.submitter = u.id where c.submitYear = ? ' +
+        'and c.submitMonth = ? and c.submitter = ? and c.obsoleteStatus != 1',
     submitMonthConclusionData: 'insert into conclusion (conclusionType, submitter, conclusionTitle, submitTime, ' +
         'updateTime, submitYear, submitMonth, submitStatus, managerRateStar, curConclusion, nextPlan, curAdvice) ' +
         'values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',

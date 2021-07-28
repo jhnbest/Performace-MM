@@ -4,7 +4,8 @@ import {
   urlSubmitMonthConclusionData,
   urlGetConclusionDataById,
   urlUpdateMonthConclusionData,
-  urlUpdateMonthConclusionStatus
+  urlUpdateMonthConclusionStatus,
+  urlGetAllUsersMonthConclusionData
 } from '../config/interface'
 
 // 获取月总结概览信息

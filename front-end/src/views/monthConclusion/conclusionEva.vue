@@ -53,7 +53,7 @@
     <br>
     <!--  月总结表格-->
     <div>
-      <el-table :data="rateTableData"
+      <el-table :data="conclusionTableData"
                 border
                 style="margin: auto; width: 99%"
                 stripe
@@ -135,7 +135,8 @@
     getCurMonthConclusionOverviewData,
     updateMonthConclusionStatus } from '@/utils/conclusion'
   import {
-    getCurApplyAbleMonth
+    getCurApplyAbleMonth,
+    getAllUsersInfo
   } from '@/utils/common'
   export default {
     data () {
@@ -147,7 +148,7 @@
           descTableShow: false
         },
         descriptionContent: '1、首先查看评价标准，了解',
-        rateTableData: [],
+        conclusionTableData: [],
         curUser: this.$store.state.userInfo.id,
         reqFlag: {
           getCurYearConclusionOverviewData: true,
@@ -156,28 +157,73 @@
         },
         tableHeight: null,
         curApplyYear: 1970,
-        curApplyMonth: 1
+        curApplyMonth: 1,
+        allUsers: null,
+        defaultEvaStar: 1
       }
     },
     methods: {
       // 初始化
       init () {
-        // 初始化默认数据
-        this.initDefaultData()
         // 获取当前申报月份
         if (this.reqFlag.getCurApplyAbleMonth) {
           this.reqFlag.getCurApplyAbleMonth = false
           getCurApplyAbleMonth().then(getCurApplyAbleMonthRes => {
             this.curApplyYear = this.$moment(getCurApplyAbleMonthRes[0].setTime).year()
             this.curApplyMonth = this.$moment(getCurApplyAbleMonthRes[0].setTime).month() + 1
+            // 获取全处员工信息
+            getAllUsersInfo().then(getAllUsersInfoRes => {
+              this.allUsers = getAllUsersInfoRes.list
+              // 获取全处员工月总结信息
+              let getAllUsersConclusionRes = this.getAllUsersConclusion(this.allUsers, this.curApplyYear, this.curApplyMonth)
+              this.fillConclusionTableData(getAllUsersConclusionRes)
+            }).catch((err) => {
+              console.log(err)
+              this.$common.toast('获取全处员工信息失败', 'error', false)
+            })
             this.reqFlag.getCurApplyAbleMonth = true
           }).catch(() => {
             this.$common.toast('获取当前申报月份错误', 'error', false)
             this.reqFlag.getCurApplyAbleMonth = true
           })
         }
-        // 获取月总结概览数据
-        this.getCurYearConclusionOverviewData(this.formData.title, this.curUser)
+        // // 初始化默认数据
+        // this.initDefaultData()
+      },
+      // 获取全处员工月总结信息
+      getAllUsersConclusion (allUsers, submitYear, submitMonth) {
+        let promise = []
+        let count = 0
+        for (let user of allUsers) {
+          promise[count++] = getCurMonthConclusionOverviewData(submitMonth, submitYear, user.id)
+        }
+        Promise.all(promise).then(result => {
+          return result
+        })
+      },
+      // 填充表格数据
+      fillConclusionTableData (getAllUsersConclusionRes) {
+        this.conclusionTableData = []
+        for (let getAllUsersConclusionResItem of getAllUsersConclusionRes) {
+          let obj = {
+            id: null,
+            conclusionType: 1,
+            name: null,
+            conclusionTitle: this.$moment(this.formData.title).month() + 1 + '月份总结',
+            month: this.$moment(this.formData.title).month() + 1 + '月份',
+            submitMonth: this.$moment(this.formData.title).month() + 1,
+            submitStatus: null,
+            getEvaStar: this.defaultEvaStar,
+            getWorkTime: null,
+            curConclusion: null,
+            nextPlan: null,
+            curAdvice: null
+          }
+          if (getAllUsersConclusionResItem.data.length !== 0) {
+          } else {
+
+          }
+        }
       },
       // 初始化默认数据
       initDefaultData () {
@@ -195,48 +241,7 @@
             nextPlan: null,
             curAdvice: null
           }
-          this.rateTableData.push(obj)
-        }
-      },
-      // 获取本年份总结概览数据
-      getCurYearConclusionOverviewData (submitYear, submitter) {
-        let promise = []
-        let _this = this
-        if (this.reqFlag.getCurYearConclusionOverviewData) {
-          this.reqFlag.getCurYearConclusionOverviewData = false
-          return new Promise(function (resolve, reject) {
-            for (let i = 0; i < 12; i++) {
-              promise[i] = getCurMonthConclusionOverviewData(i + 1, submitYear, submitter)
-            }
-            Promise.all(promise).then(result => {
-              _this.reqFlag.getCurYearConclusionOverviewData = true
-              for (let i = 0; i < result.length; i++) {
-                if (result[i].data.length !== 0) {
-                  _this.rateTableData[i].conclusionTitle = result[i].data[0].conclusionTitle
-                  _this.rateTableData[i].submitMonth = result[i].data[0].submitMonth
-                  _this.rateTableData[i].submitStatus = result[i].data[0].submitStatus
-                  _this.rateTableData[i].getEvaStar = result[i].data[0].getEvaStar
-                  _this.rateTableData[i].getWorkTime = result[i].data[0].getWorkTime
-                  _this.rateTableData[i].conclusionType = result[i].data[0].conclusionType
-                  _this.rateTableData[i].id = result[i].data[0].id
-                  _this.rateTableData[i].curConclusion = result[i].data[0].curConclusion
-                  _this.rateTableData[i].nextPlan = result[i].data[0].nextPlan
-                  _this.rateTableData[i].curAdvice = result[i].data[0].curAdvice
-                } else {
-                  _this.rateTableData[i].conclusionTitle = i + 1 + '月份总结'
-                  _this.rateTableData[i].submitMonth = i + 1
-                  _this.rateTableData[i].submitStatus = null
-                  _this.rateTableData[i].getEvaStar = null
-                  _this.rateTableData[i].getWorkTime = null
-                  _this.rateTableData[i].conclusionType = 1
-                  _this.rateTableData[i].id = null
-                  _this.rateTableData[i].curConclusion = null
-                  _this.rateTableData[i].nextPlan = null
-                  _this.rateTableData[i].curAdvice = null
-                }
-              }
-            })
-          })
+          this.conclusionTableData.push(obj)
         }
       },
       // 点击预览
@@ -307,20 +312,21 @@
       },
       // 上一年
       handlePreYear () {
-        this.formData.title = this.$moment(this.formData.title).subtract(1, 'year').format('YYYY')
+        this.formData.title = this.$moment(this.formData.title).subtract(1, 'months').format('YYYY-MM')
         this.setMonthCookie(this.formData.title, 7)
         this.handelDateChange()
       },
       // 下一年
       handleNextYear () {
-        this.formData.title = this.$moment(this.formData.title).add(1, 'year').format('YYYY')
+        this.formData.title = this.$moment(this.formData.title).add(1, 'months').format('YYYY-MM')
         this.setMonthCookie(this.formData.title, 7)
         this.handelDateChange()
       },
       // 申报月份变化
       handelDateChange () {
-        // 获取月总结概览数据
-        this.getCurYearConclusionOverviewData(this.formData.title, this.curUser)
+        let submitYear = this.$moment(this.formData.title).year()
+        let submitMonth = this.$moment(this.formData.title).month() + 1
+        this.getAllUsersConclusion(this.allUsers, submitYear, submitMonth)
       },
       // 设置cookie
       setCookie (showTable, exdays) {
@@ -417,12 +423,12 @@
       // monthConclusionTable
     },
     created () {
+      console.log('created')
       this.init()
     },
     watch: {
     },
     mounted () {
-      this.refreshTableSize()
     },
     name: 'conclusionEva'
   }

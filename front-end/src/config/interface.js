@@ -11,6 +11,7 @@ export const getUsersName = '/user/getUsersName' // 获取用户名字
 export const getGroupUserName = '/user/getGroupUserName' // 获取组员信息
 export const updateNewPassword = '/user/updateNewPassword' // 修改密码
 export const oldPasswordAuth = '/user/oldPasswordAuth' // 旧密码认证
+export const urlGetAllUsersInfo = '/user/getUsersName' // 获取全处员工信息
 
 export const weeklyAdd = '/weekly/add' // 新增周报
 export const weeklyUpdateInfo = '/weekly/updateInfo' // 更新周报信息

@@ -2,43 +2,6 @@ const $sql = require('../sql/sqlMap')
 const $http = require('../sql/http')
 const $time = require('../utils/time')
 
-function starToRates(star) {
-    switch (star) {
-        case 1:
-            return 82.5
-        case 2:
-            return 85
-        case 3:
-            return 87.5
-        case 4:
-            return 90
-        case 5:
-            return 92.5
-        default:
-            return 87.5
-    }
-}
-
-const rateTypes = [{
-    id: 1,
-    rateTypeName: 't1Star'
-}, {
-    id: 2,
-    rateTypeName: 't2Star'
-}, {
-    id: 3,
-    rateTypeName: 't3Star'
-}, {
-    id: 4,
-    rateTypeName: 't4Star'
-}, {
-    id: 5,
-    rateTypeName: 't5Star'
-}, {
-    id: 6,
-    rateTypeName: 't6Star'
-}]
-
 function RCPDDatabase(sql, arrayParams) {
     return new Promise(function (resolve, reject) {
         $http.connPool(sql, arrayParams, (err, result) => {
