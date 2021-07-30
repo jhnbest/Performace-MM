@@ -248,17 +248,17 @@
             Promise.all(promise).then(result => {
               _this.reqFlag.getCurYearConclusionOverviewData = true
               for (let i = 0; i < result.length; i++) {
-                if (result[i].data.length !== 0) {
-                  _this.rateTableData[i].conclusionTitle = result[i].data[0].conclusionTitle
-                  _this.rateTableData[i].submitMonth = result[i].data[0].submitMonth
-                  _this.rateTableData[i].submitStatus = result[i].data[0].submitStatus
-                  _this.rateTableData[i].getEvaStar = result[i].data[0].getEvaStar
-                  _this.rateTableData[i].getWorkTime = result[i].data[0].getWorkTime
-                  _this.rateTableData[i].conclusionType = result[i].data[0].conclusionType
-                  _this.rateTableData[i].id = result[i].data[0].id
-                  _this.rateTableData[i].curConclusion = result[i].data[0].curConclusion
-                  _this.rateTableData[i].nextPlan = result[i].data[0].nextPlan
-                  _this.rateTableData[i].curAdvice = result[i].data[0].curAdvice
+                if (result[i].data) {
+                  _this.rateTableData[i].conclusionTitle = result[i].data.conclusionTitle
+                  _this.rateTableData[i].submitMonth = result[i].data.submitMonth
+                  _this.rateTableData[i].submitStatus = result[i].data.submitStatus
+                  _this.rateTableData[i].getEvaStar = result[i].data.getEvaStar
+                  _this.rateTableData[i].getWorkTime = result[i].data.getWorkTime
+                  _this.rateTableData[i].conclusionType = result[i].data.conclusionType
+                  _this.rateTableData[i].id = result[i].data.id
+                  _this.rateTableData[i].curConclusion = result[i].data.curConclusion
+                  _this.rateTableData[i].nextPlan = result[i].data.nextPlan
+                  _this.rateTableData[i].curAdvice = result[i].data.curAdvice
                 } else {
                   _this.rateTableData[i].conclusionTitle = i + 1 + '月份总结'
                   _this.rateTableData[i].submitMonth = i + 1

@@ -37,3 +37,12 @@ export function getAllUsersInfo () {
     })
   })
 }
+
+// 通过姓名移除人员
+export function removeUserByName (name, usersList) {
+  let index = usersList.findIndex((usersListItem) => {
+    return usersListItem.name === name
+  })
+  usersList.splice(index, 1)
+  return usersList
+}

@@ -15,6 +15,12 @@ function RCPDDatabase(sql, arrayParams) {
     })
 }
 
+function formatData(rows) {
+    return rows.map(row => {
+        return Object.assign({}, row)
+    })
+}
+
 const conclusion = {
     // 提交月总结
     submitMonthConclusionData (req, res) {
@@ -52,7 +58,7 @@ const conclusion = {
         let sql = $sql.conclusion.getCurMonthConclusionOverviewData
         let arrayParams = [sendData.submitYear, sendData.submitMonth, sendData.submitter]
         RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
-            return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
+            return $http.writeJson(res, {code: 1, data: formatData(RCPDDatabaseRes)[0], message: 'success'})
         }).catch(RCPDDatabaseErr => {
             return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
         })

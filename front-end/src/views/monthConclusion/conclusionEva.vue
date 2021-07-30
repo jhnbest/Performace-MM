@@ -14,7 +14,7 @@
               v-model="formData.title"
               type="month"
               format="yyyy年MM月"
-              value-format="yyyy-mm"
+              value-format="yyyy-MM"
               placeholder="选择月份"
               style="width: 150px"
               @change="handelDateChange">
@@ -59,10 +59,11 @@
                 stripe
                 size="medium"
                 :header-cell-style="{ backgroundColor:'#48bfe5', color: '#333' }"
-                v-loading="!reqFlag.getCurApplyAbleMonth || !reqFlag.getCurYearConclusionOverviewData"
+                v-loading="!reqFlag.getCurApplyAbleMonth || !reqFlag.getAllUsersConclusion || !reqFlag.getAllUsersConclusion"
                 :height="tableHeight"
                 ref="rateTable"
                 highlight-current-row>
+        <el-table-column label="序号" align="center" type="index" width="50"></el-table-column>
         <el-table-column label="类型" align="center" min-width="50">
           <template slot-scope="scope">
             <el-tag :type="scope.row.conclusionType | conclusionTypeFilter" size="medium">
@@ -84,38 +85,44 @@
         </el-table-column>
         <el-table-column label="管理者评分" align="center">
           <template slot-scope="scope">
-            <el-rate v-model="scope.row.getEvaStar" slot="reference" style="size: 50px"></el-rate>
+            <el-rate v-model="scope.row.getEvaStar"
+                     slot="reference"
+                     style="size: 50px"
+                     @change="handleEvaStarChange(scope.row)"
+                     :disabled="scope.row.submitStatus !== 1"></el-rate>
           </template>
         </el-table-column>
         <el-table-column label="获得工时" align="center" prop="getWorkTime" width="100"></el-table-column>
         <el-table-column label="操作" align="center" width="250">
           <template slot-scope="scope">
-            <!--          点击预览-->
-            <!--          <el-popover-->
-            <!--            placement="left"-->
-            <!--            trigger="click">-->
-            <!--          </el-popover>-->
+<!--            查看-->
             <el-button slot="reference"
                        type="primary"
                        size="mini"
+                       :disabled="scope.row.submitStatus !== 1"
                        @click="handlePreview(scope.row, scope.$index)">点击查看</el-button>
-            <!--          编辑-->
-            <el-button :disabled="(scope.row.managerRateStar) || (curApplyYear > formData.title) ||
-                    ((curApplyMonth > scope.row.submitMonth) && (curApplyYear === Number(formData.title)))"
-                       size="mini"
-                       type="warning"
-                       @click="handleEdit(scope.row, scope.$index)"
-                       style="margin-left: 10px">编辑</el-button>
+<!--            &lt;!&ndash;          编辑&ndash;&gt;-->
+<!--            <el-button :disabled="(scope.row.managerRateStar) || (curApplyYear > formData.title) ||-->
+<!--                    ((curApplyMonth > scope.row.submitMonth) && (curApplyYear === Number(formData.title)))"-->
+<!--                       size="mini"-->
+<!--                       type="warning"-->
+<!--                       @click="handleEdit(scope.row, scope.$index)"-->
+<!--                       style="margin-left: 10px">编辑</el-button>-->
             <!--          暂存-->
             <el-button v-if="scope.row.submitStatus === 1"
-                       :disabled=" (scope.row.managerRateStar) || (curApplyYear > formData.title) ||
-                    ((curApplyMonth > scope.row.submitMonth) && (curApplyYear === Number(formData.title))) || !reqFlag.updateMonthConclusionStatus"
+                       :disabled=" (scope.row.managerRateStar) ||
+                       (curApplyYear > formData.title) ||
+                    ((curApplyMonth > scope.row.submitMonth) && (curApplyYear === Number(formData.title))) ||
+                    !reqFlag.updateMonthConclusionStatus"
                        size="mini"
                        type="info"
                        @click="handleTemporary(scope.row, scope.$index)">暂存</el-button>
             <!--          提交-->
             <el-button v-if="!(scope.row.submitStatus === 1)"
-                       :disabled="!(scope.row.id) || !reqFlag.updateMonthConclusionStatus || (scope.row.managerRateStar) || (curApplyYear > formData.title) ||
+                       :disabled="!(scope.row.id) ||
+                       !reqFlag.updateMonthConclusionStatus ||
+                       (scope.row.managerRateStar) ||
+                       (curApplyYear > formData.title) ||
                     ((curApplyMonth > scope.row.submitMonth) && (curApplyYear === Number(formData.title)))"
                        size="mini"
                        type="success"
@@ -125,6 +132,15 @@
       </el-table>
       <br>
     </div>
+    <el-dialog :title="conclusionTitle"
+               :visible.sync="conclusionDialog"
+               width="80%">
+      <div>
+        <month-conclusion-table-check :cur-conclusion="curConclusion"
+                                      :next-plan="nextPlan"
+                                      :cur-advice="curAdvice"></month-conclusion-table-check>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -136,8 +152,10 @@
     updateMonthConclusionStatus } from '@/utils/conclusion'
   import {
     getCurApplyAbleMonth,
-    getAllUsersInfo
+    getAllUsersInfo,
+    removeUserByName
   } from '@/utils/common'
+  import monthConclusionTableCheck from './childViews/monthConclusionTableCheck'
   export default {
     data () {
       return {
@@ -153,13 +171,21 @@
         reqFlag: {
           getCurYearConclusionOverviewData: true,
           updateMonthConclusionStatus: true,
-          getCurApplyAbleMonth: true
+          getCurApplyAbleMonth: true,
+          getAllUsersConclusion: true
         },
         tableHeight: null,
         curApplyYear: 1970,
         curApplyMonth: 1,
         allUsers: null,
-        defaultEvaStar: 1
+        defaultEvaStar: 1,
+        defaultGetWorkTime: 10,
+        eachStarGetWorkTime: 2,
+        conclusionDialog: false,
+        curConclusion: null,
+        nextPlan: null,
+        curAdvice: null,
+        conclusionTitle: null
       }
     },
     methods: {
@@ -169,16 +195,23 @@
         if (this.reqFlag.getCurApplyAbleMonth) {
           this.reqFlag.getCurApplyAbleMonth = false
           getCurApplyAbleMonth().then(getCurApplyAbleMonthRes => {
+            this.formData.title = this.$moment(getCurApplyAbleMonthRes[0].setTime).format('YYYY-MM')
             this.curApplyYear = this.$moment(getCurApplyAbleMonthRes[0].setTime).year()
             this.curApplyMonth = this.$moment(getCurApplyAbleMonthRes[0].setTime).month() + 1
             // 获取全处员工信息
             getAllUsersInfo().then(getAllUsersInfoRes => {
-              this.allUsers = getAllUsersInfoRes.list
-              // 获取全处员工月总结信息
-              this.getAllUsersConclusion(this.allUsers, this.curApplyYear, this.curApplyMonth).then(getAllUsersConclusionRes => {
-                // 填充总结表格数据
-                this.fillConclusionTableData(getAllUsersConclusionRes)
-              })
+              console.log('getAllUsersInfoRes')
+              console.log(getAllUsersInfoRes)
+              this.allUsers = removeUserByName('王喻强', JSON.parse(JSON.stringify(getAllUsersInfoRes.list)))
+              if (this.reqFlag.getAllUsersConclusion) {
+                this.reqFlag.getAllUsersConclusion = false
+                // 获取全处员工月总结信息
+                this.getAllUsersConclusion(this.allUsers, this.curApplyYear, this.curApplyMonth).then(getAllUsersConclusionRes => {
+                  // 填充总结表格数据
+                  this.fillConclusionTableData(getAllUsersConclusionRes)
+                  this.reqFlag.getAllUsersConclusion = true
+                })
+              }
             }).catch(() => {
               this.$common.toast('获取全处员工信息失败', 'error', false)
             })
@@ -206,8 +239,6 @@
       },
       // 填充表格数据
       fillConclusionTableData (getAllUsersConclusionRes) {
-        console.log('getAllUsersConclusionRes')
-        console.log(getAllUsersConclusionRes)
         this.conclusionTableData = []
         let count = 0
         for (let getAllUsersConclusionResItem of getAllUsersConclusionRes) {
@@ -225,10 +256,20 @@
             nextPlan: null,
             curAdvice: null
           }
-          if (getAllUsersConclusionResItem.data.length !== 0) {
-          } else {
-            this.conclusionTableData.push(obj)
+          if (getAllUsersConclusionResItem.data) {
+            obj.id = getAllUsersConclusionResItem.data.id
+            obj.conclusionType = getAllUsersConclusionResItem.data.conclusionType
+            obj.conclusionTitle = getAllUsersConclusionResItem.data.conclusionTitle
+            obj.submitStatus = getAllUsersConclusionResItem.data.submitStatus
+            obj.getEvaStar =
+              getAllUsersConclusionResItem.data.getEvaStar ? getAllUsersConclusionResItem.data.getEvaStar : this.defaultEvaStar
+            obj.getWorkTime =
+              getAllUsersConclusionResItem.data.getWorkTime ? getAllUsersConclusionResItem.data.getWorkTime : this.defaultGetWorkTime
+            obj.curConclusion = getAllUsersConclusionResItem.data.curConclusion
+            obj.nextPlan = getAllUsersConclusionResItem.data.nextPlan
+            obj.curAdvice = getAllUsersConclusionResItem.data.curAdvice
           }
+          this.conclusionTableData.push(obj)
         }
       },
       // 初始化默认数据
@@ -251,7 +292,14 @@
         }
       },
       // 点击预览
-      handlePreview () {
+      handlePreview (row, index) {
+        console.log('row')
+        console.log(row)
+        this.conclusionDialog = true
+        this.curConclusion = row.curConclusion
+        this.nextPlan = row.nextPlan
+        this.curAdvice = row.curAdvice
+        this.conclusionTitle = row.name + row.conclusionTitle
       },
       // 编辑月总结
       handleEdit (row, index) {
@@ -332,7 +380,25 @@
       handelDateChange () {
         let submitYear = this.$moment(this.formData.title).year()
         let submitMonth = this.$moment(this.formData.title).month() + 1
-        this.getAllUsersConclusion(this.allUsers, submitYear, submitMonth)
+        if (this.reqFlag.getAllUsersConclusion) {
+          this.reqFlag.getAllUsersConclusion = false
+          this.getAllUsersConclusion(this.allUsers, submitYear, submitMonth).then(getAllUsersConclusionRes => {
+            // 填充总结表格数据
+            this.fillConclusionTableData(getAllUsersConclusionRes)
+            this.reqFlag.getAllUsersConclusion = true
+          }).catch(() => {
+            this.reqFlag.getAllUsersConclusion = true
+            this.$common.toast('获取全处员工信息失败', 'error', false)
+          })
+        }
+      },
+      // 管理者评价变化
+      handleEvaStarChange (row) {
+        if (row.getEvaStar !== 1 && row.submitStatus === 1) {
+          row.getWorkTime = this.defaultGetWorkTime + (row.getEvaStar - 1) * 2
+        } else {
+          row.getWorkTime = this.defaultGetWorkTime
+        }
       },
       // 设置cookie
       setCookie (showTable, exdays) {
@@ -425,8 +491,7 @@
       }
     },
     components: {
-      // CountTo
-      // monthConclusionTable
+      monthConclusionTableCheck
     },
     created () {
       this.init()
@@ -439,5 +504,9 @@
   }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+  .dialogDiv {
+    height: 350px;
+    overflow: auto;
+  }
 </style>
