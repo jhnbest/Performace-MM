@@ -117,13 +117,10 @@ export default {
             this.reqFlag.add = false
 
             let title = this.formData.title
-            console.log('formData.title==' + title)
 
             let yearNum = this.$moment(title).year()
-            console.log('yearNum==' + yearNum)
 
             let weekNum = this.$moment(title).week()
-            console.log('weekNum==' + weekNum)
 
             let params = {
               title: yearNum + ' 第 ' + weekNum + ' 周',

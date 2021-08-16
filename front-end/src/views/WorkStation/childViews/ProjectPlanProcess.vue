@@ -479,24 +479,6 @@
             this.curApplyMonth = this.$moment(getCurApplyAbleMonthRes[0].setTime).format('YYYY-MM')
           })
         },
-        // 临时填充2021-01月份的进展
-        fillProcessOfJanuary (year, projectStageDetail) {
-          let count = 0
-          if (year === 2021) {
-            for (let projectStageDetailItem of projectStageDetail) {
-              if (projectStageDetailItem.type === 'fact') {
-                if (projectStageDetailItem.January === null &&
-                  projectStageDetailItem.process !== 0 &&
-                  projectStageDetailItem.process !== 100.0 &&
-                  projectStageDetailItem.February === null) {
-                  projectStageDetailItem.January = projectStageDetailItem.process
-                  this.handleSaveTmp(projectStageDetailItem, count)
-                }
-              }
-              count++
-            }
-          }
-        },
         // 获取当前月份能否申报的标志
         getIsSubmitAllow () {
           const url = getIsSubmitAllow
@@ -875,13 +857,10 @@
             }
             this.formData.tableData = res
             this.formData.tableDataCache = JSON.parse(JSON.stringify(this.formData.tableData))
-            // this.fillProcessOfJanuary(this.formData.yearNum, res) // 临时填充2021-01月份的进展
           })
         },
         // 表格编辑按钮
         handleEdit (row, index) {
-          console.log('row')
-          console.log(row)
           if (row.type === 'fact') {
             this.projectDetailIsApplyWorkTime([row], 'fact', this.curApplyMonth).then(projectDetailIsApplyWorkTimeRes => {
               row.isApplyWorkTime = projectDetailIsApplyWorkTimeRes[0].length
@@ -909,31 +888,6 @@
                 this.getAssignProjectDetail(this.$route.query.projectID)
                 this.reqFlag.savePlanProcess = true
                 this.$common.toast('保存成功', 'success', false)
-              }
-            })
-          }
-          row.editable = false
-          for (let item in row) {
-            this.formData.tableDataCache[index][item] = row[item]
-          }
-        },
-        // 表格保存按钮临时
-        handleSaveTmp (row, index) {
-          const url = submitPlanProcess
-          for (let item in row) {
-            if (row[item] === '') {
-              row[item] = null
-            }
-          }
-          let params = row
-          if (this.reqFlag.savePlanProcess) {
-            this.reqFlag.savePlanProcess = false
-            this.$http(url, params).then(res => {
-              if (res.code === 1) {
-                let data = res.data
-                row.monthID = data.monthID
-                this.getAssignProjectDetail(this.$route.query.projectID)
-                this.reqFlag.savePlanProcess = true
               }
             })
           }

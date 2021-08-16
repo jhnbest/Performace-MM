@@ -199,7 +199,6 @@
           }
         },
         reviewStatusTextFilter (status) {
-          console.log(status)
           switch (status.reviewStatus) {
             case 0:
               return '未审核'

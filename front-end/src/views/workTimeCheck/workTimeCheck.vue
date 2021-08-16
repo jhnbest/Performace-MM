@@ -186,7 +186,6 @@
       },
       // 小组切换
       handleSelectTypeChange (selectType) {
-        console.log(selectType)
         let groupID = this.groupName2ID(this.formData.selectType)
         this.getGroupWorkTimeList(groupID)
       },
@@ -222,8 +221,6 @@
       }
     },
     created () {
-      console.log('===workTimeCheck.vue')
-      console.log(this.$store.state.userInfo)
       this.init()
     },
     name: 'workTimeCheck'

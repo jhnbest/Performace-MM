@@ -1,5 +1,5 @@
-let path = '/demo-weekly/back-end/api';
-// let path = '/api';
+let path = '/demo-weekly/back-end/api'; // 线下
+// let path = '/api'; // 线上
 
 module.exports = {
     // user-用户管理
@@ -46,6 +46,10 @@ module.exports = {
     getCurApplyAbleMonth: path + '/performance/getCurApplyAbleMonth', // 获取当前可申报的月份
     submitProjectWorkTimeApply: path + '/performance/submitProjectWorkTimeApply', // 提交项目工时申报
     repairErrorData3: path + '/performance/repairErrorData3', // 修复错误数据3
+    updateWorkTimeListReviewStatus: path + '/performance/updateWorkTimeListReviewStatus', // 更新工时条目审核状态
+    getWorkTimeAssignInfo: path + '/performance/getWorkTimeAssignInfo', // 获取工时分配信息
+    getWorkTimeListInfo: path + '/performance/getWorkTimeListInfo', // 获取工时申报信息
+
 
     // workStation-个人工作台
     getAssignProjectList: path + '/workStation/getAssignProjectList',
@@ -75,6 +79,7 @@ module.exports = {
     projectDetailIsApplyWorkTime: path + '/workStation/projectDetailIsApplyWorkTime', // 查看项目阶段当月是否已填报工时
     repairErrorData: path + '/workStation/repairErrorData', // 修复错误数据
     repairErrorData2: path + '/workStation/repairErrorData2', // 修复错误数据2
+    setProjectFinish: path + '/workStation/setProjectFinish', // 将项目置为已完成状态
 
     // 互评模块
     getUserRates: path + '/mutualRates/getUserRates', // 获取互评信息
@@ -90,5 +95,7 @@ module.exports = {
     getCurMonthConclusionOverviewData: path + '/conclusion/getCurMonthConclusionOverviewData', // 获取总结数据
     submitMonthConclusionData: path + '/conclusion/submitMonthConclusionData', // 提交月总结
     updateMonthConclusionData: path + '/conclusion/updateMonthConclusionData', // 更新月总结
-    updateMonthConclusionStatus: path + '/conclusion/updateMonthConclusionStatus' // 更新月总结状态
+    updateMonthConclusionStatus: path + '/conclusion/updateMonthConclusionStatus', // 更新月总结状态
+    submitEvaData: path + '/conclusion/submitEvaData', // 提交评价数据
+    updateWorkTimeListIdOfConclusion: path + '/conclusion/updateWorkTimeListIdOfConclusion' // 更新总结对应的工时ID
 };

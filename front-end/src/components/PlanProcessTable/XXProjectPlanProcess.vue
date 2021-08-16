@@ -26,8 +26,6 @@
       },
       methods: {
         init () {
-          console.log('===JJProjectPlanProcess.vue')
-          console.log('init')
           this.$nextTick(() => {
             this.changeShowFlag()
           })

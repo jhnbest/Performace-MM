@@ -180,7 +180,6 @@ const mutualRate = {
     getPreMonthEva (req, res) {
         let sendData = req.body
         let sql = $sql.mutualRates.getPreMonthEva
-        console.log(sendData)
         let arrayParams = [sendData.rateMonth, sendData.userID]
         RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
             return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
@@ -227,7 +226,7 @@ const mutualRate = {
                 for (let result2Item of result2) {
                     for (let result2ItemItem of result2Item) {
                         sql = $sql.mutualRates.handleFillMulFill
-                        arrayParams = [result2ItemItem.ratePersion, result2ItemItem.ratedPersion, '2021-06', result2ItemItem.rate,
+                        arrayParams = [result2ItemItem.ratePersion, result2ItemItem.ratedPersion, '2021-07', result2ItemItem.rate,
                             result2ItemItem.rateType, rateTime, rateTime]
                         promise3[count3++] = RCPDDatabase(sql, arrayParams)
                     }

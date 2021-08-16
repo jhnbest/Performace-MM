@@ -120,7 +120,11 @@ const sqlMap = {
         ' wl.reviewStatus = 1 and wa.obsoleteStatus != 1 and u.status != 0',
     getIsWorkTimeReviewFinish: 'select * from worktimelist where applyMonth = ? and obsoleteStatus != 1 and reviewStatus = 0 ' +
         'and applyType = "fact" and submitStatus = 1',
-    getCurApplyAbleMonth: 'select * from globalflag where flagType = "curApplyMonth"'
+    getCurApplyAbleMonth: 'select * from globalflag where flagType = "curApplyMonth"',
+    updateWorkTimeListReviewStatus: 'update worktimelist set reviewKValue = ?, reviewCofficient = ?, reviewer = ?, reviewTime = ? ' +
+        ', reviewStatus = ? where id = ?; update worktimeassign set reviewWorkTime = workTime where projectID = ?',
+    getWorkTimeAssignInfo: 'select * from worktimeassign where projectID = ?',
+    getWorkTimeListInfo: 'select * from worktimelist where id = ?'
   },
   workStation: {
     getAssignProjectListUn: 'select apl.*, users.name as assigner from assignprojectlist apl left join users on apl.assignerID = users.id where ' +
@@ -221,7 +225,9 @@ const sqlMap = {
     repairErrorData3Check2: 'select count(*) as totalCount from monthprocess where year = ? and aPDID = ? and type = "fact"',
     repairErrorData3Check3: 'select u.name, apl.projectName, wl.* from assignprojectdetail apd left join assignprojectlist apl ' +
         'on apd.aPLID = apl.id left join users u on apl.userID = u.id left join worktimelist wl on wl.apdID = apd.id where apd.id = ? ' +
-        'and wl.applyMonth = "2021-01" and wl.applyType = "fact"'
+        'and wl.applyMonth = "2021-01" and wl.applyType = "fact"',
+    setProjectFinish: 'update assignprojectlist set process = 100.0 where id = ?; ' +
+        'update assignprojectdetail set process = 100.0 where aPLID = ?'
   },
   mutualRates: {
     getUserRates: 'select mr.*, u.name as ratedPersionName from mutualrate mr left join users u on ' +
@@ -235,7 +241,7 @@ const sqlMap = {
     getPreMonthEva: 'select mr.*, u.name as ratedPersionName from mutualrate mr left join users u on mr.ratedPersion = ' +
         'u.id where mr.rateMonth = ? and mr.ratePersion = ?',
     handleFillMul: 'select count(*) as totalCount from mutualrate where ratePersion = ? and rateMonth = ?',
-    handleFillMulCheck: 'select * from mutualrate where ratePersion = ? and rateMonth = "2021-05"',
+    handleFillMulCheck: 'select * from mutualrate where ratePersion = ? and rateMonth = "2021-06"',
     handleFillMulFill: 'insert into mutualrate (ratePersion, ratedPersion, rateMonth, rate, rateType, rateTime, updateTime) ' +
         'values (?, ?, ?, ?, ?, ?, ?)'
   },
@@ -247,7 +253,10 @@ const sqlMap = {
         'values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
     updateMonthConclusionData: 'update conclusion set conclusionType = ?, conclusionTitle = ?, updateTime = ?, ' +
         'submitYear = ?, submitMonth = ?, submitStatus = ?, curConclusion = ?, nextPlan = ?, curAdvice = ? where id = ?',
-    updateMonthConclusionStatus: 'update conclusion set submitStatus = ?, updateTime = ? where id = ?'
+    updateMonthConclusionStatus: 'update conclusion set submitStatus = ?, updateTime = ? where id = ?',
+    submitEvaData: 'update conclusion set managerRateStar = ?, getWorkTime = ?, managerEva = ?, evaTime = ?, evaStatus = ?' +
+        ' where id = ?',
+    updateWorkTimeListIdOfConclusion: 'update conclusion set workTimeListId = ? where id = ?'
   }
 }
 module.exports = sqlMap;

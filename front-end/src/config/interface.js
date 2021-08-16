@@ -41,6 +41,9 @@ export const getIsWorkTimeReviewFinish = '/performance/getIsWorkTimeReviewFinish
 export const urlGetCurApplyAbleMonth = '/performance/getCurApplyAbleMonth' // 获取当前可申报的月份
 export const submitProjectWorkTimeApply = '/performance/submitProjectWorkTimeApply' // 提交项目工时申报
 export const repairErrorData3 = '/performance/repairErrorData3' // 修复错误数据3
+export const urlUpdateWorkTimeListReviewStatus = '/performance/updateWorkTimeListReviewStatus' // 更新工时条目审核状态
+export const urlGetWorkTimeAssignInfo = '/performance/getWorkTimeAssignInfo' // 获取工时分配信息
+export const urlGetWorkTimeListInfo = '/performance/getWorkTimeListInfo' // 获取工时申报信息
 
 export const getAssignProjectList = '/workStation/getAssignProjectList' // 获取未完成的指派项目列表
 export const getAssignProjectDetail = '/workStation/getAssignProjectDetail' // 获取未完成的指派项目明细
@@ -69,6 +72,7 @@ export const getUnFilledProjectList = '/workStation/getUnFilledProjectList' // �
 export const projectDetailIsApplyWorkTime = '/workStation/projectDetailIsApplyWorkTime' // 查看项目阶段当月是否已填报工时
 export const repairErrorData = '/workStation/repairErrorData' // 修复错误数据
 export const repairErrorData2 = '/workStation/repairErrorData2' // 修复错误数据2
+export const urlSetProjectFinish = '/workStation/setProjectFinish' // 将项目置为已完成状态
 
 export const getUserRates = '/mutualRates/getUserRates' // 获取互评信息
 export const submitRatesResult = '/mutualRates/submitRatesResult' // 提交互评结果
@@ -84,3 +88,5 @@ export const urlSubmitMonthConclusionData = '/conclusion/submitMonthConclusionDa
 export const urlGetConclusionDataById = '/conclusion/getConclusionDataById' // 提交月总结
 export const urlUpdateMonthConclusionData = '/conclusion/updateMonthConclusionData' // 更新月总结
 export const urlUpdateMonthConclusionStatus = '/conclusion/updateMonthConclusionStatus' // 更新月总结状态
+export const urlSubmitEvaData = '/conclusion/submitEvaData' // 提交评价数据
+export const urlUpdateWorkTimeListIdOfConclusion = '/conclusion/updateWorkTimeListIdOfConclusion' // 更新总结对应的工时ID

@@ -257,30 +257,6 @@ async function getAssignProjectDetailPlan(data) {
     })
 }
 
-async function FGetAssignProjectList (result, res) {
-    for (let i = 0; i < result.length; i++) {
-        await $user.getUserNameByID(result[i].assignerID).then(res1 => {
-            result[i].assigner = res1
-            if (i === result.length - 1) {
-                return $http.writeJson(res, {code: 1, data: result, message: '成功'})
-            }
-        })
-    }
-}
-
-function insertAssignProjectList(sql, arrayParams) {
-    return new Promise(function (resolve, reject) {
-        $http.connPool(sql, arrayParams, (err, result) => {
-            if (err) {
-                reject(-1)
-            } else {
-                result = JSON.parse(JSON.stringify(result))
-                resolve(result)
-            }
-        })
-    })
-}
-
 function insertAssignProjectDetailOP(sql, arrayParams) {
     return new Promise(function (resolve, reject) {
         $http.connPool(sql, arrayParams, (err, result) => {
@@ -1066,7 +1042,6 @@ const workStation = {
         Promise.all(promises).then(result => {
             for (let resultItem of result) {
                 if (resultItem[0][0].totalCount > 1) {
-                    console.log(resultItem[1])
                     ErrResult.push(resultItem[1])
                 }
             }
@@ -1091,6 +1066,17 @@ const workStation = {
             })
         }).catch(RCPDDatabaseErr => {
             return $http.writeJson(res, { code: -2, data: RCPDDatabaseErr, message: 'error' })
+        })
+    },
+    // 将项目置为已完成状态
+    setProjectFinish (req, res) {
+        let sendData = req.body
+        let sql = $sql.workStation.setProjectFinish
+        let arrayParams = [sendData.aplId, sendData.aplId]
+        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+            return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
+        }).catch(RCPDDatabaseErr => {
+            return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
         })
     }
 }

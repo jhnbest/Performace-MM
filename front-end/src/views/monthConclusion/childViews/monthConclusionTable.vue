@@ -56,7 +56,7 @@
               :header-cell-style="{ background:'#ced1d4',color:'#000000',fontSize:'18px' }"
               style="margin: auto;width: 99%"
               highlight-current-row>
-      <el-table-column label="为更好地完成本职工作和团队目标，在下一阶段需要努力和改善的绩效，直接主管的期望、建议、措施等。"
+      <el-table-column label="对处室工作的意见/建议、不满/抱怨、工作/生活/学习中的烦恼和困难以及希望得到的帮助/支持/指导"
                        align="center">
         <template>
           <editor-vue :value="conclusionText.curAdvice"
@@ -118,8 +118,8 @@
             this.$router.push({
               path: '/home/monthConclusion'
             })
-          }).catch(() => {
-            this.$common.toast('提交失败', 'error', false)
+          }).catch((updateMonthConclusionDataErr) => {
+            this.$common.toast('提交失败 ' + updateMonthConclusionDataErr, 'error', false)
           })
         } else {
           submitMonthConclusionData(this.submitYear, this.submitMonth, this.submitter, this.conclusionTitle, submitStatus,
@@ -128,8 +128,8 @@
             this.$router.push({
               path: '/home/monthConclusion'
             })
-          }).catch(() => {
-            this.$common.toast('提交失败', 'error', false)
+          }).catch((submitMonthConclusionDataErr) => {
+            this.$common.toast('提交失败 ' + submitMonthConclusionDataErr, 'error', false)
           })
         }
       },
@@ -143,8 +143,8 @@
             this.$router.push({
               path: '/home/monthConclusion'
             })
-          }).catch(() => {
-            this.$common.toast('暂存失败', 'error', false)
+          }).catch((updateMonthConclusionDataErr) => {
+            this.$common.toast('暂存失败 ' + updateMonthConclusionDataErr, 'error', true)
           })
         } else {
           submitMonthConclusionData(this.submitYear, this.submitMonth, this.submitter, this.conclusionTitle, submitStatus,
@@ -153,8 +153,8 @@
             this.$router.push({
               path: '/home/monthConclusion'
             })
-          }).catch(() => {
-            this.$common.toast('暂存失败', 'error', false)
+          }).catch((submitMonthConclusionDataErr) => {
+            this.$common.toast('暂存失败 ' + submitMonthConclusionDataErr, 'error', true)
           })
         }
       },

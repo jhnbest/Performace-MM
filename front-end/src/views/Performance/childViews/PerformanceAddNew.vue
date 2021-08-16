@@ -560,16 +560,15 @@
           }
           let it = this
           return new Promise(function (resolve, reject) {
-            it.$http(url, params)
-              .then(res => {
-                if (res.code === 1) {
-                  for (let i = 0; i < res.data.length; i++) { // 插入项目明细ID
-                    it.formData.workTypeTimeDetail[i].apdID = res.data[i].insertID
-                    it.formData.workTypeTimeDetail[i].aplID = res.data[i].aplID
-                  }
-                  resolve(res.data)
+            it.$http(url, params).then(res => {
+              if (res.code === 1) {
+                for (let i = 0; i < res.data.length; i++) { // 插入项目明细ID
+                  it.formData.workTypeTimeDetail[i].apdID = res.data[i].insertID
+                  it.formData.workTypeTimeDetail[i].aplID = res.data[i].aplID
                 }
-              })
+                resolve(res.data)
+              }
+            })
           })
         },
         // 提交计划至计划进展表

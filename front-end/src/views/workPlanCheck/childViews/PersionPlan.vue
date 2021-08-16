@@ -129,7 +129,6 @@
     methods: {
       // 初始化
       init () {
-        console.log('init')
         this.getAssignedProject(this.userInfo.year).then(() => {
         })
       },
@@ -156,7 +155,6 @@
       // 获取选择项目的数组索引
       getSelectProjectIndex (projectTypeIndex, selectProject) {
         if (this.projectTypes[projectTypeIndex].projects.length === 0) {
-          console.log('err')
           return -1
         }
         for (let i = 0; i < this.projectTypes[projectTypeIndex].projects.length; i++) {
@@ -325,7 +323,6 @@
       // 销毁图表
       destroyPlanChart () {
         if (!this.planChart) {
-          console.log('planChart not exist!')
           return
         }
         this.planChart.dispose()

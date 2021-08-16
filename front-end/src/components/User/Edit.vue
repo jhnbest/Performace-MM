@@ -67,7 +67,6 @@ export default {
       this.$nextTick(() => {
         this.id = id
         this.getUserDetail()
-        console.log('this.id==' + this.id)
         this.changeShowFlag()
       })
     },

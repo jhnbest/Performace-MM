@@ -1,159 +1,166 @@
 <template>
   <div>
-    <el-form class="main-search" :inline="true">
-      <el-row type="flex">
-        <el-col :xs="12" :sm="12" :lg="9" :xl="6">
-          <!--        年份选择-->
-          <el-form-item label="月份选择：" prop="title">
-            <el-button size="mini"
-                       type="danger"
-                       style="margin-right: 10px"
-                       @click="handlePreYear"
-                       :disabled="!reqFlag.getCurYearConclusionOverviewData">上月</el-button>
-            <el-date-picker
-              v-model="formData.title"
-              type="month"
-              format="yyyy年MM月"
-              value-format="yyyy-MM"
-              placeholder="选择月份"
-              style="width: 150px"
-              @change="handelDateChange">
-            </el-date-picker>
-            <el-button size="mini"
-                       type="primary"
-                       style="margin-left: 10px"
-                       @click="handleNextYear"
-                       :disabled="!reqFlag.getCurYearConclusionOverviewData">下月</el-button>
-          </el-form-item>
-        </el-col>
-        <!--      填报说明-->
-        <el-col :xs="2" :sm="2" :lg="{span: 6, pull: 1}" :xl="{span: 6, pull: 0}" style="margin-top: 10px">
-          <el-popover
-            placement="bottom"
-            width="470"
-            trigger="click">
-            <span>1、查看评价标准，了解评价衡量标准以及分值对应的评价星级；</span><br>
-            <span>2、点击评价对象相应评价项下的星星，完成该评价项的评分(未点击默认按照3颗星计算分值)</span>；<br>
-            <span>3、完成对所有评价对象的所有评价项的评分，点击提交按钮即可；</span><br>
-            <span>4、若需要更改当月的评价，则直接修改相应的星星，然后点击更新即可；</span><br>
-            <span>5、每月
-            <span style="font-weight: bolder;color: red">3日0点前</span>，
-            需完成对处室相关成员的评价。若未提交当月评价，
-            <span style="font-weight: bolder;color: red">则默认按照上一月份的评价数据计算</span>；
-          </span><br>
-            <span>6、评价截止时间过后，将<span style="font-weight: bolder;color: red">不能</span>修改当月评价。</span><br>
-            <span slot="reference" class="pointer-type"><i class="el-icon-warning-outline"></i>填报说明</span>
-          </el-popover>
-        </el-col>
-      </el-row>
-    </el-form>
-    <!-- 分割线 start -->
-    <div class="hr-10"></div>
-    <!-- 分割线 end -->
-    <br>
-    <!--  月总结表格-->
-    <div>
-      <el-table :data="conclusionTableData"
-                border
-                style="margin: auto; width: 99%"
-                stripe
-                size="medium"
-                :header-cell-style="{ backgroundColor:'#48bfe5', color: '#333' }"
-                v-loading="!reqFlag.getCurApplyAbleMonth || !reqFlag.getAllUsersConclusion || !reqFlag.getAllUsersConclusion"
-                :height="tableHeight"
-                ref="rateTable"
-                highlight-current-row>
-        <el-table-column label="序号" align="center" type="index" width="50"></el-table-column>
-        <el-table-column label="类型" align="center" min-width="50">
-          <template slot-scope="scope">
-            <el-tag :type="scope.row.conclusionType | conclusionTypeFilter" size="medium">
-              <span>{{scope.row.conclusionType | conclusionTypeTextFilter}}</span>
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="姓名" align="center" prop="name" min-width="50"></el-table-column>
-        <el-table-column label="标题" align="center" prop="conclusionTitle"></el-table-column>
-        <el-table-column label="提交状态" align="center" width="100">
-          <template slot-scope="scope">
-            <el-tag v-if="scope.row.id !== null" :type="scope.row.submitStatus | submitStatusFilter" size="medium">
-              <span>{{scope.row.submitStatus | submitStatusTextFilter}}</span>
-            </el-tag>
-            <el-tag v-else type="info" size="medium">
-              <span>{{'未提交'}}</span>
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="管理者评分" align="center">
-          <template slot-scope="scope">
-            <el-rate v-model="scope.row.getEvaStar"
-                     slot="reference"
-                     style="size: 50px"
-                     @change="handleEvaStarChange(scope.row)"
-                     :disabled="scope.row.submitStatus !== 1"></el-rate>
-          </template>
-        </el-table-column>
-        <el-table-column label="获得工时" align="center" prop="getWorkTime" width="100"></el-table-column>
-        <el-table-column label="操作" align="center" width="250">
-          <template slot-scope="scope">
-<!--            查看-->
-            <el-button slot="reference"
-                       type="primary"
-                       size="mini"
-                       :disabled="scope.row.submitStatus !== 1"
-                       @click="handlePreview(scope.row, scope.$index)">点击查看</el-button>
-<!--            &lt;!&ndash;          编辑&ndash;&gt;-->
-<!--            <el-button :disabled="(scope.row.managerRateStar) || (curApplyYear > formData.title) ||-->
-<!--                    ((curApplyMonth > scope.row.submitMonth) && (curApplyYear === Number(formData.title)))"-->
-<!--                       size="mini"-->
-<!--                       type="warning"-->
-<!--                       @click="handleEdit(scope.row, scope.$index)"-->
-<!--                       style="margin-left: 10px">编辑</el-button>-->
-            <!--          暂存-->
-            <el-button v-if="scope.row.submitStatus === 1"
-                       :disabled=" (scope.row.managerRateStar) ||
-                       (curApplyYear > formData.title) ||
-                    ((curApplyMonth > scope.row.submitMonth) && (curApplyYear === Number(formData.title))) ||
-                    !reqFlag.updateMonthConclusionStatus"
-                       size="mini"
-                       type="info"
-                       @click="handleTemporary(scope.row, scope.$index)">暂存</el-button>
-            <!--          提交-->
-            <el-button v-if="!(scope.row.submitStatus === 1)"
-                       :disabled="!(scope.row.id) ||
-                       !reqFlag.updateMonthConclusionStatus ||
-                       (scope.row.managerRateStar) ||
-                       (curApplyYear > formData.title) ||
-                    ((curApplyMonth > scope.row.submitMonth) && (curApplyYear === Number(formData.title)))"
-                       size="mini"
-                       type="success"
-                       @click="handleSubmit(scope.row, scope.$index)">提交</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+    <div v-if="$store.state.userInfo.id === 26">
+      <el-form class="main-search" :inline="true">
+        <el-row type="flex">
+          <el-col :xs="12" :sm="12" :lg="9" :xl="6">
+            <!--        年份选择-->
+            <el-form-item label="月份选择：" prop="title">
+              <el-button size="mini"
+                         type="danger"
+                         style="margin-right: 10px"
+                         @click="handlePreYear"
+                         :disabled="!reqFlag.getCurYearConclusionOverviewData">上月</el-button>
+              <el-date-picker
+                v-model="formData.title"
+                type="month"
+                format="yyyy年MM月"
+                value-format="yyyy-MM"
+                placeholder="选择月份"
+                style="width: 150px"
+                @change="handleDateChange">
+              </el-date-picker>
+              <el-button size="mini"
+                         type="primary"
+                         style="margin-left: 10px"
+                         @click="handleNextYear"
+                         :disabled="!reqFlag.getCurYearConclusionOverviewData">下月</el-button>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <!-- 分割线 start -->
+      <div class="hr-10"></div>
+      <!-- 分割线 end -->
       <br>
-    </div>
-    <el-dialog :title="conclusionTitle"
-               :visible.sync="conclusionDialog"
-               width="80%">
+      <!--  月总结表格-->
       <div>
-        <month-conclusion-table-check :cur-conclusion="curConclusion"
-                                      :next-plan="nextPlan"
-                                      :cur-advice="curAdvice"></month-conclusion-table-check>
+        <el-table :data="conclusionTableData"
+                  border
+                  style="margin: auto; width: 99%"
+                  stripe
+                  size="medium"
+                  :header-cell-style="{ backgroundColor:'#48bfe5', color: '#333' }"
+                  v-loading="!reqFlag.getCurApplyAbleMonth || !reqFlag.getAllUsersConclusion || !reqFlag.getAllUsersConclusion"
+                  :height="tableHeight"
+                  ref="rateTable"
+                  highlight-current-row>
+          <el-table-column label="序号" align="center" type="index" width="50"></el-table-column>
+          <el-table-column label="类型" align="center" min-width="50">
+            <template slot-scope="scope">
+              <el-tag :type="scope.row.conclusionType | conclusionTypeFilter" size="medium">
+                <span>{{scope.row.conclusionType | conclusionTypeTextFilter}}</span>
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column label="姓名" align="center" prop="name" min-width="50"></el-table-column>
+          <el-table-column label="标题" align="center" prop="conclusionTitle"></el-table-column>
+          <el-table-column label="提交状态" align="center" width="100">
+            <template slot-scope="scope">
+              <el-tag v-if="scope.row.id !== null" :type="scope.row.submitStatus | submitStatusFilter" size="medium">
+                <span>{{scope.row.submitStatus | submitStatusTextFilter}}</span>
+              </el-tag>
+              <el-tag v-else type="info" size="medium">
+                <span>{{'未提交'}}</span>
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column label="评价状态" align="center" width="100">
+            <template slot-scope="scope">
+              <el-tag v-if="scope.row.id !== null" :type="scope.row.evaStatus | evaStatusFilter" size="medium">
+                <span>{{scope.row.evaStatus | evaStatusTextFilter}}</span>
+              </el-tag>
+              <el-tag v-else type="info" size="medium">
+                <span>{{'未提交'}}</span>
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column label="管理者评分" align="center">
+            <template slot-scope="scope">
+              <el-rate v-if="scope.row.evaStatus !== null"  v-model="scope.row.managerRateStar"
+                       slot="reference"
+                       style="size: 50px"
+                       :disabled="true"></el-rate>
+              <div v-else>
+                <el-tag v-if="scope.row.id !== null" :type="scope.row.evaStatus | evaStatusFilter" size="medium">
+                  <span>{{scope.row.evaStatus | evaStatusTextFilter}}</span>
+                </el-tag>
+                <el-tag v-else type="info" size="medium">
+                  <span>{{'未提交'}}</span>
+                </el-tag>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column label="获得工时" align="center" prop="getWorkTime" width="100"></el-table-column>
+          <el-table-column label="操作" align="center" width="250">
+            <template slot-scope="scope">
+              <!--            查看-->
+              <el-button slot="reference"
+                         type="primary"
+                         size="mini"
+                         :disabled="scope.row.submitStatus !== 1"
+                         @click="handlePreview(scope.row, scope.$index)">点击查看</el-button>
+              <!--&lt;!&ndash;            暂存&ndash;&gt;-->
+              <!--            <el-button v-if="scope.row.evaStatus === 1"-->
+              <!--                       :disabled=" (scope.row.managerRateStar === null) ||-->
+              <!--                       (curApplyYear > formData.title) ||-->
+              <!--                    ((curApplyMonth > scope.row.submitMonth) && (curApplyYear === Number(formData.title))) ||-->
+              <!--                    !reqFlag.submitEvaData"-->
+              <!--                       size="mini"-->
+              <!--                       type="info"-->
+              <!--                       @click="handleTemporary(scope.row, scope.$index)">暂存</el-button>-->
+              <!--            &lt;!&ndash;          提交&ndash;&gt;-->
+              <!--            <el-button v-if="scope.row.evaStatus === 2"-->
+              <!--                       :disabled="scope.row.id === null ||-->
+              <!--                       !reqFlag.submitEvaData ||-->
+              <!--                       (scope.row.managerRateStar === null) ||-->
+              <!--                       (curApplyYear > formData.title) ||-->
+              <!--                    ((curApplyMonth > scope.row.submitMonth) && (curApplyYear === Number(formData.title)))"-->
+              <!--                       size="mini"-->
+              <!--                       type="success"-->
+              <!--                       @click="handleSubmit(scope.row, scope.$index)">提交</el-button>-->
+            </template>
+          </el-table-column>
+        </el-table>
+        <br>
       </div>
-    </el-dialog>
+      <!--    月总结对话框-->
+      <month-conclusion-table-check v-if="conclusionDialog"
+                                    :cur-conclusion="curConclusion"
+                                    :next-plan="nextPlan"
+                                    :cur-advice="curAdvice"
+                                    :is-manager-eva="true"
+                                    :conclusion-title="conclusionTitle"
+                                    :id="selectId"
+                                    :manager-eva="managerEva"
+                                    :manager-rate-star="managerRateStar"
+                                    :submitter="submitter"
+                                    :check-user-id="this.$store.state.userInfo.id"
+                                    @close="conclusionDialog = false"
+                                    @handleSaveEvaData="handleSubmitEvaData"></month-conclusion-table-check>
+    </div>
+    <div v-else>
+      <h2>暂无权限</h2>
+    </div>
   </div>
 </template>
 
 <script>
   import {
-    urlGetCurApplyAbleMonth } from '@/config/interface'
+    urlGetCurApplyAbleMonth,
+    urlSubmitEvaData } from '@/config/interface'
   import {
     getCurMonthConclusionOverviewData,
-    updateMonthConclusionStatus } from '@/utils/conclusion'
+    submitEvaData,
+    updateWorkTimeListIdOfConclusion
+  } from '@/utils/conclusion'
   import {
     getCurApplyAbleMonth,
     getAllUsersInfo,
-    removeUserByName
+    removeUserByName,
+    workTimeListInsert,
+    updateWorkTimeListReviewStatus,
+    conclusionManagerEvaStarToWorkTime, addNewProject, getWorkTimeAssignInfo, setProjectFinish, getWorkTimeListInfo
   } from '@/utils/common'
   import monthConclusionTableCheck from './childViews/monthConclusionTableCheck'
   export default {
@@ -172,20 +179,27 @@
           getCurYearConclusionOverviewData: true,
           updateMonthConclusionStatus: true,
           getCurApplyAbleMonth: true,
-          getAllUsersConclusion: true
+          getAllUsersConclusion: true,
+          submitEvaData: true
         },
         tableHeight: null,
         curApplyYear: 1970,
         curApplyMonth: 1,
         allUsers: null,
-        defaultEvaStar: 1,
+        defaultEvaStar: this.$store.state.defaultConclusionEvaStar,
         defaultGetWorkTime: 10,
         eachStarGetWorkTime: 2,
         conclusionDialog: false,
         curConclusion: null,
         nextPlan: null,
+        managerEva: null,
         curAdvice: null,
-        conclusionTitle: null
+        managerRateStar: this.$store.state.defaultConclusionEvaStar,
+        conclusionTitle: null,
+        selectId: null,
+        submitter: null,
+        workTimeListId: null,
+        workTimeAssignInsertID: []
       }
     },
     methods: {
@@ -194,14 +208,12 @@
         // 获取当前申报月份
         if (this.reqFlag.getCurApplyAbleMonth) {
           this.reqFlag.getCurApplyAbleMonth = false
-          getCurApplyAbleMonth().then(getCurApplyAbleMonthRes => {
+          getCurApplyAbleMonth().then(getCurApplyAbleMonthRes => { // 获取当前申报月份
             this.formData.title = this.$moment(getCurApplyAbleMonthRes[0].setTime).format('YYYY-MM')
             this.curApplyYear = this.$moment(getCurApplyAbleMonthRes[0].setTime).year()
             this.curApplyMonth = this.$moment(getCurApplyAbleMonthRes[0].setTime).month() + 1
             // 获取全处员工信息
             getAllUsersInfo().then(getAllUsersInfoRes => {
-              console.log('getAllUsersInfoRes')
-              console.log(getAllUsersInfoRes)
               this.allUsers = removeUserByName('王喻强', JSON.parse(JSON.stringify(getAllUsersInfoRes.list)))
               if (this.reqFlag.getAllUsersConclusion) {
                 this.reqFlag.getAllUsersConclusion = false
@@ -221,8 +233,6 @@
             this.reqFlag.getCurApplyAbleMonth = true
           })
         }
-        // // 初始化默认数据
-        // this.initDefaultData()
       },
       // 获取全处员工月总结信息
       getAllUsersConclusion (allUsers, submitYear, submitMonth) {
@@ -250,100 +260,161 @@
             month: this.$moment(this.formData.title).month() + 1 + '月份',
             submitMonth: this.$moment(this.formData.title).month() + 1,
             submitStatus: null,
-            getEvaStar: this.defaultEvaStar,
+            managerRateStar: this.defaultEvaStar,
             getWorkTime: null,
             curConclusion: null,
             nextPlan: null,
-            curAdvice: null
+            curAdvice: null,
+            evaStatus: null,
+            managerEva: null,
+            workTimeListId: null,
+            submitter: null,
+            workTimeAssignInsertID: []
           }
           if (getAllUsersConclusionResItem.data) {
             obj.id = getAllUsersConclusionResItem.data.id
             obj.conclusionType = getAllUsersConclusionResItem.data.conclusionType
             obj.conclusionTitle = getAllUsersConclusionResItem.data.conclusionTitle
             obj.submitStatus = getAllUsersConclusionResItem.data.submitStatus
-            obj.getEvaStar =
-              getAllUsersConclusionResItem.data.getEvaStar ? getAllUsersConclusionResItem.data.getEvaStar : this.defaultEvaStar
-            obj.getWorkTime =
-              getAllUsersConclusionResItem.data.getWorkTime ? getAllUsersConclusionResItem.data.getWorkTime : this.defaultGetWorkTime
+            obj.managerRateStar =
+              getAllUsersConclusionResItem.data.managerRateStar ? getAllUsersConclusionResItem.data.managerRateStar : this.defaultEvaStar
+            obj.getWorkTime = getAllUsersConclusionResItem.data.getWorkTime !== null ? getAllUsersConclusionResItem.data.getWorkTime : null
             obj.curConclusion = getAllUsersConclusionResItem.data.curConclusion
             obj.nextPlan = getAllUsersConclusionResItem.data.nextPlan
             obj.curAdvice = getAllUsersConclusionResItem.data.curAdvice
+            obj.evaStatus = getAllUsersConclusionResItem.data.evaStatus
+            obj.managerEva = getAllUsersConclusionResItem.data.managerEva
+            obj.submitter = getAllUsersConclusionResItem.data.submitter
+            obj.workTimeListId = getAllUsersConclusionResItem.data.workTimeListId
           }
           this.conclusionTableData.push(obj)
         }
       },
-      // 初始化默认数据
-      initDefaultData () {
-        for (let i = 0; i < 12; i++) {
-          let obj = {
-            conclusionType: 1,
-            month: i + 1 + '月份',
-            submitMonth: i + 1,
-            conclusionTitle: i + 1 + '月份总结',
-            submitStatus: null,
-            getEvaStar: null,
-            getWorkTime: null,
-            id: null,
-            curConclusion: null,
-            nextPlan: null,
-            curAdvice: null
-          }
-          this.conclusionTableData.push(obj)
-        }
-      },
-      // 点击预览
+      // 点击查看
       handlePreview (row, index) {
-        console.log('row')
-        console.log(row)
-        this.conclusionDialog = true
+        this.selectId = row.id
         this.curConclusion = row.curConclusion
         this.nextPlan = row.nextPlan
         this.curAdvice = row.curAdvice
         this.conclusionTitle = row.name + row.conclusionTitle
-      },
-      // 编辑月总结
-      handleEdit (row, index) {
-        this.$router.push({
-          path: '/home/monthConclusionTable',
-          query: {
-            id: row.id,
-            conclusionTitle: row.conclusionTitle,
-            submitYear: this.formData.title,
-            submitMonth: row.submitMonth,
-            submitter: this.$store.state.userInfo.id,
-            curConclusion: row.curConclusion,
-            nextPlan: row.nextPlan,
-            curAdvice: row.curAdvice
-          }
-        })
-      },
-      // 提交月总结
-      handleSubmit (row, index) {
-        let submitStatus = 1
-        if (this.reqFlag.updateMonthConclusionStatus) {
-          this.reqFlag.updateMonthConclusionStatus = false
-          updateMonthConclusionStatus(row.id, submitStatus).then(() => {
-            row.submitStatus = submitStatus
-            this.reqFlag.updateMonthConclusionStatus = true
-            this.$common.toast('提交成功', 'success', false)
-          }).catch(() => {
-            this.reqFlag.updateMonthConclusionStatus = true
-            this.$common.toast('提交失败', 'error', false)
+        this.conclusionDialog = true
+        this.managerEva = row.managerEva
+        this.managerRateStar = row.managerRateStar
+        this.submitter = row.submitter
+        this.workTimeListId = row.workTimeListId
+        // get工时分配的ID
+        if (row.workTimeListId !== null) {
+          getWorkTimeAssignInfo(row.workTimeListId).then(getWorkTimeAssignInfoRes => {
+            this.workTimeAssignInsertID.push(getWorkTimeAssignInfoRes[0].id)
+            row.workTimeAssignInsertID.push(getWorkTimeAssignInfoRes[0].id)
           })
         }
       },
-      // 暂存月总结
+      // 提交管理者评价
+      handleSubmit (row, index) {
+        let evaStatus = 1
+        if (this.reqFlag.submitEvaData) {
+          this.reqFlag.submitEvaData = false
+          // ============================管理者评价数据提交至月总结数据库==========================
+          submitEvaData(row.id, row.managerRateStar, row.managerEva, evaStatus).then(() => {
+            row.evaStatus = 1
+            // 新增项目
+            let isFilled = 1
+            let parentID = 4
+            let projectLevel = 1
+            let projectName = row.conclusionTitle
+            let userId = row.submitter
+            let tableData = [{
+              avaiableWorkTime: conclusionManagerEvaStarToWorkTime(row.managerRateStar),
+              kValue: 1,
+              projectManagerID: row.submitter,
+              projectTypeID: 74,
+              workTime: conclusionManagerEvaStarToWorkTime(row.managerRateStar),
+              workType: '个人月总结'
+            }]
+            addNewProject(isFilled, parentID, projectLevel, projectName, userId, tableData).then(addNewProjectRes => {
+              // ================================插入工时列表==============================================================
+              let aplID = addNewProjectRes[0].aplID
+              let apdID = addNewProjectRes[0].insertID
+              let submitType = null
+              let submitDate = this.formData.title
+              let applyType = 'fact'
+              let data = []
+              if (row.workTimeListId === null) { // 管理者首次提交评价
+                submitType = 'insert'
+                let obj = {
+                  projectTypeID: 74,
+                  baseWorkTime: row.getWorkTime,
+                  defaultKValue: 1,
+                  dynamicKValue: 1,
+                  defaultCofficient: 1,
+                  workTimeAssign: [{
+                    id: userId,
+                    applyRole: '组织者',
+                    assignWorkTime: row.getWorkTime
+                  }],
+                  submitComments: null,
+                  avaiableWorkTime: 1,
+                  isConference: 0,
+                  defaultAssignWorkTime: row.getWorkTime,
+                  applyProcess: 100,
+                  planProcess: 100,
+                  apdID: apdID,
+                  aplID: aplID,
+                  lastProcess: 0
+                }
+                data.push(obj)
+              } else {
+              }
+              workTimeListInsert(submitType, submitDate, applyType, userId, data).then((workTimeListInsertRes) => {
+                // ========================================总结表中更新工时列表ID================================================
+                updateWorkTimeListIdOfConclusion(row.id, workTimeListInsertRes.insertID).then(() => {
+                  // =============================================将月总结工时条目置为已审核状态=====================================
+                  let reviewer = this.$store.state.userInfo.id
+                  let reviewKValue = 1
+                  let reviewCofficient = 1
+                  let reviewStatus = 1
+                  updateWorkTimeListReviewStatus(workTimeListInsertRes.insertID, reviewKValue,
+                    reviewCofficient, reviewStatus, reviewer).then(() => {
+                    this.$common.toast('提交成功', 'success', false)
+                    this.reqFlag.submitEvaData = true
+                  }).catch(updateWorkTimeListReviewStatusErr => {
+                    this.reqFlag.submitEvaData = true
+                    this.$common.toast('提交失败 ' + updateWorkTimeListReviewStatusErr, 'error', true)
+                  })
+                }).catch(updateWorkTimeListIdOfConclusionErr => {
+                  this.reqFlag.submitEvaData = true
+                  this.$common.toast('提交失败 ' + updateWorkTimeListIdOfConclusionErr, 'error', true)
+                })
+              }).catch(workTimeListInsertErr => {
+                this.reqFlag.submitEvaData = true
+                this.$common.toast('提交失败 ' + workTimeListInsertErr, 'error', true)
+              })
+            })
+          }).catch(submitEvaDataErr => {
+            let submitYear = this.$moment(this.formData.title).year()
+            let submitMonth = this.$moment(this.formData.title).month() + 1
+            this.getAndFillConclusionData(this.allUsers, submitYear, submitMonth)
+            this.$common.toast('提交失败' + submitEvaDataErr, 'error', true)
+            this.reqFlag.submitEvaData = true
+          })
+        }
+      },
+      // 暂存管理者评价
       handleTemporary (row, index) {
-        let submitStatus = 2
-        if (this.reqFlag.updateMonthConclusionStatus) {
-          this.reqFlag.updateMonthConclusionStatus = false
-          updateMonthConclusionStatus(row.id, submitStatus).then(() => {
-            row.submitStatus = submitStatus
-            this.reqFlag.updateMonthConclusionStatus = true
+        let evaStatus = 2
+        if (this.reqFlag.submitEvaData) {
+          this.reqFlag.submitEvaData = false
+          submitEvaData(row.id, row.managerRateStar, row.managerEva, evaStatus).then(() => {
+            row.evaStatus = 2
             this.$common.toast('暂存成功', 'success', false)
-          }).catch(() => {
-            this.reqFlag.updateMonthConclusionStatus = true
-            this.$common.toast('暂存失败', 'error', false)
+            this.reqFlag.submitEvaData = true
+          }).catch(submitEvaDataErr => {
+            let submitYear = this.$moment(this.formData.title).year()
+            let submitMonth = this.$moment(this.formData.title).month() + 1
+            this.getAndFillConclusionData(this.allUsers, submitYear, submitMonth)
+            this.$common.toast('暂存失败' + submitEvaDataErr, 'error', false)
+            this.reqFlag.submitEvaData = true
           })
         }
       },
@@ -368,18 +439,16 @@
       handlePreYear () {
         this.formData.title = this.$moment(this.formData.title).subtract(1, 'months').format('YYYY-MM')
         this.setMonthCookie(this.formData.title, 7)
-        this.handelDateChange()
+        this.handleDateChange()
       },
       // 下一年
       handleNextYear () {
         this.formData.title = this.$moment(this.formData.title).add(1, 'months').format('YYYY-MM')
         this.setMonthCookie(this.formData.title, 7)
-        this.handelDateChange()
+        this.handleDateChange()
       },
-      // 申报月份变化
-      handelDateChange () {
-        let submitYear = this.$moment(this.formData.title).year()
-        let submitMonth = this.$moment(this.formData.title).month() + 1
+      // 获取并填充表格数据
+      getAndFillConclusionData (users, submitYear, submitMonth) {
         if (this.reqFlag.getAllUsersConclusion) {
           this.reqFlag.getAllUsersConclusion = false
           this.getAllUsersConclusion(this.allUsers, submitYear, submitMonth).then(getAllUsersConclusionRes => {
@@ -392,13 +461,11 @@
           })
         }
       },
-      // 管理者评价变化
-      handleEvaStarChange (row) {
-        if (row.getEvaStar !== 1 && row.submitStatus === 1) {
-          row.getWorkTime = this.defaultGetWorkTime + (row.getEvaStar - 1) * 2
-        } else {
-          row.getWorkTime = this.defaultGetWorkTime
-        }
+      // 申报月份变化
+      handleDateChange () {
+        let submitYear = this.$moment(this.formData.title).year()
+        let submitMonth = this.$moment(this.formData.title).month() + 1
+        this.getAndFillConclusionData(this.allUsers, submitYear, submitMonth)
       },
       // 设置cookie
       setCookie (showTable, exdays) {
@@ -430,10 +497,145 @@
           }
         }
       },
-      // 标准表格显示开关
-      handleSwitchChange () {
-        this.setCookie(this.showFlag.descTableShow, 7)
-        this.refreshTableSize()
+      // 子对话框保存按钮
+      handleSubmitEvaData (childData) {
+        let evaStatus = 1
+        // ============================管理者评价数据提交至月总结数据库==========================
+        submitEvaData(childData.id, childData.managerRateStar, childData.managerEva, evaStatus).then(() => {
+          // ==================================新增项目==================================================
+          if (this.workTimeListId === null) { // 管理者首次提交评价
+            let isFilled = 1
+            let parentID = 4
+            let projectLevel = 1
+            let projectName = this.conclusionTitle
+            let userId = this.submitter
+            let tableData = [{
+              avaiableWorkTime: conclusionManagerEvaStarToWorkTime(childData.managerRateStar),
+              kValue: 1,
+              projectManagerID: this.submitter,
+              projectTypeID: 74,
+              workTime: conclusionManagerEvaStarToWorkTime(childData.managerRateStar),
+              workType: '个人月总结'
+            }]
+            addNewProject(isFilled, parentID, projectLevel, projectName, userId, tableData).then(addNewProjectRes => {
+              // =========================================插入工时列表===========================================================
+              let aplID = addNewProjectRes[0].aplID
+              let apdID = addNewProjectRes[0].insertID
+              let submitType = 'insert'
+              let submitDate = this.formData.title
+              let applyType = 'fact'
+              let data = []
+              let projectID = null
+              let obj = {
+                projectTypeID: 74,
+                baseWorkTime: conclusionManagerEvaStarToWorkTime(childData.managerRateStar),
+                defaultKValue: 1,
+                dynamicKValue: 1,
+                defaultCofficient: 1,
+                workTimeAssign: [{
+                  id: userId,
+                  applyRole: '组织者',
+                  assignWorkTime: conclusionManagerEvaStarToWorkTime(childData.managerRateStar)
+                }],
+                submitComments: null,
+                avaiableWorkTime: 1,
+                isConference: 0,
+                defaultAssignWorkTime: conclusionManagerEvaStarToWorkTime(childData.managerRateStar),
+                applyProcess: 100,
+                planProcess: 100,
+                apdID: apdID,
+                aplID: aplID,
+                lastProcess: 0
+              }
+              data.push(obj)
+              workTimeListInsert(projectID, submitType, submitDate, applyType, userId, data).then((workTimeListInsertRes) => {
+                // ========================================总结表中更新工时列表ID================================================
+                updateWorkTimeListIdOfConclusion(childData.id, workTimeListInsertRes.insertID).then(() => {
+                  // =============================================将月总结工时条目置为已审核状态=====================================
+                  let reviewer = this.$store.state.userInfo.id
+                  let reviewKValue = 1
+                  let reviewCofficient = 1
+                  let reviewStatus = 1
+                  updateWorkTimeListReviewStatus(workTimeListInsertRes.insertID, reviewKValue,
+                    reviewCofficient, reviewStatus, reviewer).then(() => {
+                    // ================================将项目重置为已完成状态============================
+                    setProjectFinish(aplID).then(() => {
+                      let submitYear = this.$moment(this.formData.title).year()
+                      let submitMonth = this.$moment(this.formData.title).month() + 1
+                      this.getAndFillConclusionData(this.allUsers, submitYear, submitMonth)
+                      this.$common.toast('提交成功', 'success', false)
+                      this.reqFlag.submitEvaData = true
+                    }).catch(setProjectFinishErr => {
+                      this.reqFlag.submitEvaData = true
+                      this.$common.toast('提交失败 ' + setProjectFinishErr, 'error', true)
+                    })
+                  }).catch(updateWorkTimeListReviewStatusErr => {
+                    this.reqFlag.submitEvaData = true
+                    this.$common.toast('提交失败 ' + updateWorkTimeListReviewStatusErr, 'error', true)
+                  })
+                }).catch(updateWorkTimeListIdOfConclusionErr => {
+                  this.reqFlag.submitEvaData = true
+                  this.$common.toast('提交失败 ' + updateWorkTimeListIdOfConclusionErr, 'error', true)
+                })
+              }).catch(workTimeListInsertErr => {
+                this.reqFlag.submitEvaData = true
+                this.$common.toast('提交失败 ' + workTimeListInsertErr, 'error', true)
+              })
+            })
+          } else {
+            // ========================================管理者更新评价=================================
+            let submitType = 'update'
+            let projectID = this.workTimeListId
+            let userId = this.submitter
+            let data = []
+            let submitDate = this.formData.title
+            let applyType = 'fact'
+            let obj = {
+              projectTypeID: 74,
+              baseWorkTime: conclusionManagerEvaStarToWorkTime(childData.managerRateStar),
+              defaultKValue: 1,
+              dynamicKValue: 1,
+              defaultCofficient: 1,
+              workTimeAssign: [{
+                id: userId,
+                applyRole: '组织者',
+                assignWorkTime: conclusionManagerEvaStarToWorkTime(childData.managerRateStar)
+              }],
+              submitComments: null,
+              workTimeAssignInsertID: this.workTimeAssignInsertID,
+              avaiableWorkTime: 1,
+              isConference: 0,
+              defaultAssignWorkTime: conclusionManagerEvaStarToWorkTime(childData.managerRateStar),
+              applyProcess: 100,
+              planProcess: 100,
+              lastProcess: 0,
+              applyBaseWorkTime: conclusionManagerEvaStarToWorkTime(childData.managerRateStar)
+            }
+            data.push(obj)
+            workTimeListInsert(projectID, submitType, submitDate, applyType, userId, data).then((workTimeListInsertRes) => {
+              let reviewer = this.$store.state.userInfo.id
+              let reviewKValue = 1
+              let reviewCofficient = 1
+              let reviewStatus = 1
+              updateWorkTimeListReviewStatus(this.workTimeListId, reviewKValue,
+                reviewCofficient, reviewStatus, reviewer).then(() => {
+                let submitYear = this.$moment(this.formData.title).year()
+                let submitMonth = this.$moment(this.formData.title).month() + 1
+                this.getAndFillConclusionData(this.allUsers, submitYear, submitMonth)
+                this.$common.toast('提交成功', 'success', false)
+                this.reqFlag.submitEvaData = true
+              }).catch(updateWorkTimeListReviewStatusErr => {
+                this.reqFlag.submitEvaData = true
+                this.$common.toast('提交失败 ' + updateWorkTimeListReviewStatusErr, 'error', true)
+              })
+            })
+          }
+        }).catch(submitEvaDataErr => {
+          let submitYear = this.$moment(this.formData.title).year()
+          let submitMonth = this.$moment(this.formData.title).month() + 1
+          this.getAndFillConclusionData(this.allUsers, submitYear, submitMonth)
+          this.$common.toast('保存失败' + submitEvaDataErr, 'error', false)
+        })
       }
     },
     filters: {
@@ -477,16 +679,18 @@
             return '错误'
         }
       },
-      manageRateStatusTextFilter (status) {
-        switch (status) {
-          case 1:
-            return '月总结'
-          case 2:
-            return '年度总结'
-          case 3:
-            return '年中总结'
-          default:
-            return '错误'
+      evaStatusFilter (status) {
+        if (status === 1) {
+          return 'success'
+        } else {
+          return 'danger'
+        }
+      },
+      evaStatusTextFilter (status) {
+        if (status === 1) {
+          return '已评价'
+        } else {
+          return '未评价'
         }
       }
     },
@@ -506,7 +710,7 @@
 
 <style lang="scss" scoped>
   .dialogDiv {
-    height: 350px;
+    height: 850px;
     overflow: auto;
   }
 </style>

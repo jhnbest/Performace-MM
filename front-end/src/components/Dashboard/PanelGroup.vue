@@ -253,8 +253,6 @@ export default {
                       let finalResultFindResult = performanceScoreResult.find(finalResultItem => {
                         return finalResultItem.id === this.$store.state.userInfo.id
                       })
-                      console.log('finalResultFindResult')
-                      console.log(finalResultFindResult)
                       if (finalResultFindResult) {
                         this.quantitativeRank = finalResultFindResult.quantitativeRank
                         this.quantitativeScore = finalResultFindResult.quantitativeScore

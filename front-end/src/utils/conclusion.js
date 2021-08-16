@@ -5,8 +5,11 @@ import {
   urlGetConclusionDataById,
   urlUpdateMonthConclusionData,
   urlUpdateMonthConclusionStatus,
-  urlGetAllUsersMonthConclusionData
+  urlGetAllUsersMonthConclusionData,
+  urlSubmitEvaData,
+  urlUpdateWorkTimeListIdOfConclusion
 } from '../config/interface'
+import { conclusionManagerEvaStarToWorkTime } from '@/utils/common'
 
 // 获取月总结概览信息
 export function getCurMonthConclusionOverviewData (submitMonth, submitYear, submitter) {
@@ -111,6 +114,49 @@ export function getConclusionDataById (id) {
   const url = urlGetConclusionDataById
   let params = {
     id: id
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(res => {
+      if (res.code === 1) {
+        resolve(res)
+      } else {
+        reject(res)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
+// 提交评价数据
+export function submitEvaData (id, managerRateStar, managerEva, evaStatus) {
+  const url = urlSubmitEvaData
+  let params = {
+    id: id,
+    managerRateStar: managerRateStar,
+    getWorkTime: conclusionManagerEvaStarToWorkTime(managerRateStar),
+    managerEva: managerEva,
+    evaStatus: evaStatus
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(res => {
+      if (res.code === 1) {
+        resolve(res)
+      } else {
+        reject(res)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
+// 更新总结对应的工时ID
+export function updateWorkTimeListIdOfConclusion (conclusionId, workTimeListId) {
+  const url = urlUpdateWorkTimeListIdOfConclusion
+  let params = {
+    workTimeListId: workTimeListId,
+    conclusionId: conclusionId
   }
   return new Promise(function (resolve, reject) {
     http(url, params).then(res => {

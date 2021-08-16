@@ -54,6 +54,9 @@ router.post(api.getIsWorkTimeReviewFinish, performance.getIsWorkTimeReviewFinish
 router.post(api.getCurApplyAbleMonth, performance.getCurApplyAbleMonth)
 router.post(api.submitProjectWorkTimeApply, performance.submitProjectWorkTimeApply)
 router.post(api.repairErrorData3, performance.repairErrorData3)
+router.post(api.updateWorkTimeListReviewStatus, performance.updateWorkTimeListReviewStatus)
+router.post(api.getWorkTimeAssignInfo, performance.getWorkTimeAssignInfo)
+router.post(api.getWorkTimeListInfo, performance.getWorkTimeListInfo)
 
 // workStation-个人工作台
 router.post(api.getAssignProjectList, workStation.getAssignProjectList)
@@ -83,6 +86,7 @@ router.post(api.getUnFilledProjectList, workStation.getUnFilledProjectList)
 router.post(api.projectDetailIsApplyWorkTime, workStation.projectDetailIsApplyWorkTime)
 router.post(api.repairErrorData, workStation.repairErrorData)
 router.post(api.repairErrorData2, workStation.repairErrorData2)
+router.post(api.setProjectFinish, workStation.setProjectFinish)
 
 // 互评模块
 router.post(api.getUserRates, mutualRates.getUserRates)
@@ -99,5 +103,7 @@ router.post(api.getCurMonthConclusionOverviewData, conclusion.getCurMonthConclus
 router.post(api.submitMonthConclusionData, conclusion.submitMonthConclusionData)
 router.post(api.updateMonthConclusionData, conclusion.updateMonthConclusionData)
 router.post(api.updateMonthConclusionStatus, conclusion.updateMonthConclusionStatus)
+router.post(api.submitEvaData, conclusion.submitEvaData)
+router.post(api.updateWorkTimeListIdOfConclusion, conclusion.updateWorkTimeListIdOfConclusion)
 
 module.exports = router;

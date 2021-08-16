@@ -136,8 +136,6 @@ function workTimeInsertOP(params, i, operate) {
         let avaiableWorkTime = params.data[i].avaiableWorkTime
         let applyProcess = params.data[i].applyProcess
         let lastProcess = params.data[i].lastProcess
-        let apdID = params.data[i].apdID
-        let aplID = params.data[i].aplID
         let monthID = params.data[i].monthID
         let applyType = params.applyType
         let applyBaseWorkTime = params.data[i].baseWorkTime
@@ -151,6 +149,8 @@ function workTimeInsertOP(params, i, operate) {
         }
         let submitComments = params.data[i].submitComments
         if (params.submitType === 'insert') {  //新增
+            let apdID = params.data[i].apdID
+            let aplID = params.data[i].aplID
             sql = $sql.performance.addProject
             arrayParams = [submitID, projectTypeID, applyKValue, reviewKValue, applyCofficient, reviewCofficient, submitTime,
                 updateTime, applyMonth, submitStatus, submitComments, avaiableWorkTime, applyProcess, apdID, aplID, monthID,
@@ -217,7 +217,7 @@ async function workTimeInsert(sendData, res, operate) {
                 return $http.writeJson(res, {code: 2, message: '添加协作记录失败'})
             }
             if (i === sendData.data.length - 1 && j === sendData.data[i].workTimeAssign.length - 1) {
-                // 更新的工时分配信息小于修改前处理
+                // 更新的工时分配信息小于修改前
                 if (sendData.submitType === 'update') {
                     if (sendData.data[i].workTimeAssign.length < sendData.data[i].workTimeAssignInsertID.length) {  //更新的工时分配信息条数小于修改前，删除多余的条目
                         for (let k = 0; k < sendData.data[i].workTimeAssignInsertID.length - sendData.data[i].workTimeAssign.length; k++) {
@@ -225,7 +225,8 @@ async function workTimeInsert(sendData, res, operate) {
                         }
                     }
                 }
-                return $http.writeJson(res, {code: 1, message: '提交成功'})
+                let result = {insertID: insertID}
+                return $http.writeJson(res, {code: 1, data: result,message: '提交成功'})
             }
         }
     }
@@ -295,42 +296,6 @@ function projectTypeRecursion(params) {
         }
     })
 }
-
-// function projectTypeRecursionOP (sql, arrayParams, params, i) {
-//     console.log('++++++++++' + i)
-//     return new Promise(function (resolve, reject) {
-//         $http.connPool(sql, arrayParams, (err, result) => {
-//             if (err) {
-//                 return $http.writeJson(res, {code:-2, message:'失败'})
-//             } else {
-//                 console.log('-=-=-=-=-=' + i)
-//                 result = JSON.stringify(result)
-//                 result = JSON.parse(result)
-//                 console.log(result)
-//                 if (result.length !== 0) {
-//                     params[i].children = result
-//                     resolve(result)
-//                 }
-//             }
-//         })
-//     })
-// }
-//
-// async function projectTypeRecursion(params) {
-//     let sql = $sql.performance.selectProjectType
-//     for (let i = 0; i < params.length; i++) {
-//         console.log('-------' + i)
-//         console.log(params)
-//         let arrayParams = [params[i].projectTypeID]
-//         projectTypeRecursionOP(sql, arrayParams, params, i).then(res => {
-//             console.log('0000000000000000000' + ' i:' + i)
-//             projectTypeRecursion(res)
-//             console.log('11111111111111111111' + ' i:' + i)
-//         })
-//     }
-//     console.log('222222222222222222222')
-//     console.log(params)
-// }
 
 function updateWorkTimeAssign(data) {
     return new Promise(function (resolve, reject) {
@@ -521,7 +486,11 @@ function setWorkTimeListPass(sql, arrayParams) {
     })
 }
 
-function updateProjectProcess(data, monthProcessExist) {
+function updateProjectProcess(data, monthProcessExistParam) {
+    let monthProcessExist = null
+    if (monthProcessExistParam) {
+        monthProcessExist = monthProcessExistParam[0]
+    }
     return new Promise(function (resolve, reject) {
         let param = {}
         if (!monthProcessExist) {
@@ -547,10 +516,10 @@ function updateProjectProcess(data, monthProcessExist) {
                 December: null,
             }
         } else {
+            monthProcessExist.kValue = data.reviewKValue
+            monthProcessExist.coefficient = data.reviewCofficient
+            monthProcessExist.applyProcess = data.applyProcess
             param = monthProcessExist
-            param.kValue = data.reviewKValue
-            param.coefficient = data.reviewCofficient
-            param.applyProcess = data.applyProcess
         }
         param[data.applyMonthString] = data.applyProcess
         $workStation.saveProcess(param).then(res0 => {
@@ -613,8 +582,6 @@ function deleteExistWorkTimeSubmit(workTimeSubmitData) {
     let promises = []
     let count = 0
     return new Promise(function (resolve, reject) {
-        console.log('workTimeSubmitData')
-        console.log(workTimeSubmitData)
         for (let workTimeSubmitDataItem of workTimeSubmitData) {
             if (workTimeSubmitDataItem.isApplyWorkTime > 0) {
                 for (let workTimeSubmitDataItemID of workTimeSubmitDataItem.id) {
@@ -950,7 +917,7 @@ const performance = {
             let data = req.body
             let sql = null
             let arrayParams = []
-            if (data.reviewStatus === 1) {
+            if (data.reviewStatus === 1) { // 审核通过
                 if (data.monthID === null) {  // 月份进展无记录时
                     updateProjectProcess(data, null).then(res0 => {
                         sql = $sql.performance.submitReviewPass
@@ -972,7 +939,7 @@ const performance = {
                         })
                     })
                 }
-            } else {
+            } else { // 撤回或者驳回
                 sql = $sql.performance.submitReviewRejectOrWithdraw
                 arrayParams = [data.reviewKValue, data.reviewCofficient, data.reviewStatus, curTime, data.reviewComments, data.reviewer,
                     data.id]
@@ -1108,6 +1075,41 @@ const performance = {
             })
         }).catch(RCPDDatabaseErr => {
             return $http.writeJson(res, { code: -2, data: RCPDDatabaseErr, message: 'error' })
+        })
+    },
+    // 更新工时条目审核状态
+    updateWorkTimeListReviewStatus (req, res) {
+        let sendData = req.body
+        let sql = $sql.performance.updateWorkTimeListReviewStatus
+        let reviewTime = $time.formatTime()
+        let arrayParams = [sendData.reviewKValue, sendData.reviewCofficient, sendData.reviewer, reviewTime,
+            sendData.reviewStatus, sendData.id, sendData.id]
+        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+            return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
+        }).catch(RCPDDatabaseErr => {
+            return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+        })
+    },
+    // 获取工时分配信息
+    getWorkTimeAssignInfo (req, res) {
+        let sendData = req.body
+        let sql = $sql.performance.getWorkTimeAssignInfo
+        let arrayParams = [sendData.workTimeListId]
+        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+            return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
+        }).catch(RCPDDatabaseErr => {
+            return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+        })
+    },
+    // 获取工时分配信息
+    getWorkTimeListInfo (req, res) {
+        let sendData = req.body
+        let sql = $sql.performance.getWorkTimeListInfo
+        let arrayParams = [sendData.workTimeListId]
+        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+            return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
+        }).catch(RCPDDatabaseErr => {
+            return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
         })
     }
 }

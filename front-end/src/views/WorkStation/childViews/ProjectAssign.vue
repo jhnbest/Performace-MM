@@ -612,7 +612,6 @@
                         item.id = ++it.id
                       }
                       it.tableData = data
-                      console.log(it.tableData)
                     }
                   })
               }
@@ -823,7 +822,6 @@
             this.formData.yearNum -= 1
             this.getAssignProjectDetail(this.checkAssignProjectID)
           }
-          console.log(this.formData.yearNum)
         },
         // 下一年度进展
         handleAddYear () {
@@ -915,7 +913,6 @@
         }
       },
       created () {
-        console.log('ProjectAssign created!')
         this.init()
       },
       mounted () {

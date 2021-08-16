@@ -307,8 +307,6 @@
               if (res.code === 1) {
                 let data = res.data
                 let reviewTable = []
-                console.log('data.list')
-                console.log(data.list)
                 for (let item of data.list) {
                   item.tableData = []
                   if (item.reviewKValue === null) {
@@ -387,30 +385,34 @@
           let applyYear = this.$moment(row.applyMonth).year()
           let applyMonth = this.$moment(row.applyMonth).month()
           let applyMonthString = this.$common.MonthToString(String(applyMonth + 1))
-          let params = {
-            id: row.id,
-            apdID: row.apdID,
-            aplID: row.aplID,
-            monthID: row.monthID,
-            applyMonthString: applyMonthString,
-            applyProcess: row.applyProcess,
-            applyYear: applyYear,
-            applyMonth: applyMonth,
-            reviewCofficient: row.reviewCofficient,
-            reviewComments: row.reviewComments,
-            reviewKValue: row.reviewKValue,
-            reviewStatus: 1,
-            reviewer: this.$store.state.userInfo.id
-          }
-          this.$http(url, params).then(res => {
-            if (res.code === 1) {
-              this.getProjectList(this.info)
-              this.$emit('reviewPass')
-              this.$common.toast('通过成功', 'success', false)
-            } else {
-              this.$common.toast('失败', 'error', false)
+          if (row.id !== null) {
+            let params = {
+              id: row.id,
+              apdID: row.apdID,
+              aplID: row.aplID,
+              monthID: row.monthID,
+              applyMonthString: applyMonthString,
+              applyProcess: row.applyProcess,
+              applyYear: applyYear,
+              applyMonth: applyMonth,
+              reviewCofficient: row.reviewCofficient,
+              reviewComments: row.reviewComments,
+              reviewKValue: row.reviewKValue,
+              reviewStatus: 1,
+              reviewer: this.$store.state.userInfo.id
             }
-          })
+            this.$http(url, params).then(res => {
+              if (res.code === 1) {
+                this.getProjectList(this.info)
+                this.$emit('reviewPass')
+                this.$common.toast('通过成功', 'success', false)
+              } else {
+                this.$common.toast('失败', 'error', false)
+              }
+            })
+          } else {
+            this.$common.toast('工時id错误', 'error', true)
+          }
         } else {
           this.$common.toast('请先审核工时分配', 'error', true)
         }

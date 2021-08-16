@@ -76,6 +76,32 @@ const conclusion = {
             return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
         })
     },
+    // 提交评价数据
+    submitEvaData (req, res) {
+        let sendData = req.body
+        let sql = $sql.conclusion.submitEvaData
+        let evaTime = $time.formatTime()
+        let arrayParams = [sendData.managerRateStar, sendData.getWorkTime, sendData.managerEva, evaTime,
+            sendData.evaStatus, sendData.id]
+
+        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+            return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
+        }).catch(RCPDDatabaseErr => {
+            return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+        })
+    },
+    // 更新总结对应的工时ID
+    updateWorkTimeListIdOfConclusion (req, res) {
+        let sendData = req.body
+        let sql = $sql.conclusion.updateWorkTimeListIdOfConclusion
+        let arrayParams = [sendData.workTimeListId, sendData.conclusionId]
+
+        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+            return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
+        }).catch(RCPDDatabaseErr => {
+            return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+        })
+    }
 }
 
 module.exports = conclusion

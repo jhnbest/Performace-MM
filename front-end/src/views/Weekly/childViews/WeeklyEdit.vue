@@ -105,7 +105,6 @@ export default {
   },
   created () {
     this.id = this.$route.query.id
-    console.log('this.id==' + this.id)
     this.getUserDetail()
   },
   methods: {

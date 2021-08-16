@@ -126,7 +126,11 @@
               :height="tableHeight"
               ref="rateTable"
               highlight-current-row>
-      <el-table-column label="姓名" align="center" prop="ratedName" min-width="50"></el-table-column>
+      <el-table-column label="姓名" align="center" min-width="50">
+        <template slot-scope="scope">
+          <span class="link-type" @click="handleClickRateName(scope.row)">{{scope.row.ratedName}}</span>
+        </template>
+      </el-table-column>
       <el-table-column v-if="$store.state.userInfo.id === 26" label="定量评价" align="center">
         <el-table-column v-if="$store.state.userInfo.id === 26" label="定量得分" align="center" prop="quantitativeScore" width="57"></el-table-column>
         <el-table-column v-if="$store.state.userInfo.id === 26" label="工时数" align="center" prop="totalWorkTime" width="57"></el-table-column>
@@ -206,6 +210,15 @@
     </el-table>
     <br>
     <br>
+    <!--    月总结对话框-->
+    <month-conclusion-table-check v-if="conclusionDialog"
+                                  :cur-conclusion="curConclusion"
+                                  :next-plan="nextPlan"
+                                  :cur-advice="curAdvice"
+                                  :conclusion-title="conclusionTitle"
+                                  :manager-eva="managerEva"
+                                  :check-user-id="selectPersionID"
+                                  @close="conclusionDialog = false"></month-conclusion-table-check>
   </div>
 </div>
 </template>
@@ -227,6 +240,8 @@
     urlGetCurApplyAbleMonth,
     handleFillMul } from '@/config/interface'
   import CountTo from 'vue-count-to'
+  import monthConclusionTableCheck from '@/views/monthConclusion/childViews/monthConclusionTableCheck'
+  import { getCurMonthConclusionOverviewData } from '@/utils/conclusion'
   export default {
     data () {
       return {
@@ -467,7 +482,14 @@
         multualEvaData: [],
         quantativeData: [],
         isPerformancePublish: false,
-        performanceIsPublishInfo: null
+        performanceIsPublishInfo: null,
+        conclusionDialog: false,
+        conclusionTitle: null,
+        curConclusion: null,
+        nextPlan: null,
+        curAdvice: null,
+        managerEva: null,
+        selectPersionID: null
       }
     },
     methods: {
@@ -488,8 +510,6 @@
             _this.genRateTableData(res1, res2)
             if (this.$store.state.userInfo.id === 26) {
               this.getPerformanceIsPublish().then(getPerformanceIsPublishRes => {
-                console.log('this.performanceIsPublishInfo')
-                console.log(this.performanceIsPublishInfo)
                 this.performanceIsPublishInfo = getPerformanceIsPublishRes
                 if (getPerformanceIsPublishRes.length > 0) {
                   this.isPerformancePublish = getPerformanceIsPublishRes[0].flagValue === 1
@@ -2091,7 +2111,7 @@
       handleFillMul () {
         const url = handleFillMul
         let params = {
-          rateMonth: '2021-06',
+          rateMonth: '2021-07',
           users: this.users
         }
         this.$http(url, params).then(res => {
@@ -2099,10 +2119,32 @@
             this.$common.toast('填充成功', 'success', false)
           }
         })
+      },
+      // 点击姓名事件
+      handleClickRateName (row) {
+        this.selectPersionID = row.ratedPersion
+        let submitMonth = this.$moment(this.formData.title).month() + 1
+        let submitYear = this.$moment(this.formData.title).year()
+        getCurMonthConclusionOverviewData(submitMonth, submitYear, row.ratedPersion).then(getCurMonthConclusionOverviewDataRes => {
+          this.curConclusion = null
+          this.nextPlan = null
+          this.curAdvice = null
+          this.conclusionTitle = null
+          this.managerEva = null
+          if (getCurMonthConclusionOverviewDataRes.data) {
+            this.curConclusion = getCurMonthConclusionOverviewDataRes.data.curConclusion
+            this.nextPlan = getCurMonthConclusionOverviewDataRes.data.nextPlan
+            this.curAdvice = getCurMonthConclusionOverviewDataRes.data.curAdvice
+            this.conclusionTitle = getCurMonthConclusionOverviewDataRes.data.conclusionTitle
+            this.managerEva = getCurMonthConclusionOverviewDataRes.data.managerEva
+          }
+          this.conclusionDialog = true
+        })
       }
     },
     components: {
       // CountTo
+      monthConclusionTableCheck
     },
     created () {
       this.init()

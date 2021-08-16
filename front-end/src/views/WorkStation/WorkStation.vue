@@ -200,8 +200,6 @@
         let params = {}
         this.$http(url, params).then(res => {
           if (res.code === 1) {
-            console.log('res.data')
-            console.log(res.data)
             this.$common.toast('修复成功', 'success', false)
           }
         })
@@ -222,7 +220,6 @@
         let params = {}
         this.$http(url, params).then(res => {
           if (res.code === 1) {
-            console.log(res.data)
             this.$common.toast('修复成功', 'success', false)
           }
         })
@@ -391,7 +388,6 @@
       },
       // 项目类型选择事件
       handleSelectProjectType () {
-        console.log(this.selectProjectType)
       }
     },
     created () {

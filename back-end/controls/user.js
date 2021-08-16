@@ -377,8 +377,6 @@ const user = {
         return $http.writeJson(res, {code: -2, message: '失败'})
       } else {
         result = formatData(result)
-        console.log(result[0].password)
-        console.log(data.oldPassword)
         if (result[0].password === data.oldPassword) {
           return $http.writeJson(res, {code: 1, message: '旧密码正确'})
         } else {

@@ -457,7 +457,6 @@
             newProjectStage: newProjectStage,
             deleteApdID: deleteApdID
           }
-          console.log(params)
           this.$http(url, params).then(res => {
             if (res.code === 1) {
               this.$common.toast('保存成功', 'success', false)

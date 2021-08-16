@@ -174,7 +174,6 @@ function workTimeInsertOP(params, i, operate) {
 }
 
 async function workTimeInsert(data, res, operate) {
-    console.log('====performance.js workTimeInsert')
     let workTimeInsertResult = null
     let workTimeAssignResult = null
     for (let i = 0; i < data.data.length; i++) {
@@ -283,9 +282,7 @@ async function getFullProjectType(res, projectTypeID, resultData) {
         }
         await getFullProjectType(res, checkResult.result[0].projectParentID, resultData)
     } else {
-        console.log('end')
         resultData.projectTypeCheck.reverse()
-        console.log(resultData)
         return $http.writeJson(res, {code: 1, data: resultData, message: '成功'})
     }
 }
@@ -378,8 +375,6 @@ const performance = {
             defaultCofficient:[]
         }
         $http.userVerify(req, res, () => {
-            console.log('=== performance.js getWorkTime')
-            console.log(params)
             for (let i = 0; i < params.selectWorkTypeNum; i++) {
                 sql = $sql.performance.selectWorkTime
                 arrayParams = [params.subWorkType1Label[i], params.subWorkType3Label[i]]
@@ -387,7 +382,6 @@ const performance = {
                     if(err) {
                          return $http.writeJson(res, {code:-2, message:'失败'})
                     } else {
-                        console.log('-=-=-=-=-=')
                         result = JSON.stringify(result)
                         result = JSON.parse(result)
                         resultData.subWorkType3Label.push(params.subWorkType3Label[i])
@@ -396,7 +390,6 @@ const performance = {
                         resultData.defaultKValue.push(result[0].defaultKValue)
                         resultData.defaultCofficient.push(result[0].defaultCofficient)
                         if (i === params.selectWorkTypeNum - 1) {
-                            console.log(resultData)
                             return $http.writeJson(res, {code: 1, data: resultData, message: '获取列表成功'})
                         }
                     }
@@ -412,7 +405,6 @@ const performance = {
         let resultData = []
         let groupID = null
         $http.userVerify(req, res, () => {
-            console.log('=== performance.js getWorkTime')
             groupID = getGroupID(params.projectParentID)
             sql = $sql.performance.selectProjectTypeFirst
             arrayParams = [groupID]
@@ -422,7 +414,6 @@ const performance = {
                 } else {
                     result = JSON.stringify(result)
                     result = JSON.parse(result)
-                    console.log(result)
                     setTimeout(function () {
                         return $http.writeJson(res, {code: 1, data: result, message: '获取列表成功'})
                     }, 1000)
@@ -434,7 +425,6 @@ const performance = {
     /* 获取项目类型对应的工时详情 */
     getWorkTimeNew (req, res) {
         let data = req.body
-        console.log(data)
         let sql = ''
         let arrayParams = []
         let resultData = []
@@ -449,7 +439,6 @@ const performance = {
                         if (result) {
                             result = JSON.stringify(result)
                             result = JSON.parse(result)
-                            console.log(result)
                             let obj = {
                                 projectTypeID: result[0].projectTypeID,
                                 workTime: result[0].workTime,
@@ -469,21 +458,16 @@ const performance = {
     /* 新增工时申报 */
     workTimeSubmit (req, res) {
         let data = req.body
-        console.log('===performace.js workTimeSubmit')
-        console.log(data)
         workTimeInsert(data, res, '1')
     },
     /* 暂存工时申报 */
     workTimeTemporary (req, res) {
         let data = req.body
-        console.log(data)
         workTimeInsert(data, res, '0')
     },
     /* 获取工时申报详情 */
     getProjectList (req, res) {
-        console.log('===performance.js getProjectList')
         let data = req.body
-        console.log(data)
         $http.userVerify(req, res, () => {
             let searchID = data.searchID
             let searchMon = data.searchMon
@@ -501,12 +485,9 @@ const performance = {
                 if (err) {
                     return $http.writeJson(res, {code:-2, message:'失败'})
                 } else {
-                    console.log(result)
                     let resultData = {}
                     resultData.totalCount = result[0][0]['totalCount']
                     resultData.list = formatData(result[1])
-                    console.log('===performance.js getProjectList')
-                    console.log(resultData)
                     return $http.writeJson(res, {code: 1, data: resultData, message: '获取工时申报成功'})
                 }
             })
@@ -514,9 +495,7 @@ const performance = {
     },
     /*获取工时分配信息*/
     getWorkAssign (req, res) {
-        console.log('===performance.js getWorkAssign')
         let data = req.body
-        console.log(data)
         $http.userVerify(req, res, () => {
             let checkID = data.projectID
             let sql = $sql.performance.getWorkAssign
@@ -527,7 +506,6 @@ const performance = {
                 } else {
 
                     result = formatData(result)
-                    console.log(result)
                     return $http.writeJson(res, {code: 1, data: result, message: '获取工时分配成功'})
                 }
             })
@@ -535,9 +513,7 @@ const performance = {
     },
     /* 获取项目信息 */
     getProjectInfo (req, res) {
-        console.log('===performance.js getProjectInfo')
         let data = req.body
-        console.log(data)
         $http.userVerify(req, res, () => {
             let checkID = data.id
             let sqlGetProjectInfo = $sql.performance.getProjectInfo

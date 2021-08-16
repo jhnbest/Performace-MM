@@ -393,7 +393,6 @@
               let remarks = []
               let workTime = []
               for (let item of this.formData.workTypeTimeDetail) {
-                console.log(item)
                 selectSubW3Name.push(item.workType)
                 kValue.push(item.defaultKValue)
                 cofficient.push(item.defaultCofficient)
@@ -402,7 +401,6 @@
               }
               let cooperatePerson = []
               for (let item of this.formData.partTableData) {
-                console.log(item)
                 let obj = {
                   account: item.account,
                   workTime: item.workTime
@@ -432,7 +430,6 @@
                     this.$common.toast('添加成功', 'success', false)
                     this.onCancel(formData)
                   } else {
-                    console.log(res.code)
                     this.$common.toast('添加失败', 'success', false)
                     this.onCancel(formData)
                   }

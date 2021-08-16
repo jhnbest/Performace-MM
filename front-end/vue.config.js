@@ -1,7 +1,7 @@
-const path = require("path")
+const path = require('path')
 const webpack = require('webpack')
 
-function resolve(dir) {
+function resolve (dir) {
     return path.join(__dirname, dir)
 }
 module.exports = {
@@ -10,7 +10,7 @@ module.exports = {
     assetsDir: 'static',
     lintOnSave: true,
     productionSourceMap: false,
-    css:{
+    css: {
         extract: true,
         sourceMap: false,
         loaderOptions: {
@@ -20,10 +20,10 @@ module.exports = {
         },
         modules: false
     },
-    devServer:{
-        port:8002,
-        open:true,
-        https:false,
+    devServer: {
+        port: 8002,
+        open: true,
+        https: false,
         overlay: {
             warnings: true,
             errors: true
@@ -32,7 +32,7 @@ module.exports = {
             '/api': {
                 target: 'http://localhost:3002', // 接口域名
                 ws: true, // 是否启用websockets
-                changeOrigin: true, //开启代理：在本地会创建一个虚拟服务端，然后发送请求的数据，并同时接收请求的数据，这样服务端和服务端进行数据的交互就不会有跨域问题
+                changeOrigin: true, // 开启代理：在本地会创建一个虚拟服务端，然后发送请求的数据，并同时接收请求的数据，这样服务端和服务端进行数据的交互就不会有跨域问题
                 pathRewrite: {
                     '^/api': '' // 修改路径
                 }
@@ -41,7 +41,7 @@ module.exports = {
     },
     chainWebpack: config => {
       config.resolve.alias
-        .set("@", resolve("./src"))
+        .set('@', resolve('./src'))
       // set svg-sprite-loader
       config.module
         .rule('svg')
@@ -61,7 +61,7 @@ module.exports = {
     },
     configureWebpack: {
         performance: {
-            hints:false
+            hints: false
         }
     },
     // 构建时开启多进程处理 babel 编译
