@@ -157,8 +157,6 @@
       methods: {
         // 初始化
         init () {
-          console.log('this.checkUserId')
-          console.log(this.checkUserId)
           this.$nextTick(() => {
             this.conclusionDialog = !this.conclusionDialog
           })

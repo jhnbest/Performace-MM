@@ -469,6 +469,54 @@ function RCPDDatabase(sql, arrayParams) {
     })
 }
 
+function fGetProjectTypeList(projectType, isFinish) {
+    let sql = null
+    let arrayParams = [projectType]
+    if (isFinish === 0) { // 获取未完成项目
+        sql = $sql.workStation.getTypeProjectListUn
+    } else if (isFinish === 1) { // 获取已完成项目
+        sql = $sql.workStation.getTypeProjectListed
+    } else if (isFinish === -1) { // 获取所有项目
+        sql = $sql.workStation.getTypeProjectList
+    }
+    return new Promise(function (resolve, reject) {
+        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+            resolve(RCPDDatabaseRes)
+        }).catch(err => {
+            reject(err)
+        })
+    })
+}
+
+function getProjectStageByPID(project) {
+    let sql = $sql.workStation.getProjectStageByPID
+    let arrayParams = [project.id]
+    return new Promise(function (resolve, reject) {
+        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+            resolve(RCPDDatabaseRes)
+        }).catch(err => {
+            reject(err)
+        })
+    })
+}
+
+function getMonthProcessByProjectStageID(projectStageList, curApplyYear) {
+    let promise = []
+    let count = 0
+    return new Promise(function (resolve, reject) {
+        for (let projectStageListItem of projectStageList) {
+            let sql = $sql.workStation.getMonthProcessByProjectStageID
+            let arrayParams = [projectStageListItem.id, curApplyYear]
+            promise[count++] = RCPDDatabase(sql, arrayParams)
+        }
+        Promise.all(promise).then(result => {
+            resolve(result)
+        }).catch(err => {
+            reject(err)
+        })
+    })
+}
+
 const workStation = {
     // 获取指派任务列表
     getAssignProjectList (req, res) {
@@ -1078,7 +1126,48 @@ const workStation = {
         }).catch(RCPDDatabaseErr => {
             return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
         })
+    },
+    // 获取特定类型的项目列表
+    getTypeProjectList (req, res) {
+        let promises = []
+        let promises2 = []
+        let count = 0
+        let count2 = 0
+        let sendData = req.body
+        fGetProjectTypeList(sendData.projectType, sendData.isFinish).then(getProjectTypeListRes => { // get 项目列表
+            for (let getProjectTypeListItem of getProjectTypeListRes) {
+                promises[count++] = getProjectStageByPID(getProjectTypeListItem) // get 项目阶段
+            }
+            Promise.all(promises).then(getProjectStageByPIDRes => {
+                for (let getProjectStageByPIDResItem of getProjectStageByPIDRes) {
+                    promises2[count2++] = getMonthProcessByProjectStageID(getProjectStageByPIDResItem, sendData.curApplyYear) // get 项目阶段计划、实际进展
+                }
+                Promise.all(promises2).then(getMonthProcessByProjectStageIDRes => {
+                    // for (let i = 0; i < getMonthProcessByProjectStageIDRes.length; i++) {
+                    //     for (let j = 0; j < getMonthProcessByProjectStageIDRes[i].length; j++) {
+                    //         let obj = {}
+                    //         if (getMonthProcessByProjectStageIDRes[i][j].length === 0) {
+                    //             obj.projectName = getProjectTypeListRes[i].projectName
+                    //             obj.projectStageName = getProjectStageByPIDRes[i][j].projectStageName
+                    //             obj.totalProjectStageProcess = getProjectTypeListRes[i].process
+                    //             obj.apdID = getProjectStageByPIDRes[i][j].id
+                    //             obj.aplID = getProjectTypeListRes[i].id
+                    //             obj.type = 'none'
+                    //             getMonthProcessByProjectStageIDRes[i][j].push(obj)
+                    //         }
+                    //     }
+                    // }
+                    let result = {
+                        projectList: getProjectTypeListRes,
+                        projectStage: getProjectStageByPIDRes,
+                        monthProcess: getMonthProcessByProjectStageIDRes
+                    }
+                    return $http.writeJson(res, {code: 1, data: result, message: 'success'})
+                })
+            })
+        }).catch(getProjectListErr => {
+            return $http.writeJson(res, {code: -2, err: getProjectListErr, message: 'false'})
+        })
     }
 }
-
 module.exports = workStation

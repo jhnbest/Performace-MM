@@ -16,11 +16,12 @@
                 :lg="{span: 1, offset: 0}"
                 :xl="{span: 1, offset: 0, pull: 2}"
                 v-if="$store.state.userInfo.role !== '普通成员'
-                || $store.state.userInfo.id === 32
-                || $store.state.userInfo.id === 7
-                || $store.state.userInfo.id === 11
-                || $store.state.userInfo.id === 12
-                || $store.state.userInfo.id === 8">
+                || $store.state.userInfo.id === 32 // 赵帅
+                || $store.state.userInfo.id === 7 // 白工
+                || $store.state.userInfo.id === 11 // 郭工
+                || $store.state.userInfo.id === 12 // 顾总
+                || $store.state.userInfo.id === 8 // 陈迪
+                || $store.state.userInfo.id === 19">
           <el-button type="danger"
                      @click="handleProjectAssign"
                      size="medium">项目指派</el-button>
@@ -35,18 +36,16 @@
 <!--        </el-col>-->
       </el-row>
     </div>
-<!--    <el-button v-if="$store.state.userInfo.id === 15" @click="repairErrorData">修正按钮</el-button>-->
-<!--    <el-button v-if="$store.state.userInfo.id === 15" @click="repairErrorData2">修正按钮2</el-button>-->
-<!--    <el-button v-if="$store.state.userInfo.id === 15" @click="repairErrorData3">修正按钮3</el-button>-->
     <!-- 分割线 start -->
     <div class="hr-10" style="margin-top: 20px"></div>
     <!-- 分割线 end -->
     <div v-if="showFlag" style="margin-top: 20px;">
-      <el-tabs type="border-card" v-model="selectProjectType" stretch style="width: 99%;margin:auto">
-        <el-tab-pane
-          v-for="projectType in projectTypes"
-          :key="projectType.projectTypeID"
-          :name="String(projectType.projectTypeID)">
+      <div v-if="this.$store.state.userInfo.id !== 15">
+        <el-tabs type="border-card" v-model="selectProjectType" stretch style="width: 99%;margin:auto">
+          <el-tab-pane
+            v-for="projectType in projectTypes"
+            :key="projectType.projectTypeID"
+            :name="String(projectType.projectTypeID)">
             <span slot="label">
               <span style="font-weight: bolder;color: black;font-size: 15px;vertical-align: center;">{{ projectType.name }}</span>
               <el-badge v-if="projectType.count !== 0" :value="projectType.count" class="item"></el-badge>
@@ -54,57 +53,34 @@
             <POverview v-if="selectProjectType === String(projectType.projectTypeID)"
                        :fatherParams="{ projectTypeID: projectType.projectTypeID, searchType: projectType.searchType }"
                        @countFeedback="handleCountFeedback"/>
-        </el-tab-pane>
-      </el-tabs>
+          </el-tab-pane>
+        </el-tabs>
+      </div>
+      <div v-else>
+        <el-tabs type="border-card" v-model="selectProjectType" stretch style="width: 99%;margin:auto">
+          <el-tab-pane
+            v-for="projectTypeManager in projectTypesManager"
+            :key="projectTypeManager.projectTypeID"
+            :name="String(projectTypeManager.projectTypeID)">
+            <span slot="label">
+              <span style="font-weight: bolder;color: black;font-size: 18px;vertical-align: center;">{{ projectTypeManager.name }}</span>
+              <el-badge v-if="projectTypeManager.count !== 0" :value="projectTypeManager.count" class="item"></el-badge>
+            </span>
+            <POverviewMan v-if="selectProjectType === String(projectTypeManager.projectTypeID)"
+                       :fatherParams="{ projectTypeID: projectTypeManager.projectTypeID,
+                                        searchType: projectTypeManager.searchType }"
+                       @countFeedback="handleCountFeedback"/>
+          </el-tab-pane>
+        </el-tabs>
+      </div>
     </div>
-<!--    <el-button type="primary" @click="repairErrorData">测试按钮</el-button>-->
-    <!-- 分割线 end -->
-<!--    <div v-if="showFlag">-->
-<!--      <el-row>-->
-<!--        <el-col :xs="24" :sm="24" :lg="24" :xl="12">-->
-<!--          <h3 class="v-line-icon-red">基建类项目</h3>-->
-<!--          <TEST :fatherParams="JJData" @countFeedback="handleCountFeedback"/>-->
-<!--        </el-col>-->
-<!--        <el-col v-if="$store.state.userInfo.groupName === '通信组'" :xs="24" :sm="24" :lg="24" :xl="12">-->
-<!--          <h3 class="v-line-icon-green">基础平台类项目</h3>-->
-<!--          <TEST :fatherParams="JCPTTXData" @countFeedback="handleCountFeedback"/>-->
-<!--        </el-col>-->
-<!--        <el-col v-else :xs="24" :sm="24" :lg="24" :xl="12">-->
-<!--          <h3 class="v-line-icon-green">基础平台类项目</h3>-->
-<!--          <TEST :fatherParams="JCPTData" @countFeedback="handleCountFeedback"/>-->
-<!--        </el-col>-->
-<!--      </el-row>-->
-<!--    </div>-->
-<!--    <div v-if="showFlag">-->
-<!--      <el-row>-->
-<!--        <el-col :xs="24" :sm="24" :lg="24" :xl="12">-->
-<!--          <h3 class="v-line-icon-green">修缮类项目</h3>-->
-<!--          <TEST :fatherParams="XSData" @countFeedback="handleCountFeedback"/>-->
-<!--        </el-col>-->
-<!--        <el-col :xs="24" :sm="24" :lg="24" :xl="12">-->
-<!--          <h3 class="v-line-icon-blue">选型项目</h3>-->
-<!--          <TEST :fatherParams="XXData" @countFeedback="handleCountFeedback"/>-->
-<!--        </el-col>-->
-<!--      </el-row>-->
-<!--    </div>-->
-<!--    <div v-if="showFlag">-->
-<!--      <el-row>-->
-<!--        <el-col :xs="24" :sm="24" :lg="24" :xl="12">-->
-<!--          <h3 class="v-line-icon-yellow">其他标准项目</h3>-->
-<!--          <TEST :fatherParams="OtherStandData" @countFeedback="handleCountFeedbackOtherStand"/>-->
-<!--        </el-col>-->
-<!--        <el-col :xs="24" :sm="24" :lg="24" :xl="12">-->
-<!--          <h3 class="v-line-icon-purple">其他非标项目</h3>-->
-<!--          <TEST :fatherParams="OtherUnStandData" @countFeedback="handleCountFeedbackOtherUnStand"/>-->
-<!--        </el-col>-->
-<!--      </el-row>-->
-<!--    </div>-->
   </div>
 </template>
 
 <script>
   import POverview from '@/components/workStation/projectOverview.vue'
-  import { getUnFilledProjectList, repairErrorData, repairErrorData2, repairErrorData3 } from '@/config/interface'
+  import POverviewMan from '@/components/workStation/projectOverviewManager.vue'
+  import { getUnFilledProjectList } from '@/config/interface'
   export default {
     data () {
       return {
@@ -190,46 +166,34 @@
           name: '其他非标类',
           count: 0,
           searchType: 'unFilled'
+        }],
+        projectTypesManager: [{
+          projectTypeID: 173,
+          name: '基建类',
+          count: 0,
+          searchType: 'unFilled'
+        }, {
+          projectTypeID: 213,
+          name: '基础平台类',
+          count: 0,
+          searchType: 'unFilled'
+        }, {
+          projectTypeID: 249,
+          name: '修缮类',
+          count: 0,
+          searchType: 'unFilled'
         }]
       }
     },
     methods: {
-      // 修复错误数据
-      repairErrorData () {
-        const url = repairErrorData
-        let params = {}
-        this.$http(url, params).then(res => {
-          if (res.code === 1) {
-            this.$common.toast('修复成功', 'success', false)
-          }
-        })
-      },
-      // 修复错误数据2
-      repairErrorData2 () {
-        const url = repairErrorData2
-        let params = {}
-        this.$http(url, params).then(res => {
-          if (res.code === 1) {
-            this.$common.toast('修复成功', 'success', false)
-          }
-        })
-      },
-      // 修复错误数据3
-      repairErrorData3 () {
-        const url = repairErrorData3
-        let params = {}
-        this.$http(url, params).then(res => {
-          if (res.code === 1) {
-            this.$common.toast('修复成功', 'success', false)
-          }
-        })
-      },
       // 初始化
       init () {
-        this.unFilledTotalCount = 0
-        this.getUnFilledProjectList().then().catch(getUnFilledProjectListErr => {
-          this.$common.toast(getUnFilledProjectListErr, 'error', true)
-        })
+        if (this.$store.state.userInfo.id !== 15) {
+          this.unFilledTotalCount = 0
+          this.getUnFilledProjectList().then().catch(getUnFilledProjectListErr => {
+            this.$common.toast(getUnFilledProjectListErr, 'error', true)
+          })
+        }
       },
       // 获取当月未填报的项目列表
       getUnFilledProjectList () {
@@ -394,7 +358,8 @@
       this.init()
     },
     components: {
-      POverview
+      POverview,
+      POverviewMan
     },
       name: 'WorkStation.vue'
   }

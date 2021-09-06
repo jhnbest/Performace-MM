@@ -80,6 +80,7 @@ module.exports = {
     repairErrorData: path + '/workStation/repairErrorData', // 修复错误数据
     repairErrorData2: path + '/workStation/repairErrorData2', // 修复错误数据2
     setProjectFinish: path + '/workStation/setProjectFinish', // 将项目置为已完成状态
+    getTypeProjectList: path + '/workStation/getTypeProjectList', // 获取特定类型的项目列表
 
     // 互评模块
     getUserRates: path + '/mutualRates/getUserRates', // 获取互评信息

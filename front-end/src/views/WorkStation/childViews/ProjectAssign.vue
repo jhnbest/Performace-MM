@@ -4,7 +4,8 @@
   || $store.state.userInfo.id === 7
   || $store.state.userInfo.id === 11
   || $store.state.userInfo.id === 12
-  || $store.state.userInfo.id === 8">
+  || $store.state.userInfo.id === 8
+  || $store.state.userInfo.id === 19">
     <div class="main-search">
       <el-row>
         <el-col :span="4">

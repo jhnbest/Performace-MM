@@ -227,7 +227,23 @@ const sqlMap = {
         'on apd.aPLID = apl.id left join users u on apl.userID = u.id left join worktimelist wl on wl.apdID = apd.id where apd.id = ? ' +
         'and wl.applyMonth = "2021-01" and wl.applyType = "fact"',
     setProjectFinish: 'update assignprojectlist set process = 100.0 where id = ?; ' +
-        'update assignprojectdetail set process = 100.0 where aPLID = ?'
+        'update assignprojectdetail set process = 100.0 where aPLID = ?',
+    getTypeProjectList: 'select apl.*, users.name as assigner, u.name as projectManager' +
+        ' from assignprojectlist apl left join users on apl.assignerID = users.id ' +
+        'left join users u on apl.userID = u.id where ' +
+        'apl.projectType = ? and apl.obsoleteStatus != 1',
+    getTypeProjectListUn: 'select apl.*, users.name as assigner, u.name as projectManager' +
+        ' from assignprojectlist apl left join users on apl.assignerID = users.id ' +
+        'left join users u on apl.userID = u.id where ' +
+        "apl.projectType = ? and apl.process != 100.0 and apl.obsoleteStatus != 1",
+    getTypeProjectListed: 'select apl.*, users.name as assigner, u.name as projectManager' +
+        ' from assignprojectlist apl left join users on apl.assignerID = users.id left join users u on apl.userID = u.id ' +
+        'where apl.projectType = ? and apl.process == 100.0 and apl.obsoleteStatus != 1',
+    getProjectStageByPID: 'select * from assignprojectdetail where aPLID = ?',
+    getMonthProcessByProjectStageID: 'select m.*, apd.id as apdID, apd.projectStageName, apl.id as aplID, apl.projectName, ' +
+        'apl.process as totalProjectStageProcess, u.name as projectManager from monthprocess m left join assignprojectdetail apd ' +
+        'on m.aPDID = apd.id left join assignprojectlist apl on apd.aPLID = apl.id left join users u on apl.userID = u.id' +
+        ' where m.aPDID = ? and m.year = ?'
   },
   mutualRates: {
     getUserRates: 'select mr.*, u.name as ratedPersionName from mutualrate mr left join users u on ' +

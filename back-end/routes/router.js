@@ -87,6 +87,7 @@ router.post(api.projectDetailIsApplyWorkTime, workStation.projectDetailIsApplyWo
 router.post(api.repairErrorData, workStation.repairErrorData)
 router.post(api.repairErrorData2, workStation.repairErrorData2)
 router.post(api.setProjectFinish, workStation.setProjectFinish)
+router.post(api.getTypeProjectList, workStation.getTypeProjectList)
 
 // 互评模块
 router.post(api.getUserRates, mutualRates.getUserRates)

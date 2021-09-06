@@ -64,6 +64,7 @@
                 border
                 style="margin: auto;width: 99%"
                 size="mini"
+                :height="300"
                 :header-cell-style="{ backgroundColor: '#67d4f6', color: '#333'}">
         <el-table-column label="序号" align="center" type="index"></el-table-column>
         <el-table-column label="项目阶段" align="center">
@@ -178,7 +179,7 @@
         <el-button type="primary" size="mini" @click="addNewProjectStage" :disabled="projectIsFinish">新增项目阶段</el-button>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="handleSaveProjectStage">保存</el-button>
+        <el-button type="primary" size="medium" @click="handleSaveProjectStage">保存</el-button>
         <el-button @click="editProject = false" size="medium">取消</el-button>
       </span>
     </el-dialog>

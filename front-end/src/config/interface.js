@@ -73,6 +73,7 @@ export const projectDetailIsApplyWorkTime = '/workStation/projectDetailIsApplyWo
 export const repairErrorData = '/workStation/repairErrorData' // 修复错误数据
 export const repairErrorData2 = '/workStation/repairErrorData2' // 修复错误数据2
 export const urlSetProjectFinish = '/workStation/setProjectFinish' // 将项目置为已完成状态
+export const urlGetTypeProjectList = '/workStation/getTypeProjectList' // 获取特定类型的项目列表
 
 export const getUserRates = '/mutualRates/getUserRates' // 获取互评信息
 export const submitRatesResult = '/mutualRates/submitRatesResult' // 提交互评结果
