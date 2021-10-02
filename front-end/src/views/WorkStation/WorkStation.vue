@@ -2,7 +2,7 @@
   <div class="workStation-container">
     <div class="main-search">
       <el-row>
-        <el-col :span="6">
+        <el-col v-if="this.$store.state.userInfo.id !== 26" :span="6">
           <el-radio-group v-model="formData.selectType" @change="handleSelectTypeChange">
             <el-badge :value="this.unFilledTotalCount" class="item">
               <el-radio-button label="已完成"></el-radio-button>
@@ -40,7 +40,7 @@
     <div class="hr-10" style="margin-top: 20px"></div>
     <!-- 分割线 end -->
     <div v-if="showFlag" style="margin-top: 20px;">
-      <div v-if="this.$store.state.userInfo.id !== 15">
+      <div v-if="this.$store.state.userInfo.id !== 26">
         <el-tabs type="border-card" v-model="selectProjectType" stretch style="width: 99%;margin:auto">
           <el-tab-pane
             v-for="projectType in projectTypes"
@@ -188,11 +188,13 @@
     methods: {
       // 初始化
       init () {
-        if (this.$store.state.userInfo.id !== 15) {
+        if (this.$store.state.userInfo.id !== 26) {
           this.unFilledTotalCount = 0
           this.getUnFilledProjectList().then().catch(getUnFilledProjectListErr => {
             this.$common.toast(getUnFilledProjectListErr, 'error', true)
           })
+        } else {
+          this.selectProjectType = String(this.projectTypesManager[0].projectTypeID)
         }
       },
       // 获取当月未填报的项目列表

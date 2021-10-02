@@ -153,7 +153,8 @@
                                size="mini"
                                :min="0.1"
                                :step="0.1"
-                               style="width: 100%"></el-input-number>
+                               style="width: 100%"
+                               :disabled="scope.row.dynamicKValue === 0"></el-input-number>
             </template>
           </el-table-column>
           <el-table-column label="项目经理" align="center" prop="projectManager" width="100%"></el-table-column>
@@ -856,8 +857,12 @@
         },
         // 一键设置K值
         handleResetKValue () {
+          console.log('======this.tableData======')
+          console.log(this.tableData)
           for (let item of this.tableData) {
-            item.kValue = this.resetKValue
+            if (item.dynamicKValue !== 0) {
+              item.kValue = this.resetKValue
+            }
           }
         }
       },

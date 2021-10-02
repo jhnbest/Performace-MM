@@ -723,6 +723,7 @@
               })
             }
           }
+          let totalWorkTimeTmp = JSON.parse(JSON.stringify(totalWorkTimeCal))
           totalWorkTimeCal.sort(this.compare('totalWorkTime')) // 根据总工时排序
           let preWorkTime = -1
           let preRank = 1
@@ -748,6 +749,21 @@
       // 生成定量数据
       genQuantativeData (quantativeData) {
         let allQuantitativeScore = []
+        for (let item of this.users) {
+          let findItem = quantativeData.findIndex(quantativeDataItem => {
+            return quantativeDataItem.id === item.id
+          })
+          if (findItem === -1 && item.groupName !== '处经理') {
+            let obj = {
+              applyMonth: quantativeData[0].applyMonth,
+              groupID: item.groupID,
+              id: item.id,
+              name: item.name,
+              reviewWorkTime: 0
+            }
+            quantativeData.push(obj)
+          }
+        }
         let groupedWorkTimeList = this.groupedWorkTimeList(quantativeData) // 对数据按照小组进行分组
         // ---------计算小组内每个人的工时数、排名和得分---------------
         for (let item of groupedWorkTimeList) {
@@ -763,6 +779,7 @@
           if (allQuantitativeScoreFindResult) {
             item.quantitativeScore = allQuantitativeScoreFindResult.quantitativeScore
             item.quantitativeRank = allQuantitativeScoreFindResult.rank
+          } else {
           }
         }
         return allQuantitativeScore
@@ -1573,6 +1590,7 @@
               item.t5Star, item.t6Star)
           }
           this.rateTableData = JSON.parse(JSON.stringify(ratesTableTmp))
+          let tmp = JSON.parse(JSON.stringify(this.rateTableData))
           return ratesTableTmp
         }
       },
@@ -2111,7 +2129,7 @@
       handleFillMul () {
         const url = handleFillMul
         let params = {
-          rateMonth: '2021-07',
+          rateMonth: '2021-08',
           users: this.users
         }
         this.$http(url, params).then(res => {

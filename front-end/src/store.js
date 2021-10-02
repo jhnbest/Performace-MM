@@ -38,7 +38,14 @@ export default new Vuex.Store({
     monthStarNum: 2,
     quarterStarNum: 2,
     defaultConclusionGetWorkTime: 10, // 月总结默认获得工时
-    defaultConclusionEvaStar: 3 // 月总结默认评价星级
+    defaultConclusionEvaStar: 3, // 月总结默认评价星级
+    progressColors: [
+      { color: '#f56c6c', percentage: 20 },
+      { color: '#e6a23c', percentage: 40 },
+      { color: '#ffdd00', percentage: 60 },
+      { color: '#1989fa', percentage: 90 },
+      { color: '#00ffa6', percentage: 100 }
+    ]
   },
   mutations: {
     [types.SAVE_USERINFO] (state, data) {

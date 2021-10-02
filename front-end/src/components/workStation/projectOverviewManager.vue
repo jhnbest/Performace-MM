@@ -3,15 +3,11 @@
       <el-table row-key="id"
                 :data="tableData"
                 size="medium"
-                style="margin: auto;width: 99%"
-                v-loading="!reqFlag.getProjectList">
+                style="margin: auto"
+                v-loading="!reqFlag.getProjectList" >
         <el-table-column type="index" label="序号" width="60" align="center"></el-table-column>
-        <el-table-column label="项目名称" align="center" show-overflow-tooltip>
-          <template slot-scope="scope">
-            <span class="link-type" @click="handleClickProject(scope.row)">{{scope.row.projectName}}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="项目级别" align="center" show-overflow-tooltip>
+        <el-table-column label="项目名称" align="center" prop="projectName" show-overflow-tooltip width="200"></el-table-column>
+        <el-table-column label="项目级别" align="center">
           <template slot-scope="scope">
             <el-tag :type="scope.row.projectLevel | projectLevelColorFilter">
               <span>{{scope.row.projectLevel | projectLevelStringFilter}}</span>
@@ -19,12 +15,24 @@
           </template>
         </el-table-column>
         <el-table-column label="项目经理" align="center" prop="projectManager" width="100"></el-table-column>
-        <el-table-column label="状态" align="center" prop="projectStatus">
-        </el-table-column>
+<!--        <el-table-column label="状态" align="center" prop="projectStatus">-->
+<!--        </el-table-column>-->
         <el-table-column label="当前阶段" align="center" prop="curProjectStage"></el-table-column>
         <el-table-column label="计划阶段" align="center" prop="planProjectStage"></el-table-column>
-        <el-table-column label="当前阶段进度" align="center" prop="curProjectStageProcess"></el-table-column>
-        <el-table-column label="总进度" align="center" prop="totalProjectStageProcess"></el-table-column>
+        <el-table-column label="当前阶段进度" align="center">
+          <template slot-scope="scope">
+            <el-progress type="dashboard"
+                         :percentage="scope.row.curProjectStageProcess === null? 0 : scope.row.curProjectStageProcess"
+                         :color="progressColors" :width="80"></el-progress>
+          </template>
+        </el-table-column>
+        <el-table-column label="总进度" align="center">
+          <template slot-scope="scope">
+            <el-progress type="dashboard"
+                         :percentage="scope.row.totalProjectStageProcess"
+                         :color="progressColors" :width="80"></el-progress>
+          </template>
+        </el-table-column>
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
             <el-button type="primary" @click="handleCheckDetails(scope.row)" size="medium">查看详情</el-button>
@@ -34,13 +42,18 @@
       <project-process-detail v-if="projectProcessDetail"
                               :projectStage="this.tableDataCache.projectStage"
                               :monthProcess="this.tableDataCache.monthProcess"
+                              :projectListIndex="projectListIndex"
+                              :project-name="projectName"
+                              :cur-year-num="this.curApplyYear"
+                              :project-type-i-d="this.fatherParams.projectTypeID"
+                              :is-finish="0"
                               @close="projectProcessDetail = false"></project-process-detail>
     </div>
 </template>
 
 <script>
-  import { urlGetTypeProjectList } from '@/config/interface'
   import { getCurApplyAbleMonth, monthNumToMonthString } from '../../utils/common'
+  import { getTypeProjectList } from '../../utils/workStation'
   import projectProcessDetail from './projectProcessDetail'
   export default {
       data () {
@@ -53,7 +66,10 @@
           },
           tableDataCache: [],
           projectProcessDetail: false,
-          selectProjectStage: null
+          selectProjectStage: null,
+          progressColors: this.$store.state.progressColors,
+          projectListIndex: null,
+          projectName: null
         }
       },
       props: {
@@ -68,15 +84,13 @@
           if (this.reqFlag.getProjectList) {
             this.reqFlag.getProjectList = false
             getCurApplyAbleMonth().then(getCurApplyAbleMonthRes => {
-              console.log('getCurApplyAbleMonthRes')
-              console.log(getCurApplyAbleMonthRes)
               this.curApplyYear = this.$moment(getCurApplyAbleMonthRes[0].setTime).year()
               this.curApplyMonth = this.$moment(getCurApplyAbleMonthRes[0].setTime).month()
-              this.getTypeProjectList(this.fatherParams.projectTypeID, 0, this.curApplyYear)
+              getTypeProjectList(this.fatherParams.projectTypeID, 0, this.curApplyYear)
                 .then(getTypeProjectListRes => {
                   console.log('getTypeProjectListRes')
                   console.log(getTypeProjectListRes)
-                  this.genTableData(getTypeProjectListRes)
+                  this.genTableData(getTypeProjectListRes, this.curApplyMonth)
                   this.reqFlag.getProjectList = true
                 })
             })
@@ -96,7 +110,8 @@
               totalProjectStageProcess: projectList[i].process,
               projectLevel: projectList[i].projectLevel,
               curProjectStage: null,
-              curProjectStageProcess: null
+              curProjectStageProcess: null,
+              projectListIndex: i
             }
             for (let projectStageItem of projectStage[i]) {
               if (projectStageItem.process !== 0) {
@@ -122,32 +137,13 @@
         handleCheckDetails (row) {
           console.log('row')
           console.log(row)
+          this.projectListIndex = row.projectListIndex
+          this.projectName = row.projectName
           this.projectProcessDetail = true
         },
         // 点击项目名称
         handleClickProject () {
           this.$common.toast('点我', 'info', false)
-        },
-        // 获取特定类型的项目列表
-        getTypeProjectList (projectType, isFinish, curApplyYear) {
-          const url = urlGetTypeProjectList
-          let params = {
-            projectType: projectType,
-            isFinish: isFinish,
-            curApplyYear: curApplyYear
-          }
-          let _this = this
-          return new Promise(function (resolve, reject) {
-            _this.$http(url, params).then(res => {
-              if (res.code === 1) {
-                resolve(res.data)
-              } else {
-                reject(res.code)
-              }
-            }).catch(err => {
-              reject(err)
-            })
-          })
         }
       },
       filters: {
