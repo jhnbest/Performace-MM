@@ -14,7 +14,7 @@
         <el-col :xs="{span: 1, offset: 0}"
                 :sm="{span: 1, offset: 0}"
                 :lg="{span: 1, offset: 0}"
-                :xl="{span: 1, offset: 0, pull: 2}"
+                :xl="{span: 1, offset: 0}"
                 v-if="$store.state.userInfo.role !== '普通成员'
                 || $store.state.userInfo.id === 32 // 赵帅
                 || $store.state.userInfo.id === 7 // 白工

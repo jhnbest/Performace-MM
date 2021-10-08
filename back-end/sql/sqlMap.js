@@ -257,7 +257,7 @@ const sqlMap = {
     getPreMonthEva: 'select mr.*, u.name as ratedPersionName from mutualrate mr left join users u on mr.ratedPersion = ' +
         'u.id where mr.rateMonth = ? and mr.ratePersion = ?',
     handleFillMul: 'select count(*) as totalCount from mutualrate where ratePersion = ? and rateMonth = ?',
-    handleFillMulCheck: 'select * from mutualrate where ratePersion = ? and rateMonth = "2021-07"',
+    handleFillMulCheck: 'select * from mutualrate where ratePersion = ? and rateMonth = "2021-08"',
     handleFillMulFill: 'insert into mutualrate (ratePersion, ratedPersion, rateMonth, rate, rateType, rateTime, updateTime) ' +
         'values (?, ?, ?, ?, ?, ?, ?)'
   },
