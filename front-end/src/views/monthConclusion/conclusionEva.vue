@@ -305,6 +305,7 @@
         // get工时分配的ID
         if (row.workTimeListId !== null) {
           getWorkTimeAssignInfo(row.workTimeListId).then(getWorkTimeAssignInfoRes => {
+            this.workTimeAssignInsertID = []
             this.workTimeAssignInsertID.push(getWorkTimeAssignInfoRes[0].id)
             row.workTimeAssignInsertID.push(getWorkTimeAssignInfoRes[0].id)
           })

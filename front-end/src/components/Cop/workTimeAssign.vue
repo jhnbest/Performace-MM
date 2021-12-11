@@ -396,7 +396,13 @@ export default {
     },
     // 删除协助者按钮
     handleDelAssist (row, index) {
+      console.log(row)
+      console.log(this.formData.participant)
       this.formData.copInfoTable.splice(index, 1)
+      let deleteIndex = this.formData.participant.findIndex(participantItem => {
+        return participantItem === row.id
+      })
+      this.formData.participant.splice(deleteIndex, 1)
     }
   },
   computed: {

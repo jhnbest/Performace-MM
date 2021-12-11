@@ -54,12 +54,12 @@
                   :header-cell-style="{ background:'#ced1d4',color:'#000000',fontSize:'16px' }"
                   style="margin: auto"
                   highlight-current-row>
-          <el-table-column label="管理者评分"
+          <el-table-column v-if="rateTableShow"
+                           label="管理者评分"
                            align="center">
             <template>
-              <el-rate v-model="managerRateStar"
-                       style="size: 50px"
-                       @change="changeFlag = true"
+              <el-rate v-model="managerRateStarCom"
+                       @change="managerRateStarSunChange"
                        show-text
                        :texts="managerRateStarText"></el-rate>
             </template>
@@ -109,7 +109,9 @@
           tableData5: [{}],
           managerEvaTmp: null,
           conclusionDialog: false,
-          changeFlag: false
+          changeFlag: false,
+          managerRateStarCom: null,
+          rateTableShow: true
         }
       },
       props: {
@@ -159,13 +161,14 @@
         init () {
           this.$nextTick(() => {
             this.conclusionDialog = !this.conclusionDialog
+            this.managerRateStarCom = this.managerRateStar
           })
         },
         // 保存
         handleSave () {
           let emitData = {
             id: this.id,
-            managerRateStar: this.managerRateStar,
+            managerRateStar: this.managerRateStarCom,
             managerEva: this.managerEvaTmp,
             submitter: this.submitter
           }
@@ -180,6 +183,14 @@
         onClose () {
           this.conclusionDialog = !this.conclusionDialog
           this.$emit('close')
+        },
+        // 管理者星级评价改变
+        managerRateStarSunChange () {
+          this.changeFlag = true
+          this.rateTableShow = false
+          this.$nextTick(() => {
+            this.rateTableShow = true
+          })
         }
       },
       created () {
@@ -197,6 +208,13 @@
       },
       components: {
         editorVue
+      },
+      watch: {
+        managerRateStarCom (e) {
+          console.log('e')
+          console.log(e)
+          this.managerRateStarCom = e
+        }
       },
       name: 'monthConclusionTableCheck'
     }
