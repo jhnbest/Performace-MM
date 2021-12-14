@@ -1,5 +1,5 @@
-// let path = '/demo-weekly/back-end/api'; // 线下
-let path = '/api'; // 线上
+let path = '/demo-weekly/back-end/api'; // 线下
+// let path = '/api'; // 线上
 
 module.exports = {
     // user-用户管理
