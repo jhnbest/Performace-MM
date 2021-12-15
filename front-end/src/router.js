@@ -139,6 +139,11 @@ export default new Router({
           name: 'conclusionEva',
           component: () => import(/* webpackChunkName: "weekly" */ './views/monthConclusion/conclusionEva.vue'),
           meta: { pagePath: '/home/conclusionEva' }
+        },{
+          path: 'PerformanceEvaNew',
+          name: 'PerformanceEvaNew',
+          component: () => import('./views/performanceEva/performanceEva.vue'),
+          meta: { pagePath: '/home/PerformanceEvaNew' }
         }
       ]
     },

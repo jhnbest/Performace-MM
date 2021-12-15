@@ -21,19 +21,20 @@ export default new Vuex.Store({
       { name: '计划查询', url: '/home/workPlanCheck', icon: 'el-icon-s-opportunity' },
       { name: '月总结评价', url: '/home/conclusionEva', icon: 'el-icon-check' },
       { name: '定性评价管理', url: '/home/mulEvaCheck', icon: 'el-icon-s-opportunity' },
-      { name: '用户管理', url: '/home/users', icon: 'el-icon-user-solid' }
+      { name: '用户管理', url: '/home/users', icon: 'el-icon-user-solid' },
+      { name: '绩效评价测试', url: '/home/PerformanceEvaNew', icon: 'el-icon-user-solid' }
     ],
     pageSize: 100, // 每页请求多少条
     refreshInterval: 300, // 组件手动刷新间隔 ms
-    commonStaffMutualCof: 0.1,
-    commonStaffManagerCof: 0.2,
-    commonStaffQuantitativeCof: 0.7,
-    groupLeaderMutualCof: 0.3,
-    groupLeaderManagerCof: 0.4,
-    groupLeaderQuantitativeCof: 0.3,
-    directorMutualCof: 0.2,
-    directorManagerCof: 0.3,
-    directorQuantitativeCof: 0.5,
+    commonStaffMutualCof: 0.1, // 普通员工对普通员工的定性评价权重
+    commonStaffManagerCof: 0.2, // 管理者对普通员工的定性评价权重
+    commonStaffQuantitativeCof: 0.7, // 普通员工定量评价权重
+    groupLeaderMutualCof: 0.3, // 普通员工对组长的定性评价权重
+    groupLeaderManagerCof: 0.4, // 管理者对组长的定性评价权重
+    groupLeaderQuantitativeCof: 0.3, // 组长定量评价权重
+    directorMutualCof: 0.2, // 普通员工对主任岗的定性评价权重
+    directorManagerCof: 0.3, // 管理者对主任岗的定性评价权重
+    directorQuantitativeCof: 0.5, // 主任岗定量评价权重
     managerID: 26,
     monthStarNum: 2,
     quarterStarNum: 2,
