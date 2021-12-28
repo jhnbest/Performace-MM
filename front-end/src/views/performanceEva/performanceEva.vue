@@ -47,12 +47,6 @@
       <span v-if="isRated" style="font-weight: bolder;color: green;font-size: 23px">已评价</span>
       <span v-else style="font-weight: bolder;color: red;font-size: 23px">未评价</span>
     </span>
-    <el-button size="medium" type="success" style="margin-left: 20px" @click="getPreMonthEva" :disabled="!reqFlag.getPreMonthEva">提取上月评价</el-button>
-    <el-button size="medium" type="warning" @click="handleFillMul" v-if="$store.state.userInfo.id === 15">一键填充定性评价</el-button>
-    <span style="font-weight: bolder;margin-left: 60px" v-if="$store.state.userInfo.id === 26">首页绩效信息发布状态:
-      <span v-if="isPerformancePublish" style="color: green;font-size: 23px">已发布</span>
-      <span v-else style="color: red;font-size: 23px">未发布</span>
-    </span>
     <el-switch v-if="$store.state.userInfo.id === 26"
                v-model="isPerformancePublish"
                @change="handlePerformancePublish"
@@ -108,7 +102,7 @@
               :height="tableHeight"
               ref="rateTable"
               highlight-current-row>
-      <el-table-column label="姓名" align="center" min-width="50">
+      <el-table-column label="姓名" align="center" min-width="40">
         <template slot-scope="scope">
           <span class="link-type" @click="handleClickRateName(scope.row)">{{scope.row.ratedName}}</span>
         </template>
@@ -153,8 +147,20 @@
           </el-table-column>
           <el-table-column label="维度4" align="center" min-width="70">
             <template slot-scope="scope">
-              <el-rate v-model="scope.row.t3Star"
+              <el-rate v-model="scope.row.t4Star"
                        @change="handleT4StarChange(scope.row)"></el-rate>
+            </template>
+          </el-table-column>
+          <el-table-column label="维度5" align="center" min-width="70">
+            <template slot-scope="scope">
+              <el-rate v-model="scope.row.t5Star"
+                       @change="handleT5StarChange(scope.row)"></el-rate>
+            </template>
+          </el-table-column>
+          <el-table-column label="维度6" align="center" min-width="70">
+            <template slot-scope="scope">
+              <el-rate v-model="scope.row.t6Star"
+                       @change="handleT6StarChange(scope.row)"></el-rate>
             </template>
           </el-table-column>
         </el-table-column>
@@ -450,11 +456,11 @@
         let _this = this
         let promises = []
         let count = 0
-        // this.getCookie()
+        this.getCookie()
         // this.getCurMutualRate()
-        this.getCurApplyAbleMonth().then(getCurApplyAbleMonthRes => {
-          this.formData.title = this.$moment(getCurApplyAbleMonthRes[0].setTime).format('YYYY-MM')
-        })
+        // this.getCurApplyAbleMonth().then(getCurApplyAbleMonthRes => {
+        //   this.formData.title = this.$moment(getCurApplyAbleMonthRes[0].setTime).format('YYYY-MM')
+        // })
         this.getUsersList().then(res1 => {
           _this.users = res1
           _this.getUserRates().then(res2 => {
@@ -1435,8 +1441,37 @@
         let curID = this.$store.state.userInfo.id
         if (rates.length === 0) { // 该月还未进行互评
           for (let user of users) {
-            if (curGroupName === '技术标准组' || curGroupName === '工程组') {
-              if (user.groupName === '技术标准组' || user.groupName === '工程组') {
+            // if (curGroupName === '技术标准组' || curGroupName === '工程组') {
+            if (curGroupName === '技术标准组') {
+              if (user.groupName === '技术标准组') {
+                if (curID !== user.id) {
+                  let obj = {
+                    ratedPersion: user.id,
+                    ratedName: user.name,
+                    t1Star: this.defaultStar,
+                    t2Star: this.defaultStar,
+                    t3Star: this.defaultStar,
+                    t4Star: this.defaultStar,
+                    t5Star: this.defaultStar,
+                    t6Star: this.defaultStar,
+                    quantitativeScore: null,
+                    quantitativeRank: null,
+                    staffMutualScore: null,
+                    staffRateRank: null,
+                    performanceScore: null,
+                    performanceRank: null,
+                    performanceRankRise: false,
+                    performanceRankDesc: false,
+                    performanceRankChanges: 0,
+                    initPerformanceRank: null
+                  }
+                  obj.totalScore = this.calMultualScore(obj.t1Star, obj.t2Star, obj.t3Star,
+                    obj.t4Star, obj.t5Star, obj.t6Star)
+                  this.rateTableData.push(obj)
+                }
+              }
+            } else if (curGroupName === '工程组') {
+              if (user.groupName === '工程组') {
                 if (curID !== user.id) {
                   let obj = {
                     ratedPersion: user.id,
@@ -1474,7 +1509,17 @@
                     t3Star: this.defaultStar,
                     t4Star: this.defaultStar,
                     t5Star: this.defaultStar,
-                    t6Star: this.defaultStar
+                    t6Star: this.defaultStar,
+                    quantitativeScore: null,
+                    quantitativeRank: null,
+                    staffMutualScore: null,
+                    staffRateRank: null,
+                    performanceScore: null,
+                    performanceRank: null,
+                    performanceRankRise: false,
+                    performanceRankDesc: false,
+                    performanceRankChanges: 0,
+                    initPerformanceRank: null
                   }
                   obj.totalScore = this.calMultualScore(obj.t1Star, obj.t2Star, obj.t3Star,
                     obj.t4Star, obj.t5Star, obj.t6Star)
@@ -1715,9 +1760,15 @@
       // 读取cookie
       getCookie: function () {
         if (document.cookie.length > 0) {
+          console.log('document.cookie')
+          console.log(document.cookie)
           let arr = document.cookie.split('; ') // 这里显示的格式需要切割一下自己可输出看下
+          console.log('arr')
+          console.log(arr)
           for (let i = 0; i < arr.length; i++) {
             let arr2 = arr[i].split('=') // 再次切割
+            console.log('arr2')
+            console.log(arr2)
             // 判断查找相对应的值
             if (arr2[0] === 'sst') {
               this.showFlag.descTableShow = arr2[1] === 'true'
