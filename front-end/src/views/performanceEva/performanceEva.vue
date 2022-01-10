@@ -40,37 +40,29 @@
   <div class="hr-10"></div>
   <!-- 分割线 end -->
   <br>
-  <div style="margin-left: 20px; margin-top: -15px">
-    <span style="font-size: 15px">评价标准：</span>
-    <el-switch v-model="showFlag.descTableShow" @change="handleSwitchChange"></el-switch>
-    <span style="margin-left: 60px;font-weight: bolder">本月互评状态：
-      <span v-if="isRated" style="font-weight: bolder;color: green;font-size: 23px">已评价</span>
-      <span v-else style="font-weight: bolder;color: red;font-size: 23px">未评价</span>
-    </span>
-    <el-switch v-if="$store.state.userInfo.id === 26"
-               v-model="isPerformancePublish"
-               @change="handlePerformancePublish"
-               style="margin-left: 10px"></el-switch>
+  <div>
+    <el-form :model="ratioFormData" :inline="true" class="main-search">
+      <el-form-item label="定量工作比例">
+        <el-input v-model="ratioFormData.quantitativeRatio" placeholder="百分比"></el-input>
+      </el-form-item>
+    </el-form>
   </div>
-  <br v-if="showFlag.descTableShow">
-  <div v-if="showFlag.descTableShow">
-    <el-table :data="tableData"
-              border
-              style="margin: auto; width: 99%"
-              :span-method="objectSpanMethod"
-              stripe
-              :header-cell-style="{ backgroundColor:'#ff2525', color: '#333' }">
-      <el-table-column label="一级指标" align="center" width="100%" prop="l1"></el-table-column>
-      <el-table-column label="二级指标" align="center" width="100%" prop="l2"></el-table-column>
-      <el-table-column label="评分衡量标准" align="center" prop="standard"></el-table-column>
-      <el-table-column label="分值" align="center" prop="score" width="100%"></el-table-column>
-      <el-table-column label="对应星级" align="center" width="145%">
-        <template slot-scope="scope">
-          <el-rate v-model="scope.row.star" disabled></el-rate>
-        </template>
-      </el-table-column>
-    </el-table>
-  </div>
+  <el-table :data="tableData"
+            border
+            style="margin: auto; width: 99%"
+            :span-method="objectSpanMethod"
+            stripe
+            :header-cell-style="{ backgroundColor:'#ff2525', color: '#333' }">
+    <el-table-column label="一级指标" align="center" width="100%" prop="l1"></el-table-column>
+    <el-table-column label="二级指标" align="center" width="100%" prop="l2"></el-table-column>
+    <el-table-column label="评分衡量标准" align="center" prop="standard"></el-table-column>
+    <el-table-column label="分值" align="center" prop="score" width="100%"></el-table-column>
+    <el-table-column label="对应星级" align="center" width="145%">
+      <template slot-scope="scope">
+        <el-rate v-model="scope.row.star" disabled></el-rate>
+      </template>
+    </el-table-column>
+  </el-table>
   <br v-if="showFlag.descTableShow">
 <!--  <br>-->
 <!--  <div>-->
@@ -205,6 +197,9 @@
       return {
         formData: {
           title: this.$moment().format('YYYY-MM')
+        },
+        ratioFormData: {
+          quantitativeRatio: null
         },
         showFlag: {
           descTableShow: false

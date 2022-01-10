@@ -206,7 +206,7 @@
         <el-table-column label="操作" align="center" width="200%" fixed="right">
           <template slot-scope="scope">
             <el-button
-              @click="handleReviewPass(scope.row, scope.$index)"
+              @click="handleReviewPass(scope.row)"
               v-if="(scope.row.reviewStatus === 0) & !(info.reviewType === 'reviewed')"
               size="small"
               type="primary" icon="el-icon-check">通过</el-button>
@@ -379,7 +379,7 @@
         }
       },
       // 审核通过
-      handleReviewPass (row, index) {
+      handleReviewPass (row) {
         if (row.workTimeAssignReviewStatus) {
           const url = submitReviewPass
           let applyYear = this.$moment(row.applyMonth).year()
@@ -459,8 +459,9 @@
           })
       },
       // 工时分配审核回调
-      handleWorkTimeAssignReview (index) {
-        this.formData.workDetailTable[index].workTimeAssignReviewStatus = 1
+      handleWorkTimeAssignReview (obj) {
+        this.formData.workDetailTable[obj.selectIndex].workTimeAssignReviewStatus = 1
+        this.handleReviewPass(obj.row)
       },
       // 审核K值修改
       handleReviewKValueChange (row) {

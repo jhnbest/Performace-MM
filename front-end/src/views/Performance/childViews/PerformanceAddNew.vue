@@ -61,7 +61,7 @@
           </el-cascader>
         </el-form-item>
         <br>
-        <el-form-item v-if="selectProjectStageID !== 400" label="项目名称" prop="projectName" >
+        <el-form-item label="项目名称" prop="projectName" >
           <el-tooltip :disabled="!isShowProjectNameToolTip" :content="formData.projectName" placement="top">
             <el-input v-model="formData.projectName"
                       placeholder="请输入"
@@ -69,7 +69,7 @@
                       @input="handleProjectNameInput"></el-input>
           </el-tooltip>
         </el-form-item>
-        <el-form-item v-if="selectProjectStageID !== 400" style="margin-left: 310px">
+        <el-form-item style="margin-left: 310px">
           <span>字数限制：
             <span v-if="!isProjectNameWordExceed">{{inputProjectNameWord + '/' + maxProjectName}}</span>
             <span v-else style="color: red">{{inputProjectNameWord + '/' + maxProjectName}}</span>
@@ -93,7 +93,7 @@
 <!--          </el-select>-->
 <!--        </el-form-item>-->
         <br>
-        <el-form-item v-if="selectProjectStageID !== 400" label="项目级别" prop="projectLevel">
+        <el-form-item label="项目级别" prop="projectLevel">
           <el-select v-model="formData.projectLevel" placeholder="请选择">
             <el-option v-for="item in projectLevels"
                        :key="item.value"

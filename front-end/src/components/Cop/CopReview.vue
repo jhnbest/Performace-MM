@@ -64,7 +64,8 @@ export default {
         reviewType: null,
         projectID: null,
         isConference: false,
-        totalWorkTime: 0
+        totalWorkTime: 0,
+        row: null
       },
       reqFlag: {
         edit: true,
@@ -93,6 +94,7 @@ export default {
         this.formData.projectID = row.id
         this.formData.isConference = row.isConference
         this.formData.totalWorkTime = row.avaiableWorkTime
+        this.formData.row = row
       })
     },
     // 获取工时分配详情
@@ -138,9 +140,13 @@ export default {
           this.$http(url, params)
           .then(res => {
             if (res.code === 1) {
-              this.$common.toast('保存成功', 'success', false)
+              // this.$common.toast('保存成功', 'success', false)
               this.onCancel(formData)
-              this.$emit('workTimeAssignReview', this.formData.selectIndex)
+              let obj = {
+                selectIndex: this.formData.selectIndex,
+                row: this.formData.row
+              }
+              this.$emit('workTimeAssignReview', obj)
             } else {
               this.$common.toast('保存失败', 'error', false)
             }
