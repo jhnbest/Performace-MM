@@ -6,10 +6,14 @@ let performance = require('../controls/performance');
 let workStation = require('../controls/workStation');
 let mutualRates = require('../controls/mutualRate');
 let conclusion = require('../controls/conclusion');
+let common = require('../controls/common')
 let api = require('../config/api');
 
 let router = express.Router();
 
+// 通用模块
+router.post(api.getTypeGlobalFlag, common.getTypeGlobalFlag)
+router.post(api.getGlobalFlagByType, common.getGlobalFlagByType)
 // user-用户管理 
 router.post(api.userLogin, user.login);
 router.post(api.userLogout, user.logout);
@@ -98,6 +102,8 @@ router.post(api.getAllUserRates, mutualRates.getAllUserRates)
 router.post(api.getPerformanceIsCount, mutualRates.getPerformanceIsCount)
 router.post(api.getPreMonthEva, mutualRates.getPreMonthEva)
 router.post(api.handleFillMul, mutualRates.handleFillMul)
+router.post(api.getPerformanceRates, mutualRates.getPerformanceRates)
+router.post(api.getAllPerformanceRate, mutualRates.getAllPerformanceRate)
 
 // 总结模块
 router.post(api.getCurMonthConclusionOverviewData, conclusion.getCurMonthConclusionOverviewData)

@@ -1,4 +1,8 @@
 const sqlMap = {
+  common: {
+    getTypeGlobalFlag: 'select * from globalflag where year(setTime) = ? and month(setTime) = ? and flagType = ?',
+    getGlobalFlagByType: 'select * from globalflag where flagType = ?',
+  },
   user: {
     // 登陆
     //login: 'select * from user where name = ? and password = ? and state != 0',
@@ -20,7 +24,7 @@ const sqlMap = {
     // 查询周报列表条数Test
     selectTotal1: 'select count(*) as totalCount from users where status != 0',
     // 查询用户姓名
-    selectUsersName: 'select id, account, dept, name, groupName from users where status != 0',
+    selectUsersName: 'select * from users where status != 0',
     // 查询组员信息
     getGroupUserName: 'select id, name, groupName from users where groupName = ? and status != 0',
     // 查询全员信息
@@ -259,7 +263,11 @@ const sqlMap = {
     handleFillMul: 'select count(*) as totalCount from mutualrate where ratePersion = ? and rateMonth = ?',
     handleFillMulCheck: 'select * from mutualrate where ratePersion = ? and rateMonth = "2021-11"',
     handleFillMulFill: 'insert into mutualrate (ratePersion, ratedPersion, rateMonth, rate, rateType, rateTime, updateTime) ' +
-        'values (?, ?, ?, ?, ?, ?, ?)'
+        'values (?, ?, ?, ?, ?, ?, ?)',
+    getPerformanceRates: 'select pr.*, u.name as ratedPersionName, u.duty from performancerate pr left join users u on pr.ratedPersion = u.id ' +
+        'where pr.ratePersion = ? and pr.rateMonth = ? and u.status != 0',
+    getPerformanceRatedData: 'select pr.*, u.duty, u.groupName from performancerate pr left join users u on pr.ratePersion = u.id where ' +  
+        'pr.ratedPersion = ? and pr.rateMonth = ?'
   },
   conclusion: {
     getCurMonthConclusionOverviewData: 'select c.*, u.name from conclusion c left join users u on c.submitter = u.id where c.submitYear = ? ' +

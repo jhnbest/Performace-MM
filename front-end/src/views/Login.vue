@@ -75,7 +75,6 @@ export default {
             .then(res => {
               if (res.code === 1) {
                 if (this.rememberUser) {
-                  console.log('checked == true')
                   // 传入账号名，密码，和保存天数3个参数
                   this.setCookie(this.formData.name, this.formData.password, 7)
                 } else {

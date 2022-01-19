@@ -20,9 +20,9 @@ export default new Vuex.Store({
       { name: '工时查询', url: '/home/workTimeCheck', icon: 'el-icon-s-claim' },
       { name: '计划查询', url: '/home/workPlanCheck', icon: 'el-icon-s-opportunity' },
       { name: '月总结评价', url: '/home/conclusionEva', icon: 'el-icon-check' },
-      { name: '定性评价管理', url: '/home/mulEvaCheck', icon: 'el-icon-s-opportunity' }
+      { name: '定性评价管理', url: '/home/mulEvaCheck', icon: 'el-icon-s-opportunity' },
       // { name: '用户管理', url: '/home/users', icon: 'el-icon-user-solid' },
-      // { name: '绩效评价测试', url: '/home/PerformanceEvaNew', icon: 'el-icon-user-solid' }
+      { name: '绩效评价测试', url: '/home/PerformanceEvaNew', icon: 'el-icon-user-solid' }
     ],
     pageSize: 100, // 每页请求多少条
     refreshInterval: 300, // 组件手动刷新间隔 ms
@@ -40,6 +40,12 @@ export default new Vuex.Store({
     quarterStarNum: 2,
     defaultConclusionGetWorkTime: 10, // 月总结默认获得工时
     defaultConclusionEvaStar: 3, // 月总结默认评价星级
+    usersNum: 23, // 处室员工总数
+    CSManagerPMEvaCof: 0.3, // 处经理对普通员工的成效评价系数
+    CSGroupLeaderPMEvaCoef: 0.2, // 组长对普通员工的成效评价系数
+    CScommonStaffPMEvaCoef: 0.5, // 普通员工对普通员工的成效评价系数
+    GPManagerPMEvaCoef: 0.5, // 处经理对组长的成效评价系数
+    GPCommonStaffPMEvaCoef: 0.5, // 普通员工对组长的成效评价系数
     progressColors: [
       { color: '#f56c6c', percentage: 20 },
       { color: '#e6a23c', percentage: 40 },

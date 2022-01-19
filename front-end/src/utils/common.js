@@ -7,7 +7,10 @@ import {
   submitAssignWorkDetail,
   urlGetWorkTimeAssignInfo,
   urlSetProjectFinish,
-  urlGetWorkTimeListInfo
+  urlGetWorkTimeListInfo,
+  urlGetPerformanceIsPublish,
+  urlGetTypeGlobalFlag,
+  urlGetGlobalFlagByType
 } from '../config/interface'
 import store from '@/store'
 
@@ -54,7 +57,7 @@ export function removeUserByName (name, usersList) {
   return usersList
 }
 
-// 总结星级对应工时
+// 月总结星级对应工时
 export function conclusionManagerEvaStarToWorkTime (managerEvaStar) {
   switch (managerEvaStar) {
     case 1:
@@ -228,4 +231,100 @@ export function monthNumToMonthString (monthNum) {
     default:
       return null
   }
+}
+
+// 绩效得分标准化计算(2021年12月启用)
+export function performanceStdScoreCal (usersNum, rank) {
+  if (rank === 1) {
+    return 95
+  }
+  if (rank < Number((usersNum * 0.1).toFixed(0)) || rank === Number((usersNum * 0.1).toFixed(0))) {
+    return 95
+  } else if (rank < Number((usersNum * 0.2).toFixed(0)) || rank === Number((usersNum * 0.2).toFixed(0))) {
+    return 92.5
+  } else if (rank < Number((usersNum * 0.49).toFixed(0)) || rank === Number((usersNum * 0.49).toFixed(0))) {
+    return 90
+  } else if (rank < Number((usersNum * 0.8).toFixed(0)) || rank === Number((usersNum * 0.8).toFixed(0))) {
+    return 87.5
+  } else if (rank < Number((usersNum * 1).toFixed(0)) || rank === Number((usersNum * 1).toFixed(0))) {
+    return 85
+  }
+}
+
+// 定性、定量指标得分计算（2021年12月前使用的）
+export function calGetScore (length, rank) {
+  if (rank === 1) {
+    return 92.5
+  }
+  if (rank < Number((length * 0.1).toFixed(0)) || rank === Number((length * 0.1).toFixed(0))) {
+    return 92.5
+  } else if (rank < Number((length * 0.3).toFixed(0)) || rank === Number((length * 0.3).toFixed(0))) {
+    return 90
+  } else if (rank < Number((length * 0.7).toFixed(0)) || rank === Number((length * 0.7).toFixed(0))) {
+    return 87.5
+  } else if (rank < Number((length * 0.9).toFixed(0)) || rank === Number((length * 0.9).toFixed(0))) {
+    return 85
+  } else if (rank < Number((length * 1).toFixed(0)) || rank === Number((length * 1).toFixed(0))) {
+    return 82.5
+  }
+}
+// 获取当前月份绩效结果是否已公布
+export function getPerformanceIsPublish (applyYear, applyMonth) {
+  const url = urlGetPerformanceIsPublish
+  let params = {
+    applyYear: applyYear,
+    applyMonth: applyMonth,
+    flagType: 'performanceInfoPublish'
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(res => {
+      if (res.code === 1) {
+        resolve(res.data)
+      } else {
+        reject(new Error('getPerformanceIsPublish recv error!'))
+      }
+    }).catch(err => {
+      reject(new Error(err + 'getPerformanceIsPublish send error!'))
+    })
+  })
+}
+
+// 根据时间获取某个类型数据的全局标志位
+export function getTypeGlobalFlag (applyYear, applyMonth, flagType) {
+  const url = urlGetTypeGlobalFlag
+  let params = {
+    applyYear: applyYear,
+    applyMonth: applyMonth,
+    flagType: flagType
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(res => {
+      if (res.code === 1) {
+        resolve(res.data)
+      } else {
+        reject(new Error('getTypeGlobalFlag recv error!'))
+      }
+    }).catch(err => {
+      reject(new Error(err + 'getTypeGlobalFlag send error!'))
+    })
+  })
+}
+
+// 根据数据类型获取全局标志位
+export function getGlobalFlagByType (flagType) {
+  const url = urlGetGlobalFlagByType
+  let params = {
+    flagType: flagType
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(res => {
+      if (res.code === 1) {
+        resolve(res.data)
+      } else {
+        reject(new Error('getGlobalFlagByType recv error!'))
+      }
+    }).catch(err => {
+      reject(new Error(err + 'getGlobalFlagByType send error!'))
+    })
+  })
 }

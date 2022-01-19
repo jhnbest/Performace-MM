@@ -1,4 +1,8 @@
 // 接口配置
+
+export const urlGetTypeGlobalFlag = '/common/getTypeGlobalFlag'
+export const urlGetGlobalFlagByType = '/common/getGlobalFlagByType'
+
 export const userLogin = '/user/login' // 用户登录
 export const userLogout = '/user/logout' // 用户登出
 export const userAdd = '/user/add' // 新增用户
@@ -36,7 +40,7 @@ export const getUnReviewProjectCount = '/performance/getUnReviewProjectCount' //
 export const submitReviewPass = '/performance/submitReviewPass' // 审核通过
 export const getAssignWorkTime = '/performance/getAssignWorkTime' // 获取分配的工时
 export const getGroupWorkTimeList = '/performance/getGroupWorkTimeList' // 获取小组已申报工时列表
-export const getAllWorkTimeList = '/performance/getAllWorkTimeList' // 获取全处已申报工时列表
+export const urlGetAllWorkTimeList = '/performance/getAllWorkTimeList' // 获取全处已申报工时列表
 export const getIsWorkTimeReviewFinish = '/performance/getIsWorkTimeReviewFinish' // 判断工时是否都已审核完毕
 export const urlGetCurApplyAbleMonth = '/performance/getCurApplyAbleMonth' // 获取当前可申报的月份
 export const submitProjectWorkTimeApply = '/performance/submitProjectWorkTimeApply' // 提交项目工时申报
@@ -66,7 +70,7 @@ export const updateEditProjectStage = '/workStation/updateEditProjectStage' // �
 export const getIsSubmitAllow = '/workStation/getIsSubmitAllow' // 获取是否可以申报工时和提交互评
 export const getCurGroupWorkTimeReviewFinish = '/workStation/getCurGroupWorkTimeReviewFinish' // 获取当前小组工时审核是否都已完毕
 export const getManagerMultualRateFinish = '/workStation/getManagerMultualRateFinish' // 当月领导者是否已经评价完毕
-export const getPerformanceIsPublish = '/workStation/getPerformanceIsPublish' // 当月互评是否已经发布
+export const urlGetPerformanceIsPublish = '/workStation/getPerformanceIsPublish' // 当月互评是否已经发布
 export const performanceInfoPublish = '/workStation/performanceInfoPublish' // 是否发布首页绩效信息
 export const getUnFilledProjectList = '/workStation/getUnFilledProjectList' // 获取未填报的项目列表
 export const projectDetailIsApplyWorkTime = '/workStation/projectDetailIsApplyWorkTime' // 查看项目阶段当月是否已填报工时
@@ -83,6 +87,8 @@ export const getAllUserRates = '/mutualRates/getAllUserRates' // 获取本处员
 export const getPerformanceIsCount = '/mutualRates/getPerformanceIsCount' // 获取绩效信息统计标志
 export const getPreMonthEva = '/mutualRates/getPreMonthEva' // 提取上月互评结果
 export const handleFillMul = '/mutualRates/handleFillMul' // 一键填充定性评价
+export const urlGetPerformanceRates = '/mutualRates/getPerformanceRates' // 获取成效评价历史数据
+export const urlGetAllPerformanceRate = '/mutualRates/getAllPerformanceRate' // 获取全处成效评价数据
 
 export const urlGetCurMonthConclusionOverviewData = '/conclusion/getCurMonthConclusionOverviewData' // 获取总结数据
 export const urlSubmitMonthConclusionData = '/conclusion/submitMonthConclusionData' // 提交月总结

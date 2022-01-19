@@ -2,6 +2,10 @@ let path = '/demo-weekly/back-end/api'; // 线下
 // let path = '/api'; // 线上
 
 module.exports = {
+    // 通用模块
+    getTypeGlobalFlag: path + '/common/getTypeGlobalFlag',
+    getGlobalFlagByType: path + '/common/getGlobalFlagByType',
+
     // user-用户管理
     userLogin: path + '/user/login', // 用户登录
     userLogout: path + '/user/logout', // 用户登出
@@ -91,7 +95,9 @@ module.exports = {
     getPerformanceIsCount: path + '/mutualRates/getPerformanceIsCount', // 获取绩效信息统计标志
     getPreMonthEva: path + '/mutualRates/getPreMonthEva', // 提取上月互评结果
     handleFillMul: path + '/mutualRates/handleFillMul', // 一键填充定性评价
-
+    getPerformanceRates: path + '/mutualRates/getPerformanceRates', // 获取成效评价历史数据
+    getAllPerformanceRate: path + '/mutualRates/getAllPerformanceRate', // 获取全处成效评价历史数据
+    
     // 总结模块
     getCurMonthConclusionOverviewData: path + '/conclusion/getCurMonthConclusionOverviewData', // 获取总结数据
     submitMonthConclusionData: path + '/conclusion/submitMonthConclusionData', // 提交月总结

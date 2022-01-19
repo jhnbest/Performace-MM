@@ -16,7 +16,7 @@
             value-format="yyyy-MM"
             placeholder="选择月"
             style="width: 150px"
-            @change="handelDateChange">
+            @change="initData(formData.title)">
           </el-date-picker>
           <el-button size="mini"
                      type="primary"
@@ -122,7 +122,7 @@
               stripe
               size="large"
               :header-cell-style="{ backgroundColor:'#48bfe5', color: '#333' }"
-              v-loading="!reqFlag.getUsersList"
+              v-loading="false"
               :height="tableHeight"
               ref="rateTable"
               highlight-current-row>
@@ -232,16 +232,17 @@
     getCurMutualRate,
     getIsSubmitAllow,
     getIsWorkTimeReviewFinish,
-    getAllWorkTimeList,
     getAllUserRates,
     performanceInfoPublish,
-    getPerformanceIsPublish,
     getPreMonthEva,
     urlGetCurApplyAbleMonth,
     handleFillMul } from '@/config/interface'
   import CountTo from 'vue-count-to'
   import monthConclusionTableCheck from '@/views/monthConclusion/childViews/monthConclusionTableCheck'
   import { getCurMonthConclusionOverviewData } from '@/utils/conclusion'
+  import { performanceStdScoreCal, calGetScore, getPerformanceIsPublish } from '@/utils/common'
+  import { getUsersList } from '@/utils/users'
+  import { getAllWorkTimeList } from '@/utils/performance'
   export default {
     data () {
       return {
@@ -455,9 +456,7 @@
         ratesTableTmp: [],
         reqFlag: {
           getUserRates: true,
-          getUsersList: true,
           updateRateToUpdate: true,
-          getAllWorkTimeList: true,
           getAllUserRates: true,
           getPreMonthEva: true
         },
@@ -495,21 +494,28 @@
     methods: {
       // 初始化
       init () {
-        let _this = this
-        let promises = []
-        let count = 0
         // this.getCookie()
         // this.getCurMutualRate()
         this.getCurApplyAbleMonth().then(getCurApplyAbleMonthRes => {
           this.formData.title = this.$moment(getCurApplyAbleMonthRes[0].setTime).format('YYYY-MM')
         })
-        this.getUsersList().then(res1 => {
-          _this.users = res1
-          _this.getUserRates().then(res2 => {
-            _this.isRated = res2.length !== 0
-            _this.genRateTableData(res1, res2)
+        getUsersList().then(userList => {
+          this.users = userList
+          this.initData(userList)
+        })
+      },
+      // 初始化互评及绩效数据（若需要）
+      initData (userList) {
+        let promises = []
+        let count = 0
+        let applyYear = this.$moment(this.formData.title).year()
+        let applyMonth = this.$moment(this.formData.title).month() + 1
+        this.getUserRates().then(userRates => {
+            this.isRated = userRates.length !== 0
+            this.genRateTableData(userList, userRates)
             if (this.$store.state.userInfo.id === 26) {
-              this.getPerformanceIsPublish().then(getPerformanceIsPublishRes => {
+              // ============================判断绩效是否已发布==========================
+              getPerformanceIsPublish(applyYear, applyMonth).then(getPerformanceIsPublishRes => {
                 this.performanceIsPublishInfo = getPerformanceIsPublishRes
                 if (getPerformanceIsPublishRes.length > 0) {
                   this.isPerformancePublish = getPerformanceIsPublishRes[0].flagValue === 1
@@ -520,7 +526,8 @@
                 this.isPerformancePublish = false
                 this.$common.toast(getPerformanceIsPublishErr, 'error', false)
               })
-              promises[count++] = this.getQuantitativeInfo() // 获取定量评价结果
+              // =======================绩效相关数据获取=====================================
+              promises[count++] = this.getQuantitativeInfo() // 获取全处定量结果
               promises[count++] = this.getAllMultualEvaResult() // 获取全处互评结果
               let genQuantativeDataResult = null
               let genMultualEvaDataResult = null
@@ -548,7 +555,6 @@
               })
             }
           })
-        })
       },
       // 获取当前可申报的月份
       getCurApplyAbleMonth () {
@@ -564,28 +570,6 @@
             }
           }).catch(err => {
             reject(err)
-          })
-        })
-      },
-      // 获取当前月份绩效结果是否已公布
-      getPerformanceIsPublish () {
-        const url = getPerformanceIsPublish
-        let params = {
-          applyYear: this.$moment(this.formData.title).year(),
-          applyMonth: this.$moment(this.formData.title).month() + 1,
-          flagType: 'performanceInfoPublish'
-        }
-        let _this = this
-        return new Promise(function (resolve, reject) {
-          _this.$http(url, params).then(res => {
-            if (res.code === 1) {
-              resolve(res.data)
-            } else {
-              reject(new Error('getPerformanceIsPublish recv error!'))
-            }
-          }).catch(err => {
-            this.$common.toast(err, 'error', true)
-            reject(new Error('getPerformanceIsPublish send error!'))
           })
         })
       },
@@ -661,7 +645,11 @@
             item.performanceRankDesc = performanceRankChanges < 0
             item.performanceRankChanges = Math.abs(performanceRankChanges)
           }
-          item.performanceScore = this.calGetScore(rateTableDataTmp.length, item.performanceRank)
+          if (this.$moment(this.formData.title).diff(this.$moment('2021-12-01'), 'days') < 0) {
+            item.performanceScore = calGetScore(this.$store.state.usersNum, item.performanceRank) // 计算绩效得分 2021年12月以前
+          } else {
+            item.performanceScore = performanceStdScoreCal(this.$store.state.usersNum, item.performanceRank) // 计算绩效得分 2021年12月及以后
+          }
         }
         for (let item of this.rateTableData) {
           let rateTableDataTmpFindResult = rateTableDataTmp.find(rateTableDataTmpItem => {
@@ -741,7 +729,7 @@
           // ==============================计算定量指标得分=======================================
           let length = totalWorkTimeCal.length
           for (let item of totalWorkTimeCal) { // 根据排名计算定量指标得分
-            item.quantitativeScore = this.calGetScore(length, item.rank)
+            item.quantitativeScore = calGetScore(length, item.rank)
           }
         }
         return totalWorkTimeCal
@@ -807,23 +795,6 @@
           }
         }
       },
-      // 定性、定量指标得分计算
-      calGetScore (length, rank) {
-        if (rank === 1) {
-          return 92.5
-        }
-        if (rank < Number((length * 0.1).toFixed(0)) || rank === Number((length * 0.1).toFixed(0))) {
-          return 92.5
-        } else if (rank < Number((length * 0.3).toFixed(0)) || rank === Number((length * 0.3).toFixed(0))) {
-          return 90
-        } else if (rank < Number((length * 0.7).toFixed(0)) || rank === Number((length * 0.7).toFixed(0))) {
-          return 87.5
-        } else if (rank < Number((length * 0.9).toFixed(0)) || rank === Number((length * 0.9).toFixed(0))) {
-          return 85
-        } else if (rank < Number((length * 1).toFixed(0)) || rank === Number((length * 1).toFixed(0))) {
-          return 82.5
-        }
-      },
       // 计算定性评价排名与得分
       calMutualRatesRank (allUserRatesTmp) {
         let allUserRates = JSON.parse(JSON.stringify(allUserRatesTmp))
@@ -883,7 +854,7 @@
           }
           count++
           standAndEngineerRates[i].staffMutualScore =
-            this.calGetScore(standAndEngineerRates.length, standAndEngineerRates[i].staffRateRank)
+            calGetScore(standAndEngineerRates.length, standAndEngineerRates[i].staffRateRank)
         }
         // 通信组互评排名&得分计算
         tmpStaffRate = -1
@@ -897,7 +868,7 @@
           }
           count++
           communicationRates[i].staffMutualScore =
-            this.calGetScore(communicationRates.length, communicationRates[i].staffRateRank)
+            calGetScore(communicationRates.length, communicationRates[i].staffRateRank)
         }
         // 全处员工领导评价排名&得分计算
         tmpStaffRate = -1
@@ -911,7 +882,7 @@
           }
           count++
           allUserRates[i].managerScore =
-            this.calGetScore(allUserRates.length, allUserRates[i].managerRateRank)
+            calGetScore(allUserRates.length, allUserRates[i].managerRateRank)
         }
         let allRates = []
         // =================================定性评价结果合并===============================================
@@ -972,61 +943,6 @@
         }
         return groupedWorkTimeList
       },
-      // 计算绩效得分
-      calPerformanceScore (result) {
-        // ========================定量指标计算=========================
-        let allQuantitativeScore = []
-        let groupedWorkTimeList = this.groupedWorkTimeList(result[0]) // 对数据进行分组
-        for (let item of groupedWorkTimeList) {
-          item.caledQuantitative = this.calQuantitativeScore(item.workTimeList)
-          for (let itemInside of item.caledQuantitative) {
-            allQuantitativeScore.push(itemInside)
-          }
-        }
-        // =======================定性指标计算===========================
-        let multualRestuls = this.calMutualRatesRank(result[1]) // 计算定性评价结果
-        // =======================绩效指标得分计算===========================
-        let finalResult = JSON.parse(JSON.stringify(multualRestuls)) // 合并定性评价和定量评价
-        for (let item of finalResult) {
-          let quantitativeInfo = allQuantitativeScore.find(quantitativeInfo => {
-            return item.id === quantitativeInfo.id
-          })
-          if (quantitativeInfo) { // 当月有工时申报
-            item.quantitativeScore = quantitativeInfo.quantitativeScore
-            item.quantitativeRank = quantitativeInfo.rank
-            if (item.id === this.$store.state.userInfo.id) {
-            }
-          } else { // 如果当月无任何工时申报
-            item.quantitativeScore = 0
-            item.quantitativeRank = 0
-            if (item.id === this.$store.state.userInfo.id) {
-            }
-          }
-          if (item.id === 7 || item.id === 11 || item.id === 31) { // 主任岗
-            item.performanceScore = item.quantitativeScore * this.directorQuantitativeCof + item.mutualScore
-          } else if (item.id === 13 || item.id === 17 || item.id === 33) { // 组长
-            item.performanceScore = item.quantitativeScore * this.groupLeaderQuantitativeCof + item.mutualScore
-          } else { // 普通成员
-            item.performanceScore = item.quantitativeScore * this.commonStaffQuantitativeCof + item.mutualScore
-          }
-          finalResult.sort(this.sortBy('performanceScore'))
-        }
-        // =========绩效排名计算==========
-        let count = 0
-        let prePerformanceScore = -1
-        let prePerformanceRank = -1
-        for (let item of finalResult) {
-          if (item.performanceScore === prePerformanceScore) {
-            item.performanceRank = prePerformanceRank
-          } else {
-            item.performanceRank = count
-            prePerformanceScore = item.performanceScore
-            prePerformanceRank = count
-          }
-          count++
-        }
-        return finalResult
-      },
       // 排序比较函数
       sortBy (props) {
         return function (a, b) {
@@ -1037,32 +953,6 @@
       sortAddBy (props) {
         return function (a, b) {
           return a[props] - b[props]
-        }
-      },
-      // 获取全处工时信息
-      getAllWorkTimeList () {
-        const url = getAllWorkTimeList
-        if (this.reqFlag.getAllWorkTimeList) {
-          this.reqFlag.getAllWorkTimeList = false
-          let params = {
-            applyMonth: this.formData.title
-          }
-          let _this = this
-          return new Promise(function (resolve, reject) {
-            _this.$http(url, params).then(res => {
-              if (res.code === 1) {
-                let recvData = res.data
-                _this.reqFlag.getAllWorkTimeList = true
-                resolve(recvData)
-              } else {
-                _this.reqFlag.getAllWorkTimeList = true
-                reject(new Error('getAllWorkTimeList recv error'))
-              }
-            }).catch(() => {
-              _this.$common.toast('请求失败', 'error', false)
-              reject(new Error('getAllWorkTimeList send error'))
-            })
-          })
         }
       },
       // 计算个人互评得分
@@ -1123,6 +1013,8 @@
           return new Promise(function (resolve, reject) {
             _this.$http(url, params).then(res => {
               if (res.code === 1) {
+                console.log('res.data')
+                console.log(res.data)
                 for (let item of res.data) {
                   let obj = {
                     id: item.id,
@@ -1162,7 +1054,7 @@
                     err: true
                   })
                 } else { // 已审核完毕
-                  _this.getAllWorkTimeList().then(getAllWorkTimeListRes => {
+                  getAllWorkTimeList(_this.formData.title).then(getAllWorkTimeListRes => {
                     resolve({
                       error: false,
                       content: getAllWorkTimeListRes
@@ -1419,24 +1311,6 @@
           }
         }
       },
-      // 获取用户列表
-      getUsersList () {
-        const url = getUsersName
-        let params = {}
-        let _this = this
-        if (this.reqFlag.getUsersList) {
-          this.reqFlag.getUsersList = false
-          return new Promise(function (resolve, reject) {
-            _this.$http(url, params)
-              .then(res => {
-                if (res.code === 1) {
-                  resolve(res.data.list)
-                }
-                _this.reqFlag.getUsersList = true
-              })
-          })
-        }
-      },
       // 获取互评信息
       getUserRates () {
         const url = getUserRates
@@ -1590,7 +1464,6 @@
               item.t5Star, item.t6Star)
           }
           this.rateTableData = JSON.parse(JSON.stringify(ratesTableTmp))
-          let tmp = JSON.parse(JSON.stringify(this.rateTableData))
           return ratesTableTmp
         }
       },
@@ -1598,64 +1471,13 @@
       handlePreMonth () {
         this.formData.title = this.$moment(this.formData.title).subtract(1, 'months').format('YYYY-MM')
         this.setMonthCookie(this.formData.title, 7)
-        this.handelDateChange()
+        this.initData(this.users)
       },
       // 下一月
       handleNextMonth () {
         this.formData.title = this.$moment(this.formData.title).add(1, 'months').format('YYYY-MM')
         this.setMonthCookie(this.formData.title, 7)
-        this.handelDateChange()
-      },
-      // 申报月份变化
-      handelDateChange () {
-        let _this = this
-        let promises = []
-        let count = 0
-        this.isQuantativeFinish = false
-        this.isMultualEvaFinish = false
-        this.getUserRates().then(res1 => {
-          _this.isRated = res1.length !== 0
-          _this.genRateTableData(_this.users, res1)
-          if (this.$store.state.userInfo.id === 26) {
-            this.getPerformanceIsPublish().then(getPerformanceIsPublishRes => {
-              this.performanceIsPublishInfo = getPerformanceIsPublishRes
-              if (getPerformanceIsPublishRes.length > 0) {
-                this.isPerformancePublish = getPerformanceIsPublishRes[0].flagValue === 1
-              } else {
-                this.isPerformancePublish = false
-              }
-            }).catch(getPerformanceIsPublishErr => {
-              this.isPerformancePublish = false
-              this.$common.toast(getPerformanceIsPublishErr, 'error', false)
-            })
-            promises[count++] = this.getQuantitativeInfo() // 获取定量评价结果
-            promises[count++] = this.getAllMultualEvaResult() // 获取全处互评结果
-            let genQuantativeDataResult = null
-            let genMultualEvaDataResult = null
-            Promise.all(promises).then(result => {
-              if (!result[0].err) { // 工时已截止且审核完毕
-                genQuantativeDataResult = this.genQuantativeData(result[0].content)
-                this.quantativeData = JSON.parse(JSON.stringify(genQuantativeDataResult))
-              } else {
-                this.isQuantativeFinish = false
-              }
-              if (!result[1].err) { // 互评已截止
-                genMultualEvaDataResult = this.genMultualEvaData(result[1].content)
-                this.multualEvaData = JSON.parse(JSON.stringify(genMultualEvaDataResult))
-              } else {
-                this.multualEvaData = []
-                this.isMultualEvaFinish = false
-              }
-              if (!result[0].err && !result[1].err) { // 工时已审核完毕且互评已截止
-                this.isQuantativeFinish = true
-                this.isMultualEvaFinish = true
-                this.genPerformanceScore(genQuantativeDataResult, genMultualEvaDataResult, 'init')
-              }
-            }).catch(err => {
-              this.$common.toast(err, 'error', true)
-            })
-          }
-        })
+        this.initData(this.users)
       },
       // 表格合并方法
       objectSpanMethod ({ row, column, rowIndex, columnIndex }) {
@@ -1845,7 +1667,7 @@
                 preManagerRate = item.managerRate
               }
               count++
-              item.managerScore = this.calGetScore(this.multualEvaData.length, item.managerRateRank)
+              item.managerScore = calGetScore(this.multualEvaData.length, item.managerRateRank)
               if (item.id === 7 || item.id === 11 || item.id === 31) { // 主任岗
                 item.mutualScore = item.staffMutualScore * this.directorMutualCof +
                   item.managerScore * this.directorManagerCof
@@ -2006,6 +1828,8 @@
       handlePerformancePublish () {
         let flagValue = null
         let flagID = -1
+        let applyYear = this.$moment(this.formData.title).year()
+        let applyMonth = this.$moment(this.formData.title).month() + 1
         if (this.isPerformancePublish) { // 发布绩效
           if (this.performanceIsPublishInfo.length > 0) { // 已存在发布绩效信息
             flagID = this.performanceIsPublishInfo[0].id
@@ -2029,7 +1853,7 @@
         return new Promise(function (resolve, reject) {
           _this.$http(url, params).then(res => {
             if (res.code === 1) {
-              _this.getPerformanceIsPublish().then(getPerformanceIsPublishRes => {
+              getPerformanceIsPublish(applyYear, applyMonth).then(getPerformanceIsPublishRes => {
                 _this.performanceIsPublishInfo = getPerformanceIsPublishRes
                 if (getPerformanceIsPublishRes.length > 0) {
                   _this.isPerformancePublish = getPerformanceIsPublishRes[0].flagValue === 1
@@ -2056,6 +1880,8 @@
       getPreMonthEva () {
         let promises = []
         let count = 0
+        let applyYear = this.$moment(this.formData.title).year()
+        let applyMonth = this.$moment(this.formData.title).month() + 1
         const url = getPreMonthEva
         let params = {
           userID: this.$store.state.userInfo.id,
@@ -2072,7 +1898,7 @@
                 let rateResult = this.genRateTableData(this.users, res.data)
                 this.reqFlag.getPreMonthEva = true
                 if (this.$store.state.userInfo.id === 26) {
-                  this.getPerformanceIsPublish().then(getPerformanceIsPublishRes => {
+                  getPerformanceIsPublish(applyYear, applyMonth).then(getPerformanceIsPublishRes => {
                     this.performanceIsPublishInfo = getPerformanceIsPublishRes
                     if (getPerformanceIsPublishRes.length > 0) {
                       this.isPerformancePublish = getPerformanceIsPublishRes[0].flagValue === 1
