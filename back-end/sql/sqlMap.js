@@ -255,8 +255,10 @@ const sqlMap = {
     submitRatesResult: 'insert into mutualrate (ratePersion, ratedPersion, rateMonth, rate, rateType, rateTime, updateTime) ' +
         'values (?, ?, ?, ?, ?, ?, ?)',
     updateUserRate: 'update mutualrate set rate = ?, updateTime = ? where id = ?',
-    getCurMutualRate: 'select * from mutualrate where ratedPersion = ? and rateMonth = ?',
-    getRateData: 'select * from mutualrate where ratePersion = ? and rateMonth = ?',
+    getCurMutualRate: 'select ml.*, u.name as ratedPersionName, u.duty from mutualrate ml left join users u on ml.ratedPersion = u.id where' +
+        'ml.ratedPersion = ? and ml.rateMonth = ?',
+    getRateData: 'select ml.*, u.duty, u.groupName from mutualrate ml left join users on ml.ratePersion = u.id' +
+        'where ml.ratePersion = ? and ml.rateMonth = ?',
     getPerformanceIsCount: 'select * from globalflag where year(setTime) = ? and month(setTime) = ? and flagType = ?',
     getPreMonthEva: 'select mr.*, u.name as ratedPersionName from mutualrate mr left join users u on mr.ratedPersion = ' +
         'u.id where mr.rateMonth = ? and mr.ratePersion = ?',
@@ -266,7 +268,7 @@ const sqlMap = {
         'values (?, ?, ?, ?, ?, ?, ?)',
     getPerformanceRates: 'select pr.*, u.name as ratedPersionName, u.duty from performancerate pr left join users u on pr.ratedPersion = u.id ' +
         'where pr.ratePersion = ? and pr.rateMonth = ? and u.status != 0',
-    getPerformanceRatedData: 'select pr.*, u.duty, u.groupName from performancerate pr left join users u on pr.ratePersion = u.id where ' +  
+    getPerformanceRatedData: 'select pr.*, u.duty, u.groupName from performancerate pr left join users u on pr.ratePersion = u.id where ' +
         'pr.ratedPersion = ? and pr.rateMonth = ?'
   },
   conclusion: {

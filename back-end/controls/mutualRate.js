@@ -157,6 +157,7 @@ const mutualRate = {
                     id: data.usersData[i].id,
                     name: data.usersData[i].name,
                     groupName: data.usersData[i].groupName,
+                    duty: sendData.userList[i].duty,
                     ratedData: result[j],
                     rateData: result[j + 1]
                 }

@@ -234,7 +234,7 @@ export function monthNumToMonthString (monthNum) {
 }
 
 // 绩效得分标准化计算(2021年12月启用)
-export function performanceStdScoreCal (usersNum, rank) {
+export function PMScoreNorCal (usersNum, rank) {
   if (rank === 1) {
     return 95
   }
@@ -327,4 +327,42 @@ export function getGlobalFlagByType (flagType) {
       reject(new Error(err + 'getGlobalFlagByType send error!'))
     })
   })
+}
+
+// 评分类型转换
+export function rateTypeSwitch (rateType) {
+  switch (rateType) {
+    case 1:
+      return 't1Star'
+    case 2:
+      return 't2Star'
+    case 3:
+      return 't3Star'
+    case 4:
+      return 't4Star'
+    case 5:
+      return 't5Star'
+    case 6:
+      return 't6Star'
+    default:
+      return 't1Star'
+  }
+}
+
+// 星级转评分
+export function starToRates (star) {
+  switch (star) {
+    case 5:
+      return 92.5
+    case 4:
+      return 90
+    case 3:
+      return 87.5
+    case 2:
+      return 85
+    case 1:
+      return 82.5
+    default:
+      return 87.5
+  }
 }

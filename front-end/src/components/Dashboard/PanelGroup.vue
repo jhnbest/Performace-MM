@@ -168,7 +168,7 @@ import { getUsersName,
   getIsSubmitAllow,
   getCurGroupWorkTimeReviewFinish,
   getManagerMultualRateFinish } from '@/config/interface'
-  import { performanceStdScoreCal, calGetScore, getPerformanceIsPublish } from '@/utils/common'
+  import { PMScoreNorCal, calGetScore, getPerformanceIsPublish } from '@/utils/common'
   import { getUsersList } from '@/utils/users'
   import { getAllWorkTimeList } from '@/utils/performance'
 export default {
@@ -530,7 +530,7 @@ export default {
           if (this.$moment(this.formData.title).diff(this.$moment('2021-12-01'), 'days') < 0) {
             finalResult[count].performanceScore = calGetScore(this.$store.state.usersNum, finalResult[count].performanceRank) // 计算绩效得分 2021年12月以前
           } else {
-            finalResult[count].performanceScore = performanceStdScoreCal(this.$store.state.usersNum, finalResult[count].performanceRank) // 计算绩效得分 2021年12月及以后
+            finalResult[count].performanceScore = PMScoreNorCal(this.$store.state.usersNum, finalResult[count].performanceRank) // 计算绩效得分 2021年12月及以后
           }
           count++
         }

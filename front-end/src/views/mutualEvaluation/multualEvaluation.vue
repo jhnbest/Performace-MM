@@ -240,7 +240,7 @@
   import CountTo from 'vue-count-to'
   import monthConclusionTableCheck from '@/views/monthConclusion/childViews/monthConclusionTableCheck'
   import { getCurMonthConclusionOverviewData } from '@/utils/conclusion'
-  import { performanceStdScoreCal, calGetScore, getPerformanceIsPublish } from '@/utils/common'
+  import { PMScoreNorCal, calGetScore, getPerformanceIsPublish } from '@/utils/common'
   import { getUsersList } from '@/utils/users'
   import { getAllWorkTimeList } from '@/utils/performance'
   export default {
@@ -648,7 +648,7 @@
           if (this.$moment(this.formData.title).diff(this.$moment('2021-12-01'), 'days') < 0) {
             item.performanceScore = calGetScore(this.$store.state.usersNum, item.performanceRank) // 计算绩效得分 2021年12月以前
           } else {
-            item.performanceScore = performanceStdScoreCal(this.$store.state.usersNum, item.performanceRank) // 计算绩效得分 2021年12月及以后
+            item.performanceScore = PMScoreNorCal(this.$store.state.usersNum, item.performanceRank) // 计算绩效得分 2021年12月及以后
           }
         }
         for (let item of this.rateTableData) {
