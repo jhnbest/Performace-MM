@@ -10,7 +10,8 @@ import {
   urlGetWorkTimeListInfo,
   urlGetPerformanceIsPublish,
   urlGetTypeGlobalFlag,
-  urlGetGlobalFlagByType
+  urlGetGlobalFlagByType,
+  urlUpdateGlobalFlagVal
 } from '../config/interface'
 import store from '@/store'
 
@@ -329,7 +330,7 @@ export function getGlobalFlagByType (flagType) {
   })
 }
 
-// 评分类型转换
+// 评分类型由代码转文字
 export function rateTypeSwitch (rateType) {
   switch (rateType) {
     case 1:
@@ -365,4 +366,24 @@ export function starToRates (star) {
     default:
       return 87.5
   }
+}
+
+// 更新某种类型的全局标志位
+export function updateGlobalFlagVal (flagType, flagValue) {
+  const url = urlUpdateGlobalFlagVal
+  let params = {
+    flagType: flagType,
+    flagValue: flagValue
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(res => {
+      if (res.code === 1) {
+        resolve(res.data)
+      } else {
+        reject(res.err)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
 }

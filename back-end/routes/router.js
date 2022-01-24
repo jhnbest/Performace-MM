@@ -14,7 +14,8 @@ let router = express.Router();
 // 通用模块
 router.post(api.getTypeGlobalFlag, common.getTypeGlobalFlag)
 router.post(api.getGlobalFlagByType, common.getGlobalFlagByType)
-// user-用户管理 
+router.post(api.updateGlobalFlagVal, common.updateGlobalFlagVal)
+// user-用户管理
 router.post(api.userLogin, user.login);
 router.post(api.userLogout, user.logout);
 router.post(api.userAdd, user.add);

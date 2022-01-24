@@ -2,6 +2,7 @@
 
 export const urlGetTypeGlobalFlag = '/common/getTypeGlobalFlag'
 export const urlGetGlobalFlagByType = '/common/getGlobalFlagByType'
+export const urlUpdateGlobalFlagVal = '/common/updateGlobalFlagVal' // 更新某种类型的全局标志位
 
 export const userLogin = '/user/login' // 用户登录
 export const userLogout = '/user/logout' // 用户登出
@@ -84,6 +85,7 @@ export const submitRatesResult = '/mutualRates/submitRatesResult' // 提交互�
 export const updateUserRate = '/mutualRates/updateUserRate' // 更新互评结果
 export const getCurMutualRate = '/mutualRates/getCurMutualRate' // 获取本人互评得分
 export const getAllUserRates = '/mutualRates/getAllUserRates' // 获取本处员工互评得分
+export const urlGetAllUserRates = '/mutualRates/getAllUserRates' // 获取本处员工互评得分
 export const getPerformanceIsCount = '/mutualRates/getPerformanceIsCount' // 获取绩效信息统计标志
 export const getPreMonthEva = '/mutualRates/getPreMonthEva' // 提取上月互评结果
 export const handleFillMul = '/mutualRates/handleFillMul' // 一键填充定性评价

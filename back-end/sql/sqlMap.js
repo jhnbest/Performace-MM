@@ -2,6 +2,7 @@ const sqlMap = {
   common: {
     getTypeGlobalFlag: 'select * from globalflag where year(setTime) = ? and month(setTime) = ? and flagType = ?',
     getGlobalFlagByType: 'select * from globalflag where flagType = ?',
+    updateGlobalFlagVal: 'update globalflag set flagValue = ? where flagType = ?'
   },
   user: {
     // 登陆
@@ -255,9 +256,9 @@ const sqlMap = {
     submitRatesResult: 'insert into mutualrate (ratePersion, ratedPersion, rateMonth, rate, rateType, rateTime, updateTime) ' +
         'values (?, ?, ?, ?, ?, ?, ?)',
     updateUserRate: 'update mutualrate set rate = ?, updateTime = ? where id = ?',
-    getCurMutualRate: 'select ml.*, u.name as ratedPersionName, u.duty from mutualrate ml left join users u on ml.ratedPersion = u.id where' +
+    getCurMutualRate: 'select ml.*, u.name as ratedPersionName, u.duty from mutualrate ml left join users u on ml.ratePersion = u.id where ' +
         'ml.ratedPersion = ? and ml.rateMonth = ?',
-    getRateData: 'select ml.*, u.duty, u.groupName from mutualrate ml left join users on ml.ratePersion = u.id' +
+    getRateData: 'select ml.*, u.duty, u.groupName from mutualrate ml left join users u on ml.ratedPersion = u.id ' +
         'where ml.ratePersion = ? and ml.rateMonth = ?',
     getPerformanceIsCount: 'select * from globalflag where year(setTime) = ? and month(setTime) = ? and flagType = ?',
     getPreMonthEva: 'select mr.*, u.name as ratedPersionName from mutualrate mr left join users u on mr.ratedPersion = ' +

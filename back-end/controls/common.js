@@ -38,6 +38,17 @@ const common = {
         }).catch(RCPDDatabaseErr => {
             return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
         })
+    },
+    // 更新某种类型的全局标志位
+    updateGlobalFlagVal (req, res) {
+        let sendData = req.body
+        let sql = $sql.common.updateGlobalFlagVal
+        let arrayParams = [sendData.flagValue, sendData.flagType]
+        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+            return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
+        }).catch(RCPDDatabaseErr => {
+            return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+        })
     }
 }
 module.exports = common

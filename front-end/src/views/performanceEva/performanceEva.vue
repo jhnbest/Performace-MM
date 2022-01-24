@@ -43,50 +43,45 @@
     <el-form :model="ratioFormData" :rules="ratioFormRules" ref="ratioFormData" :inline="true" class="main-search">
       <el-form-item label="员工互评的定性评价系数">
         <el-input v-model="ratioFormData.CSMutualCoef"
-                  :disabled="!reqFlag.getEvaCoef"
-                  @change="handleCSMutualCoefChange"></el-input>
+                  :disabled="!reqFlag.getEvaCoef || !reqFlag.tableDataInitFinish" style="width:50%"></el-input>
       </el-form-item>
-      <el-form-item label="经理评价的定性评价系数">
+      <el-form-item label="经理评价的定性评价系数" style="margin-left:-100px">
         <el-input v-model="ratioFormData.MGEvaCoef"
-                  :disabled="!reqFlag.getEvaCoef"
-                  @change="handleMGEvaCoefChange"></el-input>
+                  :disabled="!reqFlag.getEvaCoef || !reqFlag.tableDataInitFinish" style="width:50%"></el-input>
       </el-form-item>
-      <el-form-item label="定量评价系数">
+      <el-form-item label="定量评价系数" style="margin-left:-100px">
         <el-input v-model="ratioFormData.quantitativeCoef"
-                  :disabled="!reqFlag.getEvaCoef"
-                  @change="handleQuantativeRateChange"></el-input>
+                  :disabled="!reqFlag.getEvaCoef || !reqFlag.tableDataInitFinish" style="width:50%"></el-input>
       </el-form-item>
-      <el-form-item label="成效评价系数">
+      <el-form-item label="成效评价系数" style="margin-left:-100px">
         <el-input v-model="ratioFormData.PMEvaCoef"
-                  :disabled="!reqFlag.getEvaCoef"
-                  @change="handlePMEvaCoefChange"></el-input>
+                  :disabled="!reqFlag.getEvaCoef || !reqFlag.tableDataInitFinish" style="width:50%"></el-input>
       </el-form-item>
       <br>
       <el-form-item label="经理对普通职员的成效评价系数">
         <el-input v-model="ratioFormData.CSManagerPMEvaCoef"
-                  :disabled="!reqFlag.getEvaCoef"
-                  @change="handleCSManagerPMEvaCoefChange"></el-input>
+                  :disabled="!reqFlag.getEvaCoef || !reqFlag.tableDataInitFinish" style="width:50%"></el-input>
       </el-form-item>
-      <el-form-item label="组长对普通职员的成效评价系数">
+      <el-form-item label="组长对普通职员的成效评价系数" style="margin-left:-100px">
         <el-input v-model="ratioFormData.CSGroupLeaderPMEvaCoef"
-                  :disabled="!reqFlag.getEvaCoef"
-                  @change="handleCSGroupLeaderPMEvaCoefChange"></el-input>
+                  :disabled="!reqFlag.getEvaCoef || !reqFlag.tableDataInitFinish" style="width:50%"></el-input>
       </el-form-item>
-      <el-form-item label="普通职员对普通职员的成效评价系数">
+      <el-form-item label="普通职员对普通职员的成效评价系数" style="margin-left:-100px">
         <el-input v-model="ratioFormData.CScommonStaffPMEvaCoef"
-                  :disabled="!reqFlag.getEvaCoef"
-                  @change="handleCScommonStaffPMEvaCoefChange"></el-input>
+                  :disabled="!reqFlag.getEvaCoef || !reqFlag.tableDataInitFinish" style="width:50%"></el-input>
       </el-form-item>
       <br>
       <el-form-item label="经理对组长的成效评价系数">
         <el-input v-model="ratioFormData.GPManagerPMEvaCoef"
-                  :disabled="!reqFlag.getEvaCoef"
-                  @change="handleGPManagerPMEvaCoefChange"></el-input>
+                  :disabled="!reqFlag.getEvaCoef || !reqFlag.tableDataInitFinish" style="width:50%"></el-input>
       </el-form-item>
-      <el-form-item label="普通职员对组长的成效评价系数">
+      <el-form-item label="普通职员对组长的成效评价系数" style="margin-left:-100px">
         <el-input v-model="ratioFormData.GPCommonStaffPMEvaCoef"
-                  :disabled="!reqFlag.getEvaCoef"
-                  @change="handleGPCommonStaffPMEvaCoefChange"></el-input>
+                  :disabled="!reqFlag.getEvaCoef || !reqFlag.tableDataInitFinish" style="width:50%"></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="handleCalPMScore" :disabled="isCalPMScore">计算</el-button>
+        <el-button type="success" @click="handleSaveEvaCoef">保存系数</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -101,15 +96,23 @@
               :height="tableHeight"
               ref="rateTable"
               highlight-current-row>
-      <el-table-column label="姓名" prop="ratedName" align="center" min-width="40"></el-table-column>
-      <el-table-column v-if="$store.state.userInfo.id === 26" label="定量排名" align="center" prop="quantitativeRank" width="57"></el-table-column>
-      <el-table-column v-if="$store.state.userInfo.id === 26" label="互评排名" align="center" prop="staffRateRank" width="57"></el-table-column>
-      <el-table-column v-if="$store.state.userInfo.id === 26" label="领导评价排名" align="center" prop="mangerRateRank" width="57"></el-table-column>
+      <el-table-column label="姓名" prop="ratedName" align="center" min-width="20"></el-table-column>
+      <el-table-column v-if="$store.state.userInfo.id === 26" label="定量评价" align="center">
+        <el-table-column v-if="$store.state.userInfo.id === 26" label="工时排名" align="center" prop="quantitativeRank" width="57"></el-table-column>
+      </el-table-column>
+      <el-table-column v-if="$store.state.userInfo.id === 26" label="定性评价" align="center">
+        <el-table-column v-if="$store.state.userInfo.id === 26" label="员工互评排名" align="center" prop="CSMutualScoeAveRank" width="57"></el-table-column>
+        <el-table-column v-if="$store.state.userInfo.id === 26" label="经理评价排名" align="center" prop="MGQualiEvaScoreRank" width="57"></el-table-column>
+      </el-table-column>
+      <el-table-column v-if="$store.state.userInfo.id === 26" label="成效评价" align="center">
+        <el-table-column v-if="$store.state.userInfo.id === 26" label="成效评价排名" align="center" prop="PMEvaScoreUnNRank" width="57"></el-table-column>
+      </el-table-column>
+      <el-table-column v-if="$store.state.userInfo.id === 26" label="绩效排名（旧）" align="center" prop="PMScoreRankOld" width="65"></el-table-column>
       <el-table-column v-if="$store.state.userInfo.id === 26"
-                        label="绩效排名"
+                        label="绩效排名(新)"
                         align="center"
                         prop="PMScoreRank"
-                        width="57">
+                        width="65">
         <template slot-scope="scope">
           <span style="font-weight: bolder;color: red">{{scope.row.PMScoreRank}}</span>
           <i v-if="scope.row.PMScoreRankRise" class="el-icon-caret-top" style="color: red"></i>
@@ -172,7 +175,6 @@
     getCurMutualRate,
     getIsSubmitAllow,
     getIsWorkTimeReviewFinish,
-    getAllUserRates,
     urlGetPerformanceRates } from '@/config/interface'
   import { getAllPerformanceRate } from '@/utils/performancerate'
   import { getPerformanceIsPublish,
@@ -181,11 +183,14 @@
           getGlobalFlagByType,
           PMScoreNorCal,
           rateTypeSwitch,
-          starToRates } from '@/utils/common'
+          starToRates,
+          updateGlobalFlagVal } from '@/utils/common'
   import { getAllWorkTimeList } from '@/utils/performance'
   import { calPerformanceEvaScore } from '@/utils/performanceEva'
   import { groupName2String } from '@/utils/users'
+  import { getAllUserRates } from '@/utils/multual'
   import store from '@/store'
+import el from 'element-ui/src/locale/lang/el'
   export default {
     data () {
     return {
@@ -193,15 +198,15 @@
           title: this.$moment().format('YYYY-MM')
         },
         ratioFormData: {
-          CSMutualCoef: null,
-          MGEvaCoef: null,
-          quantitativeCoef: null,
-          PMEvaCoef: null,
-          CSManagerPMEvaCoef: null,
-          CSGroupLeaderPMEvaCoef: null,
-          CScommonStaffPMEvaCoef: null,
-          GPManagerPMEvaCoef: null,
-          GPCommonStaffPMEvaCoef: null
+          CSMutualCoef: 0,
+          MGEvaCoef: 0,
+          quantitativeCoef: 0,
+          PMEvaCoef: 0,
+          CSManagerPMEvaCoef: 0,
+          CSGroupLeaderPMEvaCoef: 0,
+          CScommonStaffPMEvaCoef: 0,
+          GPManagerPMEvaCoef: 0,
+          GPCommonStaffPMEvaCoef: 0
         },
         ratioFormRules: {
           quantativeRate: [
@@ -220,7 +225,6 @@
           getUserRates: true,
           getUsersList: true,
           updateRateToUpdate: true,
-          getAllUserRates: true,
           getPerformanceRates: true,
           getEvaCoef: true,
           tableDataInitFinish: false
@@ -230,24 +234,26 @@
         ratedArray: [],
         curMutualRate: 0,
         tableHeight: null,
-        commonStaffMutualCof: this.$store.state.commonStaffMutualCof,
-        commonStaffManagerCof: this.$store.state.commonStaffManagerCof,
-        commonStaffQuantitativeCof: this.$store.state.commonStaffQuantitativeCof,
-        groupLeaderMutualCof: this.$store.state.groupLeaderMutualCof,
-        groupLeaderManagerCof: this.$store.state.groupLeaderManagerCof,
-        groupLeaderQuantitativeCof: this.$store.state.groupLeaderQuantitativeCof,
-        directorMutualCof: this.$store.state.directorMutualCof,
-        directorManagerCof: this.$store.state.directorManagerCof,
-        directorQuantitativeCof: this.$store.state.directorQuantitativeCof,
+        commonStaffMutualCof: store.state.commonStaffMutualCof,
+        commonStaffManagerCof: store.state.commonStaffManagerCof,
+        commonStaffQuantitativeCof: store.state.commonStaffQuantitativeCof,
+        groupLeaderMutualCof: store.state.groupLeaderMutualCof,
+        groupLeaderManagerCof: store.state.groupLeaderManagerCof,
+        groupLeaderQuantitativeCof: store.state.groupLeaderQuantitativeCof,
+        directorMutualCof: store.state.directorMutualCof,
+        directorManagerCof: store.state.directorManagerCof,
+        directorQuantitativeCof: store.state.directorQuantitativeCof,
         isMultualEvaFinish: false,
         isQuantativeFinish: false,
         isPerformanceEvaFinish: false,
         multualEvaData: [],
         quantativeData: [],
-        performanceEvaData: [],
+        performanceEvaDataGlobal: [],
         isPerformancePublish: false,
         performanceIsPublishInfo: null,
-        PMEvaDataResult: null
+        PMEvaDataResult: null,
+        getPMEvaData: null,
+        isCalPMScore: false
       }
     },
     methods: {
@@ -332,10 +338,12 @@
               this.isPerformancePublish = false
               this.$common.toast(getPerformanceIsPublishErr, 'error', false)
             })
+
             promises[count++] = this.getQuantitativeInfo() // 获取定量评价结果
             promises[count++] = this.getAllMultualEvaResult() // 获取全处互评结果
             promises[count++] = this.getAllPerformanceRateResult(this.formData.title, 'performanceRateSubmit', userList) // 获取全处成效评价结果（总）
             promises[count++] = this.getEvaCoef() // 获取各种评价系数
+
             let genQuantativeDataResult = null
             let genMultualEvaDataResult = null
             let genPerformanceEvaDataResult = null
@@ -345,29 +353,38 @@
                 this.quantativeData = JSON.parse(JSON.stringify(genQuantativeDataResult))
               } else {
                 this.isQuantativeFinish = false
+                this.reqFlag.tableDataInitFinish = true
               }
               if (!result[1].err) { // 互评已截止
-                genMultualEvaDataResult = this.genMultualEvaData(result[1].content) // 生成互评数据
+                genMultualEvaDataResult = this.genQualiEvaData(result[1].content) // 生成互评数据
                 this.multualEvaData = JSON.parse(JSON.stringify(genMultualEvaDataResult))
               } else {
                 this.multualEvaData = []
                 this.isMultualEvaFinish = false
+                this.reqFlag.tableDataInitFinish = true
               }
               if (!result[2].err) { // 成效评价已截止
+                this.getPMEvaData = result[2].content
                 genPerformanceEvaDataResult = this.genPerformanceEvaData(result[2].content) // 生成成效评价数据
-                this.performanceEvaData = JSON.parse(JSON.stringify(genPerformanceEvaDataResult))
+                this.performanceEvaDataGlobal = JSON.parse(JSON.stringify(genPerformanceEvaDataResult))
               } else {
-                this.performanceEvaData = []
+                this.performanceEvaDataGlobal = []
                 this.isPerformanceEvaFinish = false
+                this.reqFlag.tableDataInitFinish = true
               }
               if (!result[0].err && !result[1].err && !result[2].err) { // 工时已审核完毕、互评已截止、成效评价已截止
                 this.isQuantativeFinish = true
                 this.isMultualEvaFinish = true
                 this.isPerformanceEvaFinish = true
                 this.genPerformanceScore(genQuantativeDataResult, genMultualEvaDataResult, genPerformanceEvaDataResult, 'init')
+                this.genPerformanceScoreOld(genQuantativeDataResult, genMultualEvaDataResult, 'init')
+                this.reqFlag.tableDataInitFinish = true
+              } else {
                 this.reqFlag.tableDataInitFinish = true
               }
             }).catch(err => {
+              this.reqFlag.tableDataInitFinish = true
+              console.log(err)
               this.$common.toast(err, 'error', true)
             })
           }
@@ -457,11 +474,9 @@
         }
         return allQuantitativeScore
       },
-      // 生成互评数据
-      genMultualEvaData (multualData) {
+      // 生成定性评价数据
+      genQualiEvaData (multualData) {
         let multualEvaScoreArr = []
-        console.log('multualData')
-        console.log(JSON.parse(JSON.stringify(multualData)))
         for (let multualDataItem of multualData) { // res.data格式：[{groupName: ; id: ;name: ; rateData: [{}]; ratedData: [{}]}, {...}]
           let obj = {
             id: multualDataItem.id,
@@ -605,28 +620,14 @@
           }
           count++
           allUserRates[i].MGQualiEvaScoreNor =
-            this.calGetScore(this.usersNum, allUserRates[i].MGQualiEvaScoreRank)
+            this.calGetScore(allUserRates.length, allUserRates[i].MGQualiEvaScoreRank)
         }
         let allQualiEvaScore = []
         allQualiEvaScore = standAndEngineerRates.concat(communicationRates)
         return allQualiEvaScore
-        // let multualRestuls = this.calMutualRatesRank(multualData) // 计算定性评价结果
-        // for (let item of this.rateTableData) {
-        //   let multualRestulsFindResult = multualRestuls.find(multualRestulsItem => {
-        //     return multualRestulsItem.id === item.ratedPersion
-        //   })
-        //   if (multualRestulsFindResult) {
-        //     item.staffMutualScore = multualRestulsFindResult.staffMutualScore
-        //     item.staffRateRank = multualRestulsFindResult.staffRateRank
-        //     item.multualScoreRaw = multualRestulsFindResult.mutualScore
-        //   }
-        // }
-        // return multualRestuls
       },
       // 生成成效评价数据
       genPerformanceEvaData (performanceEvaData) {
-        console.log('performanceEvaData')
-        console.log(JSON.parse(JSON.stringify(performanceEvaData)))
         let PMEvaScoreArr = []
         // ========================根据从成效评价数据库获取的数据计算每个人的成效得分========================
         for (let performanceEvaDataItem of performanceEvaData) {
@@ -702,8 +703,6 @@
           obj.PMEvaScoreUnN = Number(obj.PMEvaScoreUnN.toFixed(5))
           PMEvaScoreArr.push(obj)
         }
-        console.log('PMEvaScoreArr')
-        console.log(PMEvaScoreArr)
         // =================================按照成员所属组别计算成效标准化得分======================================
         let allPerformanceEvaRates = JSON.parse(JSON.stringify(PMEvaScoreArr))
         let managerIndex = allPerformanceEvaRates.findIndex(allUserRatesItem => {
@@ -771,18 +770,18 @@
           communicationRates[i].PMEvaScoreNor =
             calGetScore(communicationRates.length, communicationRates[i].PMEvaScoreUnNRank)
         }
-        // =================================定性评价结果合并===============================================
+        // =================================成效评价结果合并===============================================
         let allPMEvaScore = standAndEngineerRates.concat(communicationRates)
         return allPMEvaScore
       },
       // 生成绩效得分与排名数据
       genPerformanceScore (quantativeData, multualEvaData, performanceEvaData, genType) {
-        console.log('this.rateTableData')
-        console.log(JSON.parse(JSON.stringify(this.rateTableData)))
         console.log('performanceEvaData')
         console.log(performanceEvaData)
         console.log('multualEvaData')
         console.log(multualEvaData)
+        console.log('performanceEvaData')
+        console.log(performanceEvaData)
         // ==============================绩效得分(未标准化)计算================================
         for (let item of this.rateTableData) {
           let itemQuantativeScore = quantativeData.find(quantativeDataItem => { // 找出初始表格成员对应的定量数据
@@ -796,13 +795,20 @@
           })
           // 计算未标准化的绩效得分
           if (itemQuantativeScore && itemMultualEvaScore && itemPMEvaObj) {
-              item.PMScoreUnN = itemQuantativeScore.quantitativeScore * this.ratioFormData.quantitativeCoef +
-               itemMultualEvaScore.mutualScore +
-               itemPMEvaObj.PMEvaScoreUnN * this.ratioFormData.PMEvaCoef
+              item.PMScoreUnN =
+                itemQuantativeScore.quantitativeScore * this.ratioFormData.quantitativeCoef + // 定量评价乘上相应系数
+                itemMultualEvaScore.CSMutualScoreNor * this.ratioFormData.CSMutualCoef + // 定性评价（员工互评）乘上相应系数
+                itemMultualEvaScore.MGQualiEvaScoreNor * this.ratioFormData.MGEvaCoef + // 定性评价（经理评价）乘上相应系数
+                itemPMEvaObj.PMEvaScoreNor * this.ratioFormData.PMEvaCoef // 成效评价乘上相应系数
+              item.PMEvaScoreUnNRank = itemPMEvaObj.PMEvaScoreUnNRank
               item.PMEvaScoreUnN = itemPMEvaObj.PMEvaScoreUnN
-              item.staffMutualScoreTmp = itemMultualEvaScore.staffRate
-              item.managerScoreTmp = itemMultualEvaScore.managerScore
-              item.mangerRateRank = itemMultualEvaScore.managerRateRank
+              item.PMEvaScoreNor = itemPMEvaObj.PMEvaScoreNor
+              item.MGQualiEvaScoreUnN = itemMultualEvaScore.MGQualiEvaScoreUnN
+              item.MGQualiEvaScoreRank = itemMultualEvaScore.MGQualiEvaScoreRank
+              item.MGQualiEvaScoreNor = itemMultualEvaScore.MGQualiEvaScoreNor
+              item.CSMutualScoeAve = itemMultualEvaScore.CSMutualScoeAve
+              item.CSMutualScoeAveRank = itemMultualEvaScore.CSMutualScoeAveRank
+              item.CSMutualScoreNor = itemMultualEvaScore.CSMutualScoreNor
               item.totalWorkTime = Number(itemQuantativeScore.totalWorkTime.toFixed(2))
           }
         }
@@ -848,6 +854,98 @@
         if (genType === 'init') {
           this.rateTableData.sort(this.sortAddBy('PMScoreRank'))
         }
+        console.log('this.rateTableData')
+        console.log(JSON.parse(JSON.stringify(this.rateTableData)))
+      },
+      genPerformanceScoreOld (quantativeData, multualEvaData, genType) {
+        // ==============================绩效得分(未标准化)计算================================
+        for (let item of this.rateTableData) {
+          let itemQuantativeScore = quantativeData.find(quantativeDataItem => { // 找出初始表格成员对应的定量数据
+            return quantativeDataItem.id === item.ratedPersion
+          })
+          let itemMultualEvaScore = multualEvaData.find(multualEvaDataItem => { // 找出初始表格成员对应的定性数据
+            return multualEvaDataItem.id === item.ratedPersion
+          })
+          // 计算未标准化的绩效得分
+          if (itemQuantativeScore && itemMultualEvaScore) {
+            if (item.ratedPersion === 7 || item.ratedPersion === 11 || item.ratedPersion === 31) { // 主任岗
+              item.PMScoreUnNOld =
+                itemQuantativeScore.quantitativeScore * this.directorQuantitativeCof + // 定量评价乘上相应系数
+                itemMultualEvaScore.CSMutualScoreNor * this.directorMutualCof + // 定性评价（员工互评）乘上相应系数
+                itemMultualEvaScore.MGQualiEvaScoreNor * this.directorManagerCof // 定性评价（经理评价）乘上相应系数
+            } else if (item.ratedPersion === 13 || item.ratedPersion === 17 || item.ratedPersion === 33) { // 组长
+              item.PMScoreUnNOld =
+                itemQuantativeScore.quantitativeScore * this.groupLeaderQuantitativeCof + // 定量评价乘上相应系数
+                itemMultualEvaScore.CSMutualScoreNor * this.groupLeaderMutualCof + // 定性评价（员工互评）乘上相应系数
+                itemMultualEvaScore.MGQualiEvaScoreNor * this.groupLeaderManagerCof // 定性评价（经理评价）乘上相应系数
+            } else { // 普通员工
+              item.PMScoreUnNOld =
+                itemQuantativeScore.quantitativeScore * this.commonStaffQuantitativeCof + // 定量评价乘上相应系数
+                itemMultualEvaScore.CSMutualScoreNor * this.commonStaffMutualCof + // 定性评价（员工互评）乘上相应系数
+                itemMultualEvaScore.MGQualiEvaScoreNor * this.commonStaffManagerCof // 定性评价（经理评价）乘上相应系数
+            }
+            // item.MGQualiEvaScoreUnN = itemMultualEvaScore.MGQualiEvaScoreUnN
+            // item.MGQualiEvaScoreRank = itemMultualEvaScore.MGQualiEvaScoreRank
+            // item.MGQualiEvaScoreNor = itemMultualEvaScore.MGQualiEvaScoreNor
+            // item.CSMutualScoeAve = itemMultualEvaScore.CSMutualScoeAve
+            // item.CSMutualScoeAveRank = itemMultualEvaScore.CSMutualScoeAveRank
+            // item.CSMutualScoreNor = itemMultualEvaScore.CSMutualScoreNor
+            // item.totalWorkTime = Number(itemQuantativeScore.totalWorkTime.toFixed(2))
+          }
+        }
+        // this.rateTableData.sort(this.sortBy('PMScoreUnN'))
+        let rateTableDataTmp = JSON.parse(JSON.stringify(this.rateTableData))
+        rateTableDataTmp.sort(this.sortBy('PMScoreUnNOld'))
+        // ====================================绩效排名与标准化绩效得分计算======================================
+        let count = 0
+        let prePMScoreUnN = -1
+        let rankTmp = []
+        let count1 = -1
+        let count2 = 1
+        // 把绩效得分相同的人员存进对象数组同一个元素里面
+        for (let i = 0; i < rateTableDataTmp.length; i++) {
+          if (rateTableDataTmp[i].PMScoreUnNOld === prePMScoreUnN) {
+            rankTmp[count1].push(rateTableDataTmp[i])
+          } else {
+            count1++
+            if (!rankTmp[count1]) {
+              rankTmp[count1] = []
+            }
+            rankTmp[count1].push(rateTableDataTmp[i])
+            prePMScoreUnN = rateTableDataTmp[i].PMScoreUnNOld
+          }
+        }
+        // 绩效得分相同的人员根据工时多少进行排序
+        for (let i = 0; i < rankTmp.length; i++) {
+          rankTmp[i].sort(this.sortBy('totalWorkTime'))
+          for (let j = 0; j < rankTmp[i].length; j++) {
+            rateTableDataTmp[count++] = rankTmp[i][j]
+          }
+        }
+        for (let item of rateTableDataTmp) {
+          item.PMScoreRankOld = count2++ // 绩效排名计算
+          // if (genType === 'init') {
+          //   item.initPMScoreRank = item.PMScoreRankOld
+          // } else if (genType === 'update') {
+          //   let PMScoreRankChange = item.initPMScoreRank - item.PMScoreRankOld
+          //   item.PMScoreRankRise = PMScoreRankChange > 0
+          //   item.PMScoreRankDesc = PMScoreRankChange < 0
+          //   item.PMScoreRankChange = Math.abs(PMScoreRankChange)
+          // }
+          item.PMScoreNorOld = PMScoreNorCal(this.usersNum, item.PMScoreRankOld)
+        }
+        for (let item of this.rateTableData) {
+          let rateTableFindResult = rateTableDataTmp.find(rateTableDataTmpItem => {
+            return rateTableDataTmpItem.ratedPersion === item.ratedPersion
+          })
+          item.PMScoreRankOld = rateTableFindResult.PMScoreRankOld
+          item.PMScoreNorOld = rateTableFindResult.PMScoreNorOld
+        }
+        // if (genType === 'init') {
+        //   this.rateTableData.sort(this.sortAddBy('PMScoreRank'))
+        // }
+        console.log('this.rateTableData')
+        console.log(JSON.parse(JSON.stringify(this.rateTableData)))
       },
       // 数据排序方法
       compare (params) {
@@ -932,126 +1030,6 @@
           return 82.5
         }
       },
-      // 计算定性评价排名与得分
-      calMutualRatesRank (allUserRatesTmp) {
-        let allUserRates = JSON.parse(JSON.stringify(allUserRatesTmp))
-        let managerIndex = allUserRates.findIndex(allUserRatesItem => {
-          return allUserRatesItem.id === 26
-        })
-        if (managerIndex !== -1) {
-          allUserRates.splice(managerIndex, 1)
-        }
-        let standAndEngineerRates = []
-        let communicationRates = []
-        for (let item of allUserRates) {
-          if (item.groupName === '技术标准组' || item.groupName === '工程组') {
-            standAndEngineerRates.push(item)
-          } else if (item.groupName === '通信组') {
-            communicationRates.push(item)
-          }
-        }
-        // =================================定性评价排序===============================================
-        // 技术标准组&工程组员工互评排序
-        for (let i = 0; i < standAndEngineerRates.length - 1; i++) {
-          for (let j = 0; j < standAndEngineerRates.length - 1 - i; j++) {
-            if (standAndEngineerRates[j].staffRate < standAndEngineerRates[j + 1].staffRate) {
-              [standAndEngineerRates[j], standAndEngineerRates[j + 1]] =
-                [standAndEngineerRates[j + 1], standAndEngineerRates[j]]
-            }
-          }
-        }
-        // 通信组员工互评排序
-        for (let i = 0; i < communicationRates.length - 1; i++) {
-          for (let j = 0; j < communicationRates.length - 1 - i; j++) {
-            if (communicationRates[j].staffRate < communicationRates[j + 1].staffRate) {
-              [communicationRates[j], communicationRates[j + 1]] =
-                [communicationRates[j + 1], communicationRates[j]]
-            }
-          }
-        }
-        // 全处员工领导评价排序
-        for (let i = 0; i < allUserRates.length - 1; i++) {
-          for (let j = 0; j < allUserRates.length - 1 - i; j++) {
-            if (allUserRates[j].managerRate < allUserRates[j + 1].managerRate) {
-              [allUserRates[j], allUserRates[j + 1]] =
-                [allUserRates[j + 1], allUserRates[j]]
-            }
-          }
-        }
-        // =================================定性评价得分计算===============================================
-        // 技术标准组与工程组互评排名&得分计算
-        let tmpStaffRate = -1
-        let count = 1
-        for (let i = 0; i < standAndEngineerRates.length; i++) {
-          if (standAndEngineerRates[i].staffRate === tmpStaffRate) {
-            standAndEngineerRates[i].staffRateRank = standAndEngineerRates[i - 1].staffRateRank
-          } else {
-            standAndEngineerRates[i].staffRateRank = count
-            tmpStaffRate = standAndEngineerRates[i].staffRate
-          }
-          count++
-          standAndEngineerRates[i].staffMutualScore =
-            this.calGetScore(standAndEngineerRates.length, standAndEngineerRates[i].staffRateRank)
-        }
-        // 通信组互评排名&得分计算
-        tmpStaffRate = -1
-        count = 1
-        for (let i = 0; i < communicationRates.length; i++) {
-          if (communicationRates[i].staffRate === tmpStaffRate) {
-            communicationRates[i].staffRateRank = communicationRates[i - 1].staffRateRank
-          } else {
-            communicationRates[i].staffRateRank = count
-            tmpStaffRate = communicationRates[i].staffRate
-          }
-          count++
-          communicationRates[i].staffMutualScore =
-            this.calGetScore(communicationRates.length, communicationRates[i].staffRateRank)
-        }
-        // 全处员工领导评价排名&得分计算
-        tmpStaffRate = -1
-        count = 1
-        for (let i = 0; i < allUserRates.length; i++) {
-          if (allUserRates[i].managerRate === tmpStaffRate) {
-            allUserRates[i].managerRateRank = allUserRates[i - 1].managerRateRank
-          } else {
-            allUserRates[i].managerRateRank = count
-            tmpStaffRate = allUserRates[i].managerRate
-          }
-          count++
-          allUserRates[i].managerScore =
-            this.calGetScore(allUserRates.length, allUserRates[i].managerRateRank)
-        }
-        let allRates = []
-        // =================================定性评价结果合并===============================================
-        // 合并三个组结果
-        for (let item of standAndEngineerRates) { // 技术标准组和工程组互拼得分计算
-          if (item.id === 7 || item.id === 11 || item.id === 31) { // 主任岗
-            item.mutualScore = item.staffMutualScore * this.directorMutualCof +
-              item.managerScore * this.directorManagerCof
-          } else if (item.id === 13 || item.id === 17 || item.id === 33) { // 组长
-            item.mutualScore = item.staffMutualScore * this.groupLeaderMutualCof +
-              item.managerScore * this.groupLeaderManagerCof
-          } else { // 普通成员
-            item.mutualScore = item.staffMutualScore * this.commonStaffMutualCof +
-              item.managerScore * this.commonStaffManagerCof
-          }
-          allRates.push(item)
-        }
-        for (let item of communicationRates) { // 通信组互评得分计算
-          if (item.id === 7 || item.id === 11 || item.id === 31) { // 主任岗
-            item.mutualScore = item.staffMutualScore * this.directorMutualCof +
-              item.managerScore * this.directorManagerCof
-          } else if (item.id === 13 || item.id === 17 || item.id === 33) { // 组长
-            item.mutualScore = item.staffMutualScore * this.groupLeaderMutualCof +
-              item.managerScore * this.groupLeaderManagerCof
-          } else { // 普通成员
-            item.mutualScore = item.staffMutualScore * this.commonStaffMutualCof +
-              item.managerScore * this.commonStaffManagerCof
-          }
-          allRates.push(item)
-        }
-        return allRates
-      },
       // 将获得的信息按小组分类
       groupedWorkTimeList (allWorkTimeList) {
         let groupedWorkTimeList = []
@@ -1130,42 +1108,6 @@
           manageRate: manageRate
         }
       },
-      // 获取全处员工互评信息
-      getAllUserRates (users) {
-        const url = getAllUserRates
-        let params = {
-          usersData: users,
-          rateMonth: this.formData.title
-        }
-        let _this = this
-        if (this.reqFlag.getAllUserRates) {
-          this.reqFlag.getAllUserRates = false
-          return new Promise(function (resolve, reject) {
-            _this.$http(url, params).then(res => {
-              if (res.code === 1) {
-                // for (let item of res.data) { // res.data格式：[{groupName: ; id: ;name: ; rateData: [{}]; ratedData: [{}]}, {...}]
-                //   let obj = {
-                //     id: item.id,
-                //     name: item.name,
-                //     groupName: item.groupName
-                //   }
-                //   let getRated = _this.getMulRated(item.ratedData)
-                //   obj.staffRate = Number(getRated.staffRate.toFixed(3))
-                //   obj.managerRate = Number(getRated.manageRate.toFixed(3))
-                //   obj.isRate = item.rateData.length !== 0
-                //   allUsersRates.push(obj)
-                // }
-                _this.reqFlag.getAllUserRates = true
-                resolve(res.data)
-              } else {
-                reject(new Error('getAllUserRates recv error!'))
-              }
-            }).catch(err => {
-              reject(new Error(err))
-            })
-          })
-        }
-      },
       // 获取定量评价结果
       getQuantitativeInfo () {
         let _this = this
@@ -1231,12 +1173,12 @@
         return new Promise(function (resolve, reject) {
           _this.getIsSubmitMultualEvaAllow().then(getIsSubmitMultualEvaAllowRes => { // 判断互评是否已截止
             if (getIsSubmitMultualEvaAllowRes.length > 0) { // 已截止
-              _this.getAllUserRates(_this.users).then(getAllUserRatesRes => {
+              getAllUserRates(_this.users, _this.formData.title).then(getAllUserRatesRes => {
                 resolve({
                   error: false,
                   content: getAllUserRatesRes })
               }).catch(getAllUserRatesResErr => {
-                reject(new Error('getAllUserRates error' + getAllUserRatesResErr))
+                reject(getAllUserRatesResErr)
               })
             } else { // 未截止
               for (let item of _this.rateTableData) {
@@ -1248,7 +1190,7 @@
               })
             }
           }).catch(getIsSubmitMultualEvaAllowErr => {
-            reject(new Error('getIsSubmitMultualEvaAllow error ' + getIsSubmitMultualEvaAllowErr))
+            reject(getIsSubmitMultualEvaAllowErr)
           })
         })
       },
@@ -1464,7 +1406,6 @@
                     quantitativeRank: null,
                     staffMutualScore: null,
                     staffRateRank: null,
-                    performanceScore: null,
                     PMScoreRank: null,
                     PMScoreRankRise: false,
                     PMScoreRankDesc: false,
@@ -1493,7 +1434,6 @@
                     quantitativeRank: null,
                     staffMutualScore: null,
                     staffRateRank: null,
-                    performanceScore: null,
                     PMScoreRank: null,
                     PMScoreRankRise: false,
                     PMScoreRankDesc: false,
@@ -1521,7 +1461,6 @@
                   quantitativeRank: null,
                   staffMutualScore: null,
                   staffRateRank: null,
-                  performanceScore: null,
                   PMScoreRank: null,
                   PMScoreRankRise: false,
                   PMScoreRankDesc: false,
@@ -1549,7 +1488,6 @@
                 quantitativeRank: null,
                 staffMutualScore: null,
                 staffRateRank: null,
-                performanceScore: null,
                 PMScoreRank: null,
                 PMScoreRankRise: false,
                 PMScoreRankDesc: false,
@@ -1893,44 +1831,50 @@
           }
         })
       },
-      // 员工互评定性评价比例改变
-      handleCSMutualCoefChange () {
+      // 计算修改系数后的绩效得分
+      handleCalPMScore () {
+        this.isCalPMScore = true
+        if (parseFloat((Number(this.ratioFormData.CSMutualCoef) +
+        Number(this.ratioFormData.MGEvaCoef) +
+        Number(this.ratioFormData.quantitativeCoef) +
+        Number(this.ratioFormData.PMEvaCoef)).toFixed(5)) !== 1) {
+          this.$common.toast('定性评价系数、定量评价系数、成效评价系数之和不为1', 'error', true)
+          return null
+        }
+        if (parseFloat((Number(this.ratioFormData.CSManagerPMEvaCoef) +
+        Number(this.ratioFormData.CSGroupLeaderPMEvaCoef) +
+        Number(this.ratioFormData.CScommonStaffPMEvaCoef)).toFixed(5)) !== 1) {
+          this.$common.toast('经理对普通职员的成效评价系数、组长对普通职员的成效评价系数、普通职员对普通职员的成效评价系数之和不为1', 'error', true)
+          return null
+        }
+        if (parseFloat((Number(this.ratioFormData.GPManagerPMEvaCoef) +
+        Number(this.ratioFormData.GPCommonStaffPMEvaCoef)).toFixed(5)) !== 1) {
+          this.$common.toast('经理对组长的成效评价系数、普通职员对组长的成效评价系数之和不为1', 'error', true)
+          return null
+        }
+        let genPerformanceEvaDataResult = this.genPerformanceEvaData(this.getPMEvaData) // 重新生成成效评价数据
+        this.genPerformanceScore(this.quantativeData, this.multualEvaData, genPerformanceEvaDataResult, 'update')
+        this.isCalPMScore = false
       },
-      // 经理评价比例改变
-      handleMGEvaCoefChange () {
-      },
-      // 定量评价比例改变
-      handleQuantativeRateChange () {
-        this.ratioFormData.performanceRate = (0.7 - this.ratioFormData.quantativeRate).toFixed(2)
-      },
-      // 成效比例改变
-      handlePMEvaCoefChange () {
-        this.ratioFormData.quantativeRate = (0.7 - this.ratioFormData.performanceRate).toFixed(2)
-      },
-      // 经理对普通员工的成效评价系数改变
-      handleCSManagerPMEvaCoefChange () {
-      },
-      // 组长对普通员工的成效评价系数改变
-      handleCSGroupLeaderPMEvaCoefChange () {
-      },
-      // 普通员工对普通员工的成效评价系数改变
-      handleCScommonStaffPMEvaCoefChange () {
-      },
-      // 经理对组长的成效评价技术改变
-      handleGPManagerPMEvaCoefChange () {
-
-      },
-      // 普通员工对组长的评价系数改变
-      handleGPCommonStaffPMEvaCoefChange () {
-      },
-      // 普通员工成效评价比例改变
-      handleCommonStaffPerChange () {
-      },
-      // 经理对组长评价的比例改变
-      handleGLManPerCge () {
-      },
-      // 普通成员对组长评价的比例改变
-      handleGLComPerCge () {
+      // 保存系数
+      handleSaveEvaCoef () {
+        let promises = []
+        let count = 0
+        promises[count++] = updateGlobalFlagVal('CSMutualCoef', this.ratioFormData.CSMutualCoef)
+        promises[count++] = updateGlobalFlagVal('MGEvaCoef', this.ratioFormData.MGEvaCoef)
+        promises[count++] = updateGlobalFlagVal('quantitativeCoef', this.ratioFormData.quantitativeCoef)
+        promises[count++] = updateGlobalFlagVal('PMEvaCoef', this.ratioFormData.PMEvaCoef)
+        promises[count++] = updateGlobalFlagVal('CSManagerPMEvaCoef', this.ratioFormData.CSManagerPMEvaCoef)
+        promises[count++] = updateGlobalFlagVal('CSGroupLeaderPMEvaCoef', this.ratioFormData.CSGroupLeaderPMEvaCoef)
+        promises[count++] = updateGlobalFlagVal('CScommonStaffPMEvaCoef', this.ratioFormData.CScommonStaffPMEvaCoef)
+        promises[count++] = updateGlobalFlagVal('GPManagerPMEvaCoef', this.ratioFormData.GPManagerPMEvaCoef)
+        promises[count++] = updateGlobalFlagVal('GPCommonStaffPMEvaCoef', this.ratioFormData.GPCommonStaffPMEvaCoef)
+        Promise.all(promises).then(() => {
+          this.$common.toast('保存成功', 'success', false)
+        }).catch(err => {
+          console.log(err)
+          this.$common.toast('保存失败', 'error', true)
+        })
       }
     },
     components: {

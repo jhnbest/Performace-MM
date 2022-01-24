@@ -5,6 +5,7 @@ module.exports = {
     // 通用模块
     getTypeGlobalFlag: path + '/common/getTypeGlobalFlag',
     getGlobalFlagByType: path + '/common/getGlobalFlagByType',
+    updateGlobalFlagVal: path + '/common/updateGlobalFlagVal',
 
     // user-用户管理
     userLogin: path + '/user/login', // 用户登录

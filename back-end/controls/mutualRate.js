@@ -157,13 +157,15 @@ const mutualRate = {
                     id: data.usersData[i].id,
                     name: data.usersData[i].name,
                     groupName: data.usersData[i].groupName,
-                    duty: sendData.userList[i].duty,
+                    duty: data.usersData[i].duty,
                     ratedData: result[j],
                     rateData: result[j + 1]
                 }
                 resultData.push(obj)
             }
             return $http.writeJson(res, { code: 1, data: resultData, message: '成功' })
+        }).catch(err => {
+            return $http.writeJson(res, {code: -2, err: err, message: 'false'})
         })
     },
     // 获取绩效信息统计标志
