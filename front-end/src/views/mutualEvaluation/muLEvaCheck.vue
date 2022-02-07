@@ -82,7 +82,6 @@
           this.usersList = res1
           this.getAllUserRates(res1).then((res2) => {
             let mutualRatesRankResult = this.calMutualRatesRank(res2)
-            console.log(mutualRatesRankResult)
             this.tableData = res2
           })
         })
@@ -403,7 +402,6 @@
         // this.getAllUserRates(this.usersList).then()
         this.getAllUserRates(this.usersList).then((res2) => {
           let mutualRatesRankResult = this.calMutualRatesRank(res2)
-          console.log(mutualRatesRankResult)
           this.tableData = res2
         })
       },

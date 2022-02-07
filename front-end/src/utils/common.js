@@ -368,6 +368,24 @@ export function starToRates (star) {
   }
 }
 
+// 评分转星级
+export function ratesToStar (rates) {
+  switch (rates) {
+    case 92.5:
+      return 5
+    case 90:
+      return 4
+    case 87.5:
+      return 3
+    case 85:
+      return 2
+    case 82.5:
+      return 1
+    default:
+      return 4
+  }
+}
+
 // 更新某种类型的全局标志位
 export function updateGlobalFlagVal (flagType, flagValue) {
   const url = urlUpdateGlobalFlagVal
@@ -386,4 +404,20 @@ export function updateGlobalFlagVal (flagType, flagValue) {
       reject(err)
     })
   })
+}
+
+// 小写阿拉伯数字转大写
+export function smallNumToL (num) {
+  switch (num) {
+    case 1:
+      return '一'
+    case 2:
+      return '二'
+    case 3:
+      return '三'
+    case 4:
+      return '四'
+    default:
+      return '错误'
+  }
 }

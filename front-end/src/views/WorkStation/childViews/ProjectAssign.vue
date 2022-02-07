@@ -857,8 +857,6 @@
         },
         // 一键设置K值
         handleResetKValue () {
-          console.log('======this.tableData======')
-          console.log(this.tableData)
           for (let item of this.tableData) {
             if (item.dynamicKValue !== 0) {
               item.kValue = this.resetKValue

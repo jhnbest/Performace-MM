@@ -76,7 +76,7 @@ export default {
               if (res.code === 1) {
                 if (this.rememberUser) {
                   // 传入账号名，密码，和保存天数3个参数
-                  this.setCookie(this.formData.name, this.formData.password, 0.5)
+                  this.setCookie(this.formData.name, this.formData.password, 2)
                 } else {
                   console.log('清空Cookie')
                   // 清空Cookie

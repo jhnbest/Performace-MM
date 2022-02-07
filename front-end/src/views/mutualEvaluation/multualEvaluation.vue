@@ -225,7 +225,6 @@
 
 <script>
   import {
-    getUsersName,
     getUserRates,
     submitRatesResult,
     updateUserRate,
@@ -237,7 +236,6 @@
     getPreMonthEva,
     urlGetCurApplyAbleMonth,
     handleFillMul } from '@/config/interface'
-  import CountTo from 'vue-count-to'
   import monthConclusionTableCheck from '@/views/monthConclusion/childViews/monthConclusionTableCheck'
   import { getCurMonthConclusionOverviewData } from '@/utils/conclusion'
   import { PMScoreNorCal, calGetScore, getPerformanceIsPublish } from '@/utils/common'
@@ -1013,8 +1011,6 @@
           return new Promise(function (resolve, reject) {
             _this.$http(url, params).then(res => {
               if (res.code === 1) {
-                console.log('res.data')
-                console.log(res.data)
                 for (let item of res.data) {
                   let obj = {
                     id: item.id,

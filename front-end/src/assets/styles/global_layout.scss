@@ -39,7 +39,11 @@ input[type="number"]{
 .text-warning{color: $color-warning;}
 .text-danger{color: $color-danger;}
 .text-info{color: $color-info;}
-
+// .el-div {
+//   width: 30px;
+//   height: 300px;
+//   background-color: #ff0000;
+// }
 .bg-main{color: $color-main;}
 .bg-success{color:#ffffff; background: $color-success;}
 .bg-warning{color:#ffffff; background: $color-warning;}
@@ -55,12 +59,12 @@ input[type="number"]{
 /* 右边主框样式 */
 /* 布局 start */
 .home-wrap{position: relative;
-  .el-header{position:fixed;width:100%;height:60px; left:0; top:0; z-index:1000}     
+  .el-header{position:fixed;width:100%;height:60px; left:0; top:0; z-index:1000}
 }
 
 .container-wrap{margin-top: 60px; overflow:auto;
   .aside-wrap{position:fixed;width: 200px; height: 100%;z-index: 100;
-    .el-menu{height: 100%;}
+    .el-menu{height: 100%; overflow: auto;}
   }
   .main-wrap{margin-left: 200px;padding: 0;}
 }

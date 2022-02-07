@@ -22,7 +22,7 @@ export default new Vuex.Store({
       { name: '月总结评价', url: '/home/conclusionEva', icon: 'el-icon-check' },
       { name: '定性评价管理', url: '/home/mulEvaCheck', icon: 'el-icon-s-opportunity' },
       // { name: '用户管理', url: '/home/users', icon: 'el-icon-user-solid' },
-      { name: '绩效评价测试', url: '/home/PerformanceEvaNew', icon: 'el-icon-user-solid' }
+      { name: '成效评价测试', url: '/home/PerformanceEvaNew', icon: 'el-icon-user-solid' }
     ],
     pageSize: 100, // 每页请求多少条
     refreshInterval: 300, // 组件手动刷新间隔 ms
@@ -46,6 +46,7 @@ export default new Vuex.Store({
     CScommonStaffPMEvaCoef: 0.5, // 普通员工对普通员工的成效评价系数
     GPManagerPMEvaCoef: 0.5, // 处经理对组长的成效评价系数
     GPCommonStaffPMEvaCoef: 0.5, // 普通员工对组长的成效评价系数
+    defaultStar: 3, // 默认评价星级
     progressColors: [
       { color: '#f56c6c', percentage: 20 },
       { color: '#e6a23c', percentage: 40 },

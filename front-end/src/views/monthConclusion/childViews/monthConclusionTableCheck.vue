@@ -211,8 +211,6 @@
       },
       watch: {
         managerRateStarCom (e) {
-          console.log('e')
-          console.log(e)
           this.managerRateStarCom = e
         }
       },

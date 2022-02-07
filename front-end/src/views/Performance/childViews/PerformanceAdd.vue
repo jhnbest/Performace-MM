@@ -1066,8 +1066,6 @@
         }
       },
       created () {
-        console.log('===PerformanceAdd.vue created')
-        console.log(this.$store.state.userInfo)
         this.init()
       },
       name: 'PerformanceAdd.vue'

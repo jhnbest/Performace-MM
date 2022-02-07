@@ -5,7 +5,6 @@ import {
 
 // 获取全处工时信息
 export function getAllWorkTimeList (applyMonth) {
-    console.log('applyMonth:', applyMonth)
     const url = urlGetAllWorkTimeList
     let params = {
         applyMonth: applyMonth

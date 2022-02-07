@@ -160,15 +160,15 @@
 
 <script>
 import CountTo from 'vue-count-to'
-import { getUsersName,
-  getPerformanceIsCount,
+import Cookies from 'js-cookie'
+import {
   getCurMutualRate,
   getAllUserRates,
   getGroupWorkTimeList,
   getIsSubmitAllow,
   getCurGroupWorkTimeReviewFinish,
   getManagerMultualRateFinish } from '@/config/interface'
-  import { PMScoreNorCal, calGetScore, getPerformanceIsPublish } from '@/utils/common'
+  import { PMScoreNorCal, calGetScore, getPerformanceIsPublish, smallNumToL, getTypeGlobalFlag } from '@/utils/common'
   import { getUsersList } from '@/utils/users'
   import { getAllWorkTimeList } from '@/utils/performance'
 export default {
@@ -232,14 +232,14 @@ export default {
       this.quarterStar = {
         name: '加载中...'
       }
-      this.selectQuarterNum = this.smallNumToL(this.$moment(this.formData.title).quarter()) // 当前选择的季度
+      this.selectQuarterNum = smallNumToL(this.$moment(this.formData.title).quarter()) // 当前选择的季度
       if (this.reqFlag.getPerformanceScore) {
         this.reqFlag.getPerformanceScore = false
         getUsersList().then(getUsersListRes => {
           this.users = getUsersListRes
           this.calGroupMemNum(this.users)
-          getPerformanceIsPublish(this.$moment(this.formData.title).year(),
-            this.$moment(this.formData.title).month() + 1).then(getPerformanceIsPublishRes => {
+          getTypeGlobalFlag(this.$moment(this.formData.title).year(),
+            this.$moment(this.formData.title).month() + 1, 'performanceInfoPublish').then(getPerformanceIsPublishRes => {
             if (getPerformanceIsPublishRes.length > 0) { // 判断绩效信息是否已发布
               if (getPerformanceIsPublishRes[0].flagValue === 1) { // 绩效已发布
                 promises[count++] = getAllWorkTimeList(this.formData.title)
@@ -314,21 +314,6 @@ export default {
             this.reqFlag.getPerformanceScore = true
           })
         })
-      }
-    },
-    // 小写阿拉伯数字转大写
-    smallNumToL (num) {
-      switch (num) {
-        case 1:
-          return '一'
-        case 2:
-          return '二'
-        case 3:
-          return '三'
-        case 4:
-          return '四'
-        default:
-          return '错误'
       }
     },
     // 获取当前月份能否申报互评的标志
@@ -1216,7 +1201,7 @@ export default {
       this.quarterStar = {
         name: '加载中...'
       }
-      this.selectQuarterNum = this.smallNumToL(this.$moment(this.formData.title).quarter())
+      this.selectQuarterNum = smallNumToL(this.$moment(this.formData.title).quarter())
       if (this.reqFlag.getPerformanceScore) {
         this.reqFlag.getPerformanceScore = false
         getPerformanceIsPublish(this.$moment(this.formData.title).year(),
@@ -1496,7 +1481,6 @@ export default {
     }
   }
 }
-
 @media (max-width:550px) {
   .card-panel-description {
     display: none;
