@@ -309,7 +309,6 @@
           }],
           formData: {
             title: this.$moment().format('YYYY-MM'),
-            workTypeList: [],
             projectType: [[0]],
             participant: [],
             usersList: [],
@@ -374,7 +373,6 @@
           },
           reqFlag: {
             add: true,
-            workTypeList: true,
             usersName: true,
             getProjectType: true,
             getWorkTimeNew: true,
@@ -1187,7 +1185,7 @@
         // this.formData.applyType = this.$route.query.type
         this.init()
       },
-      name: 'PerformanceAdd.vue'
+      name: 'PerformanceAddNew.vue'
     }
 </script>
 

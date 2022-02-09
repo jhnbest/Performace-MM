@@ -24,8 +24,6 @@ export const weeklyUpdateState = '/weekly/updateState' // 更新周报状态
 export const weeklyDetail = '/weekly/detail' // 获取周报详情
 export const weeklyList = '/weekly/list' // 获取周报列表
 
-export const performanceAdd = '/performance/add' // 新增工时申报
-export const workTypeList = '/performance/workTypeList' // 获取工时类型
 export const getProjectType = '/performance/projectType' // 获取项目类型
 export const getWorkTime = '/performance/getWorkTime' // 查询工时
 export const workTimeSubmit = '/performance/workTimeSubmit' // 提交工时申报
@@ -71,7 +69,7 @@ export const updateEditProjectStage = '/workStation/updateEditProjectStage' // �
 export const getIsSubmitAllow = '/workStation/getIsSubmitAllow' // 获取是否可以申报工时和提交互评
 export const getCurGroupWorkTimeReviewFinish = '/workStation/getCurGroupWorkTimeReviewFinish' // 获取当前小组工时审核是否都已完毕
 export const getManagerMultualRateFinish = '/workStation/getManagerMultualRateFinish' // 当月领导者是否已经评价完毕
-export const urlGetPerformanceIsPublish = '/workStation/getPerformanceIsPublish' // 当月互评是否已经发布
+export const urlGetPerformanceIsPublish = '/workStation/getPerformanceIsPublish' // 当月绩效是否已经发布
 export const performanceInfoPublish = '/workStation/performanceInfoPublish' // 是否发布首页绩效信息
 export const getUnFilledProjectList = '/workStation/getUnFilledProjectList' // 获取未填报的项目列表
 export const projectDetailIsApplyWorkTime = '/workStation/projectDetailIsApplyWorkTime' // 查看项目阶段当月是否已填报工时

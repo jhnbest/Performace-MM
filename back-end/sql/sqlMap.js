@@ -37,29 +37,8 @@ const sqlMap = {
     // 查询用户姓名
     getUserNameByID: 'select name from users where id = ? and status != 0'
   },
-  weekly: {
-    // 新增周报
-    add: 'insert into weekly (userId, startTime, endTime, title, thisWeekWork, nextWeekWork, collaboration, create_time, update_time) values (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-    // 更新周报信息
-    updateInfo: 'update weekly set startTime = ?, endTime = ?, title = ?, thisWeekWork = ?, nextWeekWork = ?, collaboration = ?, update_time = ? where id = ? and status != 0',
-    // 更新周报状态
-    updateState: 'update weekly set status = ?, update_time = ? where id = ? and status != 0',
-    // 查询周报列表条数
-    selectTotal: 'select count(*) as totalCount from weekly where status != 0',
-     // 查询周报列表
-    selectList: 'select weekly.id, userId, user.name as userName, startTime, endTime, title, weekly.create_time, weekly.update_time, weekly.status from weekly,user where weekly.userId = user.id and weekly.status != 0',
-    // 以id为主条件查询某篇周报详情
-    getDetail: 'select weekly.id, userId, user.name as userName, startTime, endTime, title, thisWeekWork, nextWeekWork, collaboration, weekly.create_time, weekly.update_time, weekly.status from weekly,user where weekly.userId = user.id and weekly.status != 0 and weekly.id=?'
-  },
   performance: {
     //新增工时申报
-    add: 'insert into projectlist (userId, title, workType, workTime, participants) values (?, ?, ?, ?, ?)',
-    selectWorkTypeTotal: 'select count(distinct projecttype.projectLevel1) as totalCount from projecttype',
-    selectWorkTypeList: 'select distinct projecttype.projectLevel1 from projecttype',
-    selectSubWorkType1List: 'select distinct projectLevel2 from projecttype where projecttype.projectLevel1 = ?',
-    selectSubWorkType2List: 'select distinct projectLevel3 from projecttype where projecttype.projectLevel2 = ?',
-    selectSubWorkType3List: 'select distinct projectLevel4 from projecttype where projecttype.projectLevel2 = ? and projecttype.projectLevel3 = ?',
-    selectWorkTime: 'select distinct workTime, dynamicKValue, defaultKValue, defaultCofficient from projecttype where projecttype.projectLevel2 = ? and projecttype.projectLevel4 = ?',
     selectProjectTypeFirst: 'select projectTypeID, projectName from projecttypenew where projectParentID = ? or projectParentID = 0',
     selectProjectType: 'select projectTypeID, projectName from projecttypenew where projectParentID = ? and obsoleteStatus != 1',
     selectProjectTime: 'select projectTypeID, projectName, workTime, dynamicKValue, isConference, defaultAssignWorkTime ' +

@@ -1,5 +1,5 @@
 <template>
-<div v-if="$store.state.userInfo.duty === 1 || store.state.userInfo.id === 15">
+<div v-if="$store.state.userInfo.duty === 1 || $store.state.userInfo.id === 15">
   <el-form class="main-search" :inline="true">
     <el-row type="flex">
       <el-col :xs="12" :sm="12" :lg="9" :xl="6">
@@ -188,7 +188,7 @@
           ratesToStar } from '@/utils/common'
   import { getAllWorkTimeList } from '@/utils/performance'
   import { calPerformanceEvaScore } from '@/utils/performanceEva'
-  import { groupName2String } from '@/utils/users'
+  import { groupName2String, getUsersList } from '@/utils/users'
   import { getAllUserRates } from '@/utils/multual'
   import store from '@/store'
   import Cookies from 'js-cookie'
@@ -235,15 +235,15 @@
         ratedArray: [],
         curMutualRate: 0,
         tableHeight: null,
-        commonStaffMutualCof: store.state.commonStaffMutualCof,
-        commonStaffManagerCof: store.state.commonStaffManagerCof,
-        commonStaffQuantitativeCof: store.state.commonStaffQuantitativeCof,
-        groupLeaderMutualCof: store.state.groupLeaderMutualCof,
-        groupLeaderManagerCof: store.state.groupLeaderManagerCof,
-        groupLeaderQuantitativeCof: store.state.groupLeaderQuantitativeCof,
-        directorMutualCof: store.state.directorMutualCof,
-        directorManagerCof: store.state.directorManagerCof,
-        directorQuantitativeCof: store.state.directorQuantitativeCof,
+        commonStaffMutualCof: this.$store.state.commonStaffMutualCof,
+        commonStaffManagerCof: this.$store.state.commonStaffManagerCof,
+        commonStaffQuantitativeCof: this.$store.state.commonStaffQuantitativeCof,
+        groupLeaderMutualCof: this.$store.state.groupLeaderMutualCof,
+        groupLeaderManagerCof: this.$store.state.groupLeaderManagerCof,
+        groupLeaderQuantitativeCof: this.$store.state.groupLeaderQuantitativeCof,
+        directorMutualCof: this.$store.state.directorMutualCof,
+        directorManagerCof: this.$store.state.directorManagerCof,
+        directorQuantitativeCof: this.$store.state.directorQuantitativeCof,
         isMultualEvaFinish: false,
         isQuantativeFinish: false,
         isPerformanceEvaFinish: false,
@@ -271,7 +271,7 @@
         // })
         this.getEvaCoef() // 获取各种评价系数
         // 获取用户列表
-        this.getUsersList().then(userList => {
+        getUsersList().then(userList => {
           this.users = userList
           this.usersNum = this.users.length
           this.initData(userList)
@@ -331,8 +331,10 @@
           this.isRated = performanceRates.length !== 0
           this.rateTableData = JSON.parse(JSON.stringify(this.genRateTableData(userList, performanceRates))) // 成效评价表格数据初始化
           // 管理者角色进行定量、定性和绩效数据的计算
-          if (store.state.userInfo.id === 26) {
+          if (this.$store.state.userInfo.id === 26) {
             getPerformanceIsPublish(applyYear, applyMonth).then(getPerformanceIsPublishRes => {
+              console.log('getPerformanceIsPublishRes')
+              console.log(getPerformanceIsPublishRes)
               this.performanceIsPublishInfo = getPerformanceIsPublishRes
               if (getPerformanceIsPublishRes.length > 0) {
                 this.isPerformancePublish = getPerformanceIsPublishRes[0].flagValue === 1
@@ -1259,24 +1261,6 @@
           }
         }
       },
-      // 获取用户列表
-      getUsersList () {
-        const url = getUsersName
-        let params = {}
-        let _this = this
-        if (this.reqFlag.getUsersList) {
-          this.reqFlag.getUsersList = false
-          return new Promise(function (resolve, reject) {
-            _this.$http(url, params)
-              .then(res => {
-                if (res.code === 1) {
-                  resolve(res.data.list)
-                }
-                _this.reqFlag.getUsersList = true
-              })
-          })
-        }
-      },
       // 计算互评总分(通过各评分类型分数)
       calMultualScoreByScore (t1Score, t2Score, t3Score, t4Score, t5Score, t6Score) {
         let totalScore = t1Score * 0.15 + t2Score * 0.2 + t3Score * 0.1 +
@@ -1600,7 +1584,7 @@
               return getPMEvaDataItem.id === row.ratedPersion
             })
             let getPMEvaDataFindResFindRes = getPMEvaDataFindRes.ratedData.find(ratedDataItem => {
-              if (ratedDataItem.ratePersion === store.state.userInfo.id && ratedDataItem.rateType === rateType) {
+              if (ratedDataItem.ratePersion === this.$store.state.userInfo.id && ratedDataItem.rateType === rateType) {
                 return ratedDataItem
               }
             })

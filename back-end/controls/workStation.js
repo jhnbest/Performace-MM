@@ -1007,7 +1007,7 @@ const workStation = {
             return $http.writeJson(res, { code: -2, data: RCPDDatabaseErr, message: 'error' })
         })
     },
-    // 当月互评是否已经发布
+    // 当月绩效评价结果是否已经发布
     getPerformanceIsPublish (req, res) {
         let sendData = req.body
         let sql = $sql.workStation.getPerformanceIsPublish

@@ -514,6 +514,8 @@
             if (this.$store.state.userInfo.id === 26) {
               // ============================判断绩效是否已发布==========================
               getPerformanceIsPublish(applyYear, applyMonth).then(getPerformanceIsPublishRes => {
+                console.log('getPerformanceIsPublishRes')
+                console.log(getPerformanceIsPublishRes)
                 this.performanceIsPublishInfo = getPerformanceIsPublishRes
                 if (getPerformanceIsPublishRes.length > 0) {
                   this.isPerformancePublish = getPerformanceIsPublishRes[0].flagValue === 1

@@ -84,12 +84,6 @@ export default new Router({
           meta: { pagePath: '/home/workTimeCheck' }
         },
         {
-          path: 'performanceAdd',
-          name: 'performanceAdd',
-          component: () => import('./views/Performance/childViews/PerformanceAdd.vue'),
-          meta: { pagePath: '/home/workStation' }
-        },
-        {
           path: 'performanceAddNew',
           name: 'performanceAddNew',
           component: () => import('./views/Performance/childViews/PerformanceAddNew.vue'),
@@ -144,6 +138,11 @@ export default new Router({
           name: 'PerformanceEvaNew',
           component: () => import('./views/performanceEva/performanceEva.vue'),
           meta: { pagePath: '/home/PerformanceEvaNew' }
+        },{
+          path: 'PMDataFillUp',
+          name: 'PMDataFillUp',
+          component: () => import('./views/tmp/PMDataFillUp.vue'),
+          meta: { pagePath: '/home/PMDataFillUp' }
         }
       ]
     },

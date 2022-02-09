@@ -425,9 +425,6 @@
             })
           }
         },
-        handleAdd () {
-          this.$router.push({ path: '/home/PerformanceAdd' })
-        },
         handleAddNew () {
           this.$router.push({ path: '/home/PerformanceAddNew' })
         },

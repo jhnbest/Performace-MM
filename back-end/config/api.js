@@ -21,13 +21,6 @@ module.exports = {
     oldPasswordAuth: path + '/user/oldPasswordAuth', // 旧密码认证
     updateNewPassword: path + '/user/updateNewPassword', // 更新密码
 
-    // weekly-周报管理
-    weeklyAdd: path + '/weekly/add', // 新增周报
-    weeklyUpdateInfo: path + '/weekly/updateInfo', // 更新周报信息
-    weeklyUpdateState: path + '/weekly/updateState', // 更新周报状态
-    weeklyDetail: path + '/weekly/detail', // 获取周报详情
-    weeklyList: path + '/weekly/list', // 获取周报列表
-
     // Performance-工时管理
     performanceAdd: path + '/performance/add',
     getProjectType: path + '/performance/projectType',

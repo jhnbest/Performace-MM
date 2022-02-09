@@ -1,7 +1,6 @@
 // 接口地址管理
 let express = require('express');
 let user = require('../controls/user');
-let weekly = require('../controls/weekly');
 let performance = require('../controls/performance');
 let workStation = require('../controls/workStation');
 let mutualRates = require('../controls/mutualRate');
@@ -28,13 +27,6 @@ router.post(api.getUsersName, user.getUsersName);
 router.post(api.getGroupUserName, user.getGroupUserName);
 router.post(api.oldPasswordAuth, user.oldPasswordAuth);
 router.post(api.updateNewPassword, user.updateNewPassword);
-
-// weekly-周报管理
-router.post(api.weeklyAdd, weekly.add);
-router.post(api.weeklyUpdateInfo, weekly.updateInfo);
-router.post(api.weeklyUpdateState, weekly.updateState);
-router.post(api.weeklyDetail, weekly.detail);
-router.post(api.weeklyList, weekly.list);
 
 // Performance-工时管理
 router.post(api.performanceAdd, performance.add);
