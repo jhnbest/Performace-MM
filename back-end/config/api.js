@@ -16,7 +16,7 @@ module.exports = {
     userDetail: path + '/user/detail', // 获取用户详情
     userList: path + '/user/list', // 获取用户列表
     usersList: path + '/user/listTest',
-    getUsersName: path + '/user/getUsersName', //获取用户姓名
+    getUsersList: path + '/user/getUsersList', //获取用户姓名
     getGroupUserName: path + '/user/getGroupUserName', // 获取组员信息
     oldPasswordAuth: path + '/user/oldPasswordAuth', // 旧密码认证
     updateNewPassword: path + '/user/updateNewPassword', // 更新密码

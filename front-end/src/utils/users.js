@@ -1,11 +1,11 @@
 import { http } from '@/config/http'
 import {
-    getUsersName
+    urlGetUsersList
 } from '@/config/interface'
 
 // 获取用户列表
 export function getUsersList () {
-    const url = getUsersName
+    const url = urlGetUsersList
     let params = {}
     return new Promise(function (resolve, reject) {
         http(url, params).then(res => {

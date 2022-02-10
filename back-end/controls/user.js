@@ -333,8 +333,8 @@ const user = {
     })
   },
   /* 获取用户信息 */
-  getUsersName (req, res) {
-    let sql = $sql.user.selectUsersName
+  getUsersList (req, res) {
+    let sql = $sql.user.selectUsersList
     let arrayParams = []
     $http.userVerify(req, res, () => {
       $http.connPool(sql, arrayParams, (err, result) => {

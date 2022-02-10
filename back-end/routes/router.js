@@ -23,7 +23,7 @@ router.post(api.userUpdateState, user.updateState);
 router.post(api.userDetail, user.detail);
 router.post(api.userList, user.list);
 router.post(api.usersList, user.listTest);
-router.post(api.getUsersName, user.getUsersName);
+router.post(api.getUsersList, user.getUsersList);
 router.post(api.getGroupUserName, user.getGroupUserName);
 router.post(api.oldPasswordAuth, user.oldPasswordAuth);
 router.post(api.updateNewPassword, user.updateNewPassword);

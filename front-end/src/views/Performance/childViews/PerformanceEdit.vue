@@ -158,7 +158,7 @@
 </template>
 
 <script>
-  import { workTimeSubmit, getProjectInfo, getUsersName, getProjectType, getWorkTimeNew, workTimeTemporary,
+  import { workTimeSubmit, getProjectInfo, urlGetUsersList, getProjectType, getWorkTimeNew, workTimeTemporary,
     updateAssignWork, getAssignWorkDetail, getIsSubmitAllow } from '@/config/interface'
   import Assign from '@/components/Cop/workTimeAssign'
     export default {
@@ -590,7 +590,7 @@
         },
         // 获取用户姓名
         getUsersName () {
-          const url = getUsersName
+          const url = urlGetUsersList
           if (this.reqFlag.usersName) {
             this.reqFlag.usersName = false
             let params = {}

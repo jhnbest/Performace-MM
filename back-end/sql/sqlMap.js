@@ -24,8 +24,8 @@ const sqlMap = {
     selectList1: 'select * from users where status != 0',
     // 查询周报列表条数Test
     selectTotal1: 'select count(*) as totalCount from users where status != 0',
-    // 查询用户姓名
-    selectUsersName: 'select * from users where status != 0',
+    // 查询用户信息
+    selectUsersList: 'select * from users where status != 0',
     // 查询组员信息
     getGroupUserName: 'select id, name, groupName from users where groupName = ? and status != 0',
     // 查询全员信息
@@ -243,7 +243,7 @@ const sqlMap = {
     getPreMonthEva: 'select mr.*, u.name as ratedPersionName from mutualrate mr left join users u on mr.ratedPersion = ' +
         'u.id where mr.rateMonth = ? and mr.ratePersion = ?',
     handleFillMul: 'select count(*) as totalCount from mutualrate where ratePersion = ? and rateMonth = ?',
-    handleFillMulCheck: 'select * from mutualrate where ratePersion = ? and rateMonth = "2021-11"',
+    handleFillMulCheck: 'select * from mutualrate where ratePersion = ? and rateMonth = "2021-12"',
     handleFillMulFill: 'insert into mutualrate (ratePersion, ratedPersion, rateMonth, rate, rateType, rateTime, updateTime) ' +
         'values (?, ?, ?, ?, ?, ?, ?)',
     getPerformanceRates: 'select pr.*, u.name as ratedPersionName, u.duty from performancerate pr left join users u on pr.ratedPersion = u.id ' +

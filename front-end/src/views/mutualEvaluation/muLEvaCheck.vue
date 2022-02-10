@@ -49,7 +49,7 @@
 </template>
 
 <script>
-  import { getUsersName, getAllUserRates } from '@/config/interface'
+  import { urlGetUsersList, getAllUserRates } from '@/config/interface'
   export default {
     data () {
       return {
@@ -380,7 +380,7 @@
       },
       // 获取用户列表
       getUsersList () {
-        const url = getUsersName
+        const url = urlGetUsersList
         let params = {}
         let _this = this
         if (this.reqFlag.getUsersList) {

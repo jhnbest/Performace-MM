@@ -103,7 +103,7 @@
 </template>
 
 <script>
-import { userDetail, userUpdateInfo, getUsersName } from '../../config/interface'
+import { userDetail, userUpdateInfo, urlGetUsersList } from '../../config/interface'
 export default {
   data () {
     return {
@@ -199,7 +199,7 @@ export default {
     },
     // 获取用户姓名
     getUsersName () {
-      const url = getUsersName
+      const url = urlGetUsersList
       if (this.formData.reqFlag.usersName) {
         this.formData.reqFlag.usersName = false
         let params = {}

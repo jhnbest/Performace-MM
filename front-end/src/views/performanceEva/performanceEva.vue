@@ -169,7 +169,6 @@
 
 <script>
   import {
-    getUsersName,
     submitRatesResult,
     updateUserRate,
     getCurMutualRate,
@@ -333,8 +332,6 @@
           // 管理者角色进行定量、定性和绩效数据的计算
           if (this.$store.state.userInfo.id === 26) {
             getPerformanceIsPublish(applyYear, applyMonth).then(getPerformanceIsPublishRes => {
-              console.log('getPerformanceIsPublishRes')
-              console.log(getPerformanceIsPublishRes)
               this.performanceIsPublishInfo = getPerformanceIsPublishRes
               if (getPerformanceIsPublishRes.length > 0) {
                 this.isPerformancePublish = getPerformanceIsPublishRes[0].flagValue === 1

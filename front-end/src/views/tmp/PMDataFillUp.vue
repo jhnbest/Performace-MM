@@ -12,7 +12,7 @@
         value-format="yyyy-MM"
         placeholder="选择月"
         style="width: 150px"
-        @change="initData(formData.title)">
+        @change="handleDataChange()">
       </el-date-picker>
       <el-button size="mini"
                   type="primary"
@@ -23,7 +23,7 @@
   </div>
 </template>
 <script>
-import { create } from 'sortablejs'
+import { getPMData } from '@/utils/performance'
 export default {
   data () {
     return {
@@ -35,13 +35,19 @@ export default {
     init () {
 
     },
+    // 日期发生变化
+    handleDataChange () {
+      getPMData(this.title)
+    },
     // 上月
     handlePreMonth () {
       this.title = this.$moment(this.title).subtract(1, 'months').format('YYYY-MM')
+      this.handleDataChange()
     },
     // 下月
     handleNextMonth () {
       this.title = this.$moment(this.title).add(1, 'months').format('YYYY-MM')
+      this.handleDataChange()
     }
   },
   created () {

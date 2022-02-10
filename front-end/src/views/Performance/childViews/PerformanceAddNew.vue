@@ -250,7 +250,7 @@
     submitAssignWorkDetail,
     submitMonthPlanProcess,
     getIsSubmitAllow,
-    getUsersName,
+    urlGetUsersList,
     getProjectType,
     getWorkTimeNew,
     workTimeTemporary,
@@ -768,7 +768,7 @@
         },
         // 获取用户姓名
         getUsersName () {
-          const url = getUsersName
+          const url = urlGetUsersList
           if (this.reqFlag.usersName) {
             this.reqFlag.usersName = false
             let params = {}

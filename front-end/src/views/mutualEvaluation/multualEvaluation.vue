@@ -1953,7 +1953,7 @@
       handleFillMul () {
         const url = handleFillMul
         let params = {
-          rateMonth: '2021-12',
+          rateMonth: '2022-01',
           users: this.users
         }
         this.$http(url, params).then(res => {

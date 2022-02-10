@@ -229,7 +229,7 @@ const mutualRate = {
                 for (let result2Item of result2) {
                     for (let result2ItemItem of result2Item) {
                         sql = $sql.mutualRates.handleFillMulFill
-                        arrayParams = [result2ItemItem.ratePersion, result2ItemItem.ratedPersion, '2021-12', result2ItemItem.rate,
+                        arrayParams = [result2ItemItem.ratePersion, result2ItemItem.ratedPersion, '2022-01', result2ItemItem.rate,
                             result2ItemItem.rateType, rateTime, rateTime]
                         promise3[count3++] = RCPDDatabase(sql, arrayParams)
                     }

@@ -390,7 +390,7 @@
 </template>
 
 <script>
-  import { getUsersName, getProjectType, getWorkTimeNew, submitAssignWorkDetail,
+  import { urlGetUsersList, getProjectType, getWorkTimeNew, submitAssignWorkDetail,
     getAssignedProject, updateAssignProjectList, deleteAssignProject, getAssignProjectDetail } from '@/config/interface'
   import Sortable from 'sortablejs'
     export default {
@@ -530,7 +530,7 @@
         getUsersName () {
           if (this.reqFlag.getUserName) {
             this.reqFlag.getUserName = false
-            const url = getUsersName
+            const url = urlGetUsersList
             let params = {}
             this.$http(url, params)
               .then(res => {
