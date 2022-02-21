@@ -1111,6 +1111,22 @@ const performance = {
         }).catch(RCPDDatabaseErr => {
             return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
         })
+    },
+    // 写入绩效数据
+    savePMData (req, res) {
+        let sendData = req.body
+        let sql = $sql.performance.savePMData
+        let arrayParams = [sendData.userID, sendData.applyDate, sendData.totalWorkTime, sendData.QYEvaRank,
+                           sendData.QYEvaScoreNor, sendData.CSQTEvaScoreUnN, sendData.CSQTEvaScoreNor,
+                           sendData.CSQTEvaRank, sendData.MGQTEvaScoreUnN, sendData.MGQTEvaRank,
+                           sendData.MGQTEvaScoreNor, sendData.AMEvaScoreUnN, sendData.AMEvaScoreNor,
+                           sendData.AMEvaRank, sendData.PMScoreUnN, sendData.PMScoreNor, sendData.PMRank,
+                           sendData.remarks]
+        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+            return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
+        }).catch(RCPDDatabaseErr => {
+            return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+        })
     }
 }
 

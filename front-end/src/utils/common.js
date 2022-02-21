@@ -421,3 +421,74 @@ export function smallNumToL (num) {
       return '错误'
   }
 }
+
+// 数据排序方法
+export function compare (params) {
+  return function (o, p) {
+    let a, b
+    if (typeof o === 'object' && typeof p === 'object' && o && p) {
+      a = o[params]
+      b = p[params]
+      if (a === b) {
+        return 0
+      }
+      if (typeof a === typeof b) {
+        return a > b ? -1 : 1
+      }
+      return typeof a > typeof b ? -1 : 1
+    } else {
+      let obj = {}
+      throw (obj)
+    }
+  }
+}
+
+// 从数据库获取各种评价系数
+export function getEvaCoef () {
+  let promises = []
+  let count = 0
+  promises[count++] = getGlobalFlagByType('CSMutualCoef')
+  promises[count++] = getGlobalFlagByType('MGEvaCoef')
+  promises[count++] = getGlobalFlagByType('quantitativeCoef')
+  promises[count++] = getGlobalFlagByType('PMEvaCoef')
+  promises[count++] = getGlobalFlagByType('CSManagerPMEvaCoef')
+  promises[count++] = getGlobalFlagByType('CSGroupLeaderPMEvaCoef')
+  promises[count++] = getGlobalFlagByType('CScommonStaffPMEvaCoef')
+  promises[count++] = getGlobalFlagByType('GPManagerPMEvaCoef')
+  promises[count++] = getGlobalFlagByType('GPCommonStaffPMEvaCoef')
+  return new Promise(function (resolve, reject) {
+    Promise.all(promises).then(result => {
+      let allEvaCoefExist = true
+      for (let item of result) {
+        if (item.length === 0) {
+          allEvaCoefExist = false
+          break
+        }
+      }
+      if (allEvaCoefExist) {
+        let obj = {
+          CSMutualCoef: result[0][0].flagValue,
+          MGEvaCoef: result[1][0].flagValue,
+          quantitativeCoef: result[2][0].flagValue,
+          PMEvaCoef: result[3][0].flagValue,
+          CSManagerPMEvaCoef: result[4][0].flagValue,
+          CSGroupLeaderPMEvaCoef: result[5][0].flagValue,
+          CScommonStaffPMEvaCoef: result[6][0].flagValue,
+          GPManagerPMEvaCoef: result[7][0].flagValue,
+          GPCommonStaffPMEvaCoef: result[8][0].flagValue
+        }
+        resolve(obj)
+      } else {
+        reject(new Error('系数不存在'))
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+// 排序比较函数
+export function sortBy (props) {
+  return function (a, b) {
+    return b[props] - a[props]
+  }
+}

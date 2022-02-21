@@ -47,6 +47,7 @@ module.exports = {
     updateWorkTimeListReviewStatus: path + '/performance/updateWorkTimeListReviewStatus', // 更新工时条目审核状态
     getWorkTimeAssignInfo: path + '/performance/getWorkTimeAssignInfo', // 获取工时分配信息
     getWorkTimeListInfo: path + '/performance/getWorkTimeListInfo', // 获取工时申报信息
+    savePMData: path + '/performance/savePMData', // 写入绩效数据
 
 
     // workStation-个人工作台
@@ -90,13 +91,18 @@ module.exports = {
     getPreMonthEva: path + '/mutualRates/getPreMonthEva', // 提取上月互评结果
     handleFillMul: path + '/mutualRates/handleFillMul', // 一键填充定性评价
     getPerformanceRates: path + '/mutualRates/getPerformanceRates', // 获取成效评价历史数据
-    getAllPerformanceRate: path + '/mutualRates/getAllPerformanceRate', // 获取全处成效评价历史数据
-    
+
+    // 成效评价模块
+    getAllAchievements: path + '/achievementsEva/getAllAchievements', // 获取全处成效评价历史数据
+
     // 总结模块
     getCurMonthConclusionOverviewData: path + '/conclusion/getCurMonthConclusionOverviewData', // 获取总结数据
     submitMonthConclusionData: path + '/conclusion/submitMonthConclusionData', // 提交月总结
     updateMonthConclusionData: path + '/conclusion/updateMonthConclusionData', // 更新月总结
     updateMonthConclusionStatus: path + '/conclusion/updateMonthConclusionStatus', // 更新月总结状态
     submitEvaData: path + '/conclusion/submitEvaData', // 提交评价数据
-    updateWorkTimeListIdOfConclusion: path + '/conclusion/updateWorkTimeListIdOfConclusion' // 更新总结对应的工时ID
+    updateWorkTimeListIdOfConclusion: path + '/conclusion/updateWorkTimeListIdOfConclusion', // 更新总结对应的工时ID
+    submitMonthConclusionNew: path + '/conclusion/submitMonthConclusionNew', // 提交月总结（新）
+    updateMonthConclusionNew: path + '/conclusion/updateMonthConclusionNew', // 更新月总结（新）
+    getCurMonthConclusionOverviewDataNew: path + '/conclusion/getCurMonthConclusionOverviewDataNew' // 获取月总结概览信息（新）
 };

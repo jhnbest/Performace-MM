@@ -48,6 +48,25 @@ export default new Vuex.Store({
     GPManagerPMEvaCoef: 0.5, // 处经理对组长的成效评价系数
     GPCommonStaffPMEvaCoef: 0.5, // 普通员工对组长的成效评价系数
     defaultStar: 3, // 默认评价星级
+    newRulesDate: '2022-02', // 成效评价实施时间,
+    monthConclusionType: 1,
+    conclusionTextNew: {
+      buildBoutiqueProject: {
+        dimension: 1,
+        content: '【承担工作难度】：\n' + '<br>' + '<br>' +
+                 '【专业技术研究】：\n' + '<br>' + '<br>' +
+                 '【工作方法创新】：\n' + '<br>' + '<br>' +
+                 '【工作推进效率】：\n' + '<br>' + '<br>' +
+                 '【工作完成效果】：\n' + '<br>' + '<br>' +
+                 '【降本增效举措】：\n'
+      },
+      buildProTeam: {
+        dimension: 2,
+        content: '【处室绩效贡献】：\n' + '<br>' + '<br>' +
+                '【团队协作贡献】：\n' + '<br>' + '<br>' +
+                '【团建活动和宣传】：\n' + '<br>' + '<br>'
+      }
+    },
     progressColors: [
       { color: '#f56c6c', percentage: 20 },
       { color: '#e6a23c', percentage: 40 },

@@ -47,6 +47,7 @@ export const repairErrorData3 = '/performance/repairErrorData3' // 修复错误�
 export const urlUpdateWorkTimeListReviewStatus = '/performance/updateWorkTimeListReviewStatus' // 更新工时条目审核状态
 export const urlGetWorkTimeAssignInfo = '/performance/getWorkTimeAssignInfo' // 获取工时分配信息
 export const urlGetWorkTimeListInfo = '/performance/getWorkTimeListInfo' // 获取工时申报信息
+export const urlSavePMData = '/performance/savePMData' // 写入绩效数据
 
 export const getAssignProjectList = '/workStation/getAssignProjectList' // 获取未完成的指派项目列表
 export const getAssignProjectDetail = '/workStation/getAssignProjectDetail' // 获取未完成的指派项目明细
@@ -88,12 +89,16 @@ export const getPerformanceIsCount = '/mutualRates/getPerformanceIsCount' // 获
 export const getPreMonthEva = '/mutualRates/getPreMonthEva' // 提取上月互评结果
 export const handleFillMul = '/mutualRates/handleFillMul' // 一键填充定性评价
 export const urlGetPerformanceRates = '/mutualRates/getPerformanceRates' // 获取成效评价历史数据
-export const urlGetAllPerformanceRate = '/mutualRates/getAllPerformanceRate' // 获取全处成效评价数据
 
-export const urlGetCurMonthConclusionOverviewData = '/conclusion/getCurMonthConclusionOverviewData' // 获取总结数据
+export const urlGetAllAchievements = '/achievementsEva/getAllAchievements' // 获取全处成效评价数据
+
+export const urlGetCurMonthConclusionOverviewData = '/conclusion/getCurMonthConclusionOverviewData' // 获取月总结概览信息
 export const urlSubmitMonthConclusionData = '/conclusion/submitMonthConclusionData' // 提交月总结
 export const urlGetConclusionDataById = '/conclusion/getConclusionDataById' // 提交月总结
 export const urlUpdateMonthConclusionData = '/conclusion/updateMonthConclusionData' // 更新月总结
 export const urlUpdateMonthConclusionStatus = '/conclusion/updateMonthConclusionStatus' // 更新月总结状态
 export const urlSubmitEvaData = '/conclusion/submitEvaData' // 提交评价数据
 export const urlUpdateWorkTimeListIdOfConclusion = '/conclusion/updateWorkTimeListIdOfConclusion' // 更新总结对应的工时ID
+export const urlSubmitMonthConclusionNew = '/conclusion/submitMonthConclusionNew' // 提交月总结（新）
+export const urlUpdateMonthConclusionNew = '/conclusion/updateMonthConclusionNew' // 更新月总结（新）
+export const urlGetCurMonthConclusionOverviewDataNew = '/conclusion/getCurMonthConclusionOverviewDataNew' // 获取月总结概览信息（新）

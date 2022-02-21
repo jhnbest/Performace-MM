@@ -175,7 +175,7 @@
     getIsSubmitAllow,
     getIsWorkTimeReviewFinish,
     urlGetPerformanceRates } from '@/config/interface'
-  import { getAllPerformanceRate } from '@/utils/performancerate'
+  import { getAllAchievements } from '@/utils/performancerate'
   import { getPerformanceIsPublish,
           getTypeGlobalFlag,
           calGetScore,
@@ -184,7 +184,9 @@
           rateTypeSwitch,
           starToRates,
           updateGlobalFlagVal,
-          ratesToStar } from '@/utils/common'
+          ratesToStar,
+          compare,
+          sortBy } from '@/utils/common'
   import { getAllWorkTimeList } from '@/utils/performance'
   import { calPerformanceEvaScore } from '@/utils/performanceEva'
   import { groupName2String, getUsersList } from '@/utils/users'
@@ -370,6 +372,8 @@
               if (!result[2].err) { // 成效评价已截止
                 this.getPMEvaData = JSON.parse(JSON.stringify(result[2].content))
                 genPerformanceEvaDataResult = this.genPerformanceEvaData(result[2].content) // 生成成效评价数据
+                console.log('genPerformanceEvaDataResult')
+                console.log(genPerformanceEvaDataResult)
                 this.performanceEvaDataGlobal = JSON.parse(JSON.stringify(genPerformanceEvaDataResult))
               } else {
                 this.performanceEvaDataGlobal = []
@@ -426,7 +430,7 @@
                 reject(new Error('getAllPerformanceRateResult' + getTypeGlobalFlagResErr))
               })
             } else {
-              getAllPerformanceRate(userList, rateTitle).then(getAllPerformanceRateRes => {
+              getAllAchievements(userList, rateTitle).then(getAllPerformanceRateRes => {
                 resolve({
                   err: false,
                   content: getAllPerformanceRateRes
@@ -443,6 +447,7 @@
       // 生成定量数据
       genQuantativeData (quantativeData) {
         let allQuantitativeScore = []
+        // =============================对当月无工时申报的员工填充0工时==================================
         for (let item of this.users) {
           let findItem = quantativeData.findIndex(quantativeDataItem => {
             return quantativeDataItem.id === item.id
@@ -807,7 +812,7 @@
               item.totalWorkTime = Number(itemQuantativeScore.totalWorkTime.toFixed(2))
           }
         }
-        this.rateTableData.sort(this.sortBy('PMScoreUnN'))
+        this.rateTableData.sort(sortBy('PMScoreUnN'))
         // ====================================绩效排名与标准化绩效得分计算======================================
         let count = 0
         let prePMScoreUnN = -1
@@ -829,7 +834,7 @@
         }
         // 绩效得分相同的人员根据工时多少进行排序
         for (let i = 0; i < rankTmp.length; i++) {
-          rankTmp[i].sort(this.sortBy('totalWorkTime'))
+          rankTmp[i].sort(sortBy('totalWorkTime'))
           for (let j = 0; j < rankTmp[i].length; j++) {
             this.rateTableData[count++] = rankTmp[i][j]
           }
@@ -889,7 +894,7 @@
         }
         // this.rateTableData.sort(this.sortBy('PMScoreUnN'))
         let rateTableDataTmp = JSON.parse(JSON.stringify(this.rateTableData))
-        rateTableDataTmp.sort(this.sortBy('PMScoreUnNOld'))
+        rateTableDataTmp.sort(sortBy('PMScoreUnNOld'))
         // ====================================绩效排名与标准化绩效得分计算======================================
         let count = 0
         let prePMScoreUnN = -1
@@ -911,7 +916,7 @@
         }
         // 绩效得分相同的人员根据工时多少进行排序
         for (let i = 0; i < rankTmp.length; i++) {
-          rankTmp[i].sort(this.sortBy('totalWorkTime'))
+          rankTmp[i].sort(sortBy('totalWorkTime'))
           for (let j = 0; j < rankTmp[i].length; j++) {
             rateTableDataTmp[count++] = rankTmp[i][j]
           }
@@ -939,26 +944,6 @@
         //   this.rateTableData.sort(this.sortAddBy('PMScoreRank'))
         // }
       },
-      // 数据排序方法
-      compare (params) {
-        return function (o, p) {
-          let a, b
-          if (typeof o === 'object' && typeof p === 'object' && o && p) {
-            a = o[params]
-            b = p[params]
-            if (a === b) {
-              return 0
-            }
-            if (typeof a === typeof b) {
-              return a > b ? -1 : 1
-            }
-            return typeof a > typeof b ? -1 : 1
-          } else {
-            let obj = {}
-            throw (obj)
-          }
-        }
-      },
       // 计算定量得分与排名
       calQuantitativeScore (groupWorkTimeList) {
         let totalWorkTimeCal = []
@@ -982,7 +967,7 @@
               })
             }
           }
-          totalWorkTimeCal.sort(this.compare('totalWorkTime')) // 根据总工时排序
+          totalWorkTimeCal.sort(compare('totalWorkTime')) // 根据总工时排序
           let preWorkTime = -1
           let preRank = 1
           let count = 1
@@ -1025,12 +1010,6 @@
           }
         }
         return groupedWorkTimeList
-      },
-      // 排序比较函数
-      sortBy (props) {
-        return function (a, b) {
-          return b[props] - a[props]
-        }
       },
       // 排序比较函数(升序)
       sortAddBy (props) {
@@ -1543,7 +1522,7 @@
           })
           if (multualEvaDataFindResult) {
             multualEvaDataFindResult.managerRate = managerRate
-            this.multualEvaData.sort(this.sortBy('managerRate')) // 根据领导评价排序
+            this.multualEvaData.sort(sortBy('managerRate')) // 根据领导评价排序
             let count = 1
             let preManagerRate = -1
             let preManagerRateRank = -1

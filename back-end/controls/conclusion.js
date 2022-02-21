@@ -1,6 +1,7 @@
 const $sql = require('../sql/sqlMap')
 const $http = require('../sql/http')
 const $time = require('../utils/time')
+const moment = require('moment')
 
 function RCPDDatabase(sql, arrayParams) {
     return new Promise(function (resolve, reject) {
@@ -98,6 +99,43 @@ const conclusion = {
 
         RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
             return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
+        }).catch(RCPDDatabaseErr => {
+            return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+        })
+    },
+    // 提交月总结（新）
+    submitMonthConclusionNew (req, res) {
+        let sendData = req.body
+        let sql = $sql.conclusion.submitMonthConclusionNew
+        let submitTime = $time.formatTime()
+        let updateTime = submitTime
+        let arrayParams = [sendData.userID, sendData.conclusionType, sendData.conclusionYear, sendData.conclusionMonth,
+                            sendData.dimension, sendData.content, submitTime, updateTime, null, sendData.submitStatus]
+        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+            return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
+        }).catch(RCPDDatabaseErr => {
+            return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+        })
+    },
+    // 更新月总结（新）
+    updateMonthConclusionNew (req, res) {
+        let sendData = req.body
+        let sql = $sql.conclusion.updateMonthConclusionNew
+        let updateTime = $time.formatTime()
+        let arrayParams = [sendData.content, sendData.submitStatus, updateTime, sendData.id]
+        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+            return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
+        }).catch(RCPDDatabaseErr => {
+            return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+        })
+    },
+    // 获取月总结概览信息（新）
+    getCurMonthConclusionOverviewDataNew (req, res) {
+        let sendData = req.body
+        let sql = $sql.conclusion.getCurMonthConclusionOverviewDataNew
+        let arrayParams = [sendData.conclusionYear, sendData.conclusionMonth, sendData.userID]
+        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+            return $http.writeJson(res, {code: 1, data: formatData(RCPDDatabaseRes)[0], message: 'success'})
         }).catch(RCPDDatabaseErr => {
             return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
         })

@@ -108,7 +108,10 @@ const sqlMap = {
     updateWorkTimeListReviewStatus: 'update worktimelist set reviewKValue = ?, reviewCofficient = ?, reviewer = ?, reviewTime = ? ' +
         ', reviewStatus = ? where id = ?; update worktimeassign set reviewWorkTime = workTime where projectID = ?',
     getWorkTimeAssignInfo: 'select * from worktimeassign where projectID = ?',
-    getWorkTimeListInfo: 'select * from worktimelist where id = ?'
+    getWorkTimeListInfo: 'select * from worktimelist where id = ?',
+    savePMData: 'insert into performancedata (userID, applyDate, totalWorkTime, QYEvaRank, QYEvaScoreNor, CSQTEvaScoreUnN, '
+    + 'CSQTEvaScoreNor, CSQTEvaRank, MGQTEvaScoreUnN, MGQTEvaRank, MGQTEvaScoreNor, AMEvaScoreUnN, AMEvaScoreNor, AMEvaRank, '
+    + 'PMScoreUnN, PMScoreNor, PMRank, remarks) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
   },
   workStation: {
     getAssignProjectListUn: 'select apl.*, users.name as assigner from assignprojectlist apl left join users on apl.assignerID = users.id where ' +
@@ -262,7 +265,12 @@ const sqlMap = {
     updateMonthConclusionStatus: 'update conclusion set submitStatus = ?, updateTime = ? where id = ?',
     submitEvaData: 'update conclusion set managerRateStar = ?, getWorkTime = ?, managerEva = ?, evaTime = ?, evaStatus = ?' +
         ' where id = ?',
-    updateWorkTimeListIdOfConclusion: 'update conclusion set workTimeListId = ? where id = ?'
+    updateWorkTimeListIdOfConclusion: 'update conclusion set workTimeListId = ? where id = ?',
+    submitMonthConclusionNew: 'insert into newconclusion (userID, conclusionType, conclusionYear, conclusionMonth,' +
+    ' dimension, content, submitTime, updateTime, MGEvaStar, submitStatus) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    updateMonthConclusionNew: 'update newconclusion set content = ?, submitStatus = ?, updateTime = ? where id = ?',
+    getCurMonthConclusionOverviewDataNew: 'select nc.*, u.name from conclusion nc left join users u on' +
+    ' nc.userID = u.id where nc.conclusionYear = ? and nc.conclusionMonth = ? and nc.userID = ?'
   }
 }
 module.exports = sqlMap;

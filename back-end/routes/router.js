@@ -5,6 +5,7 @@ let performance = require('../controls/performance');
 let workStation = require('../controls/workStation');
 let mutualRates = require('../controls/mutualRate');
 let conclusion = require('../controls/conclusion');
+let achievementsEva = require('../controls/achievementsEva')
 let common = require('../controls/common')
 let api = require('../config/api');
 
@@ -54,6 +55,7 @@ router.post(api.repairErrorData3, performance.repairErrorData3)
 router.post(api.updateWorkTimeListReviewStatus, performance.updateWorkTimeListReviewStatus)
 router.post(api.getWorkTimeAssignInfo, performance.getWorkTimeAssignInfo)
 router.post(api.getWorkTimeListInfo, performance.getWorkTimeListInfo)
+router.post(api.savePMData, performance.savePMData)
 
 // workStation-个人工作台
 router.post(api.getAssignProjectList, workStation.getAssignProjectList)
@@ -96,7 +98,9 @@ router.post(api.getPerformanceIsCount, mutualRates.getPerformanceIsCount)
 router.post(api.getPreMonthEva, mutualRates.getPreMonthEva)
 router.post(api.handleFillMul, mutualRates.handleFillMul)
 router.post(api.getPerformanceRates, mutualRates.getPerformanceRates)
-router.post(api.getAllPerformanceRate, mutualRates.getAllPerformanceRate)
+
+// 成效评价模块
+router.post(api.getAllAchievements, achievementsEva.getAllAchievements)
 
 // 总结模块
 router.post(api.getCurMonthConclusionOverviewData, conclusion.getCurMonthConclusionOverviewData)
@@ -105,5 +109,8 @@ router.post(api.updateMonthConclusionData, conclusion.updateMonthConclusionData)
 router.post(api.updateMonthConclusionStatus, conclusion.updateMonthConclusionStatus)
 router.post(api.submitEvaData, conclusion.submitEvaData)
 router.post(api.updateWorkTimeListIdOfConclusion, conclusion.updateWorkTimeListIdOfConclusion)
+router.post(api.submitMonthConclusionNew, conclusion.submitMonthConclusionNew)
+router.post(api.updateMonthConclusionNew, conclusion.updateMonthConclusionNew)
+router.post(api.getCurMonthConclusionOverviewDataNew, conclusion.getCurMonthConclusionOverviewDataNew)
 
 module.exports = router;

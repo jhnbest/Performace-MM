@@ -88,7 +88,7 @@ export function genQualiEvaData (multualData) {
     if (count === 0) {
       count = 1 // 防止NAN
     }
-    obj.CSMutualScoeAve = Number((totalRate / count).toFixed(5))
+    obj.CSMutualScoreAve = Number((totalRate / count).toFixed(5))
     obj.MGQualiEvaScoreUnN = Number(manageRate.toFixed(5))
     multualEvaScoreArr.push(obj)
   }
@@ -112,7 +112,7 @@ export function genQualiEvaData (multualData) {
   // 技术标准组&工程组员工互评排序
   for (let i = 0; i < standAndEngineerRates.length - 1; i++) {
     for (let j = 0; j < standAndEngineerRates.length - 1 - i; j++) {
-      if (standAndEngineerRates[j].CSMutualScoeAve < standAndEngineerRates[j + 1].CSMutualScoeAve) {
+      if (standAndEngineerRates[j].CSMutualScoreAve < standAndEngineerRates[j + 1].CSMutualScoreAve) {
         [standAndEngineerRates[j], standAndEngineerRates[j + 1]] =
           [standAndEngineerRates[j + 1], standAndEngineerRates[j]]
       }
@@ -121,7 +121,7 @@ export function genQualiEvaData (multualData) {
   // 通信组员工互评排序
   for (let i = 0; i < communicationRates.length - 1; i++) {
     for (let j = 0; j < communicationRates.length - 1 - i; j++) {
-      if (communicationRates[j].CSMutualScoeAve < communicationRates[j + 1].CSMutualScoeAve) {
+      if (communicationRates[j].CSMutualScoreAve < communicationRates[j + 1].CSMutualScoreAve) {
         [communicationRates[j], communicationRates[j + 1]] =
           [communicationRates[j + 1], communicationRates[j]]
       }
@@ -138,32 +138,32 @@ export function genQualiEvaData (multualData) {
   }
   // =================================定性评价得分计算===============================================
   // 技术标准组与工程组互评排名&得分计算
-  let tmpCSMutualScoeAve = -1
+  let tmpCSMutualScoreAve = -1
   let count = 1
   for (let i = 0; i < standAndEngineerRates.length; i++) {
-    if (standAndEngineerRates[i].CSMutualScoeAve === tmpCSMutualScoeAve) {
-      standAndEngineerRates[i].CSMutualScoeAveRank = standAndEngineerRates[i - 1].CSMutualScoeAveRank
+    if (standAndEngineerRates[i].CSMutualScoreAve === tmpCSMutualScoreAve) {
+      standAndEngineerRates[i].CSMutualScoreAveRank = standAndEngineerRates[i - 1].CSMutualScoreAveRank
     } else {
-      standAndEngineerRates[i].CSMutualScoeAveRank = count
-      tmpCSMutualScoeAve = standAndEngineerRates[i].CSMutualScoeAve
+      standAndEngineerRates[i].CSMutualScoreAveRank = count
+      tmpCSMutualScoreAve = standAndEngineerRates[i].CSMutualScoreAve
     }
     count++
     standAndEngineerRates[i].CSMutualScoreNor =
-      calGetScore(standAndEngineerRates.length, standAndEngineerRates[i].CSMutualScoeAveRank)
+      calGetScore(standAndEngineerRates.length, standAndEngineerRates[i].CSMutualScoreAveRank)
   }
   // 通信组互评排名&得分计算
-  tmpCSMutualScoeAve = -1
+  tmpCSMutualScoreAve = -1
   count = 1
   for (let i = 0; i < communicationRates.length; i++) {
-    if (communicationRates[i].CSMutualScoeAve === tmpCSMutualScoeAve) {
-      communicationRates[i].CSMutualScoeAveRank = communicationRates[i - 1].CSMutualScoeAveRank
+    if (communicationRates[i].CSMutualScoreAve === tmpCSMutualScoreAve) {
+      communicationRates[i].CSMutualScoreAveRank = communicationRates[i - 1].CSMutualScoreAveRank
     } else {
-      communicationRates[i].CSMutualScoeAveRank = count
-      tmpCSMutualScoeAve = communicationRates[i].CSMutualScoeAve
+      communicationRates[i].CSMutualScoreAveRank = count
+      tmpCSMutualScoreAve = communicationRates[i].CSMutualScoreAve
     }
     count++
     communicationRates[i].CSMutualScoreNor =
-      calGetScore(communicationRates.length, communicationRates[i].CSMutualScoeAveRank)
+      calGetScore(communicationRates.length, communicationRates[i].CSMutualScoreAveRank)
   }
   // 全处员工领导评价排名&得分计算
   let tmpMGQualiEvaScoreUnN = -1

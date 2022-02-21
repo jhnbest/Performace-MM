@@ -29,7 +29,7 @@
           router
           :collapse="iscollapse">
           <el-menu-item v-for="item in menuList" :key="item.url" :index="item.url"
-          @click="handleSelect(item.url)">
+            @click="handleSelect(item.url)">
             <template slot="title">
               <i :class="item.icon" style="font-size: 20px"></i>
               <span>{{item.name}}</span>

@@ -5,11 +5,15 @@ import {
   urlGetConclusionDataById,
   urlUpdateMonthConclusionData,
   urlUpdateMonthConclusionStatus,
-  urlGetAllUsersMonthConclusionData,
   urlSubmitEvaData,
-  urlUpdateWorkTimeListIdOfConclusion
+  urlSubmitMonthConclusionNew,
+  urlUpdateWorkTimeListIdOfConclusion,
+  urlUpdateMonthConclusionNew,
+  urlGetCurMonthConclusionOverviewDataNew
 } from '../config/interface'
 import { conclusionManagerEvaStarToWorkTime } from '@/utils/common'
+import store from '@/store'
+import moment from 'moment'
 
 // 获取月总结概览信息
 export function getCurMonthConclusionOverviewData (submitMonth, submitYear, submitter) {
@@ -31,6 +35,49 @@ export function getCurMonthConclusionOverviewData (submitMonth, submitYear, subm
     })
   })
 }
+
+// 获取月总结概览信息（新）
+export function getCurMonthConclusionOverviewDataNew (conclusionYear, conclusionMonth, userID) {
+  const url = urlGetCurMonthConclusionOverviewDataNew
+  let params = {
+    conclusionYear: conclusionYear,
+    conclusionMonth: conclusionMonth,
+    userID: userID
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(res => {
+      if (res.code === 1) {
+        resolve(res)
+      } else {
+        reject(res)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
+// 获取本年份总结概览数据
+export function getCurYearConclusionOverviewData (submitYear, submitter) {
+  let promise = []
+  let titleMonth = null
+  return new Promise(function (resolve, reject) {
+    for (let i = 0; i < 12; i++) {
+      titleMonth = moment(String(submitYear) + '-' + String(i + 1)).format('YYYY-MM')
+      if (moment(titleMonth).isBefore(store.state.newRulesDate)) { // 请求的月份再新规则实施月份之前
+        promise[i] = getCurMonthConclusionOverviewData(i + 1, submitYear, submitter)
+      } else {
+        promise[i] = getCurMonthConclusionOverviewData(i + 1, submitYear, submitter)
+      }
+    }
+    Promise.all(promise).then(result => {
+      resolve(result)
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
 // 提交月总结
 export function submitMonthConclusionData (submitYear, submitMonth, submitter, conclusionTitle, submitStatus,
                                            curConclusion, nextPlan, curAdvice, managerRateStar) {
@@ -59,6 +106,52 @@ export function submitMonthConclusionData (submitYear, submitMonth, submitter, c
     })
   })
 }
+// 提交月总结（新）
+export function submitMonthConclusionNew (userID, conclusionYear, conclusionMonth, conclusionType, dimension, content, submitStatus) {
+  const url = urlSubmitMonthConclusionNew
+  let params = {
+    userID: userID,
+    conclusionType: conclusionType,
+    conclusionYear: conclusionYear,
+    conclusionMonth: conclusionMonth,
+    dimension: dimension,
+    content: content,
+    submitStatus: submitStatus
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(response => {
+      if (response.code === 1) {
+        resolve(response.data)
+      } else {
+        reject(response.err)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
+// 更新月总结（新）
+export function updateMonthConclusionNew (id, content, submitStatus) {
+  const url = urlUpdateMonthConclusionNew
+  let params = {
+    id: id,
+    content: content,
+    submitStatus: submitStatus
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(response => {
+      if (response.code === 1) {
+        resolve(response.data)
+      } else {
+        reject(response.err)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
 // 更新月总结
 export function updateMonthConclusionData (id, submitYear, submitMonth, submitter, conclusionTitle, submitStatus,
                                            curConclusion, nextPlan, curAdvice, managerRateStar) {
