@@ -143,6 +143,11 @@ export default new Router({
           name: 'PMDataFillUp',
           component: () => import('./views/tmp/PMDataFillUp.vue'),
           meta: { pagePath: '/home/PMDataFillUp' }
+        },{
+          path: 'monthConclusionTableNew',
+          name: 'monthConclusionTableNew',
+          component: () => import('./views/monthConclusion/childViews/monthConclusionTableNew.vue'),
+          meta: { pagePath: '/home/monthConclusion' }
         }
       ]
     },

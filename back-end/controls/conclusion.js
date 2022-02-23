@@ -135,7 +135,7 @@ const conclusion = {
         let sql = $sql.conclusion.getCurMonthConclusionOverviewDataNew
         let arrayParams = [sendData.conclusionYear, sendData.conclusionMonth, sendData.userID]
         RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
-            return $http.writeJson(res, {code: 1, data: formatData(RCPDDatabaseRes)[0], message: 'success'})
+            return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
         }).catch(RCPDDatabaseErr => {
             return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
         })

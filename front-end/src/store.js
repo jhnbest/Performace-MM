@@ -65,6 +65,14 @@ export default new Vuex.Store({
         content: '【处室绩效贡献】：\n' + '<br>' + '<br>' +
                 '【团队协作贡献】：\n' + '<br>' + '<br>' +
                 '【团建活动和宣传】：\n' + '<br>' + '<br>'
+      },
+      nextPlan: {
+        dimension: 3,
+        content: null
+      },
+      curAdvice: {
+        dimension: 4,
+        content: null
       }
     },
     progressColors: [

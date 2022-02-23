@@ -92,16 +92,17 @@
 <!--          </el-popover>-->
           <el-button type="primary"
                      size="mini"
-                     @click="handlePreview(scope.row, scope.$index)"
+                     @click="handlePreview(scope.row)"
                      :disabled="curApplyYear < title
                       || (curApplyMonth < scope.row.submitMonth && (curApplyYear === Number(title)))">点击预览</el-button>
 <!--          编辑-->
 <!-- (scope.row.managerRateStar !== null) || (curApplyYear !== Number(title)) ||
                     ((curApplyMonth !== scope.row.submitMonth) && (curApplyYear === Number(title))) -->
-          <el-button :disabled="false"
+          <el-button :disabled="(scope.row.managerRateStar !== null) || (curApplyYear !== Number(title)) ||
+                    ((curApplyMonth !== scope.row.submitMonth) && (curApplyYear === Number(title)))"
                      size="mini"
                      type="warning"
-                     @click="handleEdit(scope.row, scope.$index)"
+                     @click="handleEdit(scope.row)"
                      style="margin-left: 10px">编辑</el-button>
 <!--          暂存-->
           <el-button v-if="scope.row.submitStatus === 1"
@@ -110,16 +111,16 @@
                      !reqFlag.updateMonthConclusionStatus"
                      size="mini"
                      type="info"
-                     @click="handleTemporary(scope.row, scope.$index)">暂存</el-button>
+                     @click="handleSubmit(scope.row, 2)">暂存</el-button>
 <!--          提交-->
           <el-button v-if="!(scope.row.submitStatus === 1)"
-                     :disabled="scope.row.id === null || !reqFlag.updateMonthConclusionStatus
+                     :disabled="scope.row.moreDetailData.length === 0 || !reqFlag.updateMonthConclusionStatus
                       || (scope.row.managerRateStar !== null)
                       || (curApplyYear > Number(title)) ||
                     ((curApplyMonth > scope.row.submitMonth) && (curApplyYear === Number(title)))"
                      size="mini"
                      type="success"
-                     @click="handleSubmit(scope.row, scope.$index)">提交</el-button>
+                     @click="handleSubmit(scope.row, 1)">提交</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -135,19 +136,26 @@
                                 :manager-eva="managerEva"
                                 :check-user-id="this.$store.state.userInfo.id"
                                 @close="conclusionDialog = false"></month-conclusion-table-check>
+  <!-- 月总结对话框（新） -->
+  <month-conclusion-table-check-new v-if="conclusionDialogNew"
+                                :moreDetailData = moreDetailData
+                                :conclusionTitle="conclusionTitle"
+                                :checkUserId="$store.state.userInfo.id"
+                                @close="conclusionDialogNew = false"></month-conclusion-table-check-new>
 </div>
 </template>
 
 <script>
   import {
-    urlGetCurApplyAbleMonth } from '@/config/interface'
-  import {
     updateMonthConclusionStatus,
-    getCurYearConclusionOverviewData } from '@/utils/conclusion'
+    getCurYearConclusionOverviewData,
+    updateMonthConclusionNew } from '@/utils/conclusion'
   import {
     getCurApplyAbleMonth
   } from '@/utils/common'
   import monthConclusionTableCheck from './childViews/monthConclusionTableCheck'
+  import monthConclusionTableCheckNew from './childViews/monthConclusionTableCheckNew.vue'
+  import store from '@/store'
   export default {
     data () {
       return {
@@ -163,47 +171,77 @@
         curApplyYear: 1970,
         curApplyMonth: 1,
         conclusionDialog: false,
+        conclusionDialogNew: false,
         conclusionTitle: null,
         curConclusion: null,
         nextPlan: null,
         curAdvice: null,
         selectId: null,
-        managerEva: null
+        managerEva: null,
+        moreDetailData: []
       }
     },
     methods: {
       // 初始化
       init () {
-        this.reqFlag.getCurApplyAbleMonth = false
         // 获取当前申报月份
         getCurApplyAbleMonth().then(getCurApplyAbleMonthRes => {
           this.curApplyYear = this.$moment(getCurApplyAbleMonthRes[0].setTime).year()
           this.curApplyMonth = this.$moment(getCurApplyAbleMonthRes[0].setTime).month() + 1
+          console.log('this.curApplyYear')
+          console.log(this.curApplyYear)
+          console.log('this.curApplyMonth')
+          console.log(this.curApplyMonth)
         }).catch(() => {
           this.$common.toast('获取当前申报月份错误', 'error', true)
         })
-        // 获取月总结概览数据
+        // 生成表格数据
+        this.genConclusionTableData()
+      },
+      // 生成表格数据
+      genConclusionTableData () {
+        this.reqFlag.getCurApplyAbleMonth = false
+        // 获取年内所有月总结概览数据
         getCurYearConclusionOverviewData(this.title, this.curUser).then((response) => {
+          console.log('response')
+          console.log(response)
           // 初始化默认数据
           this.initDefaultData()
           for (let i = 0; i < response.length; i++) {
-            if (response[i].data) {
-              this.rateTableData[i].conclusionTitle = response[i].data.conclusionTitle
-              this.rateTableData[i].submitMonth = response[i].data.submitMonth
-              this.rateTableData[i].submitStatus = response[i].data.submitStatus
-              this.rateTableData[i].managerRateStar = response[i].data.managerRateStar
-              this.rateTableData[i].getWorkTime = response[i].data.getWorkTime
-              this.rateTableData[i].conclusionType = response[i].data.conclusionType
-              this.rateTableData[i].id = response[i].data.id
-              this.rateTableData[i].curConclusion = response[i].data.curConclusion
-              this.rateTableData[i].nextPlan = response[i].data.nextPlan
-              this.rateTableData[i].curAdvice = response[i].data.curAdvice
-              this.rateTableData[i].managerEva = response[i].data.managerEva
+            let titleMonth = this.$moment(String(this.title) + '-' + String(i + 1)).format('YYYY-MM')
+            if (this.$moment(titleMonth).isBefore(store.state.newRulesDate)) { // 请求的月份再新规则实施月份之前
+              if (response[i].data) {
+                this.rateTableData[i].conclusionTitle = response[i].data.conclusionTitle
+                this.rateTableData[i].submitMonth = response[i].data.submitMonth
+                this.rateTableData[i].submitStatus = response[i].data.submitStatus
+                this.rateTableData[i].managerRateStar = response[i].data.managerRateStar
+                this.rateTableData[i].getWorkTime = response[i].data.getWorkTime
+                this.rateTableData[i].conclusionType = response[i].data.conclusionType
+                this.rateTableData[i].id = response[i].data.id
+                this.rateTableData[i].curConclusion = response[i].data.curConclusion
+                this.rateTableData[i].nextPlan = response[i].data.nextPlan
+                this.rateTableData[i].curAdvice = response[i].data.curAdvice
+                this.rateTableData[i].managerEva = response[i].data.managerEva
+              }
+            } else {
+              if (response[i].data.length !== 0) {
+                this.rateTableData[i].conclusionTitle = response[i].data[0].conclusionType === 1 ? this.rateTableData[i].conclusionTitle : null
+                this.rateTableData[i].submitMonth = response[i].data[0].conclusionMonth
+                this.rateTableData[i].submitStatus = response[i].data[0].submitStatus
+                this.rateTableData[i].managerRateStar = response[i].data[0].MGEvaStar
+                // this.rateTableData[i].getWorkTime = response[i].data.getWorkTime
+                this.rateTableData[i].conclusionType = response[i].data[0].conclusionType
+                this.rateTableData[i].moreDetailData = response[i].data
+                this.rateTableData[i].id = response[i].data[0].id
+              }
             }
           }
+          console.log('this.rateTableData')
+          console.log(this.rateTableData)
           this.reqFlag.getCurApplyAbleMonth = true
         }).catch(err => {
           this.$common.toast('获取月总结概览数据错误', 'error', true)
+          console.log('err')
           console.log(err)
           this.reqFlag.getCurApplyAbleMonth = true
         })
@@ -224,83 +262,96 @@
             curConclusion: null,
             nextPlan: null,
             curAdvice: null,
-            managerEva: null
+            managerEva: null,
+            moreDetailData: []
           }
           this.rateTableData.push(obj)
         }
       },
       // 点击预览
-      handlePreview (row, index) {
-        this.conclusionDialog = true
-        this.curConclusion = row.curConclusion
-        this.nextPlan = row.nextPlan
-        this.curAdvice = row.curAdvice
-        this.conclusionTitle = row.conclusionTitle
-        this.selectId = row.id
-        this.managerEva = row.managerEva
+      handlePreview (row) {
+        console.log('row.length')
+        console.log(row.length)
+        console.log('row')
+        console.log(row)
+        let titleMonth = this.$moment(String(this.title) + '-' + String(row.submitMonth)).format('YYYY-MM')
+        if (this.$moment(titleMonth).isBefore(store.state.newRulesDate)) { // 请求的月份再新规则实施月份之前
+          this.conclusionDialog = true
+          this.curConclusion = row.curConclusion
+          this.nextPlan = row.nextPlan
+          this.curAdvice = row.curAdvice
+          this.conclusionTitle = row.conclusionTitle
+          this.selectId = row.id
+          this.managerEva = row.managerEva
+        } else {
+          this.moreDetailData = row.moreDetailData
+          this.conclusionTitle = row.conclusionTitle
+          this.conclusionDialogNew = true
+        }
       },
       // 编辑月总结
-      handleEdit (row, index) {
-        this.$router.push({
-          path: '/home/monthConclusionTable',
-          query: {
-            id: row.id,
-            conclusionTitle: row.conclusionTitle,
-            submitYear: this.title,
-            submitMonth: row.submitMonth,
-            submitter: this.$store.state.userInfo.id,
-            curConclusion: row.curConclusion,
-            nextPlan: row.nextPlan,
-            curAdvice: row.curAdvice
-          }
-        })
+      handleEdit (row) {
+        let titleMonth = this.$moment(String(this.title) + '-' + String(row.submitMonth)).format('YYYY-MM')
+        if (this.$moment(titleMonth).isBefore(store.state.newRulesDate)) { // 请求的月份再新规则实施月份之前
+          this.$router.push({
+            path: '/home/monthConclusionTable',
+            query: {
+              id: row.id,
+              conclusionTitle: row.conclusionTitle,
+              submitYear: this.title,
+              submitMonth: row.submitMonth,
+              submitter: this.$store.state.userInfo.id,
+              curConclusion: row.curConclusion,
+              nextPlan: row.nextPlan,
+              curAdvice: row.curAdvice
+            }
+          })
+        } else {
+          this.$router.push({
+            path: '/home/monthConclusionTableNew',
+            query: {
+              conclusionTitle: row.conclusionTitle,
+              submitYear: this.title,
+              submitMonth: row.submitMonth,
+              submitter: this.$store.state.userInfo.id,
+              moreDetailData: row.moreDetailData
+            }
+          })
+        }
       },
       // 提交月总结
-      handleSubmit (row, index) {
-        let submitStatus = 1
-        if (this.reqFlag.updateMonthConclusionStatus) {
-          this.reqFlag.updateMonthConclusionStatus = false
-          updateMonthConclusionStatus(row.id, submitStatus).then(() => {
+      handleSubmit (row, submitStatus) {
+        let titleMonth = this.$moment(String(this.title) + '-' + String(row.submitMonth)).format('YYYY-MM')
+        if (this.$moment(titleMonth).isBefore(store.state.newRulesDate)) { // 请求的月份再新规则实施月份之前
+          if (this.reqFlag.updateMonthConclusionStatus) {
+            this.reqFlag.updateMonthConclusionStatus = false
+            updateMonthConclusionStatus(row.id, submitStatus).then(() => {
+              row.submitStatus = submitStatus
+              this.reqFlag.updateMonthConclusionStatus = true
+              this.$common.toast('操作成功', 'success', false)
+            }).catch(() => {
+              this.reqFlag.updateMonthConclusionStatus = true
+              this.$common.toast('操作失败', 'error', false)
+            })
+          }
+        } else {
+          let promises = []
+          let count = 0
+          for (let item of row.moreDetailData) {
+            promises[count++] = updateMonthConclusionNew(item.id, item.content, submitStatus)
+          }
+          Promise.all(promises).then(() => {
             row.submitStatus = submitStatus
-            this.reqFlag.updateMonthConclusionStatus = true
-            this.$common.toast('提交成功', 'success', false)
-          }).catch(() => {
-            this.reqFlag.updateMonthConclusionStatus = true
-            this.$common.toast('提交失败', 'error', false)
-          })
-        }
-      },
-      // 暂存月总结
-      handleTemporary (row, index) {
-        let submitStatus = 2
-        if (this.reqFlag.updateMonthConclusionStatus) {
-          this.reqFlag.updateMonthConclusionStatus = false
-          updateMonthConclusionStatus(row.id, submitStatus).then(() => {
-            row.submitStatus = submitStatus
-            this.reqFlag.updateMonthConclusionStatus = true
-            this.$common.toast('暂存成功', 'success', false)
-          }).catch(() => {
-            this.reqFlag.updateMonthConclusionStatus = true
-            this.$common.toast('暂存失败', 'error', false)
-          })
-        }
-      },
-      // 获取当前可申报的月份
-      getCurApplyAbleMonth () {
-        const url = urlGetCurApplyAbleMonth
-        let params = {}
-        let _this = this
-        return new Promise(function (resolve, reject) {
-          _this.$http(url, params).then(res => {
-            if (res.code === 1) {
-              resolve(res.data)
-            } else {
-              reject(res.data)
-            }
+            this.$common.toast('操作成功', 'success', false)
+            this.$router.push({
+              path: '/home/monthConclusion'
+            })
           }).catch(err => {
-            reject(err)
+            console.log('err')
+            console.log(err)
+            this.$common.toast('操作失败', 'error', true)
           })
-        })
+        }
       },
       // 上一年
       handlePreYear () {
@@ -316,32 +367,7 @@
       },
       // 申报月份变化
       handelDateChange () {
-        this.reqFlag.getCurApplyAbleMonth = false
-        // 获取月总结概览数据
-        getCurYearConclusionOverviewData(this.title, this.curUser).then((response) => {
-          // 初始化默认数据
-          this.initDefaultData()
-          for (let i = 0; i < response.length; i++) {
-            if (response[i].data) {
-              this.rateTableData[i].conclusionTitle = response[i].data.conclusionTitle
-              this.rateTableData[i].submitMonth = response[i].data.submitMonth
-              this.rateTableData[i].submitStatus = response[i].data.submitStatus
-              this.rateTableData[i].managerRateStar = response[i].data.managerRateStar
-              this.rateTableData[i].getWorkTime = response[i].data.getWorkTime
-              this.rateTableData[i].conclusionType = response[i].data.conclusionType
-              this.rateTableData[i].id = response[i].data.id
-              this.rateTableData[i].curConclusion = response[i].data.curConclusion
-              this.rateTableData[i].nextPlan = response[i].data.nextPlan
-              this.rateTableData[i].curAdvice = response[i].data.curAdvice
-              this.rateTableData[i].managerEva = response[i].data.managerEva
-            }
-          }
-          this.reqFlag.getCurApplyAbleMonth = true
-        }).catch(err => {
-          this.$common.toast('获取月总结概览数据错误', 'error', true)
-          console.log(err)
-          this.reqFlag.getCurApplyAbleMonth = true
-        })
+        this.genConclusionTableData()
       },
       // 设置cookie
       setCookie (showTable, exdays) {
@@ -429,7 +455,8 @@
       }
     },
     components: {
-      monthConclusionTableCheck
+      monthConclusionTableCheck,
+      monthConclusionTableCheckNew
     },
     created () {
       this.init()

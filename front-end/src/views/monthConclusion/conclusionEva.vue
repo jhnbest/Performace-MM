@@ -4,7 +4,7 @@
       <el-form class="main-search" :inline="true">
         <el-row type="flex">
           <el-col :xs="12" :sm="12" :lg="9" :xl="6">
-            <!--        年份选择-->
+            <!--        月选择-->
             <el-form-item label="月份选择：" prop="title">
               <el-button size="mini"
                          type="danger"
@@ -41,7 +41,7 @@
                   stripe
                   size="medium"
                   :header-cell-style="{ backgroundColor:'#48bfe5', color: '#333' }"
-                  v-loading="!reqFlag.getCurApplyAbleMonth || !reqFlag.getAllUsersConclusion || !reqFlag.getAllUsersConclusion"
+                  v-loading="!reqFlag.getAllUsersConclusion"
                   :height="tableHeight"
                   ref="rateTable"
                   highlight-current-row>
@@ -147,8 +147,7 @@
 
 <script>
   import {
-    urlGetCurApplyAbleMonth,
-    urlSubmitEvaData } from '@/config/interface'
+    urlGetCurApplyAbleMonth } from '@/config/interface'
   import {
     getCurMonthConclusionOverviewData,
     submitEvaData,
@@ -163,11 +162,12 @@
     conclusionManagerEvaStarToWorkTime, addNewProject, getWorkTimeAssignInfo, setProjectFinish, getWorkTimeListInfo
   } from '@/utils/common'
   import monthConclusionTableCheck from './childViews/monthConclusionTableCheck'
+  import store from '@/store'
   export default {
     data () {
       return {
         formData: {
-          title: this.$moment().format('YYYY')
+          title: this.$moment().format('YYYY-MM')
         },
         showFlag: {
           descTableShow: false
@@ -209,7 +209,6 @@
         if (this.reqFlag.getCurApplyAbleMonth) {
           this.reqFlag.getCurApplyAbleMonth = false
           getCurApplyAbleMonth().then(getCurApplyAbleMonthRes => { // 获取当前申报月份
-            this.formData.title = this.$moment(getCurApplyAbleMonthRes[0].setTime).format('YYYY-MM')
             this.curApplyYear = this.$moment(getCurApplyAbleMonthRes[0].setTime).year()
             this.curApplyMonth = this.$moment(getCurApplyAbleMonthRes[0].setTime).month() + 1
             // 获取全处员工信息
@@ -217,6 +216,7 @@
               this.allUsers = removeUserByName('王喻强', JSON.parse(JSON.stringify(getAllUsersInfoRes.list)))
               if (this.reqFlag.getAllUsersConclusion) {
                 this.reqFlag.getAllUsersConclusion = false
+                if (this.$moment(this.formData.title).isBefore())
                 // 获取全处员工月总结信息
                 this.getAllUsersConclusion(this.allUsers, this.curApplyYear, this.curApplyMonth).then(getAllUsersConclusionRes => {
                   // 填充总结表格数据
@@ -453,6 +453,8 @@
         if (this.reqFlag.getAllUsersConclusion) {
           this.reqFlag.getAllUsersConclusion = false
           this.getAllUsersConclusion(this.allUsers, submitYear, submitMonth).then(getAllUsersConclusionRes => {
+            console.log('getAllUsersConclusionRes')
+            console.log(getAllUsersConclusionRes)
             // 填充总结表格数据
             this.fillConclusionTableData(getAllUsersConclusionRes)
             this.reqFlag.getAllUsersConclusion = true

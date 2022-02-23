@@ -24,16 +24,7 @@
               size="mini"
               style="margin: auto;width: 100%"
               :header-cell-style="{background:'#00c0d1',color:'#000000',fontSize:'18px'}">
-      <el-table-column v-if="isNewConclusion"
-                       label="打造精品工程"
-                       align="center">
-        <template>
-          <editor-vue :value="conclusionTextNew.buildBoutiqueProject.content"
-                      @input="(res)=> conclusionTextNew.buildBoutiqueProject.content = res"></editor-vue>
-        </template>
-      </el-table-column>
-      <el-table-column v-else
-                       label="在本月所完成工作的回顾及客观评价（含工作内容、进展与成效、不足与改进意见、工作成果评价、未完成的工作内容及原因分析等）"
+      <el-table-column label="在本月所完成工作的回顾及客观评价（含工作内容、进展与成效、不足与改进意见、工作成果评价、未完成的工作内容及原因分析等）"
                        align="center">
         <template>
           <editor-vue :value="conclusionText.curConclusion"
@@ -41,23 +32,7 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-table v-if="isNewConclusion"
-              :data="tableData2"
-              border
-              stripe
-              size="medium"
-              :header-cell-style="{ background:'#00c0d1',color:'#000000',fontSize:'18px' }"
-              style="margin: auto;width: 99%"
-              highlight-current-row>
-      <el-table-column label="创建专业团队"
-                       align="center">
-        <template>
-          <editor-vue :value="conclusionTextNew.buildProTeam.content"
-                      @input="(res)=> conclusionTextNew.buildProTeam.content = res"></editor-vue>
-        </template>
-      </el-table-column>
-    </el-table>
-    <el-table :data="tableData3"
+    <el-table :data="tableData2"
               border
               stripe
               size="medium"
@@ -72,7 +47,7 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-table :data="tableData4"
+    <el-table :data="tableData3"
               border
               stripe
               size="medium"
@@ -95,9 +70,7 @@
   import editorVue from '../../../components/monthConclusion/editor'
   import {
     submitMonthConclusionData,
-    updateMonthConclusionData,
-    submitMonthConclusionNew } from '@/utils/conclusion'
-  import store from '@/store'
+    updateMonthConclusionData } from '@/utils/conclusion'
   export default {
     data () {
       return {
@@ -105,7 +78,6 @@
         tableData1: [{}],
         tableData2: [{}],
         tableData3: [{}],
-        tableData4: [{}],
         submitYear: null,
         submitMonth: null,
         submitter: null,
@@ -118,9 +90,7 @@
           curAdvice: ''
         },
         isSubmit: false,
-        id: null,
-        isNewConclusion: true,
-        conclusionTextNew: this.$store.state.conclusionTextNew
+        id: null
       }
     },
     methods: {
@@ -134,59 +104,30 @@
         this.conclusionText.curConclusion = this.$route.query.curConclusion
         this.conclusionText.nextPlan = this.$route.query.nextPlan
         this.conclusionText.curAdvice = this.$route.query.curAdvice
-        let curTitle = this.submitYear + '-' + String(this.submitMonth)
-        curTitle = this.$moment(curTitle).format('YYYY-MM')
-        this.isNewConclusion = this.$moment(curTitle).isAfter(store.state.newRulesDate) ||
-                               this.$moment(curTitle).isSame(store.state.newRulesDate)
       },
       // 提交月总结
       handleSubmit () {
         let submitStatus = 1
-        if (this.isNewConclusion) { // 判断是否是新总结
-          let promises = []
-          let count = 0
-          if (this.id === null) { // 是否第一次提交
-            for (let item in this.conclusionTextNew) {
-              promises[count++] = submitMonthConclusionNew(this.submitter, this.submitYear, this.submitMonth, store.state.monthConclusionType,
-                                                          this.conclusionTextNew[item].dimension, this.conclusionTextNew[item].content,
-                                                          submitStatus)
-              this.$router.push({
-                path: '/home/monthConclusion'
-              })
-            }
-            Promise.all(promises).then(allResponses => {
-              console.log('allResponses')
-              console.log(allResponses)
-              this.$common.toast('提交成功', 'success', false)
-            }).catch(err => {
-              console.log('err')
-              console.log(err)
-              this.$common.toast('提交失败', 'false', true)
+        if (this.id !== null) {
+          updateMonthConclusionData(this.id, this.submitYear, this.submitMonth, this.submitter, this.conclusionTitle, submitStatus,
+            this.conclusionText.curConclusion, this.conclusionText.nextPlan, this.conclusionText.curAdvice).then(() => {
+            this.$common.toast('提交成功', 'success', false)
+            this.$router.push({
+              path: '/home/monthConclusion'
             })
-          } else { // 提交类型为更新
-          }
+          }).catch((updateMonthConclusionDataErr) => {
+            this.$common.toast('提交失败 ' + updateMonthConclusionDataErr, 'error', false)
+          })
         } else {
-          if (this.id !== null) {
-            updateMonthConclusionData(this.id, this.submitYear, this.submitMonth, this.submitter, this.conclusionTitle, submitStatus,
-              this.conclusionText.curConclusion, this.conclusionText.nextPlan, this.conclusionText.curAdvice).then(() => {
-              this.$common.toast('提交成功', 'success', false)
-              this.$router.push({
-                path: '/home/monthConclusion'
-              })
-            }).catch((updateMonthConclusionDataErr) => {
-              this.$common.toast('提交失败 ' + updateMonthConclusionDataErr, 'error', false)
+          submitMonthConclusionData(this.submitYear, this.submitMonth, this.submitter, this.conclusionTitle, submitStatus,
+            this.conclusionText.curConclusion, this.conclusionText.nextPlan, this.conclusionText.curAdvice).then(() => {
+            this.$common.toast('提交成功', 'success', false)
+            this.$router.push({
+              path: '/home/monthConclusion'
             })
-          } else {
-            submitMonthConclusionData(this.submitYear, this.submitMonth, this.submitter, this.conclusionTitle, submitStatus,
-              this.conclusionText.curConclusion, this.conclusionText.nextPlan, this.conclusionText.curAdvice).then(() => {
-              this.$common.toast('提交成功', 'success', false)
-              this.$router.push({
-                path: '/home/monthConclusion'
-              })
-            }).catch((submitMonthConclusionDataErr) => {
-              this.$common.toast('提交失败 ' + submitMonthConclusionDataErr, 'error', false)
-            })
-          }
+          }).catch((submitMonthConclusionDataErr) => {
+            this.$common.toast('提交失败 ' + submitMonthConclusionDataErr, 'error', false)
+          })
         }
       },
       // 暂存月总结

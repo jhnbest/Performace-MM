@@ -269,7 +269,7 @@ const sqlMap = {
     submitMonthConclusionNew: 'insert into newconclusion (userID, conclusionType, conclusionYear, conclusionMonth,' +
     ' dimension, content, submitTime, updateTime, MGEvaStar, submitStatus) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
     updateMonthConclusionNew: 'update newconclusion set content = ?, submitStatus = ?, updateTime = ? where id = ?',
-    getCurMonthConclusionOverviewDataNew: 'select nc.*, u.name from conclusion nc left join users u on' +
+    getCurMonthConclusionOverviewDataNew: 'select nc.*, u.name from newconclusion nc left join users u on' +
     ' nc.userID = u.id where nc.conclusionYear = ? and nc.conclusionMonth = ? and nc.userID = ?'
   }
 }
