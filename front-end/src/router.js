@@ -148,6 +148,11 @@ export default new Router({
           name: 'monthConclusionTableNew',
           component: () => import('./views/monthConclusion/childViews/monthConclusionTableNew.vue'),
           meta: { pagePath: '/home/monthConclusion' }
+        },{
+          path: 'AMEvaluation',
+          name: 'AMEvaluation',
+          component: () => import('./views/performanceEva/AMEva.vue'),
+          meta: { pagePath: '/home/AMEvaluation' }
         }
       ]
     },
