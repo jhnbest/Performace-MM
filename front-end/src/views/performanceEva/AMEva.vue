@@ -65,6 +65,7 @@
 <script>
 import {} from '@/utils/performance'
 import { Notification } from 'element-ui'
+import { getUsersList } from '@/utils/users'
 export default {
   data () {
     return {
@@ -78,6 +79,13 @@ export default {
   methods: {
     // 初始化
     init () {
+      getUsersList().then(response => {
+        this.genTableData()
+      })
+    },
+    // 生成表格数据
+    genTableData () {
+
     },
     // 日期发生变化
     handleDataChange () {
