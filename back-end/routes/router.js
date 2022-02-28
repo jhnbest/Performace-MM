@@ -101,6 +101,8 @@ router.post(api.getPerformanceRates, mutualRates.getPerformanceRates)
 
 // 成效评价模块
 router.post(api.getAllAchievements, achievementsEva.getAllAchievements)
+router.post(api.getAchievementOfUser, achievementsEva.getAchievementOfUser)
+router.post(api.submitAMEvaData, achievementsEva.submitAMEvaData)
 
 // 总结模块
 router.post(api.getCurMonthConclusionOverviewData, conclusion.getCurMonthConclusionOverviewData)

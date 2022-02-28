@@ -45,6 +45,22 @@ const achievementsEva = {
           }
           return $http.writeJson(res, { code: 1, data: resultData, message: '成功' })
       })
+    },
+    // 获取用户的成效评价
+    getAchievementOfUser (req, res) {
+        let sendData = req.body
+        let sql = $sql.achievementsEva.getAchievementOfUser
+        let arrayParams = [sendData.conclusionID]
+        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+            return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
+        }).catch(RCPDDatabaseErr => {
+            return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+        })
+    },
+    // 提交成效评价
+    submitAMEvaData (req, res) {
+        let sendData = req.body
+        let sql = $sql.achievementsEva.submitAMEvaData
     }
 }
 

@@ -271,6 +271,11 @@ const sqlMap = {
     updateMonthConclusionNew: 'update newconclusion set content = ?, submitStatus = ?, updateTime = ? where id = ?',
     getCurMonthConclusionOverviewDataNew: 'select nc.*, u.name from newconclusion nc left join users u on' +
     ' nc.userID = u.id where nc.conclusionYear = ? and nc.conclusionMonth = ? and nc.userID = ?'
+  },
+  achievementsEva: {
+    getAchievementOfUser: 'select nce.*, u.name from newconclusionevadata nce left join users u on' +
+                        ' nce.evaUserID = u.id where nce.dimensionID = ?',
+    submitAMEvaData: ''
   }
 }
 module.exports = sqlMap;
