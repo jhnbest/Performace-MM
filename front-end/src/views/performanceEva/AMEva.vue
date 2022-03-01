@@ -38,7 +38,11 @@
                 style="width: 100%;"
                 size="mini">
                 <el-table-column label="姓名" prop="name" align="center" width="60px"></el-table-column>
-                <el-table-column label="提交状态" prop="submitStatus" align="center" width="70px"></el-table-column>
+                <el-table-column label="提交状态" prop="submitStatus" align="center" width="70px">
+                  <template slot-scope="scope">
+                    <el-tag :type="scope.row.submitStatus | submitStatusFilter" size="mini">{{scope.row.submitStatus | submitStatusTextFilter}}</el-tag>
+                  </template>
+                </el-table-column>
                 <el-table-column label="月总结" align="center">
                   <template slot-scope="scope">
                     <el-button v-if="!scope.row.isShow"
@@ -380,6 +384,22 @@ export default {
   },
   mounted () {
     this.refreshTableSize()
+  },
+  filters: {
+    submitStatusFilter (status) {
+      if (status === 1) {
+        return 'success'
+      } else if (status === 0) {
+        return 'danger'
+      }
+    },
+    submitStatusTextFilter (status) {
+      if (status === 1) {
+        return '已提交'
+      } else if (status === 0) {
+        return '未提交'
+      }
+    }
   }
 }
 </script>

@@ -1,5 +1,6 @@
 const $sql = require('../sql/sqlMap')
 const $http = require('../sql/http')
+const $time = require('../utils/time')
 
 function RCPDDatabase(sql, arrayParams) {
   return new Promise(function (resolve, reject) {
@@ -61,6 +62,14 @@ const achievementsEva = {
     submitAMEvaData (req, res) {
         let sendData = req.body
         let sql = $sql.achievementsEva.submitAMEvaData
+        let submitTime = $time.formatTime()
+        let updateTime = submitTime
+        let arrayParams = [sendData.evaUserID, sendData.dimensionID, sendData.evaStar, submitTime, updateTime]
+        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+            return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
+        }).catch(RCPDDatabaseErr => {
+            return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+        })
     }
 }
 
