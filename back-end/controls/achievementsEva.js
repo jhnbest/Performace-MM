@@ -47,11 +47,11 @@ const achievementsEva = {
           return $http.writeJson(res, { code: 1, data: resultData, message: '成功' })
       })
     },
-    // 获取用户的成效评价
-    getAchievementOfUser (req, res) {
+    // 获取某个用户对某个用户的成效评价
+    getUserofAchievementToAnotherUser (req, res) {
         let sendData = req.body
-        let sql = $sql.achievementsEva.getAchievementOfUser
-        let arrayParams = [sendData.conclusionID]
+        let sql = $sql.achievementsEva.getUserofAchievementToAnotherUser
+        let arrayParams = [sendData.conclusionID, sendData.evaUserID]
         RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
             return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
         }).catch(RCPDDatabaseErr => {

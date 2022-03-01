@@ -273,8 +273,8 @@ const sqlMap = {
     ' nc.userID = u.id where nc.conclusionYear = ? and nc.conclusionMonth = ? and nc.userID = ?'
   },
   achievementsEva: {
-    getAchievementOfUser: 'select nce.*, u.name from newconclusionevadata nce left join users u on' +
-                        ' nce.evaUserID = u.id where nce.dimensionID = ?',
+    getUserofAchievementToAnotherUser: 'select nce.*, u.name from newconclusionevadata nce left join users u on' +
+                        ' nce.evaUserID = u.id where nce.dimensionID = ? and evaUserID = ?',
     submitAMEvaData: 'insert into newconclusionevadata (evaUserID, dimensionID, evaStar, submitTime, updateTime)' +
                     ' values (?, ?, ?, ?, ?)'
   }

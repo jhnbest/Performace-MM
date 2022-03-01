@@ -94,7 +94,7 @@ module.exports = {
 
     // 成效评价模块
     getAllAchievements: path + '/achievementsEva/getAllAchievements', // 获取全处成效评价历史数据
-    getAchievementOfUser: path + '/achievementsEva/getAchievementOfUser', // 获取用户的成效评价
+    getUserofAchievementToAnotherUser: path + '/achievementsEva/getUserofAchievementToAnotherUser', // 获取用户的成效评价
     submitAMEvaData: path + '/achievementsEva/submitAMEvaData', // 提交成效评价
 
     // 总结模块

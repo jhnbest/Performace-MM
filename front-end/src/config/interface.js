@@ -91,7 +91,7 @@ export const handleFillMul = '/mutualRates/handleFillMul' // 一键填充定性�
 export const urlGetPerformanceRates = '/mutualRates/getPerformanceRates' // 获取成效评价历史数据
 
 export const urlGetAllAchievements = '/achievementsEva/getAllAchievements' // 获取全处成效评价数据
-export const urlGetAchievementOfUser = '/achievementsEva/getAchievementOfUser' // 获取用户的成效评价
+export const urlGetUserofAchievementToAnotherUser = '/achievementsEva/getUserofAchievementToAnotherUser' // 获取用户的成效评价
 export const urlSubmitAMEvaData = '/achievementsEva/submitAMEvaData' // 提交成效评价
 
 export const urlGetCurMonthConclusionOverviewData = '/conclusion/getCurMonthConclusionOverviewData' // 获取月总结概览信息

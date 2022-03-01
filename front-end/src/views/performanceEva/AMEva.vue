@@ -25,7 +25,7 @@
     <div class="head-line">
       <el-row :gutter="10">
         <el-col :span="5">
-          <el-collapse accordion v-model="activeName">
+          <el-collapse accordion v-model="activeName" @change="handleCollapseChange()">
             <el-collapse-item name="1">
               <template slot="title">
                 <el-badge :value="toDoEvaNum" class="item"><span>待评价</span></el-badge>
@@ -36,18 +36,19 @@
                 fit
                 highlight-current-row
                 style="width: 100%;"
-                size="mini">
+                size="mini"
+                ref = "PMDataTable">
                 <el-table-column label="姓名" prop="name" align="center" width="60px"></el-table-column>
-                <el-table-column label="提交状态" prop="submitStatus" align="center" width="70px">
+                <el-table-column label="月总结提交状态" prop="submitStatus" align="center">
                   <template slot-scope="scope">
-                    <el-tag :type="scope.row.submitStatus | submitStatusFilter" size="mini">{{scope.row.submitStatus | submitStatusTextFilter}}</el-tag>
+                    <el-tag :type="scope.row.submitStatus | submitStatusFilter" size="medium">{{scope.row.submitStatus | submitStatusTextFilter}}</el-tag>
                   </template>
                 </el-table-column>
                 <el-table-column label="月总结" align="center">
                   <template slot-scope="scope">
                     <el-button v-if="!scope.row.isShow"
                               :disabled="scope.row.submitStatus === 0"
-                              @click="handlelookOver(scope.row, scope.$index)"
+                              @click="table1HandleShow(scope.row, scope.$index)"
                               size="mini">
                               <span v-if="scope.row.submitStatus === 1">点击显示</span>
                               <span v-else>未提交</span>
@@ -57,10 +58,35 @@
                 </el-table-column>
               </el-table>
             </el-collapse-item>
-            <el-collapse-item>
+            <el-collapse-item name="2">
               <template slot="title">
                 <el-badge :value="doneEvaNum" class="item"><span>已评价</span></el-badge>
               </template>
+              <el-table :data="doneEvaTableData"
+                         v-loading="!getDataLoading"
+                         fit
+                         highlight-current-row
+                         style="width: 100%;"
+                         size="mini">
+                <el-table-column label="姓名" prop="name" align="center" width="60px"></el-table-column>
+                <el-table-column label="月总结提交状态" prop="submitStatus" align="center">
+                  <template slot-scope="scope">
+                    <el-tag :type="scope.row.submitStatus | submitStatusFilter" size="medium">{{scope.row.submitStatus | submitStatusTextFilter}}</el-tag>
+                  </template>
+                </el-table-column>
+                <el-table-column label="月总结" align="center">
+                  <template slot-scope="scope">
+                    <el-button v-if="!scope.row.isShow"
+                              :disabled="scope.row.submitStatus === 0"
+                              @click="table2HandleShow(scope.row, scope.$index)"
+                              size="mini">
+                              <span v-if="scope.row.submitStatus === 1">点击显示</span>
+                              <span v-else>未提交</span>
+                    </el-button>
+                    <span v-else>已显示</span>
+                  </template>
+                </el-table-column>
+              </el-table>
             </el-collapse-item>
           </el-collapse>
         </el-col>
@@ -75,7 +101,7 @@
                       :header-cell-style="{ background:'#ced1d4', color:'#000000', fontSize:'16px'}">
               <el-table-column label="打造精品工程">
                 <template>
-                  <div v-html="buildBoutiqueProject"></div>
+                  <div v-html="buildBoutiqueProject.content"></div>
                 </template>
               </el-table-column>
               <el-table-column label="评分" width="150px" align="center">
@@ -95,7 +121,7 @@
                       highlight-current-row>
               <el-table-column label="创建专业团队">
                 <template>
-                  <div v-html="buildProTeam"></div>
+                  <div v-html="buildProTeam.content"></div>
                 </template>
               </el-table-column>
               <el-table-column label="评分" width="150px" align="center">
@@ -116,7 +142,7 @@
                       highlight-current-row>
               <el-table-column label="下一个月的工作目标、工作计划/工作安排、工作内容">
                 <template>
-                  <div v-html="nextPlan"></div>
+                  <div v-html="nextPlan.content"></div>
                 </template>
               </el-table-column>
             </el-table>
@@ -150,15 +176,16 @@ import {} from '@/utils/performance'
 import { Notification } from 'element-ui'
 import { getUsersList } from '@/utils/users'
 import { getCurMonthConclusionOverviewDataNew } from '@/utils/conclusion'
-import { getAchievementOfUser } from '@/utils/achievementEva'
+import { getUserofAchievementToAnotherUser, submitAMEvaData } from '@/utils/achievementEva'
 import store from '@/store'
 export default {
   data () {
     return {
-      title: this.$moment().format('YYYY-MM'), // 日期
+      title: this.$moment().subtract(1, 'months').format('YYYY-MM'), // 日期
       getDataLoading: false, // 表格加载标志位,
       fillUPing: true, // 表格加载标志位,
       PMdata: [], // 表格数据
+      doneEvaTableData: [], // 已经完成评价的数据
       tableHeight: null, // 动态表格高度
       conclusionYear: null, // 总结年份
       conclusionMonth: null, // 总结月份,
@@ -166,21 +193,27 @@ export default {
       tableData2: [{}],
       tableData3: [{}],
       tableData4: [{}],
-      buildBoutiqueProject: null, // 打造精品工程内容
-      buildProTeam: null, // 打造精品工程内容
-      nextPlan: null, // 打造精品工程内容
-      curShowIndex: 0, // 当前显示的用户序号
-      preShowIndex: 0, // 之前显示的用户序号
+      buildBoutiqueProject: {
+        content: ''
+      }, // 打造精品工程内容
+      buildProTeam: {
+        content: ''
+      }, // 建设专业团队内容
+      nextPlan: {
+        content: ''
+      }, // 下月计划内容
+      table1CurShowIndex: -1, // 表格1当前显示的用户序号
+      table1PreShowIndex: -1, // 表格1之前显示的用户序号
+      table2CurShowIndex: -1, // 表格2当前显示的用户序号
+      table2PreShowIndex: -1, // 表格2之前显示的用户序号
       buildBoutiqueProjectStar: 3, // 默认评价星级
       buildProTeamStar: 3, // 默认评价星级
       toDoEvaNum: 0, // 待评价的人数
       doneEvaNum: 0, // 已评价的人数,
       forceRefresh: true, // 强制刷新
       activeName: '1', // 默认展开的name,
-      curEvaUser: {
-        name: null,
-        index: null
-      } // 当前评价的用户姓名
+      curEvaUserName: null, // 当前显示的用户姓名
+      curShowTable: -1 // 当前显示的表格序号
     }
   },
   methods: {
@@ -191,40 +224,63 @@ export default {
       this.conclusionMonth = this.$moment(this.title).month() + 1
       getUsersList().then(usersList => {
         this.genTableData(this.conclusionYear, this.conclusionMonth, usersList).then(tableData => {
-          // 初始化显示第一个已经提交总结的人
-          for (let i = 0; i < tableData.length; i++) {
-            if (tableData[i].submitStatus !== 0) {
-              tableData[i].isShow = true
-              this.curEvaUserName = tableData[i].name
-              this.curShowIndex = i
-              this.preShowIndex = i
-              this.buildBoutiqueProject = tableData[i].conclusionContent.find(contenItem => {
-                return contenItem.dimension === store.state.conclusionTextNew.buildBoutiqueProject.dimension
-              }).content
-              this.buildProTeam = tableData[i].conclusionContent.find(contenItem => {
-                return contenItem.dimension === store.state.conclusionTextNew.buildProTeam.dimension
-              }).content
-              this.nextPlan = tableData[i].conclusionContent.find(contenItem => {
-                return contenItem.dimension === store.state.conclusionTextNew.nextPlan.dimension
-              }).content
-              this.forceRefresh = false
-              this.$nextTick(() => {
-                this.forceRefresh = true
-              })
-              break
+          let toDoEvaTableData = tableData.toDoEvaTableData
+          let doneEvaTableData = tableData.doneEvaTableData
+          this.toDoEvaNum = toDoEvaTableData.length
+          this.doneEvaNum = doneEvaTableData.length
+          // 初始化默认显示的数据
+          if (toDoEvaTableData.length !== 0) { // 还有未评价的用户
+            for (let i = 0; i < toDoEvaTableData.length; i++) {
+              if (toDoEvaTableData[i].submitStatus !== 0) {
+                toDoEvaTableData[i].isShow = true
+                this.curEvaUserName = toDoEvaTableData[i].name
+                this.table1CurShowIndex = i
+                this.table1PreShowIndex = i
+                this.buildBoutiqueProject = toDoEvaTableData[i].conclusionContent.find(contenItem => {
+                  return contenItem.dimension === store.state.conclusionTextNew.buildBoutiqueProject.dimension
+                })
+                this.buildProTeam = toDoEvaTableData[i].conclusionContent.find(contenItem => {
+                  return contenItem.dimension === store.state.conclusionTextNew.buildProTeam.dimension
+                })
+                this.nextPlan = toDoEvaTableData[i].conclusionContent.find(contenItem => {
+                  return contenItem.dimension === store.state.conclusionTextNew.nextPlan.dimension
+                })
+                this.forceRefresh = false
+                this.$nextTick(() => {
+                  this.forceRefresh = true
+                })
+                break
+              }
             }
+          } else { // 用户都已评价
+            doneEvaTableData[0].isShow = true
+            this.curEvaUserName = doneEvaTableData[0].name
+            this.table2CurShowIndex = 0
+            this.table2PreShowIndex = 0
+            this.buildBoutiqueProject = doneEvaTableData[0].conclusionContent.find(contenItem => {
+              return contenItem.dimension === store.state.conclusionTextNew.buildBoutiqueProject.dimension
+            })
+            this.buildProTeam = doneEvaTableData[0].conclusionContent.find(contenItem => {
+              return contenItem.dimension === store.state.conclusionTextNew.buildProTeam.dimension
+            })
+            this.nextPlan = doneEvaTableData[0].conclusionContent.find(contenItem => {
+              return contenItem.dimension === store.state.conclusionTextNew.nextPlan.dimension
+            })
+            this.forceRefresh = false
+            this.$nextTick(() => {
+              this.forceRefresh = true
+            })
           }
-          this.PMdata = tableData
+          this.PMdata = toDoEvaTableData
+          this.doneEvaTableData = doneEvaTableData
           this.getDataLoading = true
-          console.log('tableData')
-          console.log(tableData)
         })
       })
     },
     // 生成表格数据
     genTableData (conclusionYear, conclusionMonth, usersList) {
       // 初始化默认数据
-      let toDoEvaArray = []
+      let allconclusionAndEvaData = []
       for (let user of usersList) {
         if (store.state.userInfo.groupName === '技术标准组' || store.state.userInfo.groupName === '工程组') {
           if (user.groupName === '技术标准组' || user.groupName === '工程组') {
@@ -233,11 +289,11 @@ export default {
               name: user.name,
               submitStatus: 0,
               evaStatus: 0,
-              conclusionContent: null,
+              conclusionContent: [],
               isShow: false,
               conclusionEva: []
             }
-            toDoEvaArray.push(obj)
+            allconclusionAndEvaData.push(obj)
           }
         } else if (store.state.userInfo.groupName === '通信组') {
           if (user.groupName === '通信组') {
@@ -246,11 +302,11 @@ export default {
               name: user.name,
               submitStatus: 0,
               evaStatus: 0,
-              conclusionContent: null,
+              conclusionContent: [],
               isShow: false,
               conclusionEva: []
             }
-            toDoEvaArray.push(obj)
+            allconclusionAndEvaData.push(obj)
           }
         } else {
           let obj = {
@@ -258,21 +314,17 @@ export default {
             name: user.name,
             submitStatus: 0,
             evaStatus: 0,
-            conclusionContent: null,
+            conclusionContent: [],
             isShow: false,
             conclusionEva: []
           }
-          toDoEvaArray.push(obj)
+          allconclusionAndEvaData.push(obj)
         }
       }
-      console.log('toDoEvaArray')
-      console.log(toDoEvaArray)
-      console.log('toDoEvaArray')
-      console.log(JSON.parse(JSON.stringify(toDoEvaArray)))
-      toDoEvaArray.splice(toDoEvaArray.findIndex(item => { return item.id === store.state.userInfo.id }), 1) // 把自己去掉
+      allconclusionAndEvaData.splice(allconclusionAndEvaData.findIndex(item => { return item.id === store.state.userInfo.id }), 1) // 把自己去掉
       let promise = []
       let count = 0
-      for (let item of toDoEvaArray) {
+      for (let item of allconclusionAndEvaData) {
         promise[count++] = getCurMonthConclusionOverviewDataNew(conclusionYear, conclusionMonth, item.id)
       }
       return new Promise(function (resolve, reject) {
@@ -281,57 +333,99 @@ export default {
           console.log(allResponse)
           let promise2 = []
           let count2 = 0
-          for (let i = 0; i < toDoEvaArray.length; i++) {
-            toDoEvaArray[i].submitStatus = allResponse[i].data.length === 0 ? 0 : 1
-            toDoEvaArray[i].conclusionContent = allResponse[i].data
+          // ===================获取总结评价结果
+          for (let i = 0; i < allconclusionAndEvaData.length; i++) {
+            allconclusionAndEvaData[i].submitStatus = allResponse[i].data.length === 0 ? 0 : 1
+            allconclusionAndEvaData[i].conclusionContent = allResponse[i].data
             if (allResponse[i].data.length > 0) { // 已经填写总结
               for (let item of allResponse[i].data) {
                 if (item.dimension === 1 || item.dimension === 2) { // 打造精品工程和建设团队维度才获取评价结果
-                  promise2[count2++] = getAchievementOfUser(item.id)
+                  promise2[count2++] = getUserofAchievementToAnotherUser(item.id, store.state.userInfo.id)
                 }
-              }
-              Promise.all(promise2).then(allResponse2 => {
-                console.log('allResponse2')
-                console.log(allResponse2)
-                for (let item2 of allResponse2) {
-                  let findResult = allResponse.data.find(allResponseItem => {
-                    return allResponseItem.id === item2.data.dimensionID
-                  })
-                  findResult.conclusionEva.push(item2)
-                }
-                resolve(toDoEvaArray)
-              }).catch(err => {
-                reject(err)
-              })
-            } else {
-              if (i === toDoEvaArray.length - 1) {
-                resolve(toDoEvaArray)
               }
             }
           }
+          // 把对某个用户的总结评价嵌入表格数据中
+          Promise.all(promise2).then(allResponse2 => {
+            console.log('allconclusionAndEvaData')
+            console.log(allconclusionAndEvaData)
+            let toDoEvaArrayIndex = -1
+            for (let item2 of allResponse2) {
+              if (item2.length > 0) {
+                for (let i = 0; i < allconclusionAndEvaData.length; i++) {
+                  for (let j = 0; j < allconclusionAndEvaData[i].conclusionContent.length; j++) {
+                    if (allconclusionAndEvaData[i].conclusionContent[j].id === item2[0].dimensionID) {
+                      toDoEvaArrayIndex = i
+                    }
+                  }
+                }
+                if (toDoEvaArrayIndex !== -1) {
+                  allconclusionAndEvaData[toDoEvaArrayIndex].conclusionEva.push(item2[0])
+                }
+              }
+            }
+            let toDoEvaTableData = []
+            let doneEvaTableData = []
+            // 已评价和未评价分类
+            for (let allconclusionAndEvaDataItem of allconclusionAndEvaData) {
+              if (allconclusionAndEvaDataItem.conclusionEva.length !== 0) { // 已评价
+                allconclusionAndEvaDataItem.evaStatus = 1
+                doneEvaTableData.push(allconclusionAndEvaDataItem)
+              } else { // 未评价
+                toDoEvaTableData.push(allconclusionAndEvaDataItem)
+              }
+            }
+            resolve({
+              toDoEvaTableData: toDoEvaTableData,
+              doneEvaTableData: doneEvaTableData
+            })
+          }).catch(err => {
+            reject(err)
+          })
         }).catch(err => {
           reject(err)
         })
       })
     },
-    // 点击查看
-    handlelookOver (row, index) {
+    // 点击显示(表格1)
+    table1HandleShow (row, index) {
       console.log('row')
       console.log(row)
       this.curEvaUserName = row.name
-      this.curShowIndex = index
-      this.PMdata[this.curShowIndex].isShow = true
-      this.PMdata[this.preShowIndex].isShow = false
-      this.preShowIndex = index
+      this.table1CurShowIndex = index
+      this.PMdata[this.table1CurShowIndex].isShow = true
+      this.PMdata[this.table1PreShowIndex].isShow = false
+      this.table1PreShowIndex = index
       this.buildBoutiqueProject = row.conclusionContent.find(contenItem => {
         return contenItem.dimension === store.state.conclusionTextNew.buildBoutiqueProject.dimension
-      }).content
+      })
       this.buildProTeam = row.conclusionContent.find(contenItem => {
         return contenItem.dimension === store.state.conclusionTextNew.buildProTeam.dimension
-      }).content
+      })
       this.nextPlan = row.conclusionContent.find(contenItem => {
         return contenItem.dimension === store.state.conclusionTextNew.nextPlan.dimension
-      }).content
+      })
+      this.forceRefresh = false
+      this.$nextTick(() => {
+        this.forceRefresh = true
+      })
+    },
+    // 点击显示（表格2）
+    table2HandleShow (row, index) {
+      this.curEvaUserName = row.name
+      this.table2CurShowIndex = index
+      this.doneEvaTableData[this.table2CurShowIndex].isShow = true
+      this.doneEvaTableData[this.table2PreShowIndex].isShow = false
+      this.table2PreShowIndex = index
+      this.buildBoutiqueProject = row.conclusionContent.find(contenItem => {
+        return contenItem.dimension === store.state.conclusionTextNew.buildBoutiqueProject.dimension
+      })
+      this.buildProTeam = row.conclusionContent.find(contenItem => {
+        return contenItem.dimension === store.state.conclusionTextNew.buildProTeam.dimension
+      })
+      this.nextPlan = row.conclusionContent.find(contenItem => {
+        return contenItem.dimension === store.state.conclusionTextNew.nextPlan.dimension
+      })
       this.forceRefresh = false
       this.$nextTick(() => {
         this.forceRefresh = true
@@ -343,10 +437,53 @@ export default {
     // 创建专业团队评价星级
     handlebuildProTeamStarChange () {
     },
-    // 点击提交对当前用户的评价并跳转到下一个评价人
+    // 点击提交对当前用户的评价并跳转到下一个待评价人
     handleSubmitAndJumpToNext () {
       let promises = []
       let count = 0
+      promises[count++] = submitAMEvaData(store.state.userInfo.id, this.buildBoutiqueProject.id, this.buildBoutiqueProjectStar)
+      promises[count++] = submitAMEvaData(store.state.userInfo.id, this.buildProTeam.id, this.buildProTeamStar)
+      Promise.all(promises).then(() => {
+        this.PMdata[this.table1CurShowIndex].evaStatus = 1
+        this.PMdata[this.table1CurShowIndex].isShow = false
+        this.doneEvaTableData.push(this.PMdata[this.table1CurShowIndex])
+        this.PMdata.splice(this.table1CurShowIndex, 1)
+        this.toDoEvaNum -= 1
+        this.doneEvaNum += 1
+        Notification.success({
+          title: '成功',
+          message: '提交成功'
+        })
+        // 跳转到下一个未评价的用户
+        let index = this.PMdata.findIndex(PMdataItem => {
+          return PMdataItem.evaStatus === 0 && PMdataItem.submitStatus === 1
+        })
+        if (index !== -1) {
+          this.curEvaUserName = this.PMdata[index].name
+          this.table1CurShowIndex = index
+          this.PMdata[this.table1CurShowIndex].isShow = true
+          this.PMdata[this.table1PreShowIndex].isShow = false
+          this.table1PreShowIndex = index
+          this.buildBoutiqueProject = this.PMdata[this.table1CurShowIndex].conclusionContent.find(contenItem => {
+            return contenItem.dimension === store.state.conclusionTextNew.buildBoutiqueProject.dimension
+          })
+          this.buildProTeam = this.PMdata[this.table1CurShowIndex].conclusionContent.find(contenItem => {
+            return contenItem.dimension === store.state.conclusionTextNew.buildProTeam.dimension
+          })
+          this.nextPlan = this.PMdata[this.table1CurShowIndex].conclusionContent.find(contenItem => {
+            return contenItem.dimension === store.state.conclusionTextNew.nextPlan.dimension
+          })
+          this.forceRefresh = false
+          this.$nextTick(() => {
+            this.forceRefresh = true
+          })
+        } else {
+          Notification.info({
+            title: '成功',
+            message: '已全部评价完成'
+          })
+        }
+      })
     },
     // 日期发生变化
     handleDataChange () {
@@ -376,6 +513,87 @@ export default {
             _this.tableHeight = window.innerHeight - 100
           }
         }
+      })
+    },
+    // 折叠面板切换
+    handleCollapseChange () {
+      console.log('this.activeName')
+      console.log(this.activeName)
+      if (Number(this.activeName) === 1) {
+        if (this.PMdata.length !== 0) { // 还有未评价的用户
+          for (let i = 0; i < this.PMdata.length; i++) {
+            if (this.PMdata[i].submitStatus !== 0) {
+              this.PMdata[i].isShow = true
+              this.curEvaUserName = this.PMdata[i].name
+              this.table1CurShowIndex = i
+              this.table1PreShowIndex = i
+              this.buildBoutiqueProject = this.PMdata[i].conclusionContent.find(contenItem => {
+                return contenItem.dimension === store.state.conclusionTextNew.buildBoutiqueProject.dimension
+              })
+              this.buildProTeam = this.PMdata[i].conclusionContent.find(contenItem => {
+                return contenItem.dimension === store.state.conclusionTextNew.buildProTeam.dimension
+              })
+              this.nextPlan = this.PMdata[i].conclusionContent.find(contenItem => {
+                return contenItem.dimension === store.state.conclusionTextNew.nextPlan.dimension
+              })
+              this.forceRefresh = false
+              this.$nextTick(() => {
+                this.forceRefresh = true
+              })
+              break
+            }
+          }
+        } else {
+          this.clearEvaTable()
+        }
+      } else if (Number(this.activeName) === 2) {
+        this.clearEvaTable()
+        if (this.doneEvaTableData.length !== 0) {
+          console.log('-=-=-=-=-=-')
+          this.doneEvaTableData[0].isShow = true
+          this.curEvaUserName = this.doneEvaTableData[0].name
+          this.table2CurShowIndex = 0
+          this.table2PreShowIndex = 0
+          this.buildBoutiqueProject = this.doneEvaTableData[0].conclusionContent.find(contenItem => {
+            return contenItem.dimension === store.state.conclusionTextNew.buildBoutiqueProject.dimension
+          })
+          this.buildProTeam = this.doneEvaTableData[0].conclusionContent.find(contenItem => {
+            return contenItem.dimension === store.state.conclusionTextNew.buildProTeam.dimension
+          })
+          this.nextPlan = this.doneEvaTableData[0].conclusionContent.find(contenItem => {
+            return contenItem.dimension === store.state.conclusionTextNew.nextPlan.dimension
+          })
+          this.forceRefresh = false
+          this.$nextTick(() => {
+            this.forceRefresh = true
+          })
+        }
+      } else if (this.activeName === '') { // 全部折叠
+        this.clearEvaTable()
+      }
+    },
+    // 清空评价表格
+    clearEvaTable () {
+      console.log(this.table2CurShowIndex)
+      console.log(this.PMdata)
+      if (this.table1CurShowIndex !== -1) {
+        if (this.PMdata[this.table1CurShowIndex].isShow) {
+          this.PMdata[this.table1CurShowIndex].isShow = false
+          this.table1CurShowIndex = -1
+        }
+      }
+      if (this.table2CurShowIndex !== -1) {
+        if (this.doneEvaTableData[this.table2CurShowIndex].isShow) {
+          this.doneEvaTableData[this.table2CurShowIndex].isShow = false
+          this.table2CurShowIndex = -1
+        }
+      }
+      this.buildBoutiqueProject = ''
+      this.buildProTeam = ''
+      this.nextPlan = ''
+      this.forceRefresh = false
+      this.$nextTick(() => {
+        this.forceRefresh = true
       })
     }
   },

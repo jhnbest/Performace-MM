@@ -1,16 +1,17 @@
 import { http } from '../config/http'
 import {
-  urlGetAchievementOfUser,
+  urlGetUserofAchievementToAnotherUser,
   urlSubmitAMEvaData
 } from '../config/interface'
 import store from '@/store'
 import { resolve } from 'core-js/fn/promise'
 
 // 获取用户的成效评价
-export function getAchievementOfUser (conclusionID) {
-  const url = urlGetAchievementOfUser
+export function getUserofAchievementToAnotherUser (conclusionID, evaUserID) {
+  const url = urlGetUserofAchievementToAnotherUser
   let params = {
-    conclusionID: conclusionID
+    conclusionID: conclusionID,
+    evaUserID: evaUserID
   }
   return new Promise(function (resolve, reject) {
     http(url, params).then(response => {
