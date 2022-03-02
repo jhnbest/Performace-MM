@@ -70,6 +70,18 @@ const achievementsEva = {
         }).catch(RCPDDatabaseErr => {
             return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
         })
+    },
+    // 更新成效评价
+    updateAMEvaData (req, res) {
+        let sendData = req.body
+        let sql = $sql.achievementsEva.updateAMEvaData
+        let updateTime = $time.formatTime()
+        let arrayParams = [sendData.evaStar, updateTime, sendData.evaDataID]
+        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+            return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
+        }).catch(RCPDDatabaseErr => {
+            return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+        })
     }
 }
 

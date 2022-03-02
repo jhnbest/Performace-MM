@@ -276,7 +276,8 @@ const sqlMap = {
     getUserofAchievementToAnotherUser: 'select nce.*, u.name from newconclusionevadata nce left join users u on' +
                         ' nce.evaUserID = u.id where nce.dimensionID = ? and evaUserID = ?',
     submitAMEvaData: 'insert into newconclusionevadata (evaUserID, dimensionID, evaStar, submitTime, updateTime)' +
-                    ' values (?, ?, ?, ?, ?)'
+                    ' values (?, ?, ?, ?, ?)',
+    updateAMEvaData: 'update newconclusionevadata set evaStar = ?, updateTime = ? where id = ?'
   }
 }
 module.exports = sqlMap;

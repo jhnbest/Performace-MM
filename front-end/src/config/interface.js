@@ -93,6 +93,7 @@ export const urlGetPerformanceRates = '/mutualRates/getPerformanceRates' // 获�
 export const urlGetAllAchievements = '/achievementsEva/getAllAchievements' // 获取全处成效评价数据
 export const urlGetUserofAchievementToAnotherUser = '/achievementsEva/getUserofAchievementToAnotherUser' // 获取用户的成效评价
 export const urlSubmitAMEvaData = '/achievementsEva/submitAMEvaData' // 提交成效评价
+export const urlUpdateAMEvaData = '/achievementsEva/updateAMEvaData' // 更新成效评价
 
 export const urlGetCurMonthConclusionOverviewData = '/conclusion/getCurMonthConclusionOverviewData' // 获取月总结概览信息
 export const urlSubmitMonthConclusionData = '/conclusion/submitMonthConclusionData' // 提交月总结

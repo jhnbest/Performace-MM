@@ -1,7 +1,8 @@
 import { http } from '../config/http'
 import {
   urlGetUserofAchievementToAnotherUser,
-  urlSubmitAMEvaData
+  urlSubmitAMEvaData,
+  urlUpdateAMEvaData
 } from '../config/interface'
 import store from '@/store'
 import { resolve } from 'core-js/fn/promise'
@@ -33,6 +34,25 @@ export function submitAMEvaData (evaUserID, dimensionID, evaStar) {
     evaUserID: evaUserID,
     dimensionID: dimensionID,
     evaStar: evaStar
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(response => {
+      if (response.code === 1) {
+        resolve(response.data)
+      } else {
+        reject(response.err)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+// 更新成效评价
+export function updateAMEvaData (evaDataID, evaStar) {
+  const url = urlUpdateAMEvaData
+  let params = {
+    evaStar: evaStar,
+    evaDataID: evaDataID
   }
   return new Promise(function (resolve, reject) {
     http(url, params).then(response => {
