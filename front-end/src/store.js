@@ -8,11 +8,11 @@ export default new Vuex.Store({
   state: {
     userInfo: !localStorage.getItem('userInfo') ? {} : JSON.parse(localStorage.getItem('userInfo')),
     menuList: [
-      { name: '首页', url: '/home/dashboard', icon: 'el-icon-s-home' },
-      { name: '个人工作台', url: '/home/workStation', icon: 'el-icon-s-data' },
+      { name: '首页', url: '/home/dashboard', icon: 'el-icon-house' },
+      { name: '个人工作台', url: '/home/workStation', icon: 'el-icon-bank-card' },
       // { name: '工作计划', url: '/home/weekly', icon: 'el-icon-s-grid' },
-      { name: '计划/工时查询', url: '/home/performance', icon: 'el-icon-s-order' },
-      { name: '月总结', url: '/home/monthConclusion', icon: 'el-icon-s-finance', noShowID: 26 },
+      { name: '工时查询', url: '/home/performance', icon: 'el-icon-document' },
+      { name: '月总结', url: '/home/monthConclusion', icon: 'el-icon-edit-outline', noShowID: 26 },
       { name: '定性评价', url: '/home/mutualEvaluation', icon: 'el-icon-chat-dot-square' },
       { name: '成效评价', url: '/home/AMEvaluation', icon: 'el-icon-data-line' }
     ],

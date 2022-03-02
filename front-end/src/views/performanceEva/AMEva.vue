@@ -474,9 +474,23 @@ export default {
       let count = 0
       promises[count++] = submitAMEvaData(store.state.userInfo.id, this.buildBoutiqueProject.id, this.buildBoutiqueProjectStar.evaStar)
       promises[count++] = submitAMEvaData(store.state.userInfo.id, this.buildProTeam.id, this.buildProTeamStar.evaStar)
-      Promise.all(promises).then(() => {
+      Promise.all(promises).then((allResponse) => {
+        console.log('allResponse')
+        console.log(allResponse)
         this.PMdata[this.table1CurShowIndex].evaStatus = 1
         this.PMdata[this.table1CurShowIndex].isShow = false
+        // 插入提交的评价数据进当前数组
+        let obj = {
+          id: allResponse[0].id,
+          evaStar: this.buildBoutiqueProjectStar.evaStar,
+          dimensionID: this.buildBoutiqueProject.id,
+          name: store.state.userInfo.name
+        }
+        this.PMdata[this.table1CurShowIndex].conclusionEva.push(JSON.parse(JSON.stringify(obj)))
+        obj.id = allResponse[1].id
+        obj.evaStar = this.buildProTeamStar.evaStar
+        obj.dimensionID = this.buildProTeam.id
+        this.PMdata[this.table1CurShowIndex].conclusionEva.push(JSON.parse(JSON.stringify(obj)))
         this.doneEvaTableData.push(this.PMdata[this.table1CurShowIndex])
         this.PMdata.splice(this.table1CurShowIndex, 1)
         this.toDoEvaNum -= 1
@@ -512,6 +526,7 @@ export default {
             this.forceRefresh = true
           })
         } else { // 都已评价
+          this.clearEvaTable()
           Notification.info({
             title: '成功',
             message: '已全部评价完成'
@@ -566,6 +581,71 @@ export default {
         this.updateEvaDataFlag = true
         console.log(err)
       })
+    },
+    // 折叠面板切换
+    handleCollapseChange () {
+      if (Number(this.activeName) === 1) { // 展开待评价页面
+        if (this.PMdata.length !== 0) { // 还有未评价的用户
+          // 重置默认评价星级
+          this.buildBoutiqueProjectStar.evaStar = store.state.defaultStar
+          this.buildProTeamStar.evaStar = store.state.defaultStar
+          for (let i = 0; i < this.PMdata.length; i++) {
+            if (this.PMdata[i].submitStatus !== 0) {
+              this.PMdata[i].isShow = true
+              this.curEvaUserName = this.PMdata[i].name
+              this.table1CurShowIndex = i
+              this.table1PreShowIndex = i
+              this.buildBoutiqueProject = this.PMdata[i].conclusionContent.find(contenItem => {
+                return contenItem.dimension === store.state.conclusionTextNew.buildBoutiqueProject.dimension
+              })
+              this.buildProTeam = this.PMdata[i].conclusionContent.find(contenItem => {
+                return contenItem.dimension === store.state.conclusionTextNew.buildProTeam.dimension
+              })
+              this.nextPlan = this.PMdata[i].conclusionContent.find(contenItem => {
+                return contenItem.dimension === store.state.conclusionTextNew.nextPlan.dimension
+              })
+              this.forceRefresh = false
+              this.$nextTick(() => {
+                this.forceRefresh = true
+              })
+              break
+            }
+          }
+        } else {
+          this.clearEvaTable()
+        }
+      } else if (Number(this.activeName) === 2) { // 展开已评价页面
+        this.clearEvaTable()
+        if (this.doneEvaTableData.length !== 0) {
+          this.doneEvaTableData[0].isShow = true
+          this.curEvaUserName = this.doneEvaTableData[0].name
+          this.table2CurShowIndex = 0
+          this.table2PreShowIndex = 0
+          this.buildBoutiqueProject = this.doneEvaTableData[0].conclusionContent.find(contenItem => {
+            return contenItem.dimension === store.state.conclusionTextNew.buildBoutiqueProject.dimension
+          })
+          this.buildProTeam = this.doneEvaTableData[0].conclusionContent.find(contenItem => {
+            return contenItem.dimension === store.state.conclusionTextNew.buildProTeam.dimension
+          })
+          this.nextPlan = this.doneEvaTableData[0].conclusionContent.find(contenItem => {
+            return contenItem.dimension === store.state.conclusionTextNew.nextPlan.dimension
+          })
+          this.buildBoutiqueProjectStar = JSON.parse(JSON.stringify(this.doneEvaTableData[0].conclusionEva.find(evaItem => {
+            return evaItem.dimensionID === this.buildBoutiqueProject.id
+          })))
+          this.buildProTeamStar = JSON.parse(JSON.stringify(this.doneEvaTableData[0].conclusionEva.find(evaItem => {
+            return evaItem.dimensionID === this.buildProTeam.id
+          })))
+          this.forceRefresh = false
+          this.$nextTick(() => {
+            this.forceRefresh = true
+          })
+        } else {
+          this.clearEvaTable()
+        }
+      } else if (this.activeName === '') { // 全部折叠
+        this.clearEvaTable()
+      }
     },
     // 日期发生变化
     handleDataChange () {
@@ -661,71 +741,6 @@ export default {
           }
         }
       })
-    },
-    // 折叠面板切换
-    handleCollapseChange () {
-      if (Number(this.activeName) === 1) { // 展开待评价页面
-        if (this.PMdata.length !== 0) { // 还有未评价的用户
-          // 重置默认评价星级
-          this.buildBoutiqueProjectStar.evaStar = store.state.defaultStar
-          this.buildProTeamStar.evaStar = store.state.defaultStar
-          for (let i = 0; i < this.PMdata.length; i++) {
-            if (this.PMdata[i].submitStatus !== 0) {
-              this.PMdata[i].isShow = true
-              this.curEvaUserName = this.PMdata[i].name
-              this.table1CurShowIndex = i
-              this.table1PreShowIndex = i
-              this.buildBoutiqueProject = this.PMdata[i].conclusionContent.find(contenItem => {
-                return contenItem.dimension === store.state.conclusionTextNew.buildBoutiqueProject.dimension
-              })
-              this.buildProTeam = this.PMdata[i].conclusionContent.find(contenItem => {
-                return contenItem.dimension === store.state.conclusionTextNew.buildProTeam.dimension
-              })
-              this.nextPlan = this.PMdata[i].conclusionContent.find(contenItem => {
-                return contenItem.dimension === store.state.conclusionTextNew.nextPlan.dimension
-              })
-              this.forceRefresh = false
-              this.$nextTick(() => {
-                this.forceRefresh = true
-              })
-              break
-            }
-          }
-        } else {
-          this.clearEvaTable()
-        }
-      } else if (Number(this.activeName) === 2) { // 展开已评价页面
-        this.clearEvaTable()
-        if (this.doneEvaTableData.length !== 0) {
-          this.doneEvaTableData[0].isShow = true
-          this.curEvaUserName = this.doneEvaTableData[0].name
-          this.table2CurShowIndex = 0
-          this.table2PreShowIndex = 0
-          this.buildBoutiqueProject = this.doneEvaTableData[0].conclusionContent.find(contenItem => {
-            return contenItem.dimension === store.state.conclusionTextNew.buildBoutiqueProject.dimension
-          })
-          this.buildProTeam = this.doneEvaTableData[0].conclusionContent.find(contenItem => {
-            return contenItem.dimension === store.state.conclusionTextNew.buildProTeam.dimension
-          })
-          this.nextPlan = this.doneEvaTableData[0].conclusionContent.find(contenItem => {
-            return contenItem.dimension === store.state.conclusionTextNew.nextPlan.dimension
-          })
-          this.buildBoutiqueProjectStar = JSON.parse(JSON.stringify(this.doneEvaTableData[0].conclusionEva.find(evaItem => {
-            return evaItem.dimensionID === this.buildBoutiqueProject.id
-          })))
-          this.buildProTeamStar = JSON.parse(JSON.stringify(this.doneEvaTableData[0].conclusionEva.find(evaItem => {
-            return evaItem.dimensionID === this.buildProTeam.id
-          })))
-          this.forceRefresh = false
-          this.$nextTick(() => {
-            this.forceRefresh = true
-          })
-        } else {
-          this.clearEvaTable()
-        }
-      } else if (this.activeName === '') { // 全部折叠
-        this.clearEvaTable()
-      }
     },
     // 清空评价表格
     clearEvaTable () {
