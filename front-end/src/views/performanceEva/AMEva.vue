@@ -182,7 +182,8 @@
   </div>
 </template>
 <script>
-import {} from '@/utils/performance'
+import { getAllWorkTimeList } from '@/utils/performance'
+import { getAllUserRates } from '@/utils/multual'
 import { Notification } from 'element-ui'
 import { getUsersList } from '@/utils/users'
 import { getCurMonthConclusionOverviewDataNew } from '@/utils/conclusion'
@@ -210,7 +211,7 @@ export default {
         content: '无数据'
       }, // 打造精品工程内容
       buildProTeam: {
-        content: ''
+        content: '无数据'
       }, // 建设专业团队内容
       nextPlan: {
         content: '无数据'
@@ -242,8 +243,6 @@ export default {
         let conclusionYear = this.$moment(this.title).year()
         let conclusionMonth = this.$moment(this.title).month() + 1
         this.genTableData(conclusionYear, conclusionMonth, usersList).then(tableData => {
-          console.log('tableData')
-          console.log(tableData)
           let toDoEvaTableData = tableData.toDoEvaTableData
           let doneEvaTableData = tableData.doneEvaTableData
           this.toDoEvaNum = toDoEvaTableData.length
@@ -301,6 +300,15 @@ export default {
           this.doneEvaTableData = doneEvaTableData
           this.getDataLoading = true
         })
+        // 管理者在此页面需计算所有绩效信息
+        if (store.state.userInfo.duty === 1) {
+          let promises = []
+          let count = 0
+          promises[count++] = this.getAllWorkTimeList(this.title)
+          promises[count++] = this.getAllUserRates(usersList, this.title)
+          Promise.all(promises).then(allResponse => {
+          })
+        }
       })
     },
     // 生成表格数据
@@ -411,8 +419,6 @@ export default {
     },
     // 点击显示(表格1)
     table1HandleShow (row, index) {
-      console.log('row')
-      console.log(row)
       this.curEvaUserName = row.name
       this.table1CurShowIndex = index
       this.PMdata[this.table1CurShowIndex].isShow = true
@@ -434,8 +440,6 @@ export default {
     },
     // 点击显示（表格2）
     table2HandleShow (row, index) {
-      console.log('row')
-      console.log(row)
       this.curEvaUserName = row.name
       this.table2CurShowIndex = index
       this.doneEvaTableData[this.table2CurShowIndex].isShow = true
@@ -475,8 +479,6 @@ export default {
       promises[count++] = submitAMEvaData(store.state.userInfo.id, this.buildBoutiqueProject.id, this.buildBoutiqueProjectStar.evaStar)
       promises[count++] = submitAMEvaData(store.state.userInfo.id, this.buildProTeam.id, this.buildProTeamStar.evaStar)
       Promise.all(promises).then((allResponse) => {
-        console.log('allResponse')
-        console.log(allResponse)
         this.PMdata[this.table1CurShowIndex].evaStatus = 1
         this.PMdata[this.table1CurShowIndex].isShow = false
         // 插入提交的评价数据进当前数组
@@ -547,26 +549,16 @@ export default {
       this.updateEvaDataFlag = false
       let promises = []
       let count = 0
-      console.log('this.doneEvaTableData')
-      console.log(this.doneEvaTableData)
-      console.log('this.buildBoutiqueProjectStar')
-      console.log(this.buildBoutiqueProjectStar)
-      console.log('this.table2CurShowIndex')
-      console.log(this.table2CurShowIndex)
       promises[count++] = updateAMEvaData(this.buildBoutiqueProjectStar.id, this.buildBoutiqueProjectStar.evaStar)
       promises[count++] = updateAMEvaData(this.buildProTeamStar.id, this.buildProTeamStar.evaStar)
       Promise.all(promises).then(() => {
         let findEvaItem = this.doneEvaTableData[this.table2CurShowIndex].conclusionEva.find(doneEvaItem => {
           return doneEvaItem.id === this.buildBoutiqueProjectStar.id
         })
-        console.log('findEvaItem')
-        console.log(findEvaItem)
         findEvaItem.evaStar = this.buildBoutiqueProjectStar.evaStar
         findEvaItem = this.doneEvaTableData[this.table2CurShowIndex].conclusionEva.find(doneEvaItem => {
           return doneEvaItem.id === this.buildProTeamStar.id
         })
-        console.log('findEvaItem')
-        console.log(findEvaItem)
         findEvaItem.evaStar = this.buildProTeamStar.evaStar
         Notification.success({
           title: '成功',
@@ -654,8 +646,6 @@ export default {
       let conclusionYear = this.$moment(this.title).year()
       let conclusionMonth = this.$moment(this.title).month() + 1
       this.genTableData(conclusionYear, conclusionMonth, this.usersList).then(tableData => {
-        console.log('tableData')
-        console.log(tableData)
         let toDoEvaTableData = tableData.toDoEvaTableData
         let doneEvaTableData = tableData.doneEvaTableData
         this.toDoEvaNum = toDoEvaTableData.length
@@ -709,8 +699,6 @@ export default {
             this.forceRefresh = true
           })
         }
-        console.log('this.buildBoutiqueProject')
-        console.log(this.buildBoutiqueProject.length)
         this.PMdata = toDoEvaTableData
         this.doneEvaTableData = doneEvaTableData
         this.getDataLoading = true

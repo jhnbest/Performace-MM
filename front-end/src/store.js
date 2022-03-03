@@ -21,10 +21,10 @@ export default new Vuex.Store({
       { name: '工时查询', url: '/home/workTimeCheck', icon: 'el-icon-s-claim' },
       { name: '计划查询', url: '/home/workPlanCheck', icon: 'el-icon-s-opportunity' },
       { name: '月总结评价', url: '/home/conclusionEva', icon: 'el-icon-check' },
-      { name: '定性评价管理', url: '/home/mulEvaCheck', icon: 'el-icon-s-opportunity' },
+      { name: '定性评价管理', url: '/home/mulEvaCheck', icon: 'el-icon-s-opportunity' }
       // { name: '用户管理', url: '/home/users', icon: 'el-icon-user-solid' },
-      { name: '成效评价测试', url: '/home/PerformanceEvaNew', icon: 'el-icon-user-solid' },
-      { name: '历史绩效数据填充', url: '/home/PMDataFillUp', icon: 'el-icon-user-solid' }
+      // { name: '成效评价测试', url: '/home/PerformanceEvaNew', icon: 'el-icon-user-solid' },
+      // { name: '历史绩效数据填充', url: '/home/PMDataFillUp', icon: 'el-icon-user-solid' }
     ],
     pageSize: 100, // 每页请求多少条
     refreshInterval: 300, // 组件手动刷新间隔 ms
