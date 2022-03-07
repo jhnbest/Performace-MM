@@ -277,7 +277,15 @@ const sqlMap = {
                         ' nce.evaUserID = u.id where nce.dimensionID = ? and evaUserID = ?',
     submitAMEvaData: 'insert into newconclusionevadata (evaUserID, dimensionID, evaStar, submitTime, updateTime)' +
                     ' values (?, ?, ?, ?, ?)',
-    updateAMEvaData: 'update newconclusionevadata set evaStar = ?, updateTime = ? where id = ?'
+    updateAMEvaData: 'update newconclusionevadata set evaStar = ?, updateTime = ? where id = ?',
+    getAchievementEvaOfConclusionDimension: 'select nc.*, n.userID as evaedUserID, n.dimension from newconclusionevadata' +
+                     ' nc left join newconclusion n on nc.dimensionID = n.id where nc.dimensionID = ?',
+    getConclusionEvaData: 'select nc.*, u.duty as evaUserDuty, u.name as evaUserName,' +
+                     ' n.userID as evaedUserID, n.dimension from' +
+                     ' newconclusionevadata nc left join' +
+                     ' newconclusion n on nc.dimensionID = n.id left join users u on nc.evaUserID = u.id where' +
+                     ' nc.evaUserID = ? and n.conclusionYear = ? and' +
+                     ' n.conclusionMonth = ?'
   }
 }
 module.exports = sqlMap;

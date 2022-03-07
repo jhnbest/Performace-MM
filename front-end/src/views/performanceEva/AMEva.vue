@@ -182,14 +182,17 @@
   </div>
 </template>
 <script>
-import { getAllWorkTimeList } from '@/utils/performance'
-import { getAllUserRates } from '@/utils/multual'
+import { getAllWorkTimeList, genQYEvaScoreData } from '@/utils/performance'
+import { getAllUserRates, genQualiEvaData } from '@/utils/multual'
 import { Notification } from 'element-ui'
 import { getUsersList } from '@/utils/users'
 import { getCurMonthConclusionOverviewDataNew } from '@/utils/conclusion'
 import { getUserofAchievementToAnotherUser,
          submitAMEvaData,
-         updateAMEvaData } from '@/utils/achievementEva'
+         updateAMEvaData,
+         getAchievementEvaOfConclusionDimension,
+         genAMEvaScoreData,
+         getConclusionEvaData } from '@/utils/achievementEva'
 import store from '@/store'
 export default {
   data () {
@@ -231,7 +234,9 @@ export default {
       forceRefresh: true, // 强制刷新
       activeName: '1', // 默认展开的name,
       curEvaUserName: null, // 当前显示的用户姓名
-      curShowTable: -1 // 当前显示的表格序号
+      curShowTable: -1, // 当前显示的表格序号
+      standAndEngineerGroup: [], // 工程组和技术标准组成员
+      commuincationGroup: [] // 通信组成员
     }
   },
   methods: {
@@ -239,10 +244,23 @@ export default {
     init () {
       this.getDataLoading = false
       getUsersList().then(usersList => {
+        for (let user of usersList) {
+          if (user.groupName === '技术标准组' || user.groupName === '工程组') {
+            this.standAndEngineerGroup.push(user)
+          } else if (user.groupName === '通信组') {
+            this.commuincationGroup.push(user)
+          }
+        }
         this.usersList = usersList
         let conclusionYear = this.$moment(this.title).year()
         let conclusionMonth = this.$moment(this.title).month() + 1
+        let newCombinaTableData = null
         this.genTableData(conclusionYear, conclusionMonth, usersList).then(tableData => {
+          console.log('tableData')
+          console.log(tableData)
+          newCombinaTableData = tableData.toDoEvaTableData.concat(tableData.doneEvaTableData)
+          console.log('newCombinaTableData')
+          console.log(newCombinaTableData)
           let toDoEvaTableData = tableData.toDoEvaTableData
           let doneEvaTableData = tableData.doneEvaTableData
           this.toDoEvaNum = toDoEvaTableData.length
@@ -296,19 +314,47 @@ export default {
               this.forceRefresh = true
             })
           }
+          // ===============================管理者在此页面需计算所有绩效信息
+          if (store.state.userInfo.duty === 1) {
+            let promises = []
+            let count = 0
+            promises[count++] = getAllWorkTimeList(this.title)
+            promises[count++] = getAllUserRates(usersList, this.title)
+            // 获取每条月总结对应的所有评价
+            for (let newCombinaTableDataItem of newCombinaTableData) {
+              promises[count++] = getConclusionEvaData(conclusionYear, conclusionMonth, newCombinaTableDataItem.id)
+            }
+            Promise.all(promises).then(allResponse => {
+              console.log('allResponse')
+              console.log(allResponse)
+              let allWorkTimeList = allResponse[0]
+              let allUserRates = allResponse[1]
+              let allAMEvaData = []
+              for (let i = 2; i < allResponse.length; i++) {
+                allAMEvaData.push(allResponse[i])
+              }
+              // 判断各位用户是否已经评价完其他人
+              for (let i = 0; i < allAMEvaData.length; i++) {
+                newCombinaTableData[i].evaAllConclusion = allAMEvaData[i]
+                if (newCombinaTableData[i].groupName === '技术标准组' || newCombinaTableData[i].groupName === '工程组') {
+                  newCombinaTableData[i].isEvaAllFinish = allAMEvaData[i].length === this.standAndEngineerGroup.length * 2
+                } else if (newCombinaTableData[i].groupName === '通信组') {
+                  newCombinaTableData[i].isEvaAllFinish = allAMEvaData[i].length === this.commuincationGroup.length * 2
+                }
+              }
+              let QYEvaScoreData = genQYEvaScoreData(usersList, allWorkTimeList, this.title)
+              let QTEvaScoreData = genQualiEvaData(allUserRates)
+              let AMEvaScoreData = genAMEvaScoreData(allAMEvaData)
+              console.log('QYEvaScoreData')
+              console.log(QYEvaScoreData)
+              console.log('QTEvaScoreData')
+              console.log(QTEvaScoreData)
+            })
+          }
           this.PMdata = toDoEvaTableData
           this.doneEvaTableData = doneEvaTableData
           this.getDataLoading = true
         })
-        // 管理者在此页面需计算所有绩效信息
-        if (store.state.userInfo.duty === 1) {
-          let promises = []
-          let count = 0
-          promises[count++] = this.getAllWorkTimeList(this.title)
-          promises[count++] = this.getAllUserRates(usersList, this.title)
-          Promise.all(promises).then(allResponse => {
-          })
-        }
       })
     },
     // 生成表格数据
@@ -321,11 +367,15 @@ export default {
             let obj = {
               id: user.id,
               name: user.name,
+              groupName: user.groupName,
               submitStatus: 0,
               evaStatus: 0,
-              conclusionContent: [],
+              conclusionContent: [], // 月总结内容
               isShow: false,
-              conclusionEva: []
+              isEvaAllFinish: false, // 是否已经评价完别人了
+              conclusionEva: [], // 当前用户对该用户评价的数据
+              conclusionAllEva: [], // 月总结被评价的数据
+              evaAllConclusion: [] // 评价的所有月总结
             }
             allconclusionAndEvaData.push(obj)
           }
@@ -334,11 +384,15 @@ export default {
             let obj = {
               id: user.id,
               name: user.name,
+              groupName: user.groupName,
               submitStatus: 0,
               evaStatus: 0,
               conclusionContent: [],
               isShow: false,
-              conclusionEva: []
+              isEvaAllFinish: false, // 是否已经评价完别人了
+              conclusionEva: [],
+              conclusionAllEva: [], // 月总结被评价的数据
+              evaAllConclusion: [] // 评价的所有月总结
             }
             allconclusionAndEvaData.push(obj)
           }
@@ -346,11 +400,15 @@ export default {
           let obj = {
             id: user.id,
             name: user.name,
+            groupName: user.groupName,
             submitStatus: 0,
             evaStatus: 0,
             conclusionContent: [],
             isShow: false,
-            conclusionEva: []
+            isEvaAllFinish: false, // 是否已经评价完别人了
+            conclusionEva: [],
+            conclusionAllEva: [], // 月总结被评价的数据
+              evaAllConclusion: [] // 评价的所有月总结
           }
           allconclusionAndEvaData.push(obj)
         }

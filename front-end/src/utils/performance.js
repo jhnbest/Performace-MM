@@ -18,108 +18,108 @@ import moment from 'moment'
 
 // 获取全处工时信息
 export function getAllWorkTimeList (applyDate) {
-    const url = urlGetAllWorkTimeList
-    let params = {
-        applyMonth: applyDate
-    }
-    return new Promise(function (resolve, reject) {
-        http(url, params).then(res => {
-            if (res.code === 1) {
-                let recvData = res.data
-                resolve(recvData)
-            } else {
-                reject(new Error('getAllWorkTimeList recv error'))
-            }
+  const url = urlGetAllWorkTimeList
+  let params = {
+    applyMonth: applyDate
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(res => {
+      if (res.code === 1) {
+          let recvData = res.data
+          resolve(recvData)
+      } else {
+          reject(new Error('getAllWorkTimeList recv error'))
+      }
     }).catch((err) => {
-        reject(new Error(err + '请求失败'))
+      reject(new Error(err + '请求失败'))
     })
-    })
+  })
 }
 
 // 生成定量数据
-export function genQYEvaScoreData (users, quantativeData) {
-    let QYEvaScoreData = []
-    // =============================对当月无工时申报的员工填充0工时==================================
-    for (let item of users) {
-        let findItem = quantativeData.findIndex(quantativeDataItem => {
-        return quantativeDataItem.id === item.id
+export function genQYEvaScoreData (users, quantativeData, applyMonth) {
+  let QYEvaScoreData = []
+  // =============================对当月无工时申报的员工填充0工时==================================
+  for (let item of users) {
+    let findItem = quantativeData.findIndex(quantativeDataItem => {
+      return quantativeDataItem.id === item.id
+    })
+    if (findItem === -1 && item.groupName !== '处经理') {
+        let obj = {
+          applyMonth: applyMonth,
+          groupID: item.groupID,
+          id: item.id,
+          name: item.name,
+          reviewWorkTime: 0
+        }
+        quantativeData.push(obj)
+    }
+  }
+  // ===============================将所有工时申报信息按组存放===================================
+  let groupedWorkTimeList = []
+  for (let item of quantativeData) {
+    if (item.id !== store.state.managerID) {
+      let index = groupedWorkTimeList.findIndex(itemInside => {
+          return itemInside.groupID === item.groupID
+      })
+      if (index === -1) {
+          let obj = {
+              groupID: item.groupID,
+              workTimeList: []
+          }
+          obj.workTimeList.push(item)
+          groupedWorkTimeList.push(obj)
+      } else {
+          groupedWorkTimeList[index].workTimeList.push(item)
+      }
+    }
+  }
+  // --------------------------分别计算小组内每个人的工时数、排名和得分--------------------------
+  for (let groupedWorkTimeListItem of groupedWorkTimeList) {
+    let totalWorkTimeCal = []
+    if (groupedWorkTimeListItem.workTimeList.length > 0) {
+      for (let item1 of groupedWorkTimeListItem.workTimeList) { // 将各组工时信息按照个人统计
+        let index = totalWorkTimeCal.findIndex(totalWorkTimeCalItem => {
+            return totalWorkTimeCalItem.id === item1.id
         })
-        if (findItem === -1 && item.groupName !== '处经理') {
+        if (index === -1) {
             let obj = {
-                applyMonth: quantativeData[0].applyMonth,
-                groupID: item.groupID,
-                id: item.id,
-                name: item.name,
-                reviewWorkTime: 0
+                id: item1.id,
+                name: item1.name,
+                totalWorkTime: item1.reviewWorkTime
             }
-            quantativeData.push(obj)
+            totalWorkTimeCal.push(obj)
+        } else {
+            totalWorkTimeCal[index].totalWorkTime += item1.reviewWorkTime
         }
+      }
+      // ===========================计算组内工时排名==================================
+      totalWorkTimeCal.sort(compare('totalWorkTime')) // 根据总工时排序
+      let preWorkTime = -1
+      let preRank = 1
+      let count = 1
+      for (let item of totalWorkTimeCal) { // 计算排名
+        if (item.totalWorkTime === preWorkTime) {
+          item.rank = preRank
+        } else {
+          item.rank = count
+          preRank = count
+        }
+        count++
+        preWorkTime = item.totalWorkTime
+      }
+      // ==============================计算定量指标得分=======================================
+      for (let totalWorkTimeCalItem of totalWorkTimeCal) { // 根据排名计算定量指标得分
+        totalWorkTimeCalItem.QYEvaScoreNor = calGetScore(totalWorkTimeCal.length, totalWorkTimeCalItem.rank)
+      }
     }
-    // ===============================将所有工时申报信息按组存放===================================
-    let groupedWorkTimeList = []
-    for (let item of quantativeData) {
-        if (item.id !== store.state.managerID) {
-            let index = groupedWorkTimeList.findIndex(itemInside => {
-                return itemInside.groupID === item.groupID
-            })
-            if (index === -1) {
-                let obj = {
-                    groupID: item.groupID,
-                    workTimeList: []
-                }
-                obj.workTimeList.push(item)
-                groupedWorkTimeList.push(obj)
-            } else {
-                groupedWorkTimeList[index].workTimeList.push(item)
-            }
-        }
-    }
-    // --------------------------分别计算小组内每个人的工时数、排名和得分--------------------------
-    for (let groupedWorkTimeListItem of groupedWorkTimeList) {
-        let totalWorkTimeCal = []
-        if (groupedWorkTimeListItem.workTimeList.length > 0) {
-          for (let item1 of groupedWorkTimeListItem.workTimeList) { // 将各组工时信息按照个人统计
-            let index = totalWorkTimeCal.findIndex(totalWorkTimeCalItem => {
-                return totalWorkTimeCalItem.id === item1.id
-            })
-            if (index === -1) {
-                let obj = {
-                    id: item1.id,
-                    name: item1.name,
-                    totalWorkTime: item1.reviewWorkTime
-                }
-                totalWorkTimeCal.push(obj)
-            } else {
-                totalWorkTimeCal[index].totalWorkTime += item1.reviewWorkTime
-            }
-          }
-          // ===========================计算组内工时排名==================================
-          totalWorkTimeCal.sort(compare('totalWorkTime')) // 根据总工时排序
-          let preWorkTime = -1
-          let preRank = 1
-          let count = 1
-          for (let item of totalWorkTimeCal) { // 计算排名
-            if (item.totalWorkTime === preWorkTime) {
-              item.rank = preRank
-            } else {
-              item.rank = count
-              preRank = count
-            }
-            count++
-            preWorkTime = item.totalWorkTime
-          }
-          // ==============================计算定量指标得分=======================================
-          for (let totalWorkTimeCalItem of totalWorkTimeCal) { // 根据排名计算定量指标得分
-            totalWorkTimeCalItem.QYEvaScoreNor = calGetScore(totalWorkTimeCal.length, totalWorkTimeCalItem.rank)
-          }
-        }
-        groupedWorkTimeListItem.caledQYEvaData = totalWorkTimeCal
+    groupedWorkTimeListItem.caledQYEvaData = totalWorkTimeCal
 
-        for (let itemInside of groupedWorkTimeListItem.caledQYEvaData) {
-            QYEvaScoreData.push(itemInside)
-        }
+    for (let itemInside of groupedWorkTimeListItem.caledQYEvaData) {
+        QYEvaScoreData.push(itemInside)
     }
-    return QYEvaScoreData
+  }
+  return QYEvaScoreData
 }
 
 // 生成绩效得分与排名数据(新)
@@ -279,63 +279,57 @@ export function genPerformanceScoreOld (usersList, quantativeData, multualEvaDat
 
 // 获取全处绩效数据
 export function calPMData (applyDate) {
-    let applyYear = moment(applyDate).year()
-    let applyMonth = moment(applyDate).month() + 1
-    let promises0 = []
-    let count0 = 0
-    let promises = []
-    let count = 0
-    return new Promise(function (resolve, reject) {
-        getPerformanceIsPublish(applyYear, applyMonth).then(response => {
-            if (response.length > 0) {
-                if (response[0].flagValue > 0) {
-                    promises0[count0++] = getEvaCoef() // get各种系数
-                    promises0[count0++] = getUsersList() // get用户列表
-                    Promise.all(promises0).then(responseAll0 => {
-                        let evaCoef = responseAll0[0]
-                        let usersList = responseAll0[1]
-                        let MGIndex = usersList.findIndex(user => {
-                            return user.duty == 1
-                        })
-                        usersList.splice(MGIndex, 1) // 删除管理者
-                        promises[count++] = getAllWorkTimeList(applyDate) // get工时信息
-                        promises[count++] = getAllUserRates(usersList, applyDate) // get定性评价信息
-                        if (moment(applyDate).isAfter('2022-01')) { // 2022-02新增成效评价模式
-                            promises[count++] = getAllAchievements(usersList, applyDate) // get成效评价信息
-                        }
-                        Promise.all(promises).then(responseAll1 => {
-                            let allWorkTimeList = responseAll1[0]
-                            let allUserRates = responseAll1[1]
-                            let allAchievements = responseAll1[2]
-                            let QYEvaScoreData = genQYEvaScoreData(usersList, allWorkTimeList)
-                            let QTEvaScoreData = genQualiEvaData(allUserRates)
-                            let AMEvaScoreData = null
-                            let PMData = null
-                            if (moment(applyDate).isAfter('2022-01')) { // 2022-02新增成效评价模式
-                                AMEvaScoreData = genPerformanceEvaData(allAchievements, evaCoef) // get成效评价信息
-                                PMData = genPerformanceScore(usersList, QYEvaScoreData, QTEvaScoreData, AMEvaScoreData, evaCoef)
-                            } else {
-                                PMData = genPerformanceScoreOld(usersList, QYEvaScoreData, QTEvaScoreData)
-                            }
-                            console.log('QYEvaScoreData')
-                            console.log(QYEvaScoreData)
-                            console.log('QTEvaScoreData')
-                            console.log(QTEvaScoreData)
-                            console.log('AMEvaScoreData')
-                            console.log(AMEvaScoreData)
-                            resolve(PMData)
-                        })
-                    })
-                } else {
-                    reject(new Error('该月绩效未发布'))
+  let applyYear = moment(applyDate).year()
+  let applyMonth = moment(applyDate).month() + 1
+  let promises0 = []
+  let count0 = 0
+  let promises = []
+  let count = 0
+  return new Promise(function (resolve, reject) {
+    getPerformanceIsPublish(applyYear, applyMonth).then(response => {
+      if (response.length > 0) {
+          if (response[0].flagValue > 0) {
+              promises0[count0++] = getEvaCoef() // get各种系数
+              promises0[count0++] = getUsersList() // get用户列表
+              Promise.all(promises0).then(responseAll0 => {
+                let evaCoef = responseAll0[0]
+                let usersList = responseAll0[1]
+                let MGIndex = usersList.findIndex(user => {
+                    return user.duty == 1
+                })
+                usersList.splice(MGIndex, 1) // 删除管理者
+                promises[count++] = getAllWorkTimeList(applyDate) // get工时信息
+                promises[count++] = getAllUserRates(usersList, applyDate) // get定性评价信息
+                if (moment(applyDate).isAfter('2022-01')) { // 2022-02新增成效评价模式
+                    promises[count++] = getAllAchievements(usersList, applyDate) // get成效评价信息
                 }
-            } else {
-                reject(new Error('该月绩效未发布'))
-            }
-        }).catch(err => {
-            reject(new Error(err))
-        })
+                Promise.all(promises).then(responseAll1 => {
+                  let allWorkTimeList = responseAll1[0]
+                  let allUserRates = responseAll1[1]
+                  let allAchievements = responseAll1[2]
+                  let QYEvaScoreData = genQYEvaScoreData(usersList, allWorkTimeList, applyDate)
+                  let QTEvaScoreData = genQualiEvaData(allUserRates)
+                  let AMEvaScoreData = null
+                  let PMData = null
+                  if (moment(applyDate).isAfter('2022-01')) { // 2022-02新增成效评价模式
+                      AMEvaScoreData = genPerformanceEvaData(allAchievements, evaCoef) // get成效评价信息
+                      PMData = genPerformanceScore(usersList, QYEvaScoreData, QTEvaScoreData, AMEvaScoreData, evaCoef)
+                  } else {
+                      PMData = genPerformanceScoreOld(usersList, QYEvaScoreData, QTEvaScoreData)
+                  }
+                  resolve(PMData)
+                })
+              })
+          } else {
+              reject(new Error('该月绩效未发布'))
+          }
+      } else {
+          reject(new Error('该月绩效未发布'))
+      }
+    }).catch(err => {
+      reject(new Error(err))
     })
+  })
 }
 
 // 写入绩效数据

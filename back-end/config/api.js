@@ -97,6 +97,8 @@ module.exports = {
     getUserofAchievementToAnotherUser: path + '/achievementsEva/getUserofAchievementToAnotherUser', // 获取用户的成效评价
     submitAMEvaData: path + '/achievementsEva/submitAMEvaData', // 提交成效评价
     updateAMEvaData: path + '/achievementsEva/updateAMEvaData', // 更新成效评价
+    getAchievementEvaOfConclusionDimension: path + '/achievementsEva/getAchievementEvaOfConclusionDimension', // 获取对某个总结的所有评价
+    getConclusionEvaData: path + '/achievementsEva/getConclusionEvaData', // 获取某个用户的对其他人的成效评价
 
     // 总结模块
     getCurMonthConclusionOverviewData: path + '/conclusion/getCurMonthConclusionOverviewData', // 获取总结数据

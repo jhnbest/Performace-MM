@@ -64,7 +64,7 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="时间" align="center" prop="month" min-width="50"></el-table-column>
+      <el-table-column label="月份" align="center" prop="month" min-width="50"></el-table-column>
       <el-table-column label="标题" align="center" prop="conclusionTitle"></el-table-column>
       <el-table-column label="状态" align="center">
         <template slot-scope="scope">
@@ -82,7 +82,7 @@
           <span v-else>暂未评分</span>
         </template>
       </el-table-column>
-      <el-table-column label="获得工时" align="center" prop="getWorkTime" width="100"></el-table-column>
+      <!-- <el-table-column label="获得工时" align="center" prop="getWorkTime" width="100"></el-table-column> -->
       <el-table-column label="操作" align="center" width="250">
         <template slot-scope="scope">
 <!--          点击预览-->

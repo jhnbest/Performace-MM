@@ -82,6 +82,28 @@ const achievementsEva = {
         }).catch(RCPDDatabaseErr => {
             return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
         })
+    },
+    // 获取对某个总结的所有评价
+    getAchievementEvaOfConclusionDimension (req, res) {
+        let sendData = req.body
+        let sql = $sql.achievementsEva.getAchievementEvaOfConclusionDimension
+        let arrayParams = [sendData.conclusionID]
+        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+            return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
+        }).catch(RCPDDatabaseErr => {
+            return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+        })
+    },
+    // 获取某个用户的对其他人的成效评价
+    getConclusionEvaData (req, res) {
+        let sendData = req.body
+        let sql = $sql.achievementsEva.getConclusionEvaData
+        let arrayParams = [sendData.evaUserID, sendData.conclusionYear, sendData.conclusionMonth]
+        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+            return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
+        }).catch(RCPDDatabaseErr => {
+            return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+        })
     }
 }
 

@@ -368,6 +368,24 @@ export function starToRates (star) {
   }
 }
 
+// 星级转评分
+export function newStarToRates (star) {
+  switch (star) {
+    case 5:
+      return 95
+    case 4:
+      return 92.5
+    case 3:
+      return 90
+    case 2:
+      return 87.5
+    case 1:
+      return 85
+    default:
+      return 90
+  }
+}
+
 // 评分转星级
 export function ratesToStar (rates) {
   switch (rates) {

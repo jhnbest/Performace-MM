@@ -22,10 +22,11 @@
               border
               stripe
               size="mini"
-              style="margin: auto;width: 100%"
+              style="margin: auto;width: 100%;user-select:initial"
               :header-cell-style="{background:'#00c0d1',color:'#000000',fontSize:'18px'}">
       <el-table-column label="打造精品工程"
-                       align="center">
+                       align="center"
+                       :render-header="renderHeaderBuildBoutiqueProject">
         <template>
           <editor-vue :value="conclusionTextNew.buildBoutiqueProject.content"
                       @input="(res)=> conclusionTextNew.buildBoutiqueProject.content = res"></editor-vue>
@@ -37,10 +38,11 @@
               stripe
               size="medium"
               :header-cell-style="{ background:'#00c0d1',color:'#000000',fontSize:'18px' }"
-              style="margin: auto;width: 99%"
+              style="margin: auto;width: 99%;user-select:initial"
               highlight-current-row>
       <el-table-column label="创建专业团队"
-                       align="center">
+                       align="center"
+                       :render-header="renderHeaderBuildProTeam">
         <template>
           <editor-vue :value="conclusionTextNew.buildProTeam.content"
                       @input="(res)=> conclusionTextNew.buildProTeam.content = res"></editor-vue>
@@ -232,6 +234,32 @@ import jsCookie from 'js-cookie'
             this.$common.toast('暂存失败', 'error', true)
           })
         }
+      },
+      // 打造精品工程表头渲染函数
+      renderHeaderBuildBoutiqueProject (h, { column, $index }) {
+        return (
+          <div>
+            <span>打造精品工程</span>
+            <p>
+              <span style="fontSize:15px">(可以从</span>
+              <span style="color: red;font-weight:bold;fontSize:15px">承担工作难度、专业技术研究、工作方法创新、工作推进效率、工作完成效果、降本增效举措</span>
+              <span style="fontSize:15px">等方面描述)</span>
+            </p>
+          </div>
+        )
+      },
+      // 打造精品工程表头渲染函数
+      renderHeaderBuildProTeam (h, { column, $index }) {
+        return (
+          <div>
+            <span>建设专业团队</span>
+            <p>
+              <span style="fontSize:15px">(可以从</span>
+              <span style="color: red;font-weight:bold;fontSize:15px">处室绩效贡献、团队协作贡献、团建活动和宣传</span>
+              <span style="fontSize:15px">等方面描述)</span>
+            </p>
+          </div>
+        )
       },
       // 返回
       handleBack () {

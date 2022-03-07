@@ -63,10 +63,10 @@ input[type="number"]{
 }
 
 .container-wrap{margin-top: 60px; overflow:auto;
-  .aside-wrap{position:fixed;width: 200px; height: 100%;z-index: 100;
-    .el-menu{height: 100%; overflow: auto;}
+  .aside-wrap{position:fixed;width: 170px; height: 100%;z-index: 100;overflow: auto;
+    .el-menu{height: 100%;overflow: auto;}
   }
-  .main-wrap{margin-left: 200px;padding: 0;}
+  .main-wrap{margin-left: 170px;padding: 0;}
 }
 
 .main-wrap{min-width: 987px;}

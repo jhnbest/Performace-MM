@@ -54,26 +54,28 @@ export default new Vuex.Store({
     conclusionTextNew: {
       buildBoutiqueProject: {
         dimension: 1,
-        content: '【承担工作难度】：\n' + '<br>' + '<br>' +
-                 '【专业技术研究】：\n' + '<br>' + '<br>' +
-                 '【工作方法创新】：\n' + '<br>' + '<br>' +
-                 '【工作推进效率】：\n' + '<br>' + '<br>' +
-                 '【工作完成效果】：\n' + '<br>' + '<br>' +
-                 '【降本增效举措】：\n'
+        content: ''
+                //  '【承担工作难度】：\n' + '<br>' + '<br>' +
+                //  '【专业技术研究】：\n' + '<br>' + '<br>' +
+                //  '【工作方法创新】：\n' + '<br>' + '<br>' +
+                //  '【工作推进效率】：\n' + '<br>' + '<br>' +
+                //  '【工作完成效果】：\n' + '<br>' + '<br>' +
+                //  '【降本增效举措】：\n'
       },
       buildProTeam: {
         dimension: 2,
-        content: '【处室绩效贡献】：\n' + '<br>' + '<br>' +
-                '【团队协作贡献】：\n' + '<br>' + '<br>' +
-                '【团建活动和宣传】：\n' + '<br>' + '<br>'
+        content: ''
+                // '【处室绩效贡献】：\n' + '<br>' + '<br>' +
+                // '【团队协作贡献】：\n' + '<br>' + '<br>' +
+                // '【团建活动和宣传】：\n' + '<br>' + '<br>'
       },
       nextPlan: {
         dimension: 3,
-        content: null
+        content: ''
       },
       curAdvice: {
         dimension: 4,
-        content: null
+        content: ''
       }
     },
     progressColors: [
