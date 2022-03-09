@@ -59,24 +59,24 @@
       </el-form-item>
       <br>
       <el-form-item label="经理对普通职员的成效评价系数">
-        <el-input v-model="ratioFormData.CSManagerPMEvaCoef"
+        <el-input v-model="ratioFormData.CSManagerAMEvaCoef"
                   :disabled="!reqFlag.getEvaCoef || !reqFlag.tableDataInitFinish" style="width:50%"></el-input>
       </el-form-item>
       <el-form-item label="组长对普通职员的成效评价系数" style="margin-left:-100px">
-        <el-input v-model="ratioFormData.CSGroupLeaderPMEvaCoef"
+        <el-input v-model="ratioFormData.CSGroupLeaderAMEvaCoef"
                   :disabled="!reqFlag.getEvaCoef || !reqFlag.tableDataInitFinish" style="width:50%"></el-input>
       </el-form-item>
       <el-form-item label="普通职员对普通职员的成效评价系数" style="margin-left:-100px">
-        <el-input v-model="ratioFormData.CScommonStaffPMEvaCoef"
+        <el-input v-model="ratioFormData.CScommonStaffAMEvaCoef"
                   :disabled="!reqFlag.getEvaCoef || !reqFlag.tableDataInitFinish" style="width:50%"></el-input>
       </el-form-item>
       <br>
       <el-form-item label="经理对组长的成效评价系数">
-        <el-input v-model="ratioFormData.GPManagerPMEvaCoef"
+        <el-input v-model="ratioFormData.GPManagerAMEvaCoef"
                   :disabled="!reqFlag.getEvaCoef || !reqFlag.tableDataInitFinish" style="width:50%"></el-input>
       </el-form-item>
       <el-form-item label="普通职员对组长的成效评价系数" style="margin-left:-100px">
-        <el-input v-model="ratioFormData.GPCommonStaffPMEvaCoef"
+        <el-input v-model="ratioFormData.GPCommonStaffAMEvaCoef"
                   :disabled="!reqFlag.getEvaCoef || !reqFlag.tableDataInitFinish" style="width:50%"></el-input>
       </el-form-item>
       <el-form-item>
@@ -204,11 +204,11 @@
           MGEvaCoef: 0,
           quantitativeCoef: 0,
           PMEvaCoef: 0,
-          CSManagerPMEvaCoef: 0,
-          CSGroupLeaderPMEvaCoef: 0,
-          CScommonStaffPMEvaCoef: 0,
-          GPManagerPMEvaCoef: 0,
-          GPCommonStaffPMEvaCoef: 0
+          CSManagerAMEvaCoef: 0,
+          CSGroupLeaderAMEvaCoef: 0,
+          CScommonStaffAMEvaCoef: 0,
+          GPManagerAMEvaCoef: 0,
+          GPCommonStaffAMEvaCoef: 0
         },
         ratioFormRules: {
           quantativeRate: [
@@ -288,11 +288,11 @@
         promises[count++] = getGlobalFlagByType('MGEvaCoef')
         promises[count++] = getGlobalFlagByType('quantitativeCoef')
         promises[count++] = getGlobalFlagByType('PMEvaCoef')
-        promises[count++] = getGlobalFlagByType('CSManagerPMEvaCoef')
-        promises[count++] = getGlobalFlagByType('CSGroupLeaderPMEvaCoef')
-        promises[count++] = getGlobalFlagByType('CScommonStaffPMEvaCoef')
-        promises[count++] = getGlobalFlagByType('GPManagerPMEvaCoef')
-        promises[count++] = getGlobalFlagByType('GPCommonStaffPMEvaCoef')
+        promises[count++] = getGlobalFlagByType('CSManagerAMEvaCoef')
+        promises[count++] = getGlobalFlagByType('CSGroupLeaderAMEvaCoef')
+        promises[count++] = getGlobalFlagByType('CScommonStaffAMEvaCoef')
+        promises[count++] = getGlobalFlagByType('GPManagerAMEvaCoef')
+        promises[count++] = getGlobalFlagByType('GPCommonStaffAMEvaCoef')
         return new Promise(function (resolve, reject) {
           Promise.all(promises).then(result => {
             _this.reqFlag.getEvaCoef = true
@@ -308,11 +308,11 @@
               _this.ratioFormData.MGEvaCoef = result[1][0].flagValue
               _this.ratioFormData.quantitativeCoef = result[2][0].flagValue
               _this.ratioFormData.PMEvaCoef = result[3][0].flagValue
-              _this.ratioFormData.CSManagerPMEvaCoef = result[4][0].flagValue
-              _this.ratioFormData.CSGroupLeaderPMEvaCoef = result[5][0].flagValue
-              _this.ratioFormData.CScommonStaffPMEvaCoef = result[6][0].flagValue
-              _this.ratioFormData.GPManagerPMEvaCoef = result[7][0].flagValue
-              _this.ratioFormData.GPCommonStaffPMEvaCoef = result[8][0].flagValue
+              _this.ratioFormData.CSManagerAMEvaCoef = result[4][0].flagValue
+              _this.ratioFormData.CSGroupLeaderAMEvaCoef = result[5][0].flagValue
+              _this.ratioFormData.CScommonStaffAMEvaCoef = result[6][0].flagValue
+              _this.ratioFormData.GPManagerAMEvaCoef = result[7][0].flagValue
+              _this.ratioFormData.GPCommonStaffAMEvaCoef = result[8][0].flagValue
               resolve(result)
             }
           }).catch(err => {
@@ -697,12 +697,12 @@
           obj.GPPMEvaScoreUnN = Number(groupRate.toFixed(5))
           obj.MGEvaScoreUnN = Number(manageRate.toFixed(5))
           if (obj.duty === 2) {
-            obj.PMEvaScoreUnN = obj.CSPMEvaScoreAve * this.ratioFormData.GPCommonStaffPMEvaCoef +
-             obj.MGEvaScoreUnN * this.ratioFormData.GPManagerPMEvaCoef
+            obj.PMEvaScoreUnN = obj.CSPMEvaScoreAve * this.ratioFormData.GPCommonStaffAMEvaCoef +
+             obj.MGEvaScoreUnN * this.ratioFormData.GPManagerAMEvaCoef
           } else if (obj.duty === 3) {
-            obj.PMEvaScoreUnN = obj.CSPMEvaScoreAve * this.ratioFormData.CScommonStaffPMEvaCoef +
-             obj.MGEvaScoreUnN * this.ratioFormData.CSManagerPMEvaCoef +
-             obj.GPPMEvaScoreUnN * this.ratioFormData.CSGroupLeaderPMEvaCoef
+            obj.PMEvaScoreUnN = obj.CSPMEvaScoreAve * this.ratioFormData.CScommonStaffAMEvaCoef +
+             obj.MGEvaScoreUnN * this.ratioFormData.CSManagerAMEvaCoef +
+             obj.GPPMEvaScoreUnN * this.ratioFormData.CSGroupLeaderAMEvaCoef
           } else {
             obj.PMEvaScoreUnN = 0
           }
@@ -1647,14 +1647,14 @@
           this.$common.toast('定性评价系数、定量评价系数、成效评价系数之和不为1', 'error', true)
           return null
         }
-        if (parseFloat((Number(this.ratioFormData.CSManagerPMEvaCoef) +
-        Number(this.ratioFormData.CSGroupLeaderPMEvaCoef) +
-        Number(this.ratioFormData.CScommonStaffPMEvaCoef)).toFixed(5)) !== 1) {
+        if (parseFloat((Number(this.ratioFormData.CSManagerAMEvaCoef) +
+        Number(this.ratioFormData.CSGroupLeaderAMEvaCoef) +
+        Number(this.ratioFormData.CScommonStaffAMEvaCoef)).toFixed(5)) !== 1) {
           this.$common.toast('经理对普通职员的成效评价系数、组长对普通职员的成效评价系数、普通职员对普通职员的成效评价系数之和不为1', 'error', true)
           return null
         }
-        if (parseFloat((Number(this.ratioFormData.GPManagerPMEvaCoef) +
-        Number(this.ratioFormData.GPCommonStaffPMEvaCoef)).toFixed(5)) !== 1) {
+        if (parseFloat((Number(this.ratioFormData.GPManagerAMEvaCoef) +
+        Number(this.ratioFormData.GPCommonStaffAMEvaCoef)).toFixed(5)) !== 1) {
           this.$common.toast('经理对组长的成效评价系数、普通职员对组长的成效评价系数之和不为1', 'error', true)
           return null
         }
@@ -1670,11 +1670,11 @@
         promises[count++] = updateGlobalFlagVal('MGEvaCoef', this.ratioFormData.MGEvaCoef)
         promises[count++] = updateGlobalFlagVal('quantitativeCoef', this.ratioFormData.quantitativeCoef)
         promises[count++] = updateGlobalFlagVal('PMEvaCoef', this.ratioFormData.PMEvaCoef)
-        promises[count++] = updateGlobalFlagVal('CSManagerPMEvaCoef', this.ratioFormData.CSManagerPMEvaCoef)
-        promises[count++] = updateGlobalFlagVal('CSGroupLeaderPMEvaCoef', this.ratioFormData.CSGroupLeaderPMEvaCoef)
-        promises[count++] = updateGlobalFlagVal('CScommonStaffPMEvaCoef', this.ratioFormData.CScommonStaffPMEvaCoef)
-        promises[count++] = updateGlobalFlagVal('GPManagerPMEvaCoef', this.ratioFormData.GPManagerPMEvaCoef)
-        promises[count++] = updateGlobalFlagVal('GPCommonStaffPMEvaCoef', this.ratioFormData.GPCommonStaffPMEvaCoef)
+        promises[count++] = updateGlobalFlagVal('CSManagerAMEvaCoef', this.ratioFormData.CSManagerAMEvaCoef)
+        promises[count++] = updateGlobalFlagVal('CSGroupLeaderAMEvaCoef', this.ratioFormData.CSGroupLeaderAMEvaCoef)
+        promises[count++] = updateGlobalFlagVal('CScommonStaffAMEvaCoef', this.ratioFormData.CScommonStaffAMEvaCoef)
+        promises[count++] = updateGlobalFlagVal('GPManagerAMEvaCoef', this.ratioFormData.GPManagerAMEvaCoef)
+        promises[count++] = updateGlobalFlagVal('GPCommonStaffAMEvaCoef', this.ratioFormData.GPCommonStaffAMEvaCoef)
         Promise.all(promises).then(() => {
           this.$common.toast('保存成功', 'success', false)
         }).catch(err => {

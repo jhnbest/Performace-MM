@@ -469,11 +469,13 @@ export function getEvaCoef () {
   promises[count++] = getGlobalFlagByType('MGEvaCoef')
   promises[count++] = getGlobalFlagByType('quantitativeCoef')
   promises[count++] = getGlobalFlagByType('PMEvaCoef')
-  promises[count++] = getGlobalFlagByType('CSManagerPMEvaCoef')
-  promises[count++] = getGlobalFlagByType('CSGroupLeaderPMEvaCoef')
-  promises[count++] = getGlobalFlagByType('CScommonStaffPMEvaCoef')
-  promises[count++] = getGlobalFlagByType('GPManagerPMEvaCoef')
-  promises[count++] = getGlobalFlagByType('GPCommonStaffPMEvaCoef')
+  promises[count++] = getGlobalFlagByType('CSManagerAMEvaCoef')
+  promises[count++] = getGlobalFlagByType('CSGroupLeaderAMEvaCoef')
+  promises[count++] = getGlobalFlagByType('CScommonStaffAMEvaCoef')
+  promises[count++] = getGlobalFlagByType('GPManagerAMEvaCoef')
+  promises[count++] = getGlobalFlagByType('GPCommonStaffAMEvaCoef')
+  promises[count++] = getGlobalFlagByType('AMBuildBoutiqueProjectCoef')
+  promises[count++] = getGlobalFlagByType('AMBuildProTeamCoef')
   return new Promise(function (resolve, reject) {
     Promise.all(promises).then(result => {
       let allEvaCoefExist = true
@@ -489,11 +491,13 @@ export function getEvaCoef () {
           MGEvaCoef: result[1][0].flagValue,
           quantitativeCoef: result[2][0].flagValue,
           PMEvaCoef: result[3][0].flagValue,
-          CSManagerPMEvaCoef: result[4][0].flagValue,
-          CSGroupLeaderPMEvaCoef: result[5][0].flagValue,
-          CScommonStaffPMEvaCoef: result[6][0].flagValue,
-          GPManagerPMEvaCoef: result[7][0].flagValue,
-          GPCommonStaffPMEvaCoef: result[8][0].flagValue
+          CSManagerAMEvaCoef: result[4][0].flagValue,
+          CSGroupLeaderAMEvaCoef: result[5][0].flagValue,
+          CScommonStaffAMEvaCoef: result[6][0].flagValue,
+          GPManagerAMEvaCoef: result[7][0].flagValue,
+          GPCommonStaffAMEvaCoef: result[8][0].flagValue,
+          AMBuildBoutiqueProjectCoef: result[9][0].flagValue,
+          AMBuildProTeamCoef: result[10][0].flagValue
         }
         resolve(obj)
       } else {

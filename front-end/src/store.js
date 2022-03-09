@@ -44,10 +44,10 @@ export default new Vuex.Store({
     defaultConclusionEvaStar: 3, // 月总结默认评价星级
     usersNum: 23, // 处室员工总数
     CSManagerPMEvaCof: 0.3, // 处经理对普通员工的成效评价系数
-    CSGroupLeaderPMEvaCoef: 0.2, // 组长对普通员工的成效评价系数
-    CScommonStaffPMEvaCoef: 0.5, // 普通员工对普通员工的成效评价系数
-    GPManagerPMEvaCoef: 0.5, // 处经理对组长的成效评价系数
-    GPCommonStaffPMEvaCoef: 0.5, // 普通员工对组长的成效评价系数
+    CSGroupLeaderAMEvaCoef: 0.2, // 组长对普通员工的成效评价系数
+    CScommonStaffAMEvaCoef: 0.5, // 普通员工对普通员工的成效评价系数
+    GPManagerAMEvaCoef: 0.5, // 处经理对组长的成效评价系数
+    GPCommonStaffAMEvaCoef: 0.5, // 普通员工对组长的成效评价系数
     defaultStar: 3, // 默认评价星级
     newRulesDate: '2022-02', // 成效评价实施时间,
     monthConclusionType: 1,

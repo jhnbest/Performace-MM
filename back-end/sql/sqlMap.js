@@ -246,7 +246,7 @@ const sqlMap = {
     getPreMonthEva: 'select mr.*, u.name as ratedPersionName from mutualrate mr left join users u on mr.ratedPersion = ' +
         'u.id where mr.rateMonth = ? and mr.ratePersion = ?',
     handleFillMul: 'select count(*) as totalCount from mutualrate where ratePersion = ? and rateMonth = ?',
-    handleFillMulCheck: 'select * from mutualrate where ratePersion = ? and rateMonth = "2021-12"',
+    handleFillMulCheck: 'select * from mutualrate where ratePersion = ? and rateMonth = "2022-01"',
     handleFillMulFill: 'insert into mutualrate (ratePersion, ratedPersion, rateMonth, rate, rateType, rateTime, updateTime) ' +
         'values (?, ?, ?, ?, ?, ?, ?)',
     getPerformanceRates: 'select pr.*, u.name as ratedPersionName, u.duty from performancerate pr left join users u on pr.ratedPersion = u.id ' +
@@ -280,10 +280,12 @@ const sqlMap = {
     updateAMEvaData: 'update newconclusionevadata set evaStar = ?, updateTime = ? where id = ?',
     getAchievementEvaOfConclusionDimension: 'select nc.*, n.userID as evaedUserID, n.dimension from newconclusionevadata' +
                      ' nc left join newconclusion n on nc.dimensionID = n.id where nc.dimensionID = ?',
-    getConclusionEvaData: 'select nc.*, u.duty as evaUserDuty, u.name as evaUserName,' +
-                     ' n.userID as evaedUserID, n.dimension from' +
+    getConclusionEvaData: 'select nc.*, u1.duty as evaUserDuty, u1.name as evaUserName, u1.groupName as evaUserGroupID,' +
+                     ' n.userID as evaedUserID, n.dimension, u2.name as evaedUserName, u2.duty as evaedUserDuty,' +
+                     ' u2.groupName as evaedUserGroupID from' +
                      ' newconclusionevadata nc left join' +
-                     ' newconclusion n on nc.dimensionID = n.id left join users u on nc.evaUserID = u.id where' +
+                     ' newconclusion n on nc.dimensionID = n.id left join users u1 on nc.evaUserID = u1.id left join' +
+                     ' users u2 on n.userID = u2.id where' +
                      ' nc.evaUserID = ? and n.conclusionYear = ? and' +
                      ' n.conclusionMonth = ?'
   }

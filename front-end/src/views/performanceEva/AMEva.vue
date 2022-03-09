@@ -47,7 +47,7 @@
                 <el-table-column label="月总结" align="center">
                   <template slot-scope="scope">
                     <el-button v-if="!scope.row.isShow"
-                              :disabled="scope.row.submitStatus === 0"
+                              :disabled="scope.row.submitStatus !== 1"
                               @click="table1HandleShow(scope.row, scope.$index)"
                               size="mini">
                               <span v-if="scope.row.submitStatus === 1">点击显示</span>
@@ -193,6 +193,7 @@ import { getUserofAchievementToAnotherUser,
          getAchievementEvaOfConclusionDimension,
          genAMEvaScoreData,
          getConclusionEvaData } from '@/utils/achievementEva'
+import { getEvaCoef } from '@/utils/common'
 import store from '@/store'
 export default {
   data () {
@@ -256,11 +257,7 @@ export default {
         let conclusionMonth = this.$moment(this.title).month() + 1
         let newCombinaTableData = null
         this.genTableData(conclusionYear, conclusionMonth, usersList).then(tableData => {
-          console.log('tableData')
-          console.log(tableData)
           newCombinaTableData = tableData.toDoEvaTableData.concat(tableData.doneEvaTableData)
-          console.log('newCombinaTableData')
-          console.log(newCombinaTableData)
           let toDoEvaTableData = tableData.toDoEvaTableData
           let doneEvaTableData = tableData.doneEvaTableData
           this.toDoEvaNum = toDoEvaTableData.length
@@ -314,12 +311,13 @@ export default {
               this.forceRefresh = true
             })
           }
-          // ===============================管理者在此页面需计算所有绩效信息
+          // ===============================管理者在此页面需计算所有绩效信息============================
           if (store.state.userInfo.duty === 1) {
             let promises = []
             let count = 0
             promises[count++] = getAllWorkTimeList(this.title)
             promises[count++] = getAllUserRates(usersList, this.title)
+            promises[count++] = getEvaCoef()
             // 获取每条月总结对应的所有评价
             for (let newCombinaTableDataItem of newCombinaTableData) {
               promises[count++] = getConclusionEvaData(conclusionYear, conclusionMonth, newCombinaTableDataItem.id)
@@ -330,7 +328,7 @@ export default {
               let allWorkTimeList = allResponse[0]
               let allUserRates = allResponse[1]
               let allAMEvaData = []
-              for (let i = 2; i < allResponse.length; i++) {
+              for (let i = 3; i < allResponse.length; i++) {
                 allAMEvaData.push(allResponse[i])
               }
               // 判断各位用户是否已经评价完其他人
@@ -344,11 +342,8 @@ export default {
               }
               let QYEvaScoreData = genQYEvaScoreData(usersList, allWorkTimeList, this.title)
               let QTEvaScoreData = genQualiEvaData(allUserRates)
-              let AMEvaScoreData = genAMEvaScoreData(allAMEvaData)
-              console.log('QYEvaScoreData')
-              console.log(QYEvaScoreData)
-              console.log('QTEvaScoreData')
-              console.log(QTEvaScoreData)
+              let AMEvaScoreData = genAMEvaScoreData(allAMEvaData, allResponse[2].AMBuildBoutiqueProjectCoef,
+                                    allResponse[2].AMBuildProTeamCoef)
             })
           }
           this.PMdata = toDoEvaTableData
@@ -421,11 +416,17 @@ export default {
       }
       return new Promise(function (resolve, reject) {
         Promise.all(promise).then(allResponse => {
+          console.log('allResponse')
+          console.log(allResponse)
           let promise2 = []
           let count2 = 0
           // ===================获取总结评价结果
           for (let i = 0; i < allconclusionAndEvaData.length; i++) {
-            allconclusionAndEvaData[i].submitStatus = allResponse[i].data.length === 0 ? 0 : 1
+            if (allResponse[i].data.length !== 0) {
+              allconclusionAndEvaData[i].submitStatus = allResponse[i].data[0].submitStatus
+            } else {
+              allconclusionAndEvaData[i].submitStatus = 0
+            }
             allconclusionAndEvaData[i].conclusionContent = allResponse[i].data
             if (allResponse[i].data.length > 0) { // 已经填写总结
               for (let item of allResponse[i].data) {
@@ -828,15 +829,23 @@ export default {
     submitStatusFilter (status) {
       if (status === 1) {
         return 'success'
+      } else if (status === 2) {
+        return 'warning'
       } else if (status === 0) {
+        return 'danger'
+      } else {
         return 'danger'
       }
     },
     submitStatusTextFilter (status) {
       if (status === 1) {
         return '已提交'
+      } else if (status === 2) {
+        return '暂存'
       } else if (status === 0) {
         return '未提交'
+      } else {
+        return '错误'
       }
     }
   }

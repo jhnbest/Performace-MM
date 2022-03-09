@@ -93,12 +93,12 @@ export function genPerformanceEvaData (performanceEvaData, evaCoefObj) {
     obj.GPPMEvaScoreUnN = Number(groupRate.toFixed(5))
     obj.MGEvaScoreUnN = Number(manageRate.toFixed(5))
     if (obj.duty === 2) {
-      obj.PMEvaScoreUnN = obj.CSPMEvaScoreAve * evaCoefObj.GPCommonStaffPMEvaCoef +
-       obj.MGEvaScoreUnN * evaCoefObj.GPManagerPMEvaCoef
+      obj.PMEvaScoreUnN = obj.CSPMEvaScoreAve * evaCoefObj.GPCommonStaffAMEvaCoef +
+       obj.MGEvaScoreUnN * evaCoefObj.GPManagerAMEvaCoef
     } else if (obj.duty === 3) {
-      obj.PMEvaScoreUnN = obj.CSPMEvaScoreAve * evaCoefObj.CScommonStaffPMEvaCoef +
-       obj.MGEvaScoreUnN * evaCoefObj.CSManagerPMEvaCoef +
-       obj.GPPMEvaScoreUnN * evaCoefObj.CSGroupLeaderPMEvaCoef
+      obj.PMEvaScoreUnN = obj.CSPMEvaScoreAve * evaCoefObj.CScommonStaffAMEvaCoef +
+       obj.MGEvaScoreUnN * evaCoefObj.CSManagerAMEvaCoef +
+       obj.GPPMEvaScoreUnN * evaCoefObj.CSGroupLeaderAMEvaCoef
     } else {
       obj.PMEvaScoreUnN = 0
     }
