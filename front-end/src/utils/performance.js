@@ -9,7 +9,8 @@ import { getPerformanceIsPublish,
         compare,
         getEvaCoef,
         PMScoreNorCal,
-        sortBy } from '@/utils/common'
+        sortBy,
+        sortObjectArrayByParams } from '@/utils/common'
 import { getAllUserRates, genQualiEvaData } from '@/utils/multual'
 import { getAllAchievements, genPerformanceEvaData } from '@/utils/performancerate'
 import store from '@/store'
@@ -123,27 +124,27 @@ export function genQYEvaScoreData (users, quantativeData, applyMonth) {
 }
 
 // 生成绩效得分与排名数据(新)
-export function genPerformanceScore (usersList, quantativeData, multualEvaData, performanceEvaData, evaCoefObj) {
+export function genPerformanceScore (usersList, QYEvaScoreData, QTEvaScoreData, AMEvaScoreData, evaCoefObj) {
     let userPMScoreData = []
     // ==============================绩效得分(未标准化)计算================================
     for (let user of usersList) {
-      let itemQuantativeScore = quantativeData.find(quantativeDataItem => { // 找出初始表格成员对应的定量数据
+      let itemQuantativeScore = QYEvaScoreData.find(quantativeDataItem => { // 找出初始表格成员对应的定量数据
         return quantativeDataItem.id === user.id
       })
-      let itemMultualEvaScore = multualEvaData.find(multualEvaDataItem => { // 找出初始表格成员对应的定性数据
+      let itemMultualEvaScore = QTEvaScoreData.find(multualEvaDataItem => { // 找出初始表格成员对应的定性数据
         return multualEvaDataItem.id === user.id
       })
-      let itemPMEvaObj = performanceEvaData.find(performanceEvaDataItem => { // 找出初始表格成员对应的成效评价数据
-        return performanceEvaDataItem.id === user.id
+      let itemAMEvaObj = AMEvaScoreData.find(AMEvaScoreDataItem => { // 找出初始表格成员对应的成效评价数据
+        return AMEvaScoreDataItem.evaedUserID === user.id
       })
       let obj = {}
       // 计算未标准化的绩效得分
-      if (itemQuantativeScore && itemMultualEvaScore && itemPMEvaObj) {
+      if (itemQuantativeScore && itemMultualEvaScore && itemAMEvaObj) {
         obj.PMScoreUnN =
             itemQuantativeScore.QYEvaScoreNor * evaCoefObj.quantitativeCoef + // 定量评价乘上相应系数
             itemMultualEvaScore.CSMutualScoreNor * evaCoefObj.CSMutualCoef + // 定性评价（员工互评）乘上相应系数
             itemMultualEvaScore.MGQualiEvaScoreNor * evaCoefObj.MGEvaCoef + // 定性评价（经理评价）乘上相应系数
-            itemPMEvaObj.PMEvaScoreNor * evaCoefObj.PMEvaCoef // 成效评价乘上相应系数
+            itemAMEvaObj.AMEvaScoreNor * evaCoefObj.PMEvaCoef // 成效评价乘上相应系数
 
             obj.totalWorkTime = Number(itemQuantativeScore.totalWorkTime.toFixed(2))
             obj.QYEvaRank = itemQuantativeScore.rank
@@ -154,44 +155,16 @@ export function genPerformanceScore (usersList, quantativeData, multualEvaData, 
             obj.CSQTEvaScoreUnN = itemMultualEvaScore.CSMutualScoreAve
             obj.CSQTEvaRank = itemMultualEvaScore.CSMutualScoreAveRank
             obj.CSQTEvaScoreNor = itemMultualEvaScore.CSMutualScoreNor
-            obj.AMEvaScoreUnN = itemPMEvaObj.PMEvaScoreUnN
-            obj.AMEvaRank = itemPMEvaObj.PMEvaScoreUnNRank
-            obj.AMEvaScoreNor = itemPMEvaObj.PMEvaScoreNor
+            obj.AMEvaScoreUnN = itemAMEvaObj.AMEvaScoreUnN
+            obj.AMEvaRank = itemAMEvaObj.AMEvaScoreRank
+            obj.AMEvaScoreNor = itemAMEvaObj.AMEvaScoreNor
       }
       userPMScoreData.push(obj)
     }
-    console.log('userPMScoreData')
-    console.log(userPMScoreData)
-    userPMScoreData.sort(sortBy('PMScoreUnN'))
-    // ====================================绩效排名与标准化绩效得分计算======================================
-    let count = 0
-    let prePMScoreUnN = -1
-    let rankTmp = []
-    let count1 = -1
-    let count2 = 1
-    // 把绩效得分相同的人员存进对象数组同一个元素里面
+    userPMScoreData = sortObjectArrayByParams(JSON.parse(JSON.stringify(userPMScoreData)), 'PMScoreUnN', 'totalWorkTime')
     for (let i = 0; i < userPMScoreData.length; i++) {
-      if (userPMScoreData[i].PMScoreUnN === prePMScoreUnN) {
-        rankTmp[count1].push(userPMScoreData[i])
-      } else {
-        count1++
-        if (!rankTmp[count1]) {
-          rankTmp[count1] = []
-        }
-        rankTmp[count1].push(userPMScoreData[i])
-        prePMScoreUnN = userPMScoreData[i].PMScoreUnN
-      }
-    }
-    // 绩效得分相同的人员根据工时多少进行排序
-    for (let i = 0; i < rankTmp.length; i++) {
-      rankTmp[i].sort(sortBy('totalWorkTime'))
-      for (let j = 0; j < rankTmp[i].length; j++) {
-        userPMScoreData[count++] = rankTmp[i][j]
-      }
-    }
-    for (let item of userPMScoreData) {
-      item.PMRank = count2++ // 绩效排名计算
-      item.PMScoreNor = PMScoreNorCal(usersList.length, item.PMRank)
+      userPMScoreData[i].PMRank = i + 1 // 绩效排名计算
+      userPMScoreData[i].PMScoreNor = PMScoreNorCal(usersList.length, i + 1)
     }
     return userPMScoreData
 }

@@ -514,3 +514,31 @@ export function sortBy (props) {
     return b[props] - a[props]
   }
 }
+
+// 对象数组根据给定的参数从大到小排序
+export function sortObjectArrayByParams (array, param1, param2) {
+  let preValue = -1
+  let arrayTmp = []
+  let result = []
+  let count = -1
+  array.sort(sortBy(param1))
+  for (let item of array) {
+    if (item[param1] === preValue) {
+      arrayTmp[count].push(item)
+    } else {
+      count++
+      if (!arrayTmp[count]) {
+        arrayTmp[count] = []
+      }
+      arrayTmp[count].push(item)
+      preValue = item[param1]
+    }
+  }
+  for (let i = 0; i < arrayTmp.length; i++) {
+    arrayTmp[i].sort(sortBy(param2))
+    for (let item of arrayTmp[i]) {
+      result.push(item)
+    }
+  }
+  return result
+}

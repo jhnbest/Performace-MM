@@ -23,8 +23,8 @@
     </div>
     <div class="hr-10"></div>
     <div class="head-line">
-      <el-row :gutter="10">
-        <el-col :span="5">
+      <el-row :gutter="5">
+        <el-col :span="11">
           <el-collapse accordion v-model="activeName" @change="handleCollapseChange()">
             <el-collapse-item name="1">
               <template slot="title">
@@ -37,6 +37,7 @@
                 highlight-current-row
                 style="width: 100%;"
                 size="mini"
+                :height="400"
                 ref = "PMDataTable">
                 <el-table-column label="姓名" prop="name" align="center" width="60px"></el-table-column>
                 <el-table-column label="月总结提交状态" prop="submitStatus" align="center">
@@ -44,7 +45,24 @@
                     <el-tag :type="scope.row.submitStatus | submitStatusFilter" size="medium">{{scope.row.submitStatus | submitStatusTextFilter}}</el-tag>
                   </template>
                 </el-table-column>
-                <el-table-column label="月总结" align="center">
+                <el-table-column label="是否已全部评价他人" prop="submitStatus" align="center">
+                  <template slot-scope="scope">
+                    <el-tag :type="scope.row.submitStatus | submitStatusFilter" size="medium">{{scope.row.submitStatus | submitStatusTextFilter}}</el-tag>
+                  </template>
+                </el-table-column>
+                <el-table-column v-if="$store.state.userInfo.duty === 1"
+                                 label="工时排名"
+                                 prop="QYRank"
+                                 align="center" width="50px"></el-table-column>
+                <el-table-column v-if="$store.state.userInfo.duty === 1"
+                                 label="成效评价排名"
+                                 prop="QYRank"
+                                 align="center" width="60px"></el-table-column>
+                <el-table-column v-if="$store.state.userInfo.duty === 1"
+                                 label="绩效排名"
+                                 prop="QYRank"
+                                 align="center" width="50px"></el-table-column>
+                <el-table-column label="月总结" align="center" min-width="90px">
                   <template slot-scope="scope">
                     <el-button v-if="!scope.row.isShow"
                               :disabled="scope.row.submitStatus !== 1"
@@ -69,11 +87,18 @@
                          style="width: 100%;"
                          size="mini">
                 <el-table-column label="姓名" prop="name" align="center" width="60px"></el-table-column>
-                <el-table-column label="月总结提交状态" prop="submitStatus" align="center">
-                  <template slot-scope="scope">
-                    <el-tag :type="scope.row.submitStatus | submitStatusFilter" size="medium">{{scope.row.submitStatus | submitStatusTextFilter}}</el-tag>
-                  </template>
-                </el-table-column>
+                <el-table-column v-if="$store.state.userInfo.duty === 1"
+                                 label="工时排名"
+                                 prop="QYRank"
+                                 align="center" width="50px"></el-table-column>
+                <el-table-column v-if="$store.state.userInfo.duty === 1"
+                                 label="成效评价排名"
+                                 prop="QYRank"
+                                 align="center" width="60px"></el-table-column>
+                <el-table-column v-if="$store.state.userInfo.duty === 1"
+                                 label="绩效排名"
+                                 prop="QYRank"
+                                 align="center" width="50px"></el-table-column>
                 <el-table-column label="月总结" align="center">
                   <template slot-scope="scope">
                     <el-button v-if="!scope.row.isShow"
@@ -90,12 +115,13 @@
             </el-collapse-item>
           </el-collapse>
         </el-col>
-        <el-col :span="19">
+        <el-col :span="13">
           <div v-if="forceRefresh">
             <el-table :data="tableData1"
                       border
                       v-loading="!getDataLoading"
                       stripe
+                      :height="300"
                       size="medium"
                       style="margin: auto"
                       :header-cell-style="{ background:'#ced1d4', color:'#000000', fontSize:'16px'}">
@@ -115,6 +141,7 @@
                       border
                       v-loading="!getDataLoading"
                       stripe
+                      :height="250"
                       size="medium"
                       :header-cell-style="{ background:'#ced1d4', color:'#000000', fontSize:'16px' }"
                       style="margin: auto"
@@ -146,7 +173,22 @@
                 </template>
               </el-table-column>
             </el-table>
-            <el-table :data="tableData4"
+            <el-table v-if="$store.state.userInfo.duty === 1"
+                      :data="tableData4"
+                      border
+                      v-loading="!getDataLoading"
+                      stripe
+                      size="medium"
+                      :header-cell-style="{ background:'#ced1d4',color:'#000000',fontSize:'16px' }"
+                      style="margin: auto"
+                      highlight-current-row>
+              <el-table-column label="对处室工作的意见/建议、不满/抱怨、工作/生活/学习中的烦恼和困难以及希望得到的帮助/支持/指导">
+                <template>
+                  <div v-html="curAdvice.content"></div>
+                </template>
+              </el-table-column>
+            </el-table>
+            <el-table :data="tableData5"
                       border
                       v-loading="!getDataLoading"
                       stripe
@@ -182,7 +224,7 @@
   </div>
 </template>
 <script>
-import { getAllWorkTimeList, genQYEvaScoreData } from '@/utils/performance'
+import { getAllWorkTimeList, genQYEvaScoreData, genPerformanceScore } from '@/utils/performance'
 import { getAllUserRates, genQualiEvaData } from '@/utils/multual'
 import { Notification } from 'element-ui'
 import { getUsersList } from '@/utils/users'
@@ -211,6 +253,7 @@ export default {
       tableData2: [{}],
       tableData3: [{}],
       tableData4: [{}],
+      tableData5: [{}],
       buildBoutiqueProject: {
         content: '无数据'
       }, // 打造精品工程内容
@@ -220,6 +263,9 @@ export default {
       nextPlan: {
         content: '无数据'
       }, // 下月计划内容
+      curAdvice: {
+        content: '无数据'
+      }, // 建议意见
       table1CurShowIndex: -1, // 表格1当前显示的用户序号
       table1PreShowIndex: -1, // 表格1之前显示的用户序号
       table2CurShowIndex: -1, // 表格2当前显示的用户序号
@@ -257,6 +303,8 @@ export default {
         let conclusionMonth = this.$moment(this.title).month() + 1
         let newCombinaTableData = null
         this.genTableData(conclusionYear, conclusionMonth, usersList).then(tableData => {
+          console.log('tableData')
+          console.log(tableData)
           newCombinaTableData = tableData.toDoEvaTableData.concat(tableData.doneEvaTableData)
           let toDoEvaTableData = tableData.toDoEvaTableData
           let doneEvaTableData = tableData.doneEvaTableData
@@ -279,6 +327,9 @@ export default {
                 this.nextPlan = toDoEvaTableData[i].conclusionContent.find(contenItem => {
                   return contenItem.dimension === store.state.conclusionTextNew.nextPlan.dimension
                 })
+                this.curAdvice = toDoEvaTableData[i].conclusionContent.find(contenItem => {
+                  return contenItem.dimension === store.state.conclusionTextNew.curAdvice.dimension
+                })
                 this.forceRefresh = false
                 this.$nextTick(() => {
                   this.forceRefresh = true
@@ -299,6 +350,9 @@ export default {
             })
             this.nextPlan = doneEvaTableData[0].conclusionContent.find(contenItem => {
               return contenItem.dimension === store.state.conclusionTextNew.nextPlan.dimension
+            })
+            this.curAdvice = doneEvaTableData[0].conclusionContent.find(contenItem => {
+              return contenItem.dimension === store.state.conclusionTextNew.curAdvice.dimension
             })
             this.buildBoutiqueProjectStar = JSON.parse(JSON.stringify(doneEvaTableData[0].conclusionEva.find(evaItem => {
               return evaItem.dimensionID === this.buildBoutiqueProject.id
@@ -323,14 +377,15 @@ export default {
               promises[count++] = getConclusionEvaData(conclusionYear, conclusionMonth, newCombinaTableDataItem.id)
             }
             Promise.all(promises).then(allResponse => {
-              console.log('allResponse')
-              console.log(allResponse)
               let allWorkTimeList = allResponse[0]
               let allUserRates = allResponse[1]
+              let evaCoefObj = allResponse[2]
               let allAMEvaData = []
               for (let i = 3; i < allResponse.length; i++) {
                 allAMEvaData.push(allResponse[i])
               }
+              console.log('allAMEvaData')
+              console.log(allAMEvaData)
               // 判断各位用户是否已经评价完其他人
               for (let i = 0; i < allAMEvaData.length; i++) {
                 newCombinaTableData[i].evaAllConclusion = allAMEvaData[i]
@@ -342,8 +397,16 @@ export default {
               }
               let QYEvaScoreData = genQYEvaScoreData(usersList, allWorkTimeList, this.title)
               let QTEvaScoreData = genQualiEvaData(allUserRates)
-              let AMEvaScoreData = genAMEvaScoreData(allAMEvaData, allResponse[2].AMBuildBoutiqueProjectCoef,
-                                    allResponse[2].AMBuildProTeamCoef)
+              let AMEvaScoreData = genAMEvaScoreData(allAMEvaData,
+                                    allResponse[2].AMBuildBoutiqueProjectCoef, allResponse[2].AMBuildProTeamCoef,
+                                    allResponse[2].CSManagerAMEvaCoef, allResponse[2].CSGroupLeaderAMEvaCoef,
+                                    allResponse[2].CScommonStaffAMEvaCoef, allResponse[2].GPManagerAMEvaCoef,
+                                    allResponse[2].GPCommonStaffAMEvaCoef, QYEvaScoreData,
+                                    this.standAndEngineerGroup.length, this.commuincationGroup.length)
+              let PMScoreData = genPerformanceScore(this.usersList, QYEvaScoreData, QTEvaScoreData, AMEvaScoreData,
+                                 evaCoefObj)
+              console.log('PMScoreData')
+              console.log(PMScoreData)
             })
           }
           this.PMdata = toDoEvaTableData
@@ -352,7 +415,7 @@ export default {
         })
       })
     },
-    // 生成表格数据
+    // 获取并生成表格数据
     genTableData (conclusionYear, conclusionMonth, usersList) {
       // 初始化默认数据
       let allconclusionAndEvaData = []
@@ -420,7 +483,7 @@ export default {
           console.log(allResponse)
           let promise2 = []
           let count2 = 0
-          // ===================获取总结评价结果
+          // ======================获取月总结评价结果
           for (let i = 0; i < allconclusionAndEvaData.length; i++) {
             if (allResponse[i].data.length !== 0) {
               allconclusionAndEvaData[i].submitStatus = allResponse[i].data[0].submitStatus
@@ -431,7 +494,7 @@ export default {
             if (allResponse[i].data.length > 0) { // 已经填写总结
               for (let item of allResponse[i].data) {
                 if (item.dimension === 1 || item.dimension === 2) { // 打造精品工程和建设团队维度才获取评价结果
-                  promise2[count2++] = getUserofAchievementToAnotherUser(item.id, store.state.userInfo.id)
+                  promise2[count2++] = getUserofAchievementToAnotherUser(item.id, store.state.userInfo.id) // 获取当前用户对其他人总结的评价结果
                 }
               }
             }
@@ -492,6 +555,9 @@ export default {
       this.nextPlan = row.conclusionContent.find(contenItem => {
         return contenItem.dimension === store.state.conclusionTextNew.nextPlan.dimension
       })
+      this.curAdvice = row.conclusionContent.find(contenItem => {
+        return contenItem.dimension === store.state.conclusionTextNew.curAdvice.dimension
+      })
       this.forceRefresh = false
       this.$nextTick(() => {
         this.forceRefresh = true
@@ -513,6 +579,9 @@ export default {
       this.nextPlan = row.conclusionContent.find(contenItem => {
         return contenItem.dimension === store.state.conclusionTextNew.nextPlan.dimension
       })
+      this.curAdvice = row.conclusionContent.find(contenItem => {
+        return contenItem.dimension === store.state.conclusionTextNew.curAdvice.dimension
+      })
       this.buildBoutiqueProjectStar = JSON.parse(JSON.stringify(row.conclusionEva.find(evaItem => {
         return evaItem.dimensionID === this.buildBoutiqueProject.id
       })))
@@ -527,8 +596,9 @@ export default {
     // 打造精品工程
     handlebuildBoutiqueProjectStarChange () {
     },
-    // 创建专业团队评价星级
+    // 创建专业团队评价星级变化
     handlebuildProTeamStarChange () {
+      console.log(this.PMdata())
     },
     // 点击提交对当前用户的评价并跳转到下一个待评价人
     handleSubmitAndJumpToNext () {
@@ -567,11 +637,14 @@ export default {
         let index = this.PMdata.findIndex(PMdataItem => {
           return PMdataItem.evaStatus === 0 && PMdataItem.submitStatus === 1
         })
+        console.log('index')
+        console.log(index)
+        console.log('this.PMdata')
+        console.log(this.PMdata)
         if (index !== -1) { // 还有未评价的用户
           this.curEvaUserName = this.PMdata[index].name
           this.table1CurShowIndex = index
           this.PMdata[this.table1CurShowIndex].isShow = true
-          this.PMdata[this.table1PreShowIndex].isShow = false
           this.table1PreShowIndex = index
           this.buildBoutiqueProject = this.PMdata[this.table1CurShowIndex].conclusionContent.find(contenItem => {
             return contenItem.dimension === store.state.conclusionTextNew.buildBoutiqueProject.dimension
@@ -582,11 +655,16 @@ export default {
           this.nextPlan = this.PMdata[this.table1CurShowIndex].conclusionContent.find(contenItem => {
             return contenItem.dimension === store.state.conclusionTextNew.nextPlan.dimension
           })
+          this.curAdvice = this.PMdata[this.table1CurShowIndex].conclusionContent.find(contenItem => {
+            return contenItem.dimension === store.state.conclusionTextNew.curAdvice.dimension
+          })
           this.forceRefresh = false
           this.$nextTick(() => {
             this.forceRefresh = true
           })
         } else { // 都已评价
+        this.table1CurShowIndex = -1
+        this.table1PreShowIndex = -1
           this.clearEvaTable()
           Notification.info({
             title: '成功',
@@ -655,6 +733,9 @@ export default {
               this.nextPlan = this.PMdata[i].conclusionContent.find(contenItem => {
                 return contenItem.dimension === store.state.conclusionTextNew.nextPlan.dimension
               })
+              this.curAdvice = this.PMdata[i].conclusionContent.find(contenItem => {
+                return contenItem.dimension === store.state.conclusionTextNew.curAdvice.dimension
+              })
               this.forceRefresh = false
               this.$nextTick(() => {
                 this.forceRefresh = true
@@ -680,6 +761,9 @@ export default {
           })
           this.nextPlan = this.doneEvaTableData[0].conclusionContent.find(contenItem => {
             return contenItem.dimension === store.state.conclusionTextNew.nextPlan.dimension
+          })
+          this.curAdvice = this.doneEvaTableData[0].conclusionContent.find(contenItem => {
+            return contenItem.dimension === store.state.conclusionTextNew.curAdvice.dimension
           })
           this.buildBoutiqueProjectStar = JSON.parse(JSON.stringify(this.doneEvaTableData[0].conclusionEva.find(evaItem => {
             return evaItem.dimensionID === this.buildBoutiqueProject.id
@@ -726,6 +810,9 @@ export default {
               this.nextPlan = toDoEvaTableData[i].conclusionContent.find(contenItem => {
                 return contenItem.dimension === store.state.conclusionTextNew.nextPlan.dimension
               })
+              this.curAdvice = toDoEvaTableData[i].conclusionContent.find(contenItem => {
+                return contenItem.dimension === store.state.conclusionTextNew.curAdvice.dimension
+              })
               this.forceRefresh = false
               this.$nextTick(() => {
                 this.forceRefresh = true
@@ -746,6 +833,9 @@ export default {
           })
           this.nextPlan = doneEvaTableData[0].conclusionContent.find(contenItem => {
             return contenItem.dimension === store.state.conclusionTextNew.nextPlan.dimension
+          })
+          this.curAdvice = doneEvaTableData[0].conclusionContent.find(contenItem => {
+            return contenItem.dimension === store.state.conclusionTextNew.curAdvice.dimension
           })
           this.buildBoutiqueProjectStar = JSON.parse(JSON.stringify(doneEvaTableData[0].conclusionEva.find(evaItem => {
             return evaItem.dimensionID === this.buildBoutiqueProject.id
@@ -812,7 +902,12 @@ export default {
       this.buildProTeam = {
         content: '无数据'
       }
-      this.nextPlan = ''
+      this.nextPlan = {
+        content: '无数据'
+      }
+      this.curAdvice = {
+        content: '无数据'
+      }
       this.forceRefresh = false
       this.$nextTick(() => {
         this.forceRefresh = true

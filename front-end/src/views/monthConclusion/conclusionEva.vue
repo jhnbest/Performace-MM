@@ -163,6 +163,7 @@
   } from '@/utils/common'
   import monthConclusionTableCheck from './childViews/monthConclusionTableCheck'
   import store from '@/store'
+  import moment from 'moment'
   export default {
     data () {
       return {
@@ -216,15 +217,15 @@
               this.allUsers = removeUserByName('王喻强', JSON.parse(JSON.stringify(getAllUsersInfoRes.list)))
               if (this.reqFlag.getAllUsersConclusion) {
                 this.reqFlag.getAllUsersConclusion = false
-                if (this.$moment(this.formData.title).isBefore(store.state.newRulesDate)) { // 在新规则实施之前
+                // if (this.$moment(this.formData.title).isBefore(store.state.newRulesDate)) { // 在新规则实施之前
                   // 获取全处员工月总结信息
                   this.getAllUsersConclusion(this.allUsers, this.curApplyYear, this.curApplyMonth).then(getAllUsersConclusionRes => {
                     // 填充总结表格数据
                     this.fillConclusionTableData(getAllUsersConclusionRes)
                     this.reqFlag.getAllUsersConclusion = true
                   })
-                } else {
-                }
+                // } else {
+                // }
               }
             }).catch(() => {
               this.$common.toast('获取全处员工信息失败', 'error', false)
@@ -243,11 +244,11 @@
         let titleMonth = this.$moment(String(submitYear) + '-' + String(submitMonth))
         return new Promise(function (resolve, reject) {
           for (let user of allUsers) {
-            if (this.$moment(titleMonth).isBefore(store.state.newRulesDate)) {
+            // if (this.$moment(titleMonth).isBefore(store.state.newRulesDate)) {
               promise[count++] = getCurMonthConclusionOverviewData(submitMonth, submitYear, user.id)
-            } else {
+            // } else {
 
-            }
+            // }
           }
           Promise.all(promise).then(result => {
             resolve(result)
