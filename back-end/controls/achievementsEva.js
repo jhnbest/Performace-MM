@@ -94,11 +94,11 @@ const achievementsEva = {
             return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
         })
     },
-    // 获取某个用户的对其他人的成效评价
-    getConclusionEvaData (req, res) {
+    // 获取某个用户的所有被评价数据
+    getUserConclusionEvaedData (req, res) {
         let sendData = req.body
-        let sql = $sql.achievementsEva.getConclusionEvaData
-        let arrayParams = [sendData.evaUserID, sendData.conclusionYear, sendData.conclusionMonth]
+        let sql = $sql.achievementsEva.getUserConclusionEvaedData
+        let arrayParams = [sendData.evaedUserID, sendData.conclusionYear, sendData.conclusionMonth]
         RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
             return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
         }).catch(RCPDDatabaseErr => {

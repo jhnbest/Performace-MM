@@ -95,7 +95,7 @@ export const urlGetUserofAchievementToAnotherUser = '/achievementsEva/getUserofA
 export const urlSubmitAMEvaData = '/achievementsEva/submitAMEvaData' // 提交成效评价
 export const urlUpdateAMEvaData = '/achievementsEva/updateAMEvaData' // 更新成效评价
 export const urlGetAchievementEvaOfConclusionDimension = '/achievementsEva/getAchievementEvaOfConclusionDimension' // 获取对某个总结的所有评价
-export const urlGetConclusionEvaData = '/achievementsEva/getConclusionEvaData' // 获取某个用户的对其他人的成效评价
+export const urlGetUserConclusionEvaedData = '/achievementsEva/getUserConclusionEvaedData' // 获取某个用户的所有被评价数据
 
 export const urlGetCurMonthConclusionOverviewData = '/conclusion/getCurMonthConclusionOverviewData' // 获取月总结概览信息
 export const urlSubmitMonthConclusionData = '/conclusion/submitMonthConclusionData' // 提交月总结

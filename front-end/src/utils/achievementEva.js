@@ -4,7 +4,7 @@ import {
   urlSubmitAMEvaData,
   urlUpdateAMEvaData,
   urlGetAchievementEvaOfConclusionDimension,
-  urlGetConclusionEvaData
+  urlGetUserConclusionEvaedData
 } from '../config/interface'
 import { newStarToRates,
          sortBy,
@@ -257,12 +257,12 @@ export function genAMEvaScoreData (genAMEvaScoreData,
   return AMEvaScoreArray
 }
 // 获取某个用户的对其他人的成效评价
-export function getConclusionEvaData (conclusionYear, conclusionMonth, evaUserID) {
-  const url = urlGetConclusionEvaData
+export function getUserConclusionEvaedData (conclusionYear, conclusionMonth, evaedUserID) {
+  const url = urlGetUserConclusionEvaedData
   let params = {
     conclusionYear: conclusionYear,
     conclusionMonth: conclusionMonth,
-    evaUserID: evaUserID
+    evaedUserID: evaedUserID
   }
   return new Promise(function (resolve, reject) {
     http(url, params).then(response => {

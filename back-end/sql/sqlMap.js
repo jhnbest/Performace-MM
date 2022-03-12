@@ -280,14 +280,10 @@ const sqlMap = {
     updateAMEvaData: 'update newconclusionevadata set evaStar = ?, updateTime = ? where id = ?',
     getAchievementEvaOfConclusionDimension: 'select nc.*, n.userID as evaedUserID, n.dimension from newconclusionevadata' +
                      ' nc left join newconclusion n on nc.dimensionID = n.id where nc.dimensionID = ?',
-    getConclusionEvaData: 'select nc.*, u1.duty as evaUserDuty, u1.name as evaUserName, u1.groupName as evaUserGroupID,' +
-                     ' n.userID as evaedUserID, n.dimension, u2.name as evaedUserName, u2.duty as evaedUserDuty,' +
-                     ' u2.groupName as evaedUserGroupID from' +
-                     ' newconclusionevadata nc left join' +
-                     ' newconclusion n on nc.dimensionID = n.id left join users u1 on nc.evaUserID = u1.id left join' +
-                     ' users u2 on n.userID = u2.id where' +
-                     ' nc.evaUserID = ? and n.conclusionYear = ? and' +
-                     ' n.conclusionMonth = ?'
+    getUserConclusionEvaedData: 'select n.userID as evaedUserID, nc.*, u1.duty as evaedUserDuty, u1.name as evaedUserName,' +
+                     ' u2.name as evaUserName, u2.duty as evaUserDuty from newconclusion n left join newconclusionevadata nc on' +
+                     ' n.id = nc.dimensionID left join users u1 on n.userID = u1.id left join users u2 on nc.evaUserID = u2.id' +
+                     ' where n.userID = ? and n.conclusionYear = ? and n.conclusionMonth = ? and n.dimension != 3 and n.dimension != 4'
   }
 }
 module.exports = sqlMap;
