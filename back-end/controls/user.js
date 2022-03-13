@@ -75,7 +75,6 @@ const user = {
     let params = req.body
     let name = params.name
     let password = params.password
-    
     let sql = $sql.user.login
     let arrayParams = [name, password]
 

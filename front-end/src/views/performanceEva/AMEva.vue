@@ -383,11 +383,16 @@ export default {
               let evaCoefObj = allResponse[2]
               let allAMEvaedData = []
               for (let i = 3; i < allResponse.length; i++) {
-                allAMEvaedData.push(allResponse[i])
+                let obj = {
+                  evaedUserID: newCombinaTableData[i - 3].id,
+                  evaedUserDuty: newCombinaTableData[i - 3].duty,
+                  evaedUserGroupID: newCombinaTableData[i - 3].groupID,
+                  allAMEvaedData: allResponse[i]
+                }
+                allAMEvaedData.push(obj)
               }
               console.log('allAMEvaedData')
               console.log(allAMEvaedData)
-              this.globalAllAmEvaData = allAMEvaedData
               // 判断各位用户是否已经评价完其他人
               for (let i = 0; i < allAMEvaedData.length; i++) {
                 newCombinaTableData[i].evaAllConclusion = allAMEvaedData[i]
@@ -399,18 +404,19 @@ export default {
               }
               // console.log('newCombinaTableData')
               // console.log(newCombinaTableData)
-              // let QYEvaScoreData = genQYEvaScoreData(usersList, allWorkTimeList, this.title)
-              // let QTEvaScoreData = genQualiEvaData(allUserRates)
-              // let AMEvaScoreData = genAMEvaScoreData(allAMEvaData,
-              //                       allResponse[2].AMBuildBoutiqueProjectCoef, allResponse[2].AMBuildProTeamCoef,
-              //                       allResponse[2].CSManagerAMEvaCoef, allResponse[2].CSGroupLeaderAMEvaCoef,
-              //                       allResponse[2].CScommonStaffAMEvaCoef, allResponse[2].GPManagerAMEvaCoef,
-              //                       allResponse[2].GPCommonStaffAMEvaCoef, QYEvaScoreData,
-              //                       this.standAndEngineerGroup.length, this.commuincationGroup.length)
-              // let PMScoreData = genPerformanceScore(this.usersList, QYEvaScoreData, QTEvaScoreData, AMEvaScoreData,
-              //                    evaCoefObj)
-              // console.log('PMScoreData')
-              // console.log(PMScoreData)
+              let QYEvaScoreData = genQYEvaScoreData(usersList, allWorkTimeList, this.title)
+              let QTEvaScoreData = genQualiEvaData(allUserRates)
+              let AMEvaScoreData = genAMEvaScoreData(allAMEvaedData,
+                                    allResponse[2].AMBuildBoutiqueProjectCoef, allResponse[2].AMBuildProTeamCoef,
+                                    allResponse[2].CSManagerAMEvaCoef, allResponse[2].CSGroupLeaderAMEvaCoef,
+                                    allResponse[2].CScommonStaffAMEvaCoef, allResponse[2].GPManagerAMEvaCoef,
+                                    allResponse[2].GPCommonStaffAMEvaCoef, QYEvaScoreData,
+                                    this.standAndEngineerGroup.length, this.commuincationGroup.length)
+              this.globalAllAmEvaData = allAMEvaedData
+              let PMScoreData = genPerformanceScore(this.usersList, QYEvaScoreData, QTEvaScoreData, AMEvaScoreData,
+                                 evaCoefObj)
+              console.log('PMScoreData')
+              console.log(PMScoreData)
             })
           }
           this.PMdata = toDoEvaTableData
@@ -430,6 +436,8 @@ export default {
               id: user.id,
               name: user.name,
               groupName: user.groupName,
+              groupID: user.groupID,
+              duty: user.duty,
               submitStatus: 0,
               evaStatus: 0,
               conclusionContent: [], // 月总结内容
@@ -447,6 +455,8 @@ export default {
               id: user.id,
               name: user.name,
               groupName: user.groupName,
+              groupID: user.groupID,
+              duty: user.duty,
               submitStatus: 0,
               evaStatus: 0,
               conclusionContent: [],
@@ -463,6 +473,8 @@ export default {
             id: user.id,
             name: user.name,
             groupName: user.groupName,
+            groupID: user.groupID,
+            duty: user.duty,
             submitStatus: 0,
             evaStatus: 0,
             conclusionContent: [],
@@ -599,12 +611,39 @@ export default {
     },
     // 打造精品工程
     handlebuildBoutiqueProjectStarChange () {
-      console.log('this.globalAllAmEvaData')
-      console.log(this.globalAllAmEvaData)
-      if (this.activeName === '1') {
-        console.log(this.PMdata[this.table1CurShowIndex])
-      } else if (this.activeName === '2') {
-        console.log(this.doneEvaTableData[this.table2CurShowIndex])
+      if (store.state.userInfo.duty === 1) {
+        console.log('this.globalAllAmEvaData')
+        console.log(this.globalAllAmEvaData)
+        if (this.activeName === '1') {
+          console.log('this.PMdata[this.table1CurShowIndex]')
+          console.log(this.PMdata[this.table1CurShowIndex])
+          let findIndex1 = this.globalAllAmEvaData.findIndex(item => {
+            return item.evaedUserID === this.PMdata[this.table1CurShowIndex].id
+          })
+          console.log('findIndex1')
+          console.log(findIndex1)
+          let findIndex2 = this.globalAllAmEvaData[findIndex1].allAMEvaedData.findIndex(item => {
+            return item.dimension === 1 && item.evaUserID === store.state.userInfo.id
+          })
+          if (findIndex2 === -1) { // 管理者还未评价
+            let obj = {
+              dimension: 1,
+              evaStar: this.buildBoutiqueProjectStar.evaStar,
+              evaUserDuty: store.state.userInfo.duty,
+              evaUserID: store.state.userInfo.id,
+              evaUserName: store.state.userInfo.name,
+              evaedUserDuty: this.PMdata[this.table1CurShowIndex].duty,
+              evaedUserGroupID: this.PMdata[this.table1CurShowIndex].groupID,
+              evaedUserName: this.PMdata[this.table1CurShowIndex].name
+            }
+            this.globalAllAmEvaData[findIndex1].allAMEvaedData.push(obj)
+            console.log('this.globalAllAmEvaData')
+            console.log(this.globalAllAmEvaData)
+          } else { // 管理者已评价
+          }
+        } else if (this.activeName === '2') {
+          console.log(this.doneEvaTableData[this.table2CurShowIndex])
+        }
       }
     },
     // 创建专业团队评价星级变化
