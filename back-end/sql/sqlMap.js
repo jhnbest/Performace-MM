@@ -281,7 +281,8 @@ const sqlMap = {
     getAchievementEvaOfConclusionDimension: 'select nc.*, n.userID as evaedUserID, n.dimension from newconclusionevadata' +
                      ' nc left join newconclusion n on nc.dimensionID = n.id where nc.dimensionID = ?',
     getUserConclusionEvaedData: 'select n.userID as evaedUserID, n.dimension, nc.*, u1.duty as evaedUserDuty, u1.name as evaedUserName,' +
-                     ' u1.groupName as evaedUserGroupID, u2.name as evaUserName, u2.duty as evaUserDuty from newconclusionevadata nc left' +
+                     ' u1.groupName as evaedUserGroupID, u2.name as evaUserName, u2.duty as evaUserDuty, u2.groupName as evaUserGroupID' +
+                     ' from newconclusionevadata nc left' +
                      ' join newconclusion n on' +
                      ' n.id = nc.dimensionID left join users u1 on n.userID = u1.id left join users u2 on nc.evaUserID = u2.id' +
                      ' where n.userID = ? and n.conclusionYear = ? and n.conclusionMonth = ? and n.dimension != 3 and n.dimension != 4'

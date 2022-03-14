@@ -145,19 +145,19 @@ export function genPerformanceScore (usersList, QYEvaScoreData, QTEvaScoreData, 
             itemMultualEvaScore.CSMutualScoreNor * evaCoefObj.CSMutualCoef + // 定性评价（员工互评）乘上相应系数
             itemMultualEvaScore.MGQualiEvaScoreNor * evaCoefObj.MGEvaCoef + // 定性评价（经理评价）乘上相应系数
             itemAMEvaObj.AMEvaScoreNor * evaCoefObj.PMEvaCoef // 成效评价乘上相应系数
-
-            obj.totalWorkTime = Number(itemQuantativeScore.totalWorkTime.toFixed(2))
-            obj.QYEvaRank = itemQuantativeScore.rank
-            obj.QYEvaScoreNor = itemQuantativeScore.QYEvaScoreNor
-            obj.MGQTEvaScoreUnN = itemMultualEvaScore.MGQualiEvaScoreUnN
-            obj.MGQTEvaRank = itemMultualEvaScore.MGQualiEvaScoreRank
-            obj.MGQTEvaScoreNor = itemMultualEvaScore.MGQualiEvaScoreNor
-            obj.CSQTEvaScoreUnN = itemMultualEvaScore.CSMutualScoreAve
-            obj.CSQTEvaRank = itemMultualEvaScore.CSMutualScoreAveRank
-            obj.CSQTEvaScoreNor = itemMultualEvaScore.CSMutualScoreNor
-            obj.AMEvaScoreUnN = itemAMEvaObj.AMEvaScoreUnN
-            obj.AMEvaRank = itemAMEvaObj.AMEvaScoreRank
-            obj.AMEvaScoreNor = itemAMEvaObj.AMEvaScoreNor
+        obj.id = user.id
+        obj.totalWorkTime = Number(itemQuantativeScore.totalWorkTime.toFixed(2))
+        obj.QYEvaRank = itemQuantativeScore.rank
+        obj.QYEvaScoreNor = itemQuantativeScore.QYEvaScoreNor
+        obj.MGQTEvaScoreUnN = itemMultualEvaScore.MGQualiEvaScoreUnN
+        obj.MGQTEvaRank = itemMultualEvaScore.MGQualiEvaScoreRank
+        obj.MGQTEvaScoreNor = itemMultualEvaScore.MGQualiEvaScoreNor
+        obj.CSQTEvaScoreUnN = itemMultualEvaScore.CSMutualScoreAve
+        obj.CSQTEvaRank = itemMultualEvaScore.CSMutualScoreAveRank
+        obj.CSQTEvaScoreNor = itemMultualEvaScore.CSMutualScoreNor
+        obj.AMEvaScoreUnN = itemAMEvaObj.AMEvaScoreUnN
+        obj.AMEvaRank = itemAMEvaObj.AMEvaScoreRank
+        obj.AMEvaScoreNor = itemAMEvaObj.AMEvaScoreNor
       }
       userPMScoreData.push(obj)
     }

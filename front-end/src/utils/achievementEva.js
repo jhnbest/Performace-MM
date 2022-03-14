@@ -249,8 +249,8 @@ export function genAMEvaScoreData (allAMEvaedData,
       CMAMEvaScoreArrty.push(AMEvaScoreArrayItem)
     }
   }
-  SEAMEvaScoreArray = sortObjectArrayByParams(JSON.parse(JSON.stringify(SEAMEvaScoreArray)), 'AMEvaScoreUnN', 'totalWorkTime')
-  CMAMEvaScoreArrty = sortObjectArrayByParams(JSON.parse(JSON.stringify(CMAMEvaScoreArrty)), 'AMEvaScoreUnN', 'totalWorkTime')
+  SEAMEvaScoreArray = sortObjectArrayByParams(SEAMEvaScoreArray, 'AMEvaScoreUnN', 'totalWorkTime')
+  CMAMEvaScoreArrty = sortObjectArrayByParams(CMAMEvaScoreArrty, 'AMEvaScoreUnN', 'totalWorkTime')
   // 计算成效评价标准化得分
   for (let i = 0; i < SEAMEvaScoreArray.length; i++) {
     SEAMEvaScoreArray[i].AMEvaScoreRank = i + 1
@@ -260,12 +260,6 @@ export function genAMEvaScoreData (allAMEvaedData,
     CMAMEvaScoreArrty[i].AMEvaScoreRank = i + 1
     CMAMEvaScoreArrty[i].AMEvaScoreNor = PMScoreNorCal(commuincationGroupNum, i + 1)
   }
-  console.log('AMEvaScoreArray')
-  console.log(AMEvaScoreArray)
-  console.log('SEAMEvaScoreArray')
-  console.log(SEAMEvaScoreArray)
-  console.log('CMAMEvaScoreArrty')
-  console.log(CMAMEvaScoreArrty)
   return AMEvaScoreArray
 }
 // 获取某个用户的对其他人的成效评价
