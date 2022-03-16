@@ -3,7 +3,7 @@ import {
   urlGetAllUserRates
 } from '@/config/interface'
 import store from '@/store'
-import { starToRates, rateTypeSwitch, calGetScore } from '@/utils/common'
+import { starToRates, rateTypeSwitch, calGetScore, PMScoreNorCal } from '@/utils/common'
 import { groupName2String } from '@/utils/users'
 
 // 获取全处员工互评信息
@@ -177,7 +177,7 @@ export function genQualiEvaData (multualData) {
     }
     count++
     allUserRates[i].MGQualiEvaScoreNor =
-      calGetScore(allUserRates.length, allUserRates[i].MGQualiEvaScoreRank)
+      PMScoreNorCal(allUserRates.length, allUserRates[i].MGQualiEvaScoreRank)
   }
   let allQualiEvaScore = []
   allQualiEvaScore = standAndEngineerRates.concat(communicationRates)
