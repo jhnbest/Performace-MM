@@ -120,7 +120,13 @@ export function genAMEvaScoreData (allAMEvaedData,
             AMEvaScoreRank: 0,
             totalWorkTime: 0,
             dimension1AveStar: 0,
-            dimension2AveStar: 0
+            dimension2AveStar: 0,
+            dimension1CSAveStar: 0, // 评价维度1的其他员工平均评价星级
+            dimension2CSAveStar: 0, // 评价维度2的其他员工平均评价星级
+            dimension1CSEvaNum: 0, // 评价维度1的其他员工评价数量
+            dimension2CSEvaNum: 0, // 评价维度2的其他员工评价数量
+            dimension1GPEvaStar: 0, // 评价维度1的组长评价星级
+            dimension2GPEvaStar: 0 // 评价维度2的组长评价星级
           }
           // 统计2个评价维度的总分和总评价人数
           if (allAMEvaDataItemItem.dimension === 1) { // 评价维度是打造精品工程
@@ -130,15 +136,20 @@ export function genAMEvaScoreData (allAMEvaedData,
             } else if (allAMEvaDataItemItem.evaUserDuty === 2) { // 组长评价
               if (allAMEvaDataItemItem.evaUserGroupID === allAMEvaDataItemItem.evaedUserGroupID) { // 本组组长
                 obj.AMGPEvaScore += newStarToRates(allAMEvaDataItemItem.evaStar) * AMBuildBoutiqueProjectCoef
+                obj.dimension1GPEvaStar += allAMEvaDataItemItem.evaStar
               } else { // 其他组组长
                 obj.AMCSEvaTotalScore += newStarToRates(allAMEvaDataItemItem.evaStar) * AMBuildBoutiqueProjectCoef
                 obj.AMCSEvaTotalNum++
+                obj.dimension1CSAveStar += allAMEvaDataItemItem.evaStar
+                obj.dimension1CSEvaNum++
               }
               obj.dimension1AveStar += allAMEvaDataItemItem.evaStar
             } else if (allAMEvaDataItemItem.evaUserDuty === 3) { // 组员评价
               obj.AMCSEvaTotalScore += newStarToRates(allAMEvaDataItemItem.evaStar) * AMBuildBoutiqueProjectCoef
               obj.dimension1AveStar += allAMEvaDataItemItem.evaStar
               obj.AMCSEvaTotalNum++
+              obj.dimension1CSAveStar += allAMEvaDataItemItem.evaStar
+              obj.dimension1CSEvaNum++
             }
           } else if (allAMEvaDataItemItem.dimension === 2) { // 评价维度是创建专业团队
             if (allAMEvaDataItemItem.evaUserDuty === 1) { // 处室经理评价
@@ -147,15 +158,20 @@ export function genAMEvaScoreData (allAMEvaedData,
             } else if (allAMEvaDataItemItem.evaUserDuty === 2) { // 组长评价
               if (allAMEvaDataItemItem.evaUserGroupID === allAMEvaDataItemItem.evaedUserGroupID) { // 本组组长
                 obj.AMGPEvaScore += newStarToRates(allAMEvaDataItemItem.evaStar) * AMBuildProTeamCoef
+                obj.dimension2GPEvaStar += allAMEvaDataItemItem.evaStar
               } else { // 其他组组长
                 obj.AMCSEvaTotalScore += newStarToRates(allAMEvaDataItemItem.evaStar) * AMBuildProTeamCoef
                 obj.AMCSEvaTotalNum++
+                obj.dimension2CSAveStar += allAMEvaDataItemItem.evaStar
+                obj.dimension2CSEvaNum++
               }
               obj.dimension2AveStar += allAMEvaDataItemItem.evaStar
             } else if (allAMEvaDataItemItem.evaUserDuty === 3) { // 组员评价
               obj.AMCSEvaTotalScore += newStarToRates(allAMEvaDataItemItem.evaStar) * AMBuildProTeamCoef
               obj.dimension2AveStar += allAMEvaDataItemItem.evaStar
               obj.AMCSEvaTotalNum++
+              obj.dimension2CSAveStar += allAMEvaDataItemItem.evaStar
+              obj.dimension2CSEvaNum++
             }
           }
           AMEvaScoreArray.push(obj)
@@ -168,15 +184,20 @@ export function genAMEvaScoreData (allAMEvaedData,
             } else if (allAMEvaDataItemItem.evaUserDuty === 2) { // 组长评价
               if (allAMEvaDataItemItem.evaUserGroupID === allAMEvaDataItemItem.evaedUserGroupID) { // 本组组长
                 AMEvaScoreArray[findIndex].AMGPEvaScore += newStarToRates(allAMEvaDataItemItem.evaStar) * AMBuildBoutiqueProjectCoef
+                AMEvaScoreArray[findIndex].dimension1GPEvaStar += allAMEvaDataItemItem.evaStar
               } else { // 其他组组长
                 AMEvaScoreArray[findIndex].AMCSEvaTotalScore += newStarToRates(allAMEvaDataItemItem.evaStar) * AMBuildBoutiqueProjectCoef
                 AMEvaScoreArray[findIndex].AMCSEvaTotalNum++
+                AMEvaScoreArray[findIndex].dimension1CSAveStar += allAMEvaDataItemItem.evaStar
+                AMEvaScoreArray[findIndex].dimension1CSEvaNum++
               }
               AMEvaScoreArray[findIndex].dimension1AveStar += allAMEvaDataItemItem.evaStar
             } else if (allAMEvaDataItemItem.evaUserDuty === 3) { // 组员评价
               AMEvaScoreArray[findIndex].AMCSEvaTotalScore += newStarToRates(allAMEvaDataItemItem.evaStar) * AMBuildBoutiqueProjectCoef
               AMEvaScoreArray[findIndex].AMCSEvaTotalNum++
               AMEvaScoreArray[findIndex].dimension1AveStar += allAMEvaDataItemItem.evaStar
+              AMEvaScoreArray[findIndex].dimension1CSAveStar += allAMEvaDataItemItem.evaStar
+              AMEvaScoreArray[findIndex].dimension1CSEvaNum++
             }
           } else if (allAMEvaDataItemItem.dimension === 2) { // 评价维度是创建专业团队
             if (allAMEvaDataItemItem.evaUserDuty === 1) { // 处室经理评价
@@ -185,15 +206,20 @@ export function genAMEvaScoreData (allAMEvaedData,
             } else if (allAMEvaDataItemItem.evaUserDuty === 2) { // 组长评价
               if (allAMEvaDataItemItem.evaUserGroupID === allAMEvaDataItemItem.evaedUserGroupID) { // 本组组长
                 AMEvaScoreArray[findIndex].AMGPEvaScore += newStarToRates(allAMEvaDataItemItem.evaStar) * AMBuildProTeamCoef
+                AMEvaScoreArray[findIndex].dimension2GPEvaStar += allAMEvaDataItemItem.evaStar
               } else { // 其他组组长
                 AMEvaScoreArray[findIndex].AMCSEvaTotalScore += newStarToRates(allAMEvaDataItemItem.evaStar) * AMBuildProTeamCoef
                 AMEvaScoreArray[findIndex].AMCSEvaTotalNum++
+                AMEvaScoreArray[findIndex].dimension2CSAveStar += allAMEvaDataItemItem.evaStar
+                AMEvaScoreArray[findIndex].dimension2CSEvaNum++
               }
               AMEvaScoreArray[findIndex].dimension2AveStar += allAMEvaDataItemItem.evaStar
             } else if (allAMEvaDataItemItem.evaUserDuty === 3) { // 组员评价
               AMEvaScoreArray[findIndex].AMCSEvaTotalScore += newStarToRates(allAMEvaDataItemItem.evaStar) * AMBuildProTeamCoef
               AMEvaScoreArray[findIndex].AMCSEvaTotalNum++
               AMEvaScoreArray[findIndex].dimension2AveStar += allAMEvaDataItemItem.evaStar
+              AMEvaScoreArray[findIndex].dimension2CSAveStar += allAMEvaDataItemItem.evaStar
+              AMEvaScoreArray[findIndex].dimension2CSEvaNum++
             }
           }
           AMEvaScoreArray[findIndex].AMEvaedData.push(allAMEvaDataItemItem)
@@ -206,11 +232,14 @@ export function genAMEvaScoreData (allAMEvaedData,
     // 计算普通员工评价的平均分
     AMEvaScoreArrayItem.AMCSEvaTotalNum /= 2
     AMEvaScoreArrayItem.AMCSEvaAveScore = AMEvaScoreArrayItem.AMCSEvaTotalScore / AMEvaScoreArrayItem.AMCSEvaTotalNum
-    // 计算两个维度的平均评价星级
+    // 计算两个维度的所有人平均评价星级
     AMEvaScoreArrayItem.dimension1AveStar /= (AMEvaScoreArrayItem.AMEvaedData.length / 2)
     AMEvaScoreArrayItem.dimension2AveStar /= (AMEvaScoreArrayItem.AMEvaedData.length / 2)
     AMEvaScoreArrayItem.dimension1AveStar = Number(AMEvaScoreArrayItem.dimension1AveStar.toFixed(0))
     AMEvaScoreArrayItem.dimension2AveStar = Number(AMEvaScoreArrayItem.dimension2AveStar.toFixed(0))
+    // 计算两个维度的普通成员评价评价星级
+    AMEvaScoreArrayItem.dimension1CSAveStar /= AMEvaScoreArrayItem.dimension1CSEvaNum
+    AMEvaScoreArrayItem.dimension2CSAveStar /= AMEvaScoreArrayItem.dimension2CSEvaNum
     // 如果处室经理还未评价，将其评价星级重置为平均评价星级,并计算星级对应的得分
     if (AMEvaScoreArrayItem.AMMGEvaScore === 0) {
       let dimension1AveScore = newStarToRates(AMEvaScoreArrayItem.dimension1AveStar)
