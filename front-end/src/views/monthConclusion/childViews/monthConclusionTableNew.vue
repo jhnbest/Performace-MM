@@ -165,14 +165,11 @@ import jsCookie from 'js-cookie'
                                                         submitStatus)
           }
           Promise.all(promises).then(allResponses => {
-            console.log('allResponses')
-            console.log(allResponses)
             this.$common.toast('提交成功', 'success', false)
             this.$router.push({
               path: '/home/monthConclusion'
             })
           }).catch(err => {
-            console.log('err')
             console.log(err)
             this.$common.toast('提交失败', 'error', true)
           })
@@ -181,14 +178,11 @@ import jsCookie from 'js-cookie'
             promises[count++] = updateMonthConclusionNew(item.id, item.content, submitStatus)
           }
           Promise.all(promises).then(allResponses => {
-            console.log('allResponses')
-            console.log(allResponses)
             this.$common.toast('提交成功', 'success', false)
             this.$router.push({
               path: '/home/monthConclusion'
             })
           }).catch(err => {
-            console.log('err')
             console.log(err)
             this.$common.toast('提交失败', 'error', true)
           })
@@ -206,14 +200,11 @@ import jsCookie from 'js-cookie'
                                                         submitStatus)
           }
           Promise.all(promises).then(allResponses => {
-            console.log('allResponses')
-            console.log(allResponses)
             this.$common.toast('暂存成功', 'success', false)
             this.$router.push({
               path: '/home/monthConclusion'
             })
           }).catch(err => {
-            console.log('err')
             console.log(err)
             this.$common.toast('暂存失败', 'error', true)
           })
@@ -222,14 +213,11 @@ import jsCookie from 'js-cookie'
             promises[count++] = updateMonthConclusionNew(item.id, item.content, submitStatus)
           }
           Promise.all(promises).then(allResponses => {
-            console.log('allResponses')
-            console.log(allResponses)
             this.$common.toast('暂存成功', 'success', false)
             this.$router.push({
               path: '/home/monthConclusion'
             })
           }).catch(err => {
-            console.log('err')
             console.log(err)
             this.$common.toast('暂存失败', 'error', true)
           })

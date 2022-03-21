@@ -463,8 +463,6 @@
         if (this.reqFlag.getAllUsersConclusion) {
           this.reqFlag.getAllUsersConclusion = false
           this.getAllUsersConclusion(this.allUsers, submitYear, submitMonth).then(getAllUsersConclusionRes => {
-            console.log('getAllUsersConclusionRes')
-            console.log(getAllUsersConclusionRes)
             // 填充总结表格数据
             this.fillConclusionTableData(getAllUsersConclusionRes)
             this.reqFlag.getAllUsersConclusion = true

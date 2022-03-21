@@ -188,10 +188,6 @@
         getCurApplyAbleMonth().then(getCurApplyAbleMonthRes => {
           this.curApplyYear = this.$moment(getCurApplyAbleMonthRes[0].setTime).year()
           this.curApplyMonth = this.$moment(getCurApplyAbleMonthRes[0].setTime).month() + 1
-          console.log('this.curApplyYear')
-          console.log(this.curApplyYear)
-          console.log('this.curApplyMonth')
-          console.log(this.curApplyMonth)
         }).catch(() => {
           this.$common.toast('获取当前申报月份错误', 'error', true)
         })
@@ -203,8 +199,6 @@
         this.reqFlag.getCurApplyAbleMonth = false
         // 获取年内所有月总结概览数据
         getCurYearConclusionOverviewData(this.title, this.curUser).then((response) => {
-          console.log('response')
-          console.log(response)
           // 初始化默认数据
           this.initDefaultData()
           for (let i = 0; i < response.length; i++) {
@@ -236,12 +230,9 @@
               }
             }
           }
-          console.log('this.rateTableData')
-          console.log(this.rateTableData)
           this.reqFlag.getCurApplyAbleMonth = true
         }).catch(err => {
           this.$common.toast('获取月总结概览数据错误', 'error', true)
-          console.log('err')
           console.log(err)
           this.reqFlag.getCurApplyAbleMonth = true
         })
@@ -270,10 +261,6 @@
       },
       // 点击预览
       handlePreview (row) {
-        console.log('row.length')
-        console.log(row.length)
-        console.log('row')
-        console.log(row)
         let titleMonth = this.$moment(String(this.title) + '-' + String(row.submitMonth)).format('YYYY-MM')
         if (this.$moment(titleMonth).isBefore(store.state.newRulesDate)) { // 请求的月份再新规则实施月份之前
           this.conclusionDialog = true
@@ -347,7 +334,6 @@
               path: '/home/monthConclusion'
             })
           }).catch(err => {
-            console.log('err')
             console.log(err)
             this.$common.toast('操作失败', 'error', true)
           })

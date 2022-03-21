@@ -3,7 +3,8 @@ import {
   urlGetAllUserRates
 } from '@/config/interface'
 import store from '@/store'
-import { starToRates, rateTypeSwitch, calGetScore, PMScoreNorCal } from '@/utils/common'
+import { starToRates, rateTypeSwitch, calGetScore, PMScoreNorCal,
+  NorCal } from '@/utils/common'
 import { groupName2String } from '@/utils/users'
 
 // 获取全处员工互评信息
@@ -65,7 +66,7 @@ export function genQualiEvaData (multualData) {
         }
       }
     }
-    // ========================计算各被评价人成效评价得分总分===============================
+    // ========================计算各被评价人评价得分总分===============================
     for (let item of ratesTableTmp) {
       item.totalScore = calPerformanceEvaScore(item.t1Star, item.t2Star, item.t3Star, item.t4Star,
         item.t5Star, item.t6Star)
@@ -177,7 +178,7 @@ export function genQualiEvaData (multualData) {
     }
     count++
     allUserRates[i].MGQualiEvaScoreNor =
-      PMScoreNorCal(allUserRates.length, allUserRates[i].MGQualiEvaScoreRank)
+      calGetScore(allUserRates.length, allUserRates[i].MGQualiEvaScoreRank)
   }
   let allQualiEvaScore = []
   allQualiEvaScore = standAndEngineerRates.concat(communicationRates)

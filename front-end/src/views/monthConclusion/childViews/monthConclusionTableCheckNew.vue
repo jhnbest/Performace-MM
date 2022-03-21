@@ -174,8 +174,6 @@
                 return item.dimension === 4
               }).content
             }
-            console.log('moreDetailData')
-            console.log(this.moreDetailData)
           })
         },
         // 保存

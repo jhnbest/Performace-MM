@@ -126,6 +126,7 @@
               :height="tableHeight"
               ref="rateTable"
               highlight-current-row>
+      <el-table-column label="序号" align="center" type="index"></el-table-column>
       <el-table-column label="姓名" align="center" min-width="50">
         <template slot-scope="scope">
           <span class="link-type" @click="handleClickRateName(scope.row)">{{scope.row.ratedName}}</span>
@@ -514,8 +515,6 @@
             if (this.$store.state.userInfo.id === 26) {
               // ============================判断绩效是否已发布==========================
               getPerformanceIsPublish(applyYear, applyMonth).then(getPerformanceIsPublishRes => {
-                console.log('getPerformanceIsPublishRes')
-                console.log(getPerformanceIsPublishRes)
                 this.performanceIsPublishInfo = getPerformanceIsPublishRes
                 if (getPerformanceIsPublishRes.length > 0) {
                   this.isPerformancePublish = getPerformanceIsPublishRes[0].flagValue === 1

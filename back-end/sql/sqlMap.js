@@ -111,7 +111,7 @@ const sqlMap = {
     getWorkTimeListInfo: 'select * from worktimelist where id = ?',
     savePMData: 'insert into performancedata (userID, applyDate, totalWorkTime, QYEvaRank, QYEvaScoreNor, CSQTEvaScoreUnN, '
     + 'CSQTEvaScoreNor, CSQTEvaRank, MGQTEvaScoreUnN, MGQTEvaRank, MGQTEvaScoreNor, AMEvaScoreUnN, AMEvaScoreNor, AMEvaRank, '
-    + 'PMScoreUnN, PMScoreNor, PMRank, remarks) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+    + 'PMScoreUnN, PMScoreNor, PMRank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
   },
   workStation: {
     getAssignProjectListUn: 'select apl.*, users.name as assigner from assignprojectlist apl left join users on apl.assignerID = users.id where ' +

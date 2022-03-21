@@ -234,6 +234,25 @@ export function monthNumToMonthString (monthNum) {
   }
 }
 
+// 标准计算
+export function NorCal (usersNum, rank) {
+  if (rank === 1) {
+    return 95
+  }
+  let ratio = rank / usersNum
+  if (ratio < 0.1 || ratio === 0.1) {
+    return 95
+  } else if (ratio < 0.2 || ratio === 0.2) {
+    return 92.5
+  } else if (ratio < 0.49 || ratio === 0.49) {
+    return 90
+  } else if (ratio < 0.8 || ratio === 0.8) {
+    return 87.5
+  } else {
+    return 85
+  }
+}
+
 // 绩效得分标准化计算(2021年12月启用)
 export function PMScoreNorCal (usersNum, rank) {
   if (rank === 1) {

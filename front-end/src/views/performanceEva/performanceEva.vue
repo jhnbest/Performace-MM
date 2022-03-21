@@ -372,8 +372,6 @@
               if (!result[2].err) { // 成效评价已截止
                 this.getPMEvaData = JSON.parse(JSON.stringify(result[2].content))
                 genPerformanceEvaDataResult = this.genPerformanceEvaData(result[2].content) // 生成成效评价数据
-                console.log('genPerformanceEvaDataResult')
-                console.log(genPerformanceEvaDataResult)
                 this.performanceEvaDataGlobal = JSON.parse(JSON.stringify(genPerformanceEvaDataResult))
               } else {
                 this.performanceEvaDataGlobal = []

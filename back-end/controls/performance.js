@@ -1120,8 +1120,7 @@ const performance = {
                            sendData.QYEvaScoreNor, sendData.CSQTEvaScoreUnN, sendData.CSQTEvaScoreNor,
                            sendData.CSQTEvaRank, sendData.MGQTEvaScoreUnN, sendData.MGQTEvaRank,
                            sendData.MGQTEvaScoreNor, sendData.AMEvaScoreUnN, sendData.AMEvaScoreNor,
-                           sendData.AMEvaRank, sendData.PMScoreUnN, sendData.PMScoreNor, sendData.PMRank,
-                           sendData.remarks]
+                           sendData.AMEvaRank, sendData.PMScoreUnN, sendData.PMScoreNor, sendData.PMRank]
         RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
             return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
         }).catch(RCPDDatabaseErr => {

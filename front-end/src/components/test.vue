@@ -301,7 +301,6 @@
             row.projectStageID = row.selectProjectID[row.selectProjectID.length - 1]
             if (row.projectStageID !== 72) { // 非自定义项目阶段
               this.getProjectTypeInfo(row.projectStageID, row.selectProjectID[0]).then(res0 => {
-                console.log(res0)
                 row.dynamicKValue = res0[0].dynamicKValue
                 row.baseWorkTime = res0[0].workTime
                 row.kValue = 1

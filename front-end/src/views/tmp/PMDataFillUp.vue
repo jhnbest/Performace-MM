@@ -38,24 +38,22 @@
         size="mini"
         :height="tableHeight"
         ref="PMDataTable">
-        <el-table-column label="序号" align="center" type="index" width="80px"></el-table-column>
-        <el-table-column label="姓名" prop="name" align="center" width="110px" fixed="left"></el-table-column>
+        <el-table-column label="序号" align="center" type="index"></el-table-column>
+        <el-table-column label="姓名" prop="name" align="center" width="110px"></el-table-column>
         <el-table-column label="定量评价得分" prop="QYEvaScoreNor" align="center" width="110px"></el-table-column>
         <el-table-column label="定量评价排名" prop="QYEvaRank" align="center" width="110px"></el-table-column>
         <el-table-column label="当月工时数" prop="totalWorkTime" align="center" width="110px"></el-table-column>
         <el-table-column label="员工定性评价得分（标准化）" prop="CSQTEvaScoreNor" align="center" width="110px"></el-table-column>
+        <el-table-column label="员工定性评价得分（未标准化）" prop="CSQTEvaScoreNor" align="center" width="110px"></el-table-column>
         <el-table-column label="员工定性评价排名" prop="CSQTEvaRank" align="center" width="110px"></el-table-column>
         <el-table-column label="经理定性评价得分（标准化）" prop="MGQTEvaScoreNor" align="center" width="110px"></el-table-column>
+        <el-table-column label="经理定性评价得分（未标准化）" prop="MGQTEvaScoreNor" align="center" width="110px"></el-table-column>
         <el-table-column label="经理定性评价排名" prop="MGQTEvaRank" align="center" width="110px"></el-table-column>
-        <el-table-column label="员工成效评价得分（标准化）" prop="MGQTEvaScoreUnN" align="center" width="110px"></el-table-column>
-        <el-table-column label="员工成效评价排名" prop="MGQTEvaScoreUnN" align="center" width="110px"></el-table-column>
-        <el-table-column label="组长成效评价得分（标准化）" prop="MGQTEvaScoreUnN" align="center" width="110px"></el-table-column>
-        <el-table-column label="组长成效评价排名" prop="MGQTEvaScoreUnN" align="center" width="110px"></el-table-column>
-        <el-table-column label="经理成效评价得分（标准化）" prop="MGQTEvaScoreUnN" align="center" width="110px"></el-table-column>
-        <el-table-column label="经理成效评价排名" prop="MGQTEvaScoreUnN" align="center" width="110px"></el-table-column>
+        <el-table-column label="成效评价得分（标准化）" prop="MGQTEvaScoreUnN" align="center" width="110px"></el-table-column>
+        <el-table-column label="成效评价排名" prop="MGQTEvaScoreUnN" align="center" width="110px"></el-table-column>
         <el-table-column label="绩效得分（标准化）" prop="PMScoreNor" align="center" width="110px"></el-table-column>
-        <el-table-column label="绩效排名" prop="PMRank" align="center" width="110px"></el-table-column>
         <el-table-column label="绩效得分（未标准化）" prop="PMScoreUnN" align="center" width="110px"></el-table-column>
+        <el-table-column label="绩效排名" prop="PMRank" align="center" width="110px"></el-table-column>
       </el-table>
     </div>
   </div>
@@ -67,7 +65,7 @@ import { Notification } from 'element-ui'
 export default {
   data () {
     return {
-      title: this.$moment().format('YYYY-MM'), // 日期
+      title: this.$moment().subtract(3, 'month').format('YYYY-MM'), // 日期
       getDataLoading: true, // 表格加载标志位,
       fillUPing: true, // 表格加载标志位,
       PMdata: null, // 表格数据
@@ -77,11 +75,10 @@ export default {
   methods: {
     // 初始化
     init () {
+      this.getDataLoading = false
       calPMData(this.title).then(response => {
         this.PMdata = response
-        this.getDataLoading = false
-        console.log('PMData')
-        console.log(response)
+        this.getDataLoading = true
       }).catch(err => {
         this.getDataLoading = true
         this.PMdata = []
@@ -94,8 +91,6 @@ export default {
       calPMData(this.title).then(response => {
         this.PMdata = response
         this.getDataLoading = true
-        console.log('PMData')
-        console.log(response)
       }).catch(err => {
         this.PMdata = []
         this.getDataLoading = true
@@ -117,6 +112,10 @@ export default {
       this.fillUPing = false
       let promise = []
       let count = 0
+      console.log('this.PMdata')
+      console.log(this.PMdata)
+      console.log('this.title')
+      console.log(this.title.length)
       for (let item of this.PMdata) {
         promise[count++] = savePMData(this.title, item)
       }
@@ -126,7 +125,6 @@ export default {
           title: '成功',
           message: '填充成功'
         })
-        console.log(allResponse)
       }).catch(err => {
         this.fillUPing = true
         Notification.error({

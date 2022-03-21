@@ -88,8 +88,6 @@
               this.curApplyMonth = this.$moment(getCurApplyAbleMonthRes[0].setTime).month()
               getTypeProjectList(this.fatherParams.projectTypeID, 0, this.curApplyYear)
                 .then(getTypeProjectListRes => {
-                  console.log('getTypeProjectListRes')
-                  console.log(getTypeProjectListRes)
                   this.genTableData(getTypeProjectListRes, this.curApplyMonth)
                   this.reqFlag.getProjectList = true
                 })
@@ -135,8 +133,6 @@
         },
         // 查看详情
         handleCheckDetails (row) {
-          console.log('row')
-          console.log(row)
           this.projectListIndex = row.projectListIndex
           this.projectName = row.projectName
           this.projectProcessDetail = true

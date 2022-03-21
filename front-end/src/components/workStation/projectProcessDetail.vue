@@ -136,8 +136,6 @@
         },
         // 生成表格数据
         genTableData (projectStage, monthProcess, projectListIndex) {
-          console.log('monthProcess')
-          console.log(monthProcess)
           let obj = {}
           this.tableData = []
           for (let i = 0; i < projectStage[projectListIndex].length; i++) {

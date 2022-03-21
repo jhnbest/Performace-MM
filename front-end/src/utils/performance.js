@@ -10,12 +10,14 @@ import { getPerformanceIsPublish,
         getEvaCoef,
         PMScoreNorCal,
         sortBy,
-        sortObjectArrayByParams } from '@/utils/common'
+        sortObjectArrayByParams,
+        NorCal } from '@/utils/common'
 import { getAllUserRates, genQualiEvaData } from '@/utils/multual'
 import { getAllAchievements, genPerformanceEvaData } from '@/utils/performancerate'
 import store from '@/store'
 
 import moment from 'moment'
+import { Calendar } from 'element-ui'
 
 // 获取全处工时信息
 export function getAllWorkTimeList (applyDate) {
@@ -111,7 +113,7 @@ export function genQYEvaScoreData (users, quantativeData, applyMonth) {
       }
       // ==============================计算定量指标得分=======================================
       for (let totalWorkTimeCalItem of totalWorkTimeCal) { // 根据排名计算定量指标得分
-        totalWorkTimeCalItem.QYEvaScoreNor = PMScoreNorCal(totalWorkTimeCal.length, totalWorkTimeCalItem.rank)
+        totalWorkTimeCalItem.QYEvaScoreNor = calGetScore(totalWorkTimeCal.length, totalWorkTimeCalItem.rank)
       }
     }
     groupedWorkTimeListItem.caledQYEvaData = totalWorkTimeCal
@@ -166,7 +168,7 @@ export function genPerformanceScore (usersList, QYEvaScoreData, QTEvaScoreData, 
     for (let i = 0; i < userPMScoreData.length; i++) {
       userPMScoreData[i].PMRank = i + 1 // 绩效排名计算
       userPMScoreData[i].initPMrank = userPMScoreData[i].PMRank // 初始绩效排名
-      userPMScoreData[i].PMScoreNor = PMScoreNorCal(usersList.length, i + 1)
+      userPMScoreData[i].PMScoreNor = NorCal(usersList.length, i + 1)
     }
     return userPMScoreData
 }
@@ -247,7 +249,7 @@ export function genPerformanceScoreOld (usersList, quantativeData, multualEvaDat
     }
     for (let item of userPMScoreData) {
       item.PMRank = count2++ // 绩效排名计算
-      item.PMScoreNor = PMScoreNorCal(usersList.length, item.PMRank)
+      item.PMScoreNor = calGetScore(usersList.length, item.PMRank)
     }
     return userPMScoreData
 }
@@ -261,43 +263,40 @@ export function calPMData (applyDate) {
   let promises = []
   let count = 0
   return new Promise(function (resolve, reject) {
+    // 判断绩效是否已经发布
     getPerformanceIsPublish(applyYear, applyMonth).then(response => {
-      if (response.length > 0) {
-          if (response[0].flagValue > 0) {
-              promises0[count0++] = getEvaCoef() // get各种系数
-              promises0[count0++] = getUsersList() // get用户列表
-              Promise.all(promises0).then(responseAll0 => {
-                let evaCoef = responseAll0[0]
-                let usersList = responseAll0[1]
-                let MGIndex = usersList.findIndex(user => {
-                    return user.duty == 1
-                })
-                usersList.splice(MGIndex, 1) // 删除管理者
-                promises[count++] = getAllWorkTimeList(applyDate) // get工时信息
-                promises[count++] = getAllUserRates(usersList, applyDate) // get定性评价信息
-                if (moment(applyDate).isAfter('2022-01')) { // 2022-02新增成效评价模式
-                    promises[count++] = getAllAchievements(usersList, applyDate) // get成效评价信息
-                }
-                Promise.all(promises).then(responseAll1 => {
-                  let allWorkTimeList = responseAll1[0]
-                  let allUserRates = responseAll1[1]
-                  let allAchievements = responseAll1[2]
-                  let QYEvaScoreData = genQYEvaScoreData(usersList, allWorkTimeList, applyDate)
-                  let QTEvaScoreData = genQualiEvaData(allUserRates)
-                  let AMEvaScoreData = null
-                  let PMData = null
-                  if (moment(applyDate).isAfter('2022-01')) { // 2022-02新增成效评价模式
-                      AMEvaScoreData = genPerformanceEvaData(allAchievements, evaCoef) // get成效评价信息
-                      PMData = genPerformanceScore(usersList, QYEvaScoreData, QTEvaScoreData, AMEvaScoreData, evaCoef)
-                  } else {
-                      PMData = genPerformanceScoreOld(usersList, QYEvaScoreData, QTEvaScoreData)
-                  }
-                  resolve(PMData)
-                })
-              })
-          } else {
-              reject(new Error('该月绩效未发布'))
+      if (response.length > 0 && response[0].flagValue > 0) {
+        promises0[count0++] = getEvaCoef() // get各种系数
+        promises0[count0++] = getUsersList() // get用户列表
+        Promise.all(promises0).then(responseAll0 => {
+          let evaCoef = responseAll0[0]
+          let usersList = responseAll0[1]
+          let MGIndex = usersList.findIndex(user => {
+              return user.duty == 1
+          })
+          usersList.splice(MGIndex, 1) // 删除管理者
+          promises[count++] = getAllWorkTimeList(applyDate) // get工时信息
+          promises[count++] = getAllUserRates(usersList, applyDate) // get定性评价信息
+          if (moment(applyDate).isAfter('2022-01')) { // 2022-02新增成效评价模式
+              promises[count++] = getAllAchievements(usersList, applyDate) // get成效评价信息
           }
+          Promise.all(promises).then(responseAll1 => {
+            let allWorkTimeList = responseAll1[0]
+            let allUserRates = responseAll1[1]
+            let allAchievements = responseAll1[2]
+            let QYEvaScoreData = genQYEvaScoreData(usersList, allWorkTimeList, applyDate)
+            let QTEvaScoreData = genQualiEvaData(allUserRates)
+            let AMEvaScoreData = null
+            let PMData = null
+            if (moment(applyDate).isAfter('2022-01')) { // 2022-02新增成效评价模式
+                AMEvaScoreData = genPerformanceEvaData(allAchievements, evaCoef) // 生成成效评价数据
+                PMData = genPerformanceScore(usersList, QYEvaScoreData, QTEvaScoreData, AMEvaScoreData, evaCoef)
+            } else {
+                PMData = genPerformanceScoreOld(usersList, QYEvaScoreData, QTEvaScoreData)
+            }
+            resolve(PMData)
+          })
+        })
       } else {
           reject(new Error('该月绩效未发布'))
       }
@@ -328,8 +327,7 @@ export function savePMData (applyDate, PMData) {
             AMEvaRank: PMData.AMEvaRank,
             PMScoreUnN: PMData.PMScoreUnN,
             PMScoreNor: PMData.PMScoreNor,
-            PMRank: PMData.PMRank,
-            remarks: PMData.remarks
+            PMRank: PMData.PMRank
         }
         http(url, params).then(response => {
             if (response.code === 1) {

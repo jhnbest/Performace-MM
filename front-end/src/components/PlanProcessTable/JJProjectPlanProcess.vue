@@ -151,8 +151,6 @@
       },
       methods: {
         init (params) {
-          console.log('===JJProjectPlanProcess.vue')
-          console.log('init')
           this.formData.projectType = params.projectType
           this.getAssignProjectDetail(params.projectID)
           this.$nextTick(() => {
@@ -170,7 +168,6 @@
             this.$http(url, params)
               .then(res => {
                 if (res.code === 1) {
-                  console.log(res.data)
                   for (let item of res.data) {
                     item.editable = false
                   }
@@ -196,10 +193,8 @@
         }
       },
       created () {
-        console.log('created')
       },
       destroyed () {
-        console.log('destroy')
       },
       name: 'JJProjectPlanProcess'
     }

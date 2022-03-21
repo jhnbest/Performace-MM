@@ -515,8 +515,6 @@
                   let _this = this
                   // for (let i = 0; i < this.submitParams.data.length; i++) { // 删除当月已经申报工时
                   //   if (this.submitParams.data[i].isApplyWorkTime > 0) {
-                  //     console.log('this.submitParams.data')
-                  //     console.log(this.submitParams.data)
                   //   }
                   // }
                   return new Promise(function (resolve, reject) {

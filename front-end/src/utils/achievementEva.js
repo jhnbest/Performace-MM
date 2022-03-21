@@ -9,7 +9,8 @@ import {
 import { newStarToRates,
          sortBy,
          PMScoreNorCal,
-         sortObjectArrayByParams } from '@/utils/common'
+         sortObjectArrayByParams,
+         NorCal } from '@/utils/common'
 import store from '@/store'
 
 // 获取用户的成效评价
