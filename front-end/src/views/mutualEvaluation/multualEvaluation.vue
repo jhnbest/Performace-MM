@@ -67,14 +67,14 @@
     </span>
     <el-button size="medium" type="success" style="margin-left: 20px" @click="getPreMonthEva" :disabled="!reqFlag.getPreMonthEva">提取上月评价</el-button>
     <el-button size="medium" type="warning" @click="handleFillMul" v-if="$store.state.userInfo.id === 15">一键填充定性评价</el-button>
-    <span style="font-weight: bolder;margin-left: 60px" v-if="$store.state.userInfo.id === 26">首页绩效信息发布状态:
+    <!-- <span style="font-weight: bolder;margin-left: 60px" v-if="$store.state.userInfo.id === 26">首页绩效信息发布状态:
       <span v-if="isPerformancePublish" style="color: green;font-size: 23px">已发布</span>
       <span v-else style="color: red;font-size: 23px">未发布</span>
     </span>
     <el-switch v-if="$store.state.userInfo.id === 26"
                v-model="isPerformancePublish"
                @change="handlePerformancePublish"
-               style="margin-left: 10px"></el-switch>
+               style="margin-left: 10px"></el-switch> -->
   </div>
   <br v-if="showFlag.descTableShow">
   <div v-if="showFlag.descTableShow">
@@ -96,23 +96,6 @@
     </el-table>
   </div>
   <br v-if="showFlag.descTableShow">
-<!--  <br>-->
-<!--  <div>-->
-<!--    <el-table :data="realTimeShowTableData"-->
-<!--              style="width: 99%; margin: auto"-->
-<!--              border-->
-<!--              size="large"-->
-<!--              :header-cell-style="{ backgroundColor:'#58c480', color: '#333'}">-->
-<!--      <el-table-column label="类别" align="center" prop="rateType" width="100"></el-table-column>-->
-<!--      <el-table-column label="评价细则" align="center" prop="rateDetail"></el-table-column>-->
-<!--      <el-table-column label="选中星级" align="center" prop="star" width="150">-->
-<!--        <template slot-scope="scope">-->
-<!--          <el-rate v-model="scope.row.star" :disabled="true"></el-rate>-->
-<!--        </template>-->
-<!--      </el-table-column>-->
-<!--      <el-table-column label="得分" align="center" prop="score" width="110"></el-table-column>-->
-<!--    </el-table>-->
-<!--  </div>-->
   <br>
   <div>
     <el-table :data="rateTableData"
@@ -132,7 +115,7 @@
           <span class="link-type" @click="handleClickRateName(scope.row)">{{scope.row.ratedName}}</span>
         </template>
       </el-table-column>
-      <el-table-column v-if="$store.state.userInfo.id === 26" label="定量评价" align="center">
+      <!-- <el-table-column v-if="$store.state.userInfo.id === 26" label="定量评价" align="center">
         <el-table-column v-if="$store.state.userInfo.id === 26" label="定量得分" align="center" prop="quantitativeScore" width="57"></el-table-column>
         <el-table-column v-if="$store.state.userInfo.id === 26" label="工时数" align="center" prop="totalWorkTime" width="57"></el-table-column>
         <el-table-column v-if="$store.state.userInfo.id === 26" label="定量排名" align="center" prop="quantitativeRank" width="57"></el-table-column>
@@ -159,7 +142,7 @@
             </span>
           </template>
         </el-table-column>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column v-if="$store.state.userInfo.id === 26" label="领导评价" align="center">
         <el-table-column v-if="$store.state.userInfo.id === 26" label="领导评价得分(标准化)" align="center" prop="managerScoreTmp" width="77"></el-table-column>
         <el-table-column v-if="$store.state.userInfo.id === 26" label="领导评价得分(未标准化)" align="center" prop="totalScore" width="77"></el-table-column>

@@ -49,8 +49,9 @@
         <el-table-column label="经理定性评价得分（标准化）" prop="MGQTEvaScoreNor" align="center" width="110px"></el-table-column>
         <el-table-column label="经理定性评价得分（未标准化）" prop="MGQTEvaScoreNor" align="center" width="110px"></el-table-column>
         <el-table-column label="经理定性评价排名" prop="MGQTEvaRank" align="center" width="110px"></el-table-column>
-        <el-table-column label="成效评价得分（标准化）" prop="MGQTEvaScoreUnN" align="center" width="110px"></el-table-column>
-        <el-table-column label="成效评价排名" prop="MGQTEvaScoreUnN" align="center" width="110px"></el-table-column>
+        <el-table-column label="成效评价得分（标准化）" prop="AMEvaScoreNor" align="center" width="110px"></el-table-column>
+        <el-table-column label="成效评价得分（未标准化）" prop="AMEvaScoreUnN" align="center" width="110px"></el-table-column>
+        <el-table-column label="成效评价排名" prop="AMEvaRank" align="center" width="110px"></el-table-column>
         <el-table-column label="绩效得分（标准化）" prop="PMScoreNor" align="center" width="110px"></el-table-column>
         <el-table-column label="绩效得分（未标准化）" prop="PMScoreUnN" align="center" width="110px"></el-table-column>
         <el-table-column label="绩效排名" prop="PMRank" align="center" width="110px"></el-table-column>
@@ -112,10 +113,6 @@ export default {
       this.fillUPing = false
       let promise = []
       let count = 0
-      console.log('this.PMdata')
-      console.log(this.PMdata)
-      console.log('this.title')
-      console.log(this.title.length)
       for (let item of this.PMdata) {
         promise[count++] = savePMData(this.title, item)
       }

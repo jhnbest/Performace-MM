@@ -340,3 +340,7 @@ export function savePMData (applyDate, PMData) {
         })
     })
 }
+
+// 发布绩效数据
+export function publishPMData (publishType) {
+}
