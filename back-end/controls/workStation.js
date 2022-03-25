@@ -1024,7 +1024,7 @@ const workStation = {
         let sql = null
         let arrayParams = null
         let applyDateTime = null
-        if (sendData.flagID !== null) {
+        if (sendData.flagID !== -1) {
             sql = $sql.workStation.updatePerformanceInfoPublish
             arrayParams = [sendData.flagValue, sendData.flagID]
         } else {

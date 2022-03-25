@@ -56,6 +56,8 @@ router.post(api.updateWorkTimeListReviewStatus, performance.updateWorkTimeListRe
 router.post(api.getWorkTimeAssignInfo, performance.getWorkTimeAssignInfo)
 router.post(api.getWorkTimeListInfo, performance.getWorkTimeListInfo)
 router.post(api.savePMData, performance.savePMData)
+router.post(api.updatePMData, performance.updatePMData)
+router.post(api.getPMData, performance.getPMData)
 
 // workStation-个人工作台
 router.post(api.getAssignProjectList, workStation.getAssignProjectList)

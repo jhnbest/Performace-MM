@@ -48,6 +48,8 @@ export const urlUpdateWorkTimeListReviewStatus = '/performance/updateWorkTimeLis
 export const urlGetWorkTimeAssignInfo = '/performance/getWorkTimeAssignInfo' // 获取工时分配信息
 export const urlGetWorkTimeListInfo = '/performance/getWorkTimeListInfo' // 获取工时申报信息
 export const urlSavePMData = '/performance/savePMData' // 写入绩效数据
+export const urlUpdatePMData = '/performance/updatePMData' // 更新绩效数据
+export const urlGetPMData = '/performance/getPMData' // 获取绩效数据
 
 export const getAssignProjectList = '/workStation/getAssignProjectList' // 获取未完成的指派项目列表
 export const getAssignProjectDetail = '/workStation/getAssignProjectDetail' // 获取未完成的指派项目明细

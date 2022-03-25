@@ -48,6 +48,8 @@ module.exports = {
     getWorkTimeAssignInfo: path + '/performance/getWorkTimeAssignInfo', // 获取工时分配信息
     getWorkTimeListInfo: path + '/performance/getWorkTimeListInfo', // 获取工时申报信息
     savePMData: path + '/performance/savePMData', // 写入绩效数据
+    updatePMData: path + '/performance/updatePMData', // 更新绩效数据
+    getPMData: path + '/performance/getPMData', // 获取绩效数据
 
 
     // workStation-个人工作台

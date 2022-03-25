@@ -1,14 +1,16 @@
 import { http } from '../config/http'
 import {
     urlGetAllWorkTimeList,
-    urlSavePMData
+    urlSavePMData,
+    performanceInfoPublish,
+    urlUpdatePMData,
+    urlGetPMData
 } from '../config/interface'
 import { getUsersList } from '@/utils/users'
 import { getPerformanceIsPublish,
         calGetScore,
         compare,
         getEvaCoef,
-        PMScoreNorCal,
         sortBy,
         sortObjectArrayByParams,
         NorCal } from '@/utils/common'
@@ -308,39 +310,110 @@ export function calPMData (applyDate) {
 
 // 写入绩效数据
 export function savePMData (applyDate, PMData) {
-    return new Promise(function (resolve, reject) {
-        let url = urlSavePMData
-        let params = {
-            applyDate: applyDate,
-            userID: PMData.id,
-            totalWorkTime: PMData.totalWorkTime,
-            QYEvaRank: PMData.QYEvaRank,
-            QYEvaScoreNor: PMData.QYEvaScoreNor,
-            CSQTEvaScoreUnN: PMData.CSQTEvaScoreUnN,
-            CSQTEvaScoreNor: PMData.CSQTEvaScoreNor,
-            CSQTEvaRank: PMData.CSQTEvaRank,
-            MGQTEvaScoreUnN: PMData.MGQTEvaScoreUnN,
-            MGQTEvaRank: PMData.MGQTEvaRank,
-            MGQTEvaScoreNor: PMData.MGQTEvaScoreNor,
-            AMEvaScoreUnN: PMData.AMEvaScoreUnN,
-            AMEvaScoreNor: PMData.AMEvaScoreNor,
-            AMEvaRank: PMData.AMEvaRank,
-            PMScoreUnN: PMData.PMScoreUnN,
-            PMScoreNor: PMData.PMScoreNor,
-            PMRank: PMData.PMRank
-        }
-        http(url, params).then(response => {
-            if (response.code === 1) {
-                resolve(response.data)
-            } else {
-                reject(response.err)
-            }
-        }).catch(err => {
-            reject(err)
-        })
+  return new Promise(function (resolve, reject) {
+    let url = urlSavePMData
+    let params = {
+      applyDate: applyDate,
+      userID: PMData.id,
+      totalWorkTime: PMData.totalWorkTime,
+      QYEvaRank: PMData.QYEvaRank,
+      QYEvaScoreNor: PMData.QYEvaScoreNor,
+      CSQTEvaScoreUnN: PMData.CSQTEvaScoreUnN,
+      CSQTEvaScoreNor: PMData.CSQTEvaScoreNor,
+      CSQTEvaRank: PMData.CSQTEvaRank,
+      MGQTEvaScoreUnN: PMData.MGQTEvaScoreUnN,
+      MGQTEvaRank: PMData.MGQTEvaRank,
+      MGQTEvaScoreNor: PMData.MGQTEvaScoreNor,
+      AMEvaScoreUnN: PMData.AMEvaScoreUnN,
+      AMEvaScoreNor: PMData.AMEvaScoreNor,
+      AMEvaRank: PMData.AMEvaRank,
+      PMScoreUnN: PMData.PMScoreUnN,
+      PMScoreNor: PMData.PMScoreNor,
+      PMRank: PMData.PMRank
+    }
+    http(url, params).then(response => {
+      if (response.code === 1) {
+        resolve(response.data)
+      } else {
+        reject(response.err)
+      }
+    }).catch(err => {
+      reject(err)
     })
+  })
+}
+
+// 更新绩效数据
+export function updatePMData (PMData) {
+  return new Promise(function (resolve, reject) {
+    let url = urlUpdatePMData
+    let params = {
+      userID: PMData.id,
+      totalWorkTime: PMData.totalWorkTime,
+      QYEvaRank: PMData.QYEvaRank,
+      QYEvaScoreNor: PMData.QYEvaScoreNor,
+      CSQTEvaScoreUnN: PMData.CSQTEvaScoreUnN,
+      CSQTEvaScoreNor: PMData.CSQTEvaScoreNor,
+      CSQTEvaRank: PMData.CSQTEvaRank,
+      MGQTEvaScoreUnN: PMData.MGQTEvaScoreUnN,
+      MGQTEvaRank: PMData.MGQTEvaRank,
+      MGQTEvaScoreNor: PMData.MGQTEvaScoreNor,
+      AMEvaScoreUnN: PMData.AMEvaScoreUnN,
+      AMEvaScoreNor: PMData.AMEvaScoreNor,
+      AMEvaRank: PMData.AMEvaRank,
+      PMScoreUnN: PMData.PMScoreUnN,
+      PMScoreNor: PMData.PMScoreNor,
+      PMRank: PMData.PMRank
+    }
+    http(url, params).then(response => {
+      if (response.code === 1) {
+        resolve(response.data)
+      } else {
+        reject(response.err)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+// 获取绩效数据
+export function getPMData (applyDate) {
+  const url = urlGetPMData
+  let params = {
+    applyDate: applyDate
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(response => {
+      if (response.code === 1) {
+        resolve(response.data)
+      } else {
+        reject(response.err)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
 }
 
 // 发布绩效数据
-export function publishPMData (publishType) {
+export function publishPMData (applyYear, applyMonth, publishID, flagValue) {
+  const url = performanceInfoPublish
+  let params = {
+    flagID: publishID,
+    applyYear: applyYear,
+    applyMonth: applyMonth,
+    flagType: 'performanceInfoPublish',
+    flagValue: flagValue
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(response => {
+      if (response.code === 1) {
+        resolve(response)
+      } else {
+        reject(response.err)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
 }
