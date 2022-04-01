@@ -170,7 +170,7 @@ export function genPerformanceScore (usersList, QYEvaScoreData, QTEvaScoreData, 
     for (let i = 0; i < userPMScoreData.length; i++) {
       userPMScoreData[i].PMRank = i + 1 // 绩效排名计算
       userPMScoreData[i].initPMrank = userPMScoreData[i].PMRank // 初始绩效排名
-      userPMScoreData[i].PMScoreNor = NorCal(usersList.length, i + 1)
+      userPMScoreData[i].PMScoreNor = NorCal(usersList.length + 1, i + 1)
     }
     return userPMScoreData
 }
@@ -315,6 +315,8 @@ export function savePMData (applyDate, PMData) {
     let params = {
       applyDate: applyDate,
       userID: PMData.id,
+      userJob: PMData.userJob,
+      userDuty: PMData.userDuty,
       totalWorkTime: PMData.totalWorkTime,
       QYEvaRank: PMData.QYEvaRank,
       QYEvaScoreNor: PMData.QYEvaScoreNor,
@@ -329,7 +331,11 @@ export function savePMData (applyDate, PMData) {
       AMEvaRank: PMData.AMEvaRank,
       PMScoreUnN: PMData.PMScoreUnN,
       PMScoreNor: PMData.PMScoreNor,
-      PMRank: PMData.PMRank
+      PMRank: PMData.PMRank,
+      dimension1CSAveStar: PMData.dimension1CSAveStar,
+      dimension1GPEvaStar: PMData.dimension1GPEvaStar,
+      dimension2CSAveStar: PMData.dimension2CSAveStar,
+      dimension2GPEvaStar: PMData.dimension2GPEvaStar
     }
     http(url, params).then(response => {
       if (response.code === 1) {
@@ -348,7 +354,8 @@ export function updatePMData (PMData) {
   return new Promise(function (resolve, reject) {
     let url = urlUpdatePMData
     let params = {
-      userID: PMData.id,
+      id: PMData.id,
+      userID: PMData.userID,
       totalWorkTime: PMData.totalWorkTime,
       QYEvaRank: PMData.QYEvaRank,
       QYEvaScoreNor: PMData.QYEvaScoreNor,
@@ -363,7 +370,11 @@ export function updatePMData (PMData) {
       AMEvaRank: PMData.AMEvaRank,
       PMScoreUnN: PMData.PMScoreUnN,
       PMScoreNor: PMData.PMScoreNor,
-      PMRank: PMData.PMRank
+      PMRank: PMData.PMRank,
+      dimension1CSAveStar: PMData.dimension1CSAveStar,
+      dimension1GPEvaStar: PMData.dimension1GPEvaStar,
+      dimension2CSAveStar: PMData.dimension2CSAveStar,
+      dimension2GPEvaStar: PMData.dimension2GPEvaStar
     }
     http(url, params).then(response => {
       if (response.code === 1) {

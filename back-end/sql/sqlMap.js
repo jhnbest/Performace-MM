@@ -111,11 +111,13 @@ const sqlMap = {
     getWorkTimeListInfo: 'select * from worktimelist where id = ?',
     savePMData: 'insert into performancedata (userID, applyDate, totalWorkTime, QYEvaRank, QYEvaScoreNor, CSQTEvaScoreUnN, '
     + 'CSQTEvaScoreNor, CSQTEvaRank, MGQTEvaScoreUnN, MGQTEvaRank, MGQTEvaScoreNor, AMEvaScoreUnN, AMEvaScoreNor, AMEvaRank, '
-    + 'PMScoreUnN, PMScoreNor, PMRank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    + 'PMScoreUnN, PMScoreNor, PMRank, dimension1CSAveStar, dimension1GPEvaStar, dimension2CSAveStar, dimension2GPEvaStar, userDuty, userJob) '
+    + 'values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
     updatePMData: 'update performancedata set totalWorkTime = ?, QYEvaRank = ?, QYEvaScoreNor = ?, CSQTEvaScoreUnN = ?, '
-    + 'CSQTEvaScoreNor, CSQTEvaRank, MGQTEvaScoreUnN, MGQTEvaRank, MGQTEvaScoreNor, AMEvaScoreUnN, AMEvaScoreNor, AMEvaRank, '
-    + 'PMScoreUnN, PMScoreNor, PMRank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-    getPMData: 'select * from performancedata where applyDate = ?'
+    + 'CSQTEvaScoreNor = ?, CSQTEvaRank = ?, MGQTEvaScoreUnN = ?, MGQTEvaRank = ?, MGQTEvaScoreNor = ?, AMEvaScoreUnN = ?, '
+    + 'AMEvaScoreNor = ?, AMEvaRank = ?, PMScoreUnN = ?, PMScoreNor = ?, PMRank = ?, dimension1CSAveStar = ?, '
+    + 'dimension1GPEvaStar = ?, dimension2CSAveStar = ?, dimension2GPEvaStar = ? where id = ?',
+    getPMData: 'select pm.*, u.name, u.groupName as groupID from performancedata pm left join users u on pm.userID = u.id where pm.applyDate = ?'
   },
   workStation: {
     getAssignProjectListUn: 'select apl.*, users.name as assigner from assignprojectlist apl left join users on apl.assignerID = users.id where ' +

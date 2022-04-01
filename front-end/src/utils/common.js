@@ -234,6 +234,22 @@ export function monthNumToMonthString (monthNum) {
   }
 }
 
+// 获取季度对应的月份
+export function getQuarterMon (applyYear, applyQuarter) {
+  switch (applyQuarter) {
+    case 1:
+      return [applyYear + '-' + '01', applyYear + '-' + '02', applyYear + '-' + '03']
+    case 2:
+      return [applyYear + '-' + '04', applyYear + '-' + '05', applyYear + '-' + '06']
+    case 3:
+      return [applyYear + '-' + '07', applyYear + '-' + '08', applyYear + '-' + '09']
+    case 4:
+      return [applyYear + '-' + '10', applyYear + '-' + '11', applyYear + '-' + '12']
+    default:
+      return []
+  }
+}
+
 // 标准计算
 export function NorCal (usersNum, rank) {
   if (rank === 1) {

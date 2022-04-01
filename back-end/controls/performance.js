@@ -2,6 +2,7 @@ const $sql = require('../sql/sqlMap')
 const $http = require('../sql/http')
 const $time = require('../utils/time')
 const $workStation = require('./workStation')
+const { send } = require('express/lib/response')
 
 function formatData(rows) {
     return rows.map(row => {
@@ -1120,7 +1121,9 @@ const performance = {
                            sendData.QYEvaScoreNor, sendData.CSQTEvaScoreUnN, sendData.CSQTEvaScoreNor,
                            sendData.CSQTEvaRank, sendData.MGQTEvaScoreUnN, sendData.MGQTEvaRank,
                            sendData.MGQTEvaScoreNor, sendData.AMEvaScoreUnN, sendData.AMEvaScoreNor,
-                           sendData.AMEvaRank, sendData.PMScoreUnN, sendData.PMScoreNor, sendData.PMRank]
+                           sendData.AMEvaRank, sendData.PMScoreUnN, sendData.PMScoreNor, sendData.PMRank,
+                           sendData.dimension1CSAveStar, sendData.dimension1GPEvaStar,
+                           sendData.dimension2CSAveStar, sendData.dimension2GPEvaStar, sendData.userDuty, sendData.userJob]
         RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
             return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
         }).catch(RCPDDatabaseErr => {
@@ -1130,12 +1133,14 @@ const performance = {
     // 更新绩效数据
     updatePMData (req, res) {
         let sendData = req.body
-        let sql = $sql.performance.savePMData
-        let arrayParams = [sendData.userID, sendData.applyDate, sendData.totalWorkTime, sendData.QYEvaRank,
-                           sendData.QYEvaScoreNor, sendData.CSQTEvaScoreUnN, sendData.CSQTEvaScoreNor,
+        let sql = $sql.performance.updatePMData
+        let arrayParams = [sendData.totalWorkTime, sendData.QYEvaRank, sendData.QYEvaScoreNor,
+                           sendData.CSQTEvaScoreUnN, sendData.CSQTEvaScoreNor,
                            sendData.CSQTEvaRank, sendData.MGQTEvaScoreUnN, sendData.MGQTEvaRank,
                            sendData.MGQTEvaScoreNor, sendData.AMEvaScoreUnN, sendData.AMEvaScoreNor,
-                           sendData.AMEvaRank, sendData.PMScoreUnN, sendData.PMScoreNor, sendData.PMRank]
+                           sendData.AMEvaRank, sendData.PMScoreUnN, sendData.PMScoreNor, sendData.PMRank,
+                           sendData.dimension1CSAveStar, sendData.dimension1GPEvaStar,
+                           sendData.dimension2CSAveStar, sendData.dimension2GPEvaStar, sendData.id]
         RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
             return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
         }).catch(RCPDDatabaseErr => {
