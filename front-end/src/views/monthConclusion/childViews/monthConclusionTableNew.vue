@@ -92,7 +92,6 @@
     submitMonthConclusionNew,
     updateMonthConclusionNew } from '@/utils/conclusion'
   import store from '@/store'
-import jsCookie from 'js-cookie'
   export default {
     data () {
       return {
