@@ -150,7 +150,7 @@ export function genQualiEvaData (multualData) {
     }
     count++
     standAndEngineerRates[i].CSMutualScoreNor =
-      calGetScore(standAndEngineerRates.length, standAndEngineerRates[i].CSMutualScoreAveRank)
+    calGetScore(standAndEngineerRates.length, standAndEngineerRates[i].CSMutualScoreAveRank)
   }
   // 通信组互评排名&得分计算
   tmpCSMutualScoreAve = -1
@@ -164,7 +164,7 @@ export function genQualiEvaData (multualData) {
     }
     count++
     communicationRates[i].CSMutualScoreNor =
-      calGetScore(communicationRates.length, communicationRates[i].CSMutualScoreAveRank)
+    calGetScore(communicationRates.length, communicationRates[i].CSMutualScoreAveRank)
   }
   // 全处员工领导评价排名&得分计算
   let tmpMGQualiEvaScoreUnN = -1
@@ -178,7 +178,7 @@ export function genQualiEvaData (multualData) {
     }
     count++
     allUserRates[i].MGQualiEvaScoreNor =
-      calGetScore(allUserRates.length, allUserRates[i].MGQualiEvaScoreRank)
+    calGetScore(allUserRates.length, allUserRates[i].MGQualiEvaScoreRank)
   }
   let allQualiEvaScore = []
   allQualiEvaScore = standAndEngineerRates.concat(communicationRates)

@@ -526,6 +526,8 @@ export default {
                                       this.evaCoefObj.CSManagerAMEvaCoef, this.evaCoefObj.CSGroupLeaderAMEvaCoef,
                                       this.evaCoefObj.CScommonStaffAMEvaCoef, this.evaCoefObj.GPManagerAMEvaCoef,
                                       this.evaCoefObj.GPCommonStaffAMEvaCoef, this.QYEvaScoreData) // 生成成效评价数据
+                console.log('AMEvaScoreData')
+                console.log(AMEvaScoreData)
                 if (AMEvaScoreData.length > 0) {
                   // 把生成的成效评价数据插入表格数据里
                   for (let tableDataItem of tableData) {
@@ -573,16 +575,18 @@ export default {
                     let findResult = this.initPMData.find(initPMDataItem => {
                       return initPMDataItem.id === tableDataItem.id
                     })
-                    tableDataItem.PMData = findResult
-                    tableDataItem.PMData.dimension1CSAveStar = tableDataItem.AMEvaScoreData.dimension1CSAveStar
-                    tableDataItem.PMData.dimension1GPEvaStar = tableDataItem.AMEvaScoreData.dimension1GPEvaStar
-                    tableDataItem.PMData.dimension2CSAveStar = tableDataItem.AMEvaScoreData.dimension2CSAveStar
-                    tableDataItem.PMData.dimension2GPEvaStar = tableDataItem.AMEvaScoreData.dimension2GPEvaStar
-                    tableDataItem.newPMData = JSON.parse(JSON.stringify(tableDataItem.PMData))
-                    tableDataItem.newPMData.userJob = tableDataItem.job
-                    tableDataItem.newPMData.userDuty = tableDataItem.duty
-                    tableDataItem.PMScoreUnN = tableDataItem.newPMData.PMScoreUnN
-                    tableDataItem.totalWorkTime = tableDataItem.newPMData.totalWorkTime
+                    if (typeof (findResult) !== 'undefined') {
+                      tableDataItem.PMData = findResult
+                      tableDataItem.PMData.dimension1CSAveStar = tableDataItem.AMEvaScoreData.dimension1CSAveStar
+                      tableDataItem.PMData.dimension1GPEvaStar = tableDataItem.AMEvaScoreData.dimension1GPEvaStar
+                      tableDataItem.PMData.dimension2CSAveStar = tableDataItem.AMEvaScoreData.dimension2CSAveStar
+                      tableDataItem.PMData.dimension2GPEvaStar = tableDataItem.AMEvaScoreData.dimension2GPEvaStar
+                      tableDataItem.newPMData = JSON.parse(JSON.stringify(tableDataItem.PMData))
+                      tableDataItem.newPMData.userJob = tableDataItem.job
+                      tableDataItem.newPMData.userDuty = tableDataItem.duty
+                      tableDataItem.PMScoreUnN = tableDataItem.newPMData.PMScoreUnN
+                      tableDataItem.totalWorkTime = tableDataItem.newPMData.totalWorkTime
+                    }
                   }
                   // 排序
                   tableData = sortObjectArrayByParams(tableData, 'PMScoreUnN', 'totalWorkTime')
@@ -803,7 +807,9 @@ export default {
       // 如果是经理，将显示的绩效数据设置为初始状态
       if (store.state.userInfo.duty === 1) {
         for (let PMDataItem of this.PMData) {
-          PMDataItem.newPMData = PMDataItem.PMData
+          if (typeof (PMDataItem.PMData) !== 'undefined') {
+             PMDataItem.newPMData = PMDataItem.PMData
+          }
         }
       }
       // =================设置评价星级=====================
@@ -840,11 +846,19 @@ export default {
           }
         }
       }
-      // 显示组员平均评价星级和组长评价星级
-      this.dimension1CSAveStar = Number(this.PMData[this.table1CurShowIndex].newPMData.dimension1CSAveStar.toFixed(2))
-      this.dimension1GPEvaStar = Number(this.PMData[this.table1CurShowIndex].newPMData.dimension1GPEvaStar.toFixed(2))
-      this.dimension2CSAveStar = Number(this.PMData[this.table1CurShowIndex].newPMData.dimension2CSAveStar.toFixed(2))
-      this.dimension2GPEvaStar = Number(this.PMData[this.table1CurShowIndex].newPMData.dimension2GPEvaStar.toFixed(2))
+      console.log('this.PMData[this.table1CurShowIndex].AMEvaScoreData')
+      if (typeof (this.PMData[this.table1CurShowIndex].AMEvaScoreData) !== 'undefined') {
+        // 显示组员平均评价星级和组长评价星级
+        this.dimension1CSAveStar = Number(this.PMData[this.table1CurShowIndex].newPMData.dimension1CSAveStar.toFixed(2))
+        this.dimension1GPEvaStar = Number(this.PMData[this.table1CurShowIndex].newPMData.dimension1GPEvaStar.toFixed(2))
+        this.dimension2CSAveStar = Number(this.PMData[this.table1CurShowIndex].newPMData.dimension2CSAveStar.toFixed(2))
+        this.dimension2GPEvaStar = Number(this.PMData[this.table1CurShowIndex].newPMData.dimension2GPEvaStar.toFixed(2))
+      } else {
+        this.dimension1CSAveStar = 0
+        this.dimension1GPEvaStar = 0
+        this.dimension2CSAveStar = 0
+        this.dimension2GPEvaStar = 0
+      }
       this.forceRefresh = false
       this.$nextTick(() => {
         this.forceRefresh = true
@@ -854,8 +868,6 @@ export default {
     handlebuildBoutiqueProjectStarChange () {
       if (store.state.userInfo.duty === 1) {
         let PMDataTmp = JSON.parse(JSON.stringify(this.PMData))
-        console.log('PMDataTmp')
-        console.log(JSON.parse(JSON.stringify(PMDataTmp)))
         let findResult = PMDataTmp[this.table1CurShowIndex].allAMEvaedData.find(item => {
           return item.dimension === 1 && item.evaUserID === store.state.userInfo.id
         })
@@ -868,21 +880,23 @@ export default {
                                   this.evaCoefObj.CScommonStaffAMEvaCoef, this.evaCoefObj.GPManagerAMEvaCoef,
                                   this.evaCoefObj.GPCommonStaffAMEvaCoef, this.QYEvaScoreData,
                                   this.standAndEngineerGroup.length, this.commuincationGroup.length)
-        let userListTmp = JSON.parse(JSON.stringify(this.usersList))
-        userListTmp.splice(this.usersList.findIndex(user => { return user.id === store.state.userInfo.id }), 1)
-        let newPMData = genPerformanceScore(userListTmp, this.QYEvaScoreData, this.QTEvaScoreData, AMEvaScoreData,
-                                this.evaCoefObj)
-        //
-        for (let initPMDataItem of this.initPMData) {
-          let newPMdataFindResult = newPMData.find(newPMDataItem => {
-            return newPMDataItem.id === initPMDataItem.id
-          })
-          newPMdataFindResult.PMRankChange = newPMdataFindResult.PMRank - initPMDataItem.PMRank
-        }
-        for (let PMdataItem of this.PMData) {
-          PMdataItem.newPMData = newPMData.find(newPMDataItem => {
-            return newPMDataItem.id === PMdataItem.id
-          })
+        if (AMEvaScoreData.length > 0) {
+          let userListTmp = JSON.parse(JSON.stringify(this.usersList))
+          userListTmp.splice(this.usersList.findIndex(user => { return user.id === store.state.userInfo.id }), 1)
+          let newPMData = genPerformanceScore(userListTmp, this.QYEvaScoreData, this.QTEvaScoreData, AMEvaScoreData,
+                                  this.evaCoefObj)
+          //
+          for (let initPMDataItem of this.initPMData) {
+            let newPMdataFindResult = newPMData.find(newPMDataItem => {
+              return newPMDataItem.id === initPMDataItem.id
+            })
+            newPMdataFindResult.PMRankChange = newPMdataFindResult.PMRank - initPMDataItem.PMRank
+          }
+          for (let PMdataItem of this.PMData) {
+            PMdataItem.newPMData = newPMData.find(newPMDataItem => {
+              return newPMDataItem.id === PMdataItem.id
+            })
+          }
         }
       }
     },
@@ -902,20 +916,22 @@ export default {
                                   this.evaCoefObj.CScommonStaffAMEvaCoef, this.evaCoefObj.GPManagerAMEvaCoef,
                                   this.evaCoefObj.GPCommonStaffAMEvaCoef, this.QYEvaScoreData,
                                   this.standAndEngineerGroup.length, this.commuincationGroup.length)
-        let userListTmp = JSON.parse(JSON.stringify(this.usersList))
-        userListTmp.splice(this.usersList.findIndex(user => { return user.id === store.state.userInfo.id }), 1)
-        let newPMData = genPerformanceScore(userListTmp, this.QYEvaScoreData, this.QTEvaScoreData, AMEvaScoreData,
-                                this.evaCoefObj)
-        for (let initPMDataItem of this.initPMData) {
-          let newPMdataFindResult = newPMData.find(newPMDataItem => {
-            return newPMDataItem.id === initPMDataItem.id
-          })
-          newPMdataFindResult.PMRankChange = newPMdataFindResult.PMRank - initPMDataItem.PMRank
-        }
-        for (let PMdataItem of this.PMData) {
-          PMdataItem.newPMData = newPMData.find(newPMDataItem => {
-            return newPMDataItem.id === PMdataItem.id
-          })
+        if (AMEvaScoreData.length > 0) {
+          let userListTmp = JSON.parse(JSON.stringify(this.usersList))
+          userListTmp.splice(this.usersList.findIndex(user => { return user.id === store.state.userInfo.id }), 1)
+          let newPMData = genPerformanceScore(userListTmp, this.QYEvaScoreData, this.QTEvaScoreData, AMEvaScoreData,
+                                  this.evaCoefObj)
+          for (let initPMDataItem of this.initPMData) {
+            let newPMdataFindResult = newPMData.find(newPMDataItem => {
+              return newPMDataItem.id === initPMDataItem.id
+            })
+            newPMdataFindResult.PMRankChange = newPMdataFindResult.PMRank - initPMDataItem.PMRank
+          }
+          for (let PMdataItem of this.PMData) {
+            PMdataItem.newPMData = newPMData.find(newPMDataItem => {
+              return newPMDataItem.id === PMdataItem.id
+            })
+          }
         }
       }
     },
@@ -945,16 +961,26 @@ export default {
           name: store.state.userInfo.name
         }
         this.PMData[this.table1CurShowIndex].conclusionEva.push(JSON.parse(JSON.stringify(obj)))
-        this.PMData[this.table1CurShowIndex].allAMEvaedData.findIndex(item => {
+
+        let findResult = this.PMData[this.table1CurShowIndex].allAMEvaedData.find(item => {
           return item.dimension === 1 && item.evaUserID === store.state.userInfo.id
-        }).evaStar = this.buildBoutiqueProjectStar.evaStar
+        })
+        if (typeof (findResult) !== 'undefined') {
+          findResult.evaStar = this.buildBoutiqueProjectStar.evaStar
+        } else {
+        }
         obj.id = allResponse[1].insertId
         obj.evaStar = this.buildProTeamStar.evaStar
         obj.dimensionID = this.buildProTeam.id
         this.PMData[this.table1CurShowIndex].conclusionEva.push(JSON.parse(JSON.stringify(obj)))
-        this.PMData[this.table1CurShowIndex].allAMEvaedData.findIndex(item => {
+
+        findResult = this.PMData[this.table1CurShowIndex].allAMEvaedData.find(item => {
           return item.dimension === 2 && item.evaUserID === store.state.userInfo.id
-        }).evaStar = this.buildProTeamStar.evaStar
+        })
+        if (typeof (findResult) !== 'undefined') {
+          findResult.evaStar = this.buildProTeamStar.evaStar
+        } else {
+        }
         this.toDoEvaNum -= 1
         this.doneEvaNum += 1
         Notification.success({
@@ -1053,10 +1079,10 @@ export default {
             PMDataItem.newPMData.PMRankChange = 0
             PMDataItem.PMData = PMDataItem.newPMData
           }
-          this.PMData[this.table1CurShowIndex].allAMEvaedData.findIndex(item => {
+          this.PMData[this.table1CurShowIndex].allAMEvaedData.find(item => {
             return item.dimension === 1 && item.evaUserID === store.state.userInfo.id
           }).evaStar = this.buildProTeamStar.evaStar
-          this.PMData[this.table1CurShowIndex].allAMEvaedData.findIndex(item => {
+          this.PMData[this.table1CurShowIndex].allAMEvaedData.find(item => {
             return item.dimension === 2 && item.evaUserID === store.state.userInfo.id
           }).evaStar = this.buildProTeamStar.evaStar
         }

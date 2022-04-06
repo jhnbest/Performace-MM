@@ -13,7 +13,8 @@ import { getPerformanceIsPublish,
         getEvaCoef,
         sortBy,
         sortObjectArrayByParams,
-        NorCal } from '@/utils/common'
+        NorCal,
+        PMScoreNorCal } from '@/utils/common'
 import { getAllUserRates, genQualiEvaData } from '@/utils/multual'
 import { getAllAchievements, genPerformanceEvaData } from '@/utils/performancerate'
 import store from '@/store'
@@ -115,7 +116,7 @@ export function genQYEvaScoreData (users, quantativeData, applyMonth) {
       }
       // ==============================计算定量指标得分=======================================
       for (let totalWorkTimeCalItem of totalWorkTimeCal) { // 根据排名计算定量指标得分
-        totalWorkTimeCalItem.QYEvaScoreNor = calGetScore(totalWorkTimeCal.length, totalWorkTimeCalItem.rank)
+        totalWorkTimeCalItem.QYEvaScoreNor = PMScoreNorCal(totalWorkTimeCal.length, totalWorkTimeCalItem.rank)
       }
     }
     groupedWorkTimeListItem.caledQYEvaData = totalWorkTimeCal
@@ -170,7 +171,7 @@ export function genPerformanceScore (usersList, QYEvaScoreData, QTEvaScoreData, 
     for (let i = 0; i < userPMScoreData.length; i++) {
       userPMScoreData[i].PMRank = i + 1 // 绩效排名计算
       userPMScoreData[i].initPMrank = userPMScoreData[i].PMRank // 初始绩效排名
-      userPMScoreData[i].PMScoreNor = NorCal(usersList.length + 1, i + 1)
+      userPMScoreData[i].PMScoreNor = PMScoreNorCal(usersList.length, i + 1)
     }
     return userPMScoreData
 }

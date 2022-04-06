@@ -240,8 +240,13 @@ export function genAMEvaScoreData (tableData,
       AMEvaScoreArrayItem.dimension1AveStar = Number(AMEvaScoreArrayItem.dimension1AveStar.toFixed(0))
       AMEvaScoreArrayItem.dimension2AveStar = Number(AMEvaScoreArrayItem.dimension2AveStar.toFixed(0))
       // 计算两个维度的普通成员评价评价星级
-      AMEvaScoreArrayItem.dimension1CSAveStar /= AMEvaScoreArrayItem.dimension1CSEvaNum
-      AMEvaScoreArrayItem.dimension2CSAveStar /= AMEvaScoreArrayItem.dimension2CSEvaNum
+      if (AMEvaScoreArrayItem.dimension1CSEvaNum === 0) {
+        AMEvaScoreArrayItem.dimension1CSAveStar = 0
+        AMEvaScoreArrayItem.dimension2CSAveStar = 0
+      } else {
+        AMEvaScoreArrayItem.dimension1CSAveStar /= AMEvaScoreArrayItem.dimension1CSEvaNum
+        AMEvaScoreArrayItem.dimension2CSAveStar /= AMEvaScoreArrayItem.dimension2CSEvaNum
+      }
       // 如果处室经理还未评价，将其评价星级重置为平均评价星级,并计算星级对应的得分
       if (AMEvaScoreArrayItem.AMMGEvaScore === 0) {
         let dimension1AveScore = newStarToRates(AMEvaScoreArrayItem.dimension1AveStar)
@@ -267,7 +272,7 @@ export function genAMEvaScoreData (tableData,
     AMEvaScoreArray = sortObjectArrayByParams(AMEvaScoreArray, 'AMEvaScoreUnN', 'totalWorkTime')
     for (let i = 0; i < AMEvaScoreArray.length; i++) {
       AMEvaScoreArray[i].AMEvaScoreRank = i + 1
-      AMEvaScoreArray[i].AMEvaScoreNor = PMScoreNorCal(AMEvaScoreArray.length + 1, i + 1)
+      AMEvaScoreArray[i].AMEvaScoreNor = PMScoreNorCal(AMEvaScoreArray.length, i + 1)
     }
   }
   return AMEvaScoreArray
