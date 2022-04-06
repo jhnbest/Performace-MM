@@ -526,8 +526,6 @@ export default {
                                       this.evaCoefObj.CSManagerAMEvaCoef, this.evaCoefObj.CSGroupLeaderAMEvaCoef,
                                       this.evaCoefObj.CScommonStaffAMEvaCoef, this.evaCoefObj.GPManagerAMEvaCoef,
                                       this.evaCoefObj.GPCommonStaffAMEvaCoef, this.QYEvaScoreData) // 生成成效评价数据
-                console.log('AMEvaScoreData')
-                console.log(AMEvaScoreData)
                 if (AMEvaScoreData.length > 0) {
                   // 把生成的成效评价数据插入表格数据里
                   for (let tableDataItem of tableData) {
