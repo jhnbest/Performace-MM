@@ -443,9 +443,9 @@ export default {
           communicationRates.push(PMDataItem)
         }
       }
-      if (store.state.userInfo.groupID === '技术标准组' ||
-        store.state.userInfo.groupID === '工程组') {
-        if (store.state.userInfo.groupID === '技术标准组') {
+      if (store.state.userInfo.groupID === 1 ||
+        store.state.userInfo.groupID === 2) {
+        if (store.state.userInfo.groupID === 1) {
           this.QYEvaNum = standGroupMembers.length
         } else {
           this.QYEvaNum = engineerGroupMembers.length
