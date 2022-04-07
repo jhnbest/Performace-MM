@@ -291,7 +291,10 @@ const sqlMap = {
                      ' from newconclusionevadata nc left' +
                      ' join newconclusion n on' +
                      ' n.id = nc.dimensionID left join users u1 on n.userID = u1.id left join users u2 on nc.evaUserID = u2.id' +
-                     ' where n.userID = ? and n.conclusionYear = ? and n.conclusionMonth = ? and n.dimension != 3 and n.dimension != 4'
+                     ' where n.userID = ? and n.conclusionYear = ? and n.conclusionMonth = ? and n.dimension != 3 and n.dimension != 4',
+    getOtherUserConclusionEvaedData: 'select nce.*, u.name as evaUserName, u.duty as evaUserDuty, u.groupName as' +
+                     ' evaUserGroupID from newconclusionevadata nce left join users u on nce.evaUserID = u.id where' +
+                     ' nce.dimensionID = ?'
   }
 }
 module.exports = sqlMap;

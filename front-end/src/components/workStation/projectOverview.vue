@@ -51,10 +51,6 @@
                      type="primary"
                      size="mini"
                      @click="handleFillIn(scope.row)">重新填报</el-button>
-          <el-button type="danger"
-                     size="mini"
-                     @click="handleDelete(scope.row)"
-                     :disabled="scope.row.process === 100">删除</el-button>
         </template>
       </el-table-column>
     </el-table>

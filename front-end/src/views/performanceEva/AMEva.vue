@@ -348,13 +348,13 @@ export default {
         this.usersList = usersList
         let conclusionYear = this.$moment(this.title).year()
         let conclusionMonth = this.$moment(this.title).month() + 1
-        this.initData(conclusionYear, conclusionMonth, usersList)
+        this.initData(conclusionYear, conclusionMonth, this.standAndEngineerGroup, this.commuincationGroup, usersList)
       })
     },
     // 初始化显示数据
-    initData (conclusionYear, conclusionMonth, usersList) {
+    initData (conclusionYear, conclusionMonth, SEGroup, CMGroup, usersList) {
       // 先生成表格初始数据（获取其他人的月总结以及对其他的月总结评价
-      this.genTableData(conclusionYear, conclusionMonth, usersList).then(tableData => {
+      this.genTableData(conclusionYear, conclusionMonth, SEGroup, CMGroup).then(tableData => {
         // 普通员工
         if (store.state.userInfo.duty !== 1) {
           // 初始化默认显示的数据
@@ -399,16 +399,20 @@ export default {
           let promise1 = []
           let count1 = 0
           promise1[count1++] = getPerformanceIsPublish(conclusionYear, conclusionMonth) // 获取绩效信息发布状态
+          let start = new Date()
           for (let tableDataItem of tableData) {
-            promise1[count1++] = getUserConclusionEvaedData(conclusionYear, conclusionMonth, tableDataItem.id) // 获取每条月总结对应的所有评价
+            promise1[count1++] = getUserConclusionEvaedData(conclusionYear, conclusionMonth, tableDataItem.id) // 获取某个用户的所有被评价数据
           }
 
           Promise.all(promise1).then(allResponse1 => {
+            console.log('获取某个用户的所有被评价数据所花费时间: ' + String(new Date() - start) + 'ms')
             this.PMPublishStatusData = allResponse1[0] // 绩效发布状态
             // 整理月总结评价数据
             for (let i = 1; i < allResponse1.length; i++) {
               tableData[i - 1].allAMEvaedData = allResponse1[i]
             }
+            console.log('tableData')
+            console.log(tableData)
             // =============================判断各位用户是否已经评价完其他人=========================
             for (let i = 0; i < tableData.length; i++) {
               if (tableData[i].groupID === 1 || tableData[i].groupID === 2) {
@@ -642,8 +646,6 @@ export default {
                   }
                 }
                 this.PMData = tableData
-                console.log('this.PMData')
-                console.log(JSON.parse(JSON.stringify(this.PMData)))
                 this.forceRefresh = false
                 this.$nextTick(() => {
                   this.forceRefresh = true
@@ -656,125 +658,104 @@ export default {
       })
     },
     // 获取并生成表格数据
-    genTableData (conclusionYear, conclusionMonth, usersList) {
+    genTableData (conclusionYear, conclusionMonth, SEGroup, CMGroup) {
       // 初始化默认数据
       let allconclusionAndEvaData = []
-      // 根据当前用户类型生成待评价用户列表
-      for (let user of usersList) {
-        if (store.state.userInfo.groupName === '技术标准组' || store.state.userInfo.groupName === '工程组') {
-          if (user.groupName === '技术标准组' || user.groupName === '工程组') {
-            let obj = {
-              id: user.id,
-              name: user.name,
-              groupName: user.groupName,
-              groupID: user.groupID,
-              duty: user.duty,
-              job: user.job,
-              submitStatus: 0,
-              evaStatus: 0,
-              conclusionContent: [], // 月总结内容
-              isShow: false,
-              isEvaAllFinish: true, // 是否已经评价完别人了
-              conclusionEva: [], // 当前用户对该用户评价的数据
-              newPMData: {
-                QYEvaRank: null,
-                AMEvaRank: null,
-                PMRank: null
-              }
-            }
-            allconclusionAndEvaData.push(obj)
-          }
-        } else if (store.state.userInfo.groupName === '通信组') {
-          if (user.groupName === '通信组') {
-            let obj = {
-              id: user.id,
-              name: user.name,
-              groupName: user.groupName,
-              groupID: user.groupID,
-              duty: user.duty,
-              job: user.job,
-              submitStatus: 0,
-              evaStatus: 0,
-              conclusionContent: [],
-              isShow: false,
-              isEvaAllFinish: true, // 是否已经评价完别人了
-              conclusionEva: [],
-              newPMData: {
-                QYEvaRank: null,
-                AMEvaRank: null,
-                PMRank: null
-              }
-            }
-            allconclusionAndEvaData.push(obj)
-          }
-        } else {
-          let obj = {
-            id: user.id,
-            name: user.name,
-            groupName: user.groupName,
-            groupID: user.groupID,
-            duty: user.duty,
-            job: user.job,
-            submitStatus: 0,
-            evaStatus: 0,
-            conclusionContent: [],
-            isShow: false,
-            isEvaAllFinish: true, // 是否已经评价完别人了
-            conclusionEva: [],
-            newPMData: {
-              QYEvaRank: null,
-              AMEvaRank: null,
-              PMRank: null
-            }
-          }
-          allconclusionAndEvaData.push(obj)
+      let allUsers = SEGroup.concat(CMGroup) // 拼接成所有用户
+      // =====================================根据当前用户类型生成待评价用户列表=================================
+      // 首先构造表格数据单元组成
+      let tableDataItem = {
+        id: null,
+        name: null,
+        groupName: null,
+        groupID: null,
+        duty: null,
+        job: null,
+        submitStatus: 0, // 月总结提交状态
+        evaStatus: 0, // 评价状态
+        conclusionContent: [], // 月总结内容
+        isShow: false, // 当前是否显示
+        isEvaAllFinish: true, // 是否已经评价完别人了
+        conclusionEva: [], // 当前用户对该用户评价的数据
+        newPMData: { // 存储绩效数据
+          QYEvaRank: null, // 定量评价排名
+          AMEvaRank: null, // 成效评价排名
+          PMRank: null // 绩效排名
+        },
+        allAMEvaedData: [] // 被评价的数据
+      }
+      // 如果当前用户属于技术标准组或工程组，则构造相应组别的成员
+      if (store.state.userInfo.groupID === 1 || store.state.userInfo.groupID === 2) {
+        for (let SEGroupItem of SEGroup) {
+          tableDataItem.id = SEGroupItem.id
+          tableDataItem.name = SEGroupItem.name
+          tableDataItem.groupName = SEGroupItem.groupName
+          tableDataItem.groupID = SEGroupItem.groupID
+          tableDataItem.duty = SEGroupItem.duty
+          tableDataItem.job = SEGroupItem.job
+          allconclusionAndEvaData.push(JSON.parse(JSON.stringify(tableDataItem)))
+        }
+      } else if (store.state.userInfo.groupID === 3) { // 如果属于通信组
+        for (let CMGroupItem of CMGroup) {
+          tableDataItem.id = CMGroupItem.id
+          tableDataItem.name = CMGroupItem.name
+          tableDataItem.groupName = CMGroupItem.groupName
+          tableDataItem.groupID = CMGroupItem.groupID
+          tableDataItem.duty = CMGroupItem.duty
+          tableDataItem.job = CMGroupItem.job
+          allconclusionAndEvaData.push(JSON.parse(JSON.stringify(tableDataItem)))
+        }
+      } else { // 如果是处经理
+        for (let allUsersItem of allUsers) {
+          tableDataItem.id = allUsersItem.id
+          tableDataItem.name = allUsersItem.name
+          tableDataItem.groupName = allUsersItem.groupName
+          tableDataItem.groupID = allUsersItem.groupID
+          tableDataItem.duty = allUsersItem.duty
+          tableDataItem.job = allUsersItem.job
+          allconclusionAndEvaData.push(JSON.parse(JSON.stringify(tableDataItem)))
         }
       }
       // 把自己去掉
-      allconclusionAndEvaData.splice(allconclusionAndEvaData.findIndex(item => { return item.id === store.state.userInfo.id }), 1)
-      // 根据生成的用户列表获取每个用户的月总结数据
+      let findIndex = allconclusionAndEvaData.findIndex(item => { return item.id === store.state.userInfo.id })
+      if (findIndex !== -1) {
+        allconclusionAndEvaData.splice(findIndex, 1)
+      }
+      // 根据构造的表格数据单元获取每个用户的月总结及对应的评价
       let promise = []
       let count = 0
       for (let item of allconclusionAndEvaData) {
-        promise[count++] = getCurMonthConclusionOverviewDataNew(conclusionYear, conclusionMonth, item.id)
+        promise[count++] = getCurMonthConclusionOverviewDataNew(conclusionYear, conclusionMonth, item.id, store.state.userInfo.id,
+          store.state.userInfo.duty)
       }
-      // ======================判断月总结提交状态并对已提交总结的用户获取总结内容对应的自己对该用户的评价结果======================
+      let start = new Date()
+      // ======================判断月总结提交状态并对已提交总结的用户获取月总结内容对应的该用户的评价结果======================
       return new Promise(function (resolve, reject) {
         Promise.all(promise).then(allResponse => {
-          let promise2 = []
-          let count2 = 0
-          let checkConclusionData = [] // 有发送查询评价结果的月总结数据
+          console.log('获取月总结所花费时间: ' + String(new Date() - start) + 'ms')
+          console.log('allResponse')
+          console.log(allResponse)
           for (let i = 0; i < allconclusionAndEvaData.length; i++) {
-            // 判断月总结提交状态
-            if (allResponse[i].data.length !== 0) { // 已提交月总结
-              allconclusionAndEvaData[i].submitStatus = allResponse[i].data[0].submitStatus // 月总结提交状态
-              // 对已经提交总结的用户获取总结内容对应的自己对该用户的评价结果
-              if (allconclusionAndEvaData[i].submitStatus === 1) {
-                // 月总结内容赋值
-                allconclusionAndEvaData[i].conclusionContent = allResponse[i].data
-                for (let item of allResponse[i].data) {
-                  if (item.dimension === 1 || item.dimension === 2) { // 打造精品工程和建设团队维度才获取评价结果
-                    promise2[count2++] = getUserofAchievementToAnotherUser(item.id, store.state.userInfo.id) // 获取当前用户对该用户总结的评价结果
-                    checkConclusionData.push(allconclusionAndEvaData[i])
+            allconclusionAndEvaData[i].submitStatus = allResponse[i].data.conclusionData.length > 0 ? 1 : 0
+            allconclusionAndEvaData[i].conclusionContent = allResponse[i].data.conclusionData
+            if (store.state.userInfo.duty !== 1) { // 普通成员
+              allconclusionAndEvaData[i].evaStatus = allResponse[i].data.AMEvaedData.length > 0 ? 1 : 0
+              allconclusionAndEvaData[i].conclusionEva = allResponse[i].data.AMEvaedData
+            } else { // 处经理
+              let conclusionEva = []
+              if (allResponse[i].data.AMEvaedData.length > 0) {
+                for (let AMEvaedDataItem of allResponse[i].data.AMEvaedData) {
+                  if (AMEvaedDataItem.evaUserID === store.state.userInfo.id) {
+                    conclusionEva.push(AMEvaedDataItem)
                   }
                 }
               }
-            } else { // 还未提交月总结
-              allconclusionAndEvaData[i].submitStatus = 0
+              allconclusionAndEvaData[i].evaStatus = conclusionEva.length > 0 ? 1 : 0
+              allconclusionAndEvaData[i].conclusionEva = conclusionEva
+              allconclusionAndEvaData[i].allAMEvaedData = allResponse[i].data.AMEvaedData
             }
           }
-          // ================================把对某个用户的总结评价嵌入表格数据中==============================
-          Promise.all(promise2).then(allResponse2 => {
-            for (let i = 0; i < allResponse2.length; i++) {
-              if (allResponse2[i].length > 0) {
-                checkConclusionData[i].conclusionEva.push(allResponse2[i][0])
-                checkConclusionData[i].evaStatus = 1
-              }
-            }
-            resolve(allconclusionAndEvaData)
-          }).catch(err => {
-            reject(err)
-          })
+          resolve(allconclusionAndEvaData)
         }).catch(err => {
           reject(err)
         })
@@ -786,8 +767,6 @@ export default {
       this.table1CurShowIndex = index
       this.PMData[this.table1CurShowIndex].isShow = true
       this.PMData[this.table1PreShowIndex].isShow = false
-      console.log('this.PMData[this.table1CurShowIndex]')
-      console.log(JSON.parse(JSON.stringify(this.PMData[this.table1CurShowIndex])))
       this.currentShowUserisEva = this.PMData[this.table1CurShowIndex].evaStatus === 1
       this.table1PreShowIndex = index
       this.buildBoutiqueProject = row.conclusionContent.find(contenItem => {
@@ -844,7 +823,6 @@ export default {
           }
         }
       }
-      console.log('this.PMData[this.table1CurShowIndex].AMEvaScoreData')
       if (typeof (this.PMData[this.table1CurShowIndex].AMEvaScoreData) !== 'undefined') {
         // 显示组员平均评价星级和组长评价星级
         this.dimension1CSAveStar = Number(this.PMData[this.table1CurShowIndex].newPMData.dimension1CSAveStar.toFixed(2))
@@ -1019,11 +997,13 @@ export default {
           this.$nextTick(() => {
             this.forceRefresh = true
           })
-          // 显示组员平均评价星级和组长评价星级
-          this.dimension1CSAveStar = Number(this.PMData[this.table1CurShowIndex].newPMData.dimension1CSAveStar.toFixed(2))
-          this.dimension1GPEvaStar = Number(this.PMData[this.table1CurShowIndex].newPMData.dimension1GPEvaStar.toFixed(2))
-          this.dimension2CSAveStar = Number(this.PMData[this.table1CurShowIndex].newPMData.dimension2CSAveStar.toFixed(2))
-          this.dimension2GPEvaStar = Number(this.PMData[this.table1CurShowIndex].newPMData.dimension2GPEvaStar.toFixed(2))
+          if (store.state.userInfo.duty === 1) {
+            // 显示组员平均评价星级和组长评价星级
+            this.dimension1CSAveStar = Number(this.PMData[this.table1CurShowIndex].newPMData.dimension1CSAveStar.toFixed(2))
+            this.dimension1GPEvaStar = Number(this.PMData[this.table1CurShowIndex].newPMData.dimension1GPEvaStar.toFixed(2))
+            this.dimension2CSAveStar = Number(this.PMData[this.table1CurShowIndex].newPMData.dimension2CSAveStar.toFixed(2))
+            this.dimension2GPEvaStar = Number(this.PMData[this.table1CurShowIndex].newPMData.dimension2GPEvaStar.toFixed(2))
+          }
         } else { // 都已评价
           this.currentShowUserisEva = true
           Notification.info({
@@ -1168,7 +1148,7 @@ export default {
       this.getDataLoading = false
       let conclusionYear = this.$moment(this.title).year()
       let conclusionMonth = this.$moment(this.title).month() + 1
-      this.initData(conclusionYear, conclusionMonth, this.usersList)
+      this.initData(conclusionYear, conclusionMonth, this.standAndEngineerGroup, this.commuincationGroup, this.usersList)
     },
     // 上月
     handlePreMonth () {

@@ -272,7 +272,7 @@ export function genAMEvaScoreData (tableData,
     AMEvaScoreArray = sortObjectArrayByParams(AMEvaScoreArray, 'AMEvaScoreUnN', 'totalWorkTime')
     for (let i = 0; i < AMEvaScoreArray.length; i++) {
       AMEvaScoreArray[i].AMEvaScoreRank = i + 1
-      AMEvaScoreArray[i].AMEvaScoreNor = PMScoreNorCal(AMEvaScoreArray.length, i + 1)
+      AMEvaScoreArray[i].AMEvaScoreNor = PMScoreNorCal(AMEvaScoreArray.length + 1, i + 1)
     }
   }
   return AMEvaScoreArray

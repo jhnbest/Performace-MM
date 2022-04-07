@@ -37,12 +37,14 @@ export function getCurMonthConclusionOverviewData (submitMonth, submitYear, subm
 }
 
 // 获取月总结概览信息（新）
-export function getCurMonthConclusionOverviewDataNew (conclusionYear, conclusionMonth, userID) {
+export function getCurMonthConclusionOverviewDataNew (conclusionYear, conclusionMonth, userID, evaUserID, evaUserDuty) {
   const url = urlGetCurMonthConclusionOverviewDataNew
   let params = {
     conclusionYear: conclusionYear,
     conclusionMonth: conclusionMonth,
-    userID: userID
+    userID: userID,
+    evaUserID: evaUserID,
+    evaUserDuty: evaUserDuty
   }
   return new Promise(function (resolve, reject) {
     http(url, params).then(res => {

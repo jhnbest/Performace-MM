@@ -207,6 +207,7 @@ import { getPerformanceIsPublish, smallNumToL, getQuarterMon, sortObjectArrayByP
 import { getPMData } from '@/utils/performance'
 import store from '@/store'
 import moment from 'moment'
+import Cookies from 'js-cookie'
 export default {
   data () {
     return {
@@ -239,7 +240,12 @@ export default {
   methods: {
     // 初始化
     init () {
-      this.getMonthCookie()
+      console.log('document.Cookies')
+      console.log(document.cookie)
+      if (typeof (Cookies.get('hMon')) === 'undefined') {
+        Cookies.set('hMon', this.title)
+      }
+      this.title = Cookies.get('hMon')
       this.initData()
     },
     // 初始化数据
@@ -477,16 +483,26 @@ export default {
     // 上一月
     handlePreMonth () {
       this.title = this.$moment(this.title).subtract(1, 'months').format('YYYY-MM')
-      this.setMonthCookie(this.title, 7)
+      if (typeof (Cookies.get('hMon')) !== 'undefined') {
+        Cookies.remove('hMon')
+      }
+      Cookies.set('hMon', this.title)
       this.initData()
     },
     // 下一月
     handleNextMonth () {
       this.title = this.$moment(this.title).add(1, 'months').format('YYYY-MM')
-      this.setMonthCookie(this.title, 7)
+      if (typeof (Cookies.get('hMon')) !== 'undefined') {
+        Cookies.remove('hMon')
+      }
+      Cookies.set('hMon', this.title)
       this.initData()
     },
     handelDateChange () {
+      if (typeof (Cookies.get('hMon')) !== 'undefined') {
+        Cookies.remove('hMon')
+      }
+      Cookies.set('hMon', this.title)
       this.initData()
     },
     // 首页关于
