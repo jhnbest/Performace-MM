@@ -312,7 +312,7 @@ export default {
               }
             }
             this.monthStar.name = monthStarPerson
-            this.getQuarStar(applyYear, applyMonth, applyQuater) // 季度之星数据计算
+            this.getQuarStar(applyYear, applyQuater) // 季度之星数据计算
             this.isCount = true
             this.reqFlag.getPerformanceScore = true
           })
@@ -339,16 +339,15 @@ export default {
       })
     },
     // 季度之星数据获取
-    getQuarStar (applyYear, applyMonth, applyQuater) {
+    getQuarStar (applyYear, applyQuater) {
       let quarterStarNum = this.$store.state.quarterStarNum
       let promises1 = []
       let promises2 = []
       let quarterMonth = []
       let count = 0
-      let performanceScoreResult = []
       quarterMonth = getQuarterMon(applyYear, applyQuater) // 获取季度对应的月份
       for (let i = 0; i < quarterMonth.length; i++) { // 请求季度所有月份的绩效发布情况
-        promises1[i] = getPerformanceIsPublish(applyYear, applyMonth)
+        promises1[i] = getPerformanceIsPublish(applyYear, this.$moment(quarterMonth[i]).month() + 1)
       }
       Promise.all(promises1).then(allResponse1 => {
         let PMDataPublishInfo = allResponse1
@@ -436,7 +435,7 @@ export default {
       let standGroupMembers = []
       let engineerGroupMembers = []
       let communicationRates = []
-      this.usersNumNotMG = PMData.length - 1
+      this.usersNumNotMG = PMData.length
       for (let PMDataItem of PMData) {
         if (PMDataItem.groupID === 1 || PMDataItem.groupID === 2) {
           if (PMDataItem.groupID === 1) {

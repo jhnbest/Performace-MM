@@ -20,7 +20,6 @@ import { getAllAchievements, genPerformanceEvaData } from '@/utils/performancera
 import store from '@/store'
 
 import moment from 'moment'
-import { Calendar } from 'element-ui'
 
 // 获取全处工时信息
 export function getAllWorkTimeList (applyDate) {
@@ -46,16 +45,16 @@ export function getAllWorkTimeList (applyDate) {
 export function genQYEvaScoreData (users, quantativeData, applyMonth) {
   let QYEvaScoreData = []
   // =============================对当月无工时申报的员工填充0工时==================================
-  for (let item of users) {
+  for (let user of users) {
     let findItem = quantativeData.findIndex(quantativeDataItem => {
-      return quantativeDataItem.id === item.id
+      return quantativeDataItem.id === user.id
     })
-    if (findItem === -1 && item.groupName !== '处经理') {
+    if (findItem === -1 && user.groupName !== '处经理') {
         let obj = {
           applyMonth: applyMonth,
-          groupID: item.groupID,
-          id: item.id,
-          name: item.name,
+          groupID: user.groupID,
+          id: user.id,
+          name: user.name,
           reviewWorkTime: 0
         }
         quantativeData.push(obj)
@@ -64,7 +63,7 @@ export function genQYEvaScoreData (users, quantativeData, applyMonth) {
   // ===============================将所有工时申报信息按组存放===================================
   let groupedWorkTimeList = []
   for (let item of quantativeData) {
-    if (item.id !== store.state.managerID) {
+    if (item.duty !== 1) {
       let index = groupedWorkTimeList.findIndex(itemInside => {
           return itemInside.groupID === item.groupID
       })
@@ -83,97 +82,79 @@ export function genQYEvaScoreData (users, quantativeData, applyMonth) {
   // --------------------------分别计算小组内每个人的工时数、排名和得分--------------------------
   for (let groupedWorkTimeListItem of groupedWorkTimeList) {
     let totalWorkTimeCal = []
-    if (groupedWorkTimeListItem.workTimeList.length > 0) {
-      for (let item1 of groupedWorkTimeListItem.workTimeList) { // 将各组工时信息按照个人统计
-        let index = totalWorkTimeCal.findIndex(totalWorkTimeCalItem => {
-            return totalWorkTimeCalItem.id === item1.id
-        })
-        if (index === -1) {
-            let obj = {
-                id: item1.id,
-                name: item1.name,
-                totalWorkTime: item1.reviewWorkTime
-            }
-            totalWorkTimeCal.push(obj)
-        } else {
-            totalWorkTimeCal[index].totalWorkTime += item1.reviewWorkTime
-        }
-      }
-      // ===========================计算组内工时排名==================================
-      totalWorkTimeCal.sort(compare('totalWorkTime')) // 根据总工时排序
-      let preWorkTime = -1
-      let preRank = 1
-      let count = 1
-      for (let item of totalWorkTimeCal) { // 计算排名
-        if (item.totalWorkTime === preWorkTime) {
-          item.rank = preRank
-        } else {
-          item.rank = count
-          preRank = count
-        }
-        count++
-        preWorkTime = item.totalWorkTime
-      }
-      // ==============================计算定量指标得分=======================================
-      for (let totalWorkTimeCalItem of totalWorkTimeCal) { // 根据排名计算定量指标得分
-        totalWorkTimeCalItem.QYEvaScoreNor = PMScoreNorCal(totalWorkTimeCal.length, totalWorkTimeCalItem.rank)
+    for (let item1 of groupedWorkTimeListItem.workTimeList) { // 将各组工时信息按照个人统计
+      let index = totalWorkTimeCal.findIndex(totalWorkTimeCalItem => {
+          return totalWorkTimeCalItem.id === item1.id
+      })
+      if (index === -1) {
+          let obj = {
+              id: item1.id,
+              name: item1.name,
+              duty: item1.duty,
+              totalWorkTime: item1.reviewWorkTime
+          }
+          totalWorkTimeCal.push(obj)
+      } else {
+          totalWorkTimeCal[index].totalWorkTime += item1.reviewWorkTime
       }
     }
-    groupedWorkTimeListItem.caledQYEvaData = totalWorkTimeCal
-
-    for (let itemInside of groupedWorkTimeListItem.caledQYEvaData) {
-        QYEvaScoreData.push(itemInside)
+    // ===========================计算组内工时排名并计算定量指标得分==================================
+    totalWorkTimeCal.sort(compare('totalWorkTime')) // 根据总工时排序
+    let preWorkTime = -1
+    let preRank = 1
+    let count = 1
+    for (let totalWorkTimeCalItem of totalWorkTimeCal) { // 计算排名
+      if (totalWorkTimeCalItem.totalWorkTime === preWorkTime) {
+        totalWorkTimeCalItem.rank = preRank
+      } else {
+        totalWorkTimeCalItem.rank = count
+        preRank = count
+      }
+      totalWorkTimeCalItem.QYEvaScoreNor = NorCal(totalWorkTimeCal.length, totalWorkTimeCalItem.rank)
+      QYEvaScoreData.push(totalWorkTimeCalItem)
+      count++
+      preWorkTime = totalWorkTimeCalItem.totalWorkTime
     }
   }
   return QYEvaScoreData
 }
 
 // 生成绩效得分与排名数据(新)
-export function genPerformanceScore (usersList, QYEvaScoreData, QTEvaScoreData, AMEvaScoreData, evaCoefObj) {
+export function genPerformanceScore (tableData, QYEvaScoreData, QTEvaScoreData, evaCoefObj) {
     let userPMScoreData = []
     // ==============================绩效得分(未标准化)计算================================
-    for (let user of usersList) {
+    for (let tableDataItem of tableData) {
       let itemQuantativeScore = QYEvaScoreData.find(quantativeDataItem => { // 找出初始表格成员对应的定量数据
-        return quantativeDataItem.id === user.id
+        return quantativeDataItem.id === tableDataItem.id
       })
       let itemMultualEvaScore = QTEvaScoreData.find(multualEvaDataItem => { // 找出初始表格成员对应的定性数据
-        return multualEvaDataItem.id === user.id
+        return multualEvaDataItem.id === tableDataItem.id
       })
-      let itemAMEvaObj = AMEvaScoreData.find(AMEvaScoreDataItem => { // 找出初始表格成员对应的成效评价数据
-        return AMEvaScoreDataItem.evaedUserID === user.id
-      })
-      let obj = {}
       // 计算未标准化的绩效得分
-      if (itemQuantativeScore && itemMultualEvaScore && itemAMEvaObj) {
-        obj.PMScoreUnN =
+      if (itemQuantativeScore && itemMultualEvaScore) {
+        tableDataItem.PMScoreUnN =
             itemQuantativeScore.QYEvaScoreNor * evaCoefObj.quantitativeCoef + // 定量评价乘上相应系数
             itemMultualEvaScore.CSMutualScoreNor * evaCoefObj.CSMutualCoef + // 定性评价（员工互评）乘上相应系数
             itemMultualEvaScore.MGQualiEvaScoreNor * evaCoefObj.MGEvaCoef + // 定性评价（经理评价）乘上相应系数
-            itemAMEvaObj.AMEvaScoreNor * evaCoefObj.PMEvaCoef // 成效评价乘上相应系数
-        obj.id = user.id
-        obj.totalWorkTime = Number(itemQuantativeScore.totalWorkTime.toFixed(2))
-        obj.QYEvaRank = itemQuantativeScore.rank
-        obj.QYEvaScoreNor = itemQuantativeScore.QYEvaScoreNor
-        obj.MGQTEvaScoreUnN = itemMultualEvaScore.MGQualiEvaScoreUnN
-        obj.MGQTEvaRank = itemMultualEvaScore.MGQualiEvaScoreRank
-        obj.MGQTEvaScoreNor = itemMultualEvaScore.MGQualiEvaScoreNor
-        obj.CSQTEvaScoreUnN = itemMultualEvaScore.CSMutualScoreAve
-        obj.CSQTEvaRank = itemMultualEvaScore.CSMutualScoreAveRank
-        obj.CSQTEvaScoreNor = itemMultualEvaScore.CSMutualScoreNor
-        obj.AMEvaScoreUnN = itemAMEvaObj.AMEvaScoreUnN
-        obj.AMEvaRank = itemAMEvaObj.AMEvaScoreRank
-        obj.AMEvaScoreNor = itemAMEvaObj.AMEvaScoreNor
-        obj.PMRankChange = 0
+            tableDataItem.AMEvaScoreNor * evaCoefObj.PMEvaCoef // 成效评价乘上相应系数
+        tableDataItem.QYEvaRank = itemQuantativeScore.rank
+        tableDataItem.QYEvaScoreNor = itemQuantativeScore.QYEvaScoreNor
+        tableDataItem.MGQTEvaScoreUnN = itemMultualEvaScore.MGQualiEvaScoreUnN
+        tableDataItem.MGQTEvaRank = itemMultualEvaScore.MGQualiEvaScoreRank
+        tableDataItem.MGQTEvaScoreNor = itemMultualEvaScore.MGQualiEvaScoreNor
+        tableDataItem.CSQTEvaScoreUnN = itemMultualEvaScore.CSMutualScoreAve
+        tableDataItem.CSQTEvaRank = itemMultualEvaScore.CSMutualScoreAveRank
+        tableDataItem.CSQTEvaScoreNor = itemMultualEvaScore.CSMutualScoreNor
+        tableDataItem.PMRankChange = 0
       }
-      userPMScoreData.push(obj)
     }
-    userPMScoreData = sortObjectArrayByParams(JSON.parse(JSON.stringify(userPMScoreData)), 'PMScoreUnN', 'totalWorkTime')
-    for (let i = 0; i < userPMScoreData.length; i++) {
-      userPMScoreData[i].PMRank = i + 1 // 绩效排名计算
-      userPMScoreData[i].initPMrank = userPMScoreData[i].PMRank // 初始绩效排名
-      userPMScoreData[i].PMScoreNor = PMScoreNorCal(usersList.length, i + 1)
+    tableData = sortObjectArrayByParams(JSON.parse(JSON.stringify(tableData)), 'PMScoreUnN', 'totalWorkTime')
+    for (let i = 0; i < tableData.length; i++) {
+      tableData[i].PMScoreRank = i + 1 // 绩效排名计算
+      tableData[i].initPMRank = i + 1 // 初始绩效排名
+      tableData[i].PMScoreNor = NorCal(tableData.length + 1, i + 1)
     }
-    return userPMScoreData
+    return tableData
 }
 
 // 生成绩效得分与排名数据(旧)

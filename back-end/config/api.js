@@ -93,6 +93,7 @@ module.exports = {
     getPreMonthEva: path + '/mutualRates/getPreMonthEva', // 提取上月互评结果
     handleFillMul: path + '/mutualRates/handleFillMul', // 一键填充定性评价
     getPerformanceRates: path + '/mutualRates/getPerformanceRates', // 获取成效评价历史数据
+    getAllQTEvaedData: path + '/mutualRates/getAllQTEvaedData', // 获取全处员工定性评价数据(被评价人为对象)
 
     // 成效评价模块
     getAllAchievements: path + '/achievementsEva/getAllAchievements', // 获取全处成效评价历史数据

@@ -402,6 +402,23 @@ export function starToRates (star) {
       return 87.5
   }
 }
+// 星级转评分(新)
+export function starToRatesNew (star) {
+  switch (star) {
+    case 5:
+      return 95
+    case 4:
+      return 92.5
+    case 3:
+      return 90
+    case 2:
+      return 87.5
+    case 1:
+      return 85
+    default:
+      return 0
+  }
+}
 
 // 星级转评分
 export function newStarToRates (star) {
@@ -475,7 +492,7 @@ export function smallNumToL (num) {
   }
 }
 
-// 数据排序方法
+// 数据排序方法(从大到小)
 export function compare (params) {
   return function (o, p) {
     let a, b

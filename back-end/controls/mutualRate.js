@@ -112,31 +112,8 @@ const mutualRate = {
             return $http.writeJson(res, { code: 1, data: res0, message: 'success'})
         })
     },
-    // // 获取本处员工互评得分
-    // async getAllUserRates (req, res) {
-    //     let data = req.body
-    //     let resultData = []
-    //     for (let item of data.usersData) {
-    //         let sql = $sql.mutualRates.getCurMutualRate
-    //         let arrayParams = [item.id, data.rateMonth]
-    //         await RCPDDatabase(sql, arrayParams).then(async (res0) => {
-    //             sql = $sql.mutualRates.getRateData
-    //             await RCPDDatabase(sql, arrayParams).then(async (res1) => {
-    //                 let obj = {
-    //                     id: item.id,
-    //                     name: item.name,
-    //                     groupName: item.groupName,
-    //                     ratedData: res0,
-    //                     rateData: res1
-    //                 }
-    //                 resultData.push(obj)
-    //             })
-    //         })
-    //     }
-    //     return $http.writeJson(res, { code: 1, data: resultData, message: '成功' })
-    // },
     // 获取本处员工互评得分
-    async getAllUserRates (req, res) {
+    getAllUserRates (req, res) {
         let data = req.body
         let resultData = []
         let promises = []
@@ -167,6 +144,35 @@ const mutualRate = {
         }).catch(err => {
             return $http.writeJson(res, {code: -2, err: err, message: 'false'})
         })
+    },
+    // 获取本处员工互评得分
+    getAllQTEvaedData (req, res) {
+      let sendData = req.body
+      let sql = $sql.mutualRates.getAllQTEvaedData
+      let arrayParams = []
+      let promises = []
+      let count = 0
+      for (let user of sendData.usersList) {
+        arrayParams = [user.id, sendData.applyDate]
+        promises[count++] = RCPDDatabase(sql, arrayParams)
+      }
+      Promise.all(promises).then(allResponse => {
+        let result = []
+        for (let i = 0; i < sendData.usersList.length; i++) {
+          let obj = {
+            ratedPersion: sendData.usersList[i].id,
+            ratedPersionName: sendData.usersList[i].name,
+            ratedPersionGroupID: sendData.usersList[i].groupID,
+            ratedPersionGroupName: sendData.usersList[i].groupName,
+            ratedPersionDuty: sendData.usersList[i].duty,
+            QTEvaedData: allResponse[i]
+          }
+          result.push(obj)
+        }
+        return $http.writeJson(res, {code: 1, data: result, message: 'success'})
+      }).catch(RCPDDatabaseErr => {
+        return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+      })
     },
     // 获取绩效信息统计标志
     getPerformanceIsCount (req, res) {

@@ -100,6 +100,7 @@ router.post(api.getPerformanceIsCount, mutualRates.getPerformanceIsCount)
 router.post(api.getPreMonthEva, mutualRates.getPreMonthEva)
 router.post(api.handleFillMul, mutualRates.handleFillMul)
 router.post(api.getPerformanceRates, mutualRates.getPerformanceRates)
+router.post(api.getAllQTEvaedData, mutualRates.getAllQTEvaedData)
 
 // 成效评价模块
 router.post(api.getAllAchievements, achievementsEva.getAllAchievements)

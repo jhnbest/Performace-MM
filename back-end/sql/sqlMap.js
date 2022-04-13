@@ -99,7 +99,7 @@ const sqlMap = {
     getGroupWorkTimeList: 'select u.id, u.name, wa.reviewWorkTime, wl.applyMonth from worktimeassign wa left join worktimelist ' +
         'wl on wa.projectID = wl.id left join users u on wa.userID = u.id where wl.applyMonth = ? and u.groupName = ? and ' +
         ' wl.reviewStatus = 1 and wa.obsoleteStatus != 1 and u.status != 0',
-    getAllWorkTimeList: 'select u.id, u.name, u.groupName as groupID, wa.reviewWorkTime, wl.applyMonth from worktimeassign wa left join worktimelist ' +
+    getAllWorkTimeList: 'select u.id, u.name, u.duty, u.groupName as groupID, wa.reviewWorkTime, wl.applyMonth from worktimeassign wa left join worktimelist ' +
         'wl on wa.projectID = wl.id left join users u on wa.userID = u.id where wl.applyMonth = ? and ' +
         ' wl.reviewStatus = 1 and wa.obsoleteStatus != 1 and u.status != 0',
     getIsWorkTimeReviewFinish: 'select * from worktimelist where applyMonth = ? and obsoleteStatus != 1 and reviewStatus = 0 ' +
@@ -258,7 +258,9 @@ const sqlMap = {
     getPerformanceRates: 'select pr.*, u.name as ratedPersionName, u.duty from performancerate pr left join users u on pr.ratedPersion = u.id ' +
         'where pr.ratePersion = ? and pr.rateMonth = ? and u.status != 0',
     getPerformanceRatedData: 'select pr.*, u.duty, u.groupName from performancerate pr left join users u on pr.ratePersion = u.id where ' +
-        'pr.ratedPersion = ? and pr.rateMonth = ?'
+        'pr.ratedPersion = ? and pr.rateMonth = ?',
+    getAllQTEvaedData: 'select ml.*, u.duty as ratePersionDuty from mutualrate ml left join users u on ml.ratePersion' +
+        ' = u.id where ml.ratedPersion = ? and ml.rateMonth = ?'
   },
   conclusion: {
     getCurMonthConclusionOverviewData: 'select c.*, u.name from conclusion c left join users u on c.submitter = u.id where c.submitYear = ? ' +
@@ -293,8 +295,8 @@ const sqlMap = {
                      ' n.id = nc.dimensionID left join users u1 on n.userID = u1.id left join users u2 on nc.evaUserID = u2.id' +
                      ' where n.userID = ? and n.conclusionYear = ? and n.conclusionMonth = ? and n.dimension != 3 and n.dimension != 4',
     getOtherUserConclusionEvaedData: 'select nce.*, u.name as evaUserName, u.duty as evaUserDuty, u.groupName as' +
-                     ' evaUserGroupID from newconclusionevadata nce left join users u on nce.evaUserID = u.id where' +
-                     ' nce.dimensionID = ?'
+                     ' evaUserGroupID, nc.dimension from newconclusionevadata nce left join users u on nce.evaUserID = u.id left join' +
+                     ' newconclusion nc on nce.dimensionID = nc.id where nce.dimensionID = ?'
   }
 }
 module.exports = sqlMap;

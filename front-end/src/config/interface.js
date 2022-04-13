@@ -91,6 +91,7 @@ export const getPerformanceIsCount = '/mutualRates/getPerformanceIsCount' // 获
 export const getPreMonthEva = '/mutualRates/getPreMonthEva' // 提取上月互评结果
 export const handleFillMul = '/mutualRates/handleFillMul' // 一键填充定性评价
 export const urlGetPerformanceRates = '/mutualRates/getPerformanceRates' // 获取成效评价历史数据
+export const urlGetAllQTEvaedData = '/mutualRates/getAllQTEvaedData' // 获取全处员工定性评价数据(被评价人为对象)
 
 export const urlGetAllAchievements = '/achievementsEva/getAllAchievements' // 获取全处成效评价数据
 export const urlGetUserofAchievementToAnotherUser = '/achievementsEva/getUserofAchievementToAnotherUser' // 获取用户的成效评价

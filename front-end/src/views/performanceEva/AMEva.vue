@@ -99,25 +99,25 @@
             </el-table-column>
             <el-table-column v-if="$store.state.userInfo.duty === 1"
                               label="工时排名"
-                              prop="newPMData.QYEvaRank"
+                              prop="QYEvaRank"
                               align="center" width="50px"></el-table-column>
             <el-table-column v-if="$store.state.userInfo.duty === 1"
                               label="成效评价排名"
-                              prop="newPMData.AMEvaRank"
+                              prop="AMEvaScoreRank"
                               align="center" width="60px"></el-table-column>
             <el-table-column v-if="$store.state.userInfo.duty === 1"
                               label="标准化绩效得分"
-                              prop="newPMData.PMScoreNor"
+                              prop="PMScoreNor"
                               align="center" width="70px"></el-table-column>
             <el-table-column v-if="$store.state.userInfo.duty === 1"
                               label="绩效排名"
                               align="center" width="50px">
               <template slot-scope="scope">
-                <span style="font-weight: bolder;color: red">{{scope.row.newPMData.PMRank}}</span>
-                <i v-if="scope.row.newPMData.PMRankChange < 0" class="el-icon-caret-top" style="color: red"></i>
-                <i v-if="scope.row.newPMData.PMRankChange > 0" class="el-icon-caret-bottom" style="color: green"></i>
-                <span v-if="scope.row.newPMData.PMRankChange !== 0" style="font-size: 10px">
-                  {{scope.row.newPMData.PMRankChange > 0 ? scope.row.newPMData.PMRankChange : -scope.row.newPMData.PMRankChange}}
+                <span style="font-weight: bolder;color: red">{{scope.row.PMScoreRank}}</span>
+                <i v-if="scope.row.PMRankChange < 0" class="el-icon-caret-top" style="color: red"></i>
+                <i v-if="scope.row.PMRankChange > 0" class="el-icon-caret-bottom" style="color: green"></i>
+                <span v-if="scope.row.PMRankChange !== 0" style="font-size: 10px">
+                  {{scope.row.PMRankChange > 0 ? scope.row.PMRankChange : -scope.row.PMRankChange}}
                 </span>
               </template>
             </el-table-column>
@@ -259,7 +259,7 @@ import { getAllWorkTimeList,
          publishPMData,
          getPMData,
          updatePMData } from '@/utils/performance'
-import { getAllUserRates, genQualiEvaData } from '@/utils/multual'
+import { getAllUserRates, genQualiEvaData, getAllQTEvaedData } from '@/utils/multual'
 import { Notification } from 'element-ui'
 import { getUsersList } from '@/utils/users'
 import { getCurMonthConclusionOverviewDataNew } from '@/utils/conclusion'
@@ -274,7 +274,8 @@ import Cookies from 'js-cookie'
 export default {
   data () {
     return {
-      title: this.$moment().format('YYYY-MM'), // 日期
+      // title: this.$moment().format('YYYY-MM'), // 日期
+      title: '2022-02', // 日期
       usersList: null, // 用户列表
       getDataLoading: false, // 表格加载标志位,
       submitEvaDataFlag: true, // 提交评价标志位
@@ -332,10 +333,10 @@ export default {
   methods: {
     // 初始化
     init () {
-      if (typeof (Cookies.get('cookieAMEvaPageDate')) === 'undefined') {
-        Cookies.set('cookieAMEvaPageDate', this.title)
-      }
-      this.title = Cookies.get('cookieAMEvaPageDate')
+      // if (typeof (Cookies.get('cookieAMEvaPageDate')) === 'undefined') {
+      //   Cookies.set('cookieAMEvaPageDate', this.title)
+      // }
+      // this.title = Cookies.get('cookieAMEvaPageDate')
       this.getDataLoading = false
       getUsersList().then(usersList => {
         for (let user of usersList) {
@@ -396,51 +397,10 @@ export default {
           this.getDataLoading = true
         } else { // 管理者页面
           // 首先判断绩效信息发布状态并获取每条月总结对应的所有评价，如果绩效已发布，则显示已经发布的绩效数据；
-          let promise1 = []
-          let count1 = 0
-          promise1[count1++] = getPerformanceIsPublish(conclusionYear, conclusionMonth) // 获取绩效信息发布状态
-          let start = new Date()
-          for (let tableDataItem of tableData) {
-            promise1[count1++] = getUserConclusionEvaedData(conclusionYear, conclusionMonth, tableDataItem.id) // 获取某个用户的所有被评价数据
-          }
-
-          Promise.all(promise1).then(allResponse1 => {
-            console.log('获取某个用户的所有被评价数据所花费时间: ' + String(new Date() - start) + 'ms')
-            this.PMPublishStatusData = allResponse1[0] // 绩效发布状态
-            // 整理月总结评价数据
-            for (let i = 1; i < allResponse1.length; i++) {
-              tableData[i - 1].allAMEvaedData = allResponse1[i]
-            }
+          getPerformanceIsPublish(conclusionYear, conclusionMonth).then(response => {
+            this.PMPublishStatusData = response // 绩效发布状态
             console.log('tableData')
-            console.log(tableData)
-            // =============================判断各位用户是否已经评价完其他人=========================
-            for (let i = 0; i < tableData.length; i++) {
-              if (tableData[i].groupID === 1 || tableData[i].groupID === 2) {
-                for (let j = 0; j < tableData.length; j++) {
-                  let findIndex = tableData[j].allAMEvaedData.findIndex(item => {
-                    return item.evaUserID === tableData[i].id
-                  })
-                  if (findIndex === -1 && // 没找到
-                      j !== i && // 不是本人
-                      (tableData[j].groupID === 1 || tableData[j].groupID === 2)) {
-                    tableData[i].isEvaAllFinish = false
-                    break
-                  }
-                }
-              } else if (tableData[i].groupID === 3) {
-                for (let j = 0; j < tableData.length; j++) {
-                  let findIndex = tableData[j].allAMEvaedData.findIndex(item => {
-                    return item.evaUserID === tableData[i].id
-                  })
-                  if (findIndex === -1 && // 没找到
-                      j !== i && // 不是本人
-                      (tableData[j].groupID === 3)) {
-                    tableData[i].isEvaAllFinish = false
-                    break
-                  }
-                }
-              }
-            }
+            console.log(JSON.parse(JSON.stringify(tableData)))
             // =============================计算绩效评价相关信息====================================
             if (this.PMPublishStatusData.length > 0) { // 绩效数据库中已有相关数据
               this.PMPublishStatus = this.PMPublishStatusData[0].flagValue !== 0
@@ -498,10 +458,10 @@ export default {
                       })))
                     }
                     // 显示组员平均评价星级和组长评价星级
-                    this.dimension1CSAveStar = Number(tableData[i].newPMData.dimension1CSAveStar.toFixed(2))
-                    this.dimension1GPEvaStar = Number(tableData[i].newPMData.dimension1GPEvaStar.toFixed(2))
-                    this.dimension2CSAveStar = Number(tableData[i].newPMData.dimension2CSAveStar.toFixed(2))
-                    this.dimension2GPEvaStar = Number(tableData[i].newPMData.dimension2GPEvaStar.toFixed(2))
+                    this.dimension1CSAveStar = Number(tableData[i].AMD1CSEvaAveStar.toFixed(2))
+                    this.dimension1GPEvaStar = Number(tableData[i].AMD1GPEvaStar.toFixed(2))
+                    this.dimension2CSAveStar = Number(tableData[i].AMD2CSEvaAveStar.toFixed(2))
+                    this.dimension2GPEvaStar = Number(tableData[i].AMD2GPEvaStar.toFixed(2))
                     break
                   }
                 }
@@ -517,87 +477,27 @@ export default {
               let promises = []
               let count = 0
               promises[count++] = getAllWorkTimeList(this.title) // 获取工时申报情况
-              promises[count++] = getAllUserRates(usersList, this.title) // 获取定性评价情况
+              promises[count++] = getAllQTEvaedData(usersList, this.title) // 获取定性评价情况
+              // promises[count++] = getAllUserRates(usersList, this.title) // 获取定性评价情况
               promises[count++] = getEvaCoef() // 获取各种系数
               Promise.all(promises).then(allResponse => {
                 let allWorkTimeList = allResponse[0]
-                let allUserRates = allResponse[1]
+                let QTEvaedData = allResponse[1]
                 this.evaCoefObj = allResponse[2]
                 this.QYEvaScoreData = genQYEvaScoreData(usersList, allWorkTimeList, this.title) // 生成定量评价数据
-                this.QTEvaScoreData = genQualiEvaData(allUserRates) // 生成定性评价数据
-                let AMEvaScoreData = genAMEvaScoreData(tableData,
+                this.QTEvaScoreData = genQualiEvaData(QTEvaedData, this.QYEvaScoreData) // 生成定性评价数据
+                tableData = genAMEvaScoreData(tableData,
                                       this.evaCoefObj.AMBuildBoutiqueProjectCoef, this.evaCoefObj.AMBuildProTeamCoef,
                                       this.evaCoefObj.CSManagerAMEvaCoef, this.evaCoefObj.CSGroupLeaderAMEvaCoef,
                                       this.evaCoefObj.CScommonStaffAMEvaCoef, this.evaCoefObj.GPManagerAMEvaCoef,
                                       this.evaCoefObj.GPCommonStaffAMEvaCoef, this.QYEvaScoreData) // 生成成效评价数据
-                if (AMEvaScoreData.length > 0) {
-                  // 把生成的成效评价数据插入表格数据里
-                  for (let tableDataItem of tableData) {
-                    let findResult = AMEvaScoreData.find(AMEvaScoreDataItem => {
-                      return AMEvaScoreDataItem.evaedUserID === tableDataItem.id
-                    })
-                    tableDataItem.AMEvaScoreData = findResult
-                  }
-                  // ===========================在初始get到的成效评价数据上插入经理评价（如果经理还未评价）=========================
-                  for (let tableDataItem of tableData) {
-                    if (tableDataItem.conclusionEva.length === 0 && // 管理者尚未评价
-                        tableDataItem.submitStatus === 1 && // 月总结已提交
-                        tableDataItem.allAMEvaedData.length !== 0) { // 已有其他人评价
-                      // 构造打造精品工程的评价
-                      let obj = {
-                        dimension: 1,
-                        dimensionID: tableDataItem.allAMEvaedData.find(item => { return item.dimension === 1 }).dimensionID,
-                        evaStar: tableDataItem.AMEvaScoreData.dimension1AveStar,
-                        evaUserDuty: store.state.userInfo.duty,
-                        evaUserID: store.state.userInfo.id,
-                        evaUserName: store.state.userInfo.name,
-                        evaedUserDuty: tableDataItem.duty,
-                        evaedUserGroupID: tableDataItem.groupID,
-                        evaedUserID: tableDataItem.id,
-                        evaedUserName: tableDataItem.name
-                      }
-                      // 把构建的打造精品工程插入评价星级中
-                      tableDataItem.conclusionEva.push(JSON.parse(JSON.stringify(obj)))
-                      tableDataItem.allAMEvaedData.push(JSON.parse(JSON.stringify(obj))) // 插入对打造精品工程的经理评价
-                      // 构造创建专业团队的评价
-                      obj.dimension = 2
-                      obj.dimensionID = tableDataItem.allAMEvaedData.find(item => { return item.dimension === 2 }).dimensionID
-                      obj.evaStar = tableDataItem.AMEvaScoreData.dimension2AveStar
-                      tableDataItem.conclusionEva.push(JSON.parse(JSON.stringify(obj))) // 把构建的专业团队评价插入评价星级中
-                      tableDataItem.allAMEvaedData.push(JSON.parse(JSON.stringify(obj))) // 插入对创建专业团队的经理评价
-                    }
-                  }
-                  // 计算绩效信息
-                  let userListTmp = JSON.parse(JSON.stringify(this.usersList))
-                  userListTmp.splice(this.usersList.findIndex(user => { return user.id === store.state.userInfo.id }), 1)
-                  this.initPMData = genPerformanceScore(userListTmp, this.QYEvaScoreData, this.QTEvaScoreData, AMEvaScoreData,
-                                    this.evaCoefObj)
-                  // 把算出来的绩效信息插入表格数据
-                  for (let tableDataItem of tableData) {
-                    let findResult = this.initPMData.find(initPMDataItem => {
-                      return initPMDataItem.id === tableDataItem.id
-                    })
-                    if (typeof (findResult) !== 'undefined') {
-                      tableDataItem.PMData = findResult
-                      tableDataItem.PMData.dimension1CSAveStar = tableDataItem.AMEvaScoreData.dimension1CSAveStar
-                      tableDataItem.PMData.dimension1GPEvaStar = tableDataItem.AMEvaScoreData.dimension1GPEvaStar
-                      tableDataItem.PMData.dimension2CSAveStar = tableDataItem.AMEvaScoreData.dimension2CSAveStar
-                      tableDataItem.PMData.dimension2GPEvaStar = tableDataItem.AMEvaScoreData.dimension2GPEvaStar
-                      tableDataItem.newPMData = JSON.parse(JSON.stringify(tableDataItem.PMData))
-                      tableDataItem.newPMData.userJob = tableDataItem.job
-                      tableDataItem.newPMData.userDuty = tableDataItem.duty
-                      tableDataItem.PMScoreUnN = tableDataItem.newPMData.PMScoreUnN
-                      tableDataItem.totalWorkTime = tableDataItem.newPMData.totalWorkTime
-                    }
-                  }
-                  // 排序
-                  tableData = sortObjectArrayByParams(tableData, 'PMScoreUnN', 'totalWorkTime')
-                } else {
-                  this.dimension1CSAveStar = 0
-                  this.dimension1GPEvaStar = 0
-                  this.dimension2CSAveStar = 0
-                  this.dimension2GPEvaStar = 0
-                }
+                console.log('tableData2')
+                console.log(tableData)
+                // 计算绩效信息
+                tableData = genPerformanceScore(tableData, this.QYEvaScoreData, this.QTEvaScoreData, this.evaCoefObj)
+                this.initPMData = JSON.parse(JSON.stringify(tableData))
+                // 排序
+                tableData = sortObjectArrayByParams(tableData, 'PMScoreUnN', 'totalWorkTime')
                 // 显示第一个已提交的用户信息
                 for (let i = 0; i < tableData.length; i++) {
                   if (tableData[i].submitStatus !== 0) {
@@ -635,13 +535,11 @@ export default {
                         })))
                       }
                     }
-                    if (AMEvaScoreData.length > 0) {
-                      // 显示组员平均评价星级和组长评价星级
-                      this.dimension1CSAveStar = Number(tableData[i].newPMData.dimension1CSAveStar.toFixed(2))
-                      this.dimension1GPEvaStar = Number(tableData[i].newPMData.dimension1GPEvaStar.toFixed(2))
-                      this.dimension2CSAveStar = Number(tableData[i].newPMData.dimension2CSAveStar.toFixed(2))
-                      this.dimension2GPEvaStar = Number(tableData[i].newPMData.dimension2GPEvaStar.toFixed(2))
-                    }
+                    // 显示组员平均评价星级和组长评价星级
+                    this.dimension1CSAveStar = Number(tableData[i].AMD1CSEvaAveStar.toFixed(2))
+                    this.dimension1GPEvaStar = Number(tableData[i].AMD1GPEvaStar.toFixed(2))
+                    this.dimension2CSAveStar = Number(tableData[i].AMD2CSEvaAveStar.toFixed(2))
+                    this.dimension2GPEvaStar = Number(tableData[i].AMD2GPEvaStar.toFixed(2))
                     break
                   }
                 }
@@ -653,11 +551,11 @@ export default {
                 this.getDataLoading = true
               })
             }
-          })
+          }) // 获取绩效信息发布状态
         }
       })
     },
-    // 获取并生成表格数据
+    // 获取月总结及相关评价数据，生成初始表格数据
     genTableData (conclusionYear, conclusionMonth, SEGroup, CMGroup) {
       // 初始化默认数据
       let allconclusionAndEvaData = []
@@ -677,11 +575,21 @@ export default {
         isShow: false, // 当前是否显示
         isEvaAllFinish: true, // 是否已经评价完别人了
         conclusionEva: [], // 当前用户对该用户评价的数据
-        newPMData: { // 存储绩效数据
-          QYEvaRank: null, // 定量评价排名
-          AMEvaRank: null, // 成效评价排名
-          PMRank: null // 绩效排名
-        },
+        AMCSEvaTotalScore: 0, // 普通成员对该用户的成效评价总分
+        AMGPEvaScore: 0, // 本组组长对该用户的成效评价总分
+        AMMGEvaScore: 0, // 处经理对该用户的成效评价总分
+        AMD1GPEvaStar: 0, // 组长对评价维度1的评价星级
+        AMD2GPEvaStar: 0, // 组长对评价维度2的评价星级
+        AMD1CSEvaTotalStar: 0, // 普通成员对评价维度1的总评价星级
+        AMD2CSEvaTotalStar: 0, // 普通成员对评价维度2的总评价星级
+        AMD1CSEvaAveStar: 0, // 普通成员对评价维度1的平均评价星级
+        AMD2CSEvaAveStar: 0, // 普通成员对评价维度2的平均评价星级
+        AMEvaScoreUnN: 0, // 用户的成效评价得分（未标准化）
+        AMEvaScoreNor: 0, // 用户的成效评价得分（标准化）
+        totalWorkTime: 0, // 用户的总工时
+        PMScoreRank: 0, // 绩效得分排名
+        PMScoreUnN: 0, // 绩效得分(未标准化)
+        PMScoreNor: 0, // 绩效得分排名（标准化）
         allAMEvaedData: [] // 被评价的数据
       }
       // 如果当前用户属于技术标准组或工程组，则构造相应组别的成员
@@ -755,13 +663,41 @@ export default {
               allconclusionAndEvaData[i].allAMEvaedData = allResponse[i].data.AMEvaedData
             }
           }
+          // =============================判断各位用户是否已经评价完其他人=========================
+          for (let i = 0; i < allconclusionAndEvaData.length; i++) {
+            if (allconclusionAndEvaData[i].groupID === 1 || allconclusionAndEvaData[i].groupID === 2) {
+              for (let j = 0; j < allconclusionAndEvaData.length; j++) {
+                let findIndex = allconclusionAndEvaData[j].allAMEvaedData.findIndex(item => {
+                  return item.evaUserID === allconclusionAndEvaData[i].id
+                })
+                if (findIndex === -1 && // 没找到
+                    j !== i && // 不是本人
+                    (allconclusionAndEvaData[j].groupID === 1 || allconclusionAndEvaData[j].groupID === 2)) {
+                  allconclusionAndEvaData[i].isEvaAllFinish = false
+                  break
+                }
+              }
+            } else if (allconclusionAndEvaData[i].groupID === 3) {
+              for (let j = 0; j < allconclusionAndEvaData.length; j++) {
+                let findIndex = allconclusionAndEvaData[j].allAMEvaedData.findIndex(item => {
+                  return item.evaUserID === allconclusionAndEvaData[i].id
+                })
+                if (findIndex === -1 && // 没找到
+                    j !== i && // 不是本人
+                    (allconclusionAndEvaData[j].groupID === 3)) {
+                  allconclusionAndEvaData[i].isEvaAllFinish = false
+                  break
+                }
+              }
+            }
+          }
           resolve(allconclusionAndEvaData)
         }).catch(err => {
           reject(err)
         })
       })
     },
-    // 点击显示(表格1)
+    // 点击显示
     table1HandleShow (row, index) {
       this.curEvaUserName = row.name
       this.table1CurShowIndex = index
@@ -789,7 +725,7 @@ export default {
           }
         }
       }
-      // =================设置评价星级=====================
+      // ==========================================设置评价星级===============================================
       if (row.evaStatus === 1) {
         this.buildBoutiqueProjectStar = JSON.parse(JSON.stringify(row.conclusionEva.find(evaItem => {
             return evaItem.dimensionID === this.buildBoutiqueProject.id
@@ -823,18 +759,11 @@ export default {
           }
         }
       }
-      if (typeof (this.PMData[this.table1CurShowIndex].AMEvaScoreData) !== 'undefined') {
-        // 显示组员平均评价星级和组长评价星级
-        this.dimension1CSAveStar = Number(this.PMData[this.table1CurShowIndex].newPMData.dimension1CSAveStar.toFixed(2))
-        this.dimension1GPEvaStar = Number(this.PMData[this.table1CurShowIndex].newPMData.dimension1GPEvaStar.toFixed(2))
-        this.dimension2CSAveStar = Number(this.PMData[this.table1CurShowIndex].newPMData.dimension2CSAveStar.toFixed(2))
-        this.dimension2GPEvaStar = Number(this.PMData[this.table1CurShowIndex].newPMData.dimension2GPEvaStar.toFixed(2))
-      } else {
-        this.dimension1CSAveStar = 0
-        this.dimension1GPEvaStar = 0
-        this.dimension2CSAveStar = 0
-        this.dimension2GPEvaStar = 0
-      }
+      // 显示组员平均评价星级和组长评价星级
+      this.dimension1CSAveStar = Number(this.PMData[this.table1CurShowIndex].AMD1CSEvaAveStar.toFixed(2))
+      this.dimension1GPEvaStar = Number(this.PMData[this.table1CurShowIndex].AMD1GPEvaStar.toFixed(2))
+      this.dimension2CSAveStar = Number(this.PMData[this.table1CurShowIndex].AMD2CSEvaAveStar.toFixed(2))
+      this.dimension2GPEvaStar = Number(this.PMData[this.table1CurShowIndex].AMD2GPEvaStar.toFixed(2))
       this.forceRefresh = false
       this.$nextTick(() => {
         this.forceRefresh = true
@@ -849,6 +778,9 @@ export default {
         })
         if (typeof (findResult) !== 'undefined') {
           findResult.evaStar = this.buildBoutiqueProjectStar.evaStar
+        } else {
+          let obj = {
+          }
         }
         let AMEvaScoreData = genAMEvaScoreData(PMDataTmp,
                                   this.evaCoefObj.AMBuildBoutiqueProjectCoef, this.evaCoefObj.AMBuildProTeamCoef,
