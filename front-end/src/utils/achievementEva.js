@@ -113,6 +113,9 @@ export function genAMEvaScoreData (tableData,
   for (let tableDataItem of tableData) {
     let allAMEvaedDataLength = tableDataItem.allAMEvaedData.length
     let AMCSEvaNum = 0
+    tableDataItem.AMMGEvaScore = 0
+    tableDataItem.AMGPEvaScore = 0
+    tableDataItem.AMCSEvaTotalScore = 0
     for (let i = 0; i < allAMEvaedDataLength; i++) {
       let evaStar = tableDataItem.allAMEvaedData[i].evaStar
       let dimension = tableDataItem.allAMEvaedData[i].dimension
@@ -144,13 +147,22 @@ export function genAMEvaScoreData (tableData,
 
     // 如果处经理还未对该用户评价
     if (tableDataItem.AMMGEvaScore === 0) {
-      if (tableDataItem.AMCSEvaTotalScore !== 0 && tableDataItem.AMGPEvaScore !== 0) { // 如果普通成员和组长都评价了，则设置成他们的平均分
-        tableDataItem.AMMGEvaScore = (tableDataItem.AMCSEvaTotalScore + tableDataItem.AMGPEvaScore) / (AMCSEvaNum / 2 + 1)
-      } else if (tableDataItem.AMCSEvaTotalScore === 0 && tableDataItem.AMGPEvaScore !== 0) { // 如果普通成员还未有人评价，组长评价了，则设置成组长的评分
-        tableDataItem.AMMGEvaScore = tableDataItem.AMGPEvaScore
-      } else if (tableDataItem.AMCSEvaTotalScore !== 0 && tableDataItem.AMGPEvaScore === 0) { // 如果普通成员有人评价了，组长还没评价，则设置成普通成员的评分
-        tableDataItem.AMMGEvaScore = tableDataItem.AMCSEvaAveScore
+      let AMD1AveStar = 0
+      let AMD2AveStar = 0
+      if (tableDataItem.AMCSEvaTotalScore !== 0 && tableDataItem.AMGPEvaScore !== 0) { // 如果普通成员和组长都评价了，则设置成他们的平均星级取整
+        AMD1AveStar = Number(((tableDataItem.AMD1CSEvaTotalStar + tableDataItem.AMD1GPEvaStar) / (AMCSEvaNum / 2 + 1)).toFixed(0))
+        AMD2AveStar = Number(((tableDataItem.AMD2CSEvaTotalStar + tableDataItem.AMD2GPEvaStar) / (AMCSEvaNum / 2 + 1)).toFixed(0))
+      } else if (tableDataItem.AMCSEvaTotalScore === 0 && tableDataItem.AMGPEvaScore !== 0) { // 如果普通成员还未有人评价，组长评价了，则设置成组长的评价星级
+        AMD1AveStar = tableDataItem.AMD1GPEvaStar
+        AMD2AveStar = tableDataItem.AMD2GPEvaStar
+      } else if (tableDataItem.AMCSEvaTotalScore !== 0 && tableDataItem.AMGPEvaScore === 0) { // 如果普通成员有人评价了，组长还没评价，则设置成普通成员的评价评价星级取整
+        AMD1AveStar = Number(((tableDataItem.AMD1CSEvaTotalStar) / (AMCSEvaNum / 2)).toFixed(0))
+        AMD2AveStar = Number(((tableDataItem.AMD2CSEvaTotalStar) / (AMCSEvaNum / 2)).toFixed(0))
       }
+      tableDataItem.AMD1MGEvaStarV = AMD1AveStar
+      tableDataItem.AMD2MGEvaStarV = AMD2AveStar
+      tableDataItem.AMMGEvaScore = calAMRateMid(AMD1AveStar, 1, AMBuildBoutiqueProjectCoef, AMBuildProTeamCoef) +
+                                   calAMRateMid(AMD2AveStar, 2, AMBuildBoutiqueProjectCoef, AMBuildProTeamCoef)
     }
   }
   // ===================================================计算成效评价的标准化得分=========================================================

@@ -121,7 +121,6 @@ export function genQYEvaScoreData (users, quantativeData, applyMonth) {
 
 // 生成绩效得分与排名数据(新)
 export function genPerformanceScore (tableData, QYEvaScoreData, QTEvaScoreData, evaCoefObj) {
-    let userPMScoreData = []
     // ==============================绩效得分(未标准化)计算================================
     for (let tableDataItem of tableData) {
       let itemQuantativeScore = QYEvaScoreData.find(quantativeDataItem => { // 找出初始表格成员对应的定量数据
