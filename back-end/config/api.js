@@ -6,6 +6,7 @@ module.exports = {
     getTypeGlobalFlag: path + '/common/getTypeGlobalFlag',
     getGlobalFlagByType: path + '/common/getGlobalFlagByType',
     updateGlobalFlagVal: path + '/common/updateGlobalFlagVal',
+    getEvaCoef: path + '/common/getEvaCoef',
 
     // user-用户管理
     userLogin: path + '/user/login', // 用户登录

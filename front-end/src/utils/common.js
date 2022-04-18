@@ -11,7 +11,8 @@ import {
   urlGetPerformanceIsPublish,
   urlGetTypeGlobalFlag,
   urlGetGlobalFlagByType,
-  urlUpdateGlobalFlagVal
+  urlUpdateGlobalFlagVal,
+  urlGetEvaCoef
 } from '../config/interface'
 import store from '@/store'
 
@@ -515,23 +516,15 @@ export function compare (params) {
 
 // 从数据库获取各种评价系数
 export function getEvaCoef () {
-  let promises = []
-  let count = 0
-  promises[count++] = getGlobalFlagByType('CSMutualCoef')
-  promises[count++] = getGlobalFlagByType('MGEvaCoef')
-  promises[count++] = getGlobalFlagByType('quantitativeCoef')
-  promises[count++] = getGlobalFlagByType('PMEvaCoef')
-  promises[count++] = getGlobalFlagByType('CSManagerAMEvaCoef')
-  promises[count++] = getGlobalFlagByType('CSGroupLeaderAMEvaCoef')
-  promises[count++] = getGlobalFlagByType('CScommonStaffAMEvaCoef')
-  promises[count++] = getGlobalFlagByType('GPManagerAMEvaCoef')
-  promises[count++] = getGlobalFlagByType('GPCommonStaffAMEvaCoef')
-  promises[count++] = getGlobalFlagByType('AMBuildBoutiqueProjectCoef')
-  promises[count++] = getGlobalFlagByType('AMBuildProTeamCoef')
+  const url = urlGetEvaCoef
+  let params = {}
   return new Promise(function (resolve, reject) {
-    Promise.all(promises).then(result => {
+    http(url, params).then(result => {
+      console.log('result')
+      console.log(result)
+      let resultData = result.data
       let allEvaCoefExist = true
-      for (let item of result) {
+      for (let item of resultData) {
         if (item.length === 0) {
           allEvaCoefExist = false
           break
@@ -539,17 +532,17 @@ export function getEvaCoef () {
       }
       if (allEvaCoefExist) {
         let obj = {
-          CSMutualCoef: result[0][0].flagValue,
-          MGEvaCoef: result[1][0].flagValue,
-          quantitativeCoef: result[2][0].flagValue,
-          PMEvaCoef: result[3][0].flagValue,
-          CSManagerAMEvaCoef: result[4][0].flagValue,
-          CSGroupLeaderAMEvaCoef: result[5][0].flagValue,
-          CScommonStaffAMEvaCoef: result[6][0].flagValue,
-          GPManagerAMEvaCoef: result[7][0].flagValue,
-          GPCommonStaffAMEvaCoef: result[8][0].flagValue,
-          AMBuildBoutiqueProjectCoef: result[9][0].flagValue,
-          AMBuildProTeamCoef: result[10][0].flagValue
+          CSMutualCoef: resultData[0][0].flagValue,
+          MGEvaCoef: resultData[1][0].flagValue,
+          quantitativeCoef: resultData[2][0].flagValue,
+          PMEvaCoef: resultData[3][0].flagValue,
+          CSManagerAMEvaCoef: resultData[4][0].flagValue,
+          CSGroupLeaderAMEvaCoef: resultData[5][0].flagValue,
+          CScommonStaffAMEvaCoef: resultData[6][0].flagValue,
+          GPManagerAMEvaCoef: resultData[7][0].flagValue,
+          GPCommonStaffAMEvaCoef: resultData[8][0].flagValue,
+          AMBuildBoutiqueProjectCoef: resultData[9][0].flagValue,
+          AMBuildProTeamCoef: resultData[10][0].flagValue
         }
         resolve(obj)
       } else {
@@ -560,10 +553,17 @@ export function getEvaCoef () {
     })
   })
 }
-// 排序比较函数
+// 排序比较函数(从大到小)
 export function sortBy (props) {
   return function (a, b) {
     return b[props] - a[props]
+  }
+}
+
+// 排序比较函数(从小到大)
+export function sortByAscend (props) {
+  return function (a, b) {
+    return a[props] - b[props]
   }
 }
 

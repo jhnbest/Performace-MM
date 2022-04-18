@@ -15,6 +15,7 @@ let router = express.Router();
 router.post(api.getTypeGlobalFlag, common.getTypeGlobalFlag)
 router.post(api.getGlobalFlagByType, common.getGlobalFlagByType)
 router.post(api.updateGlobalFlagVal, common.updateGlobalFlagVal)
+router.post(api.getEvaCoef, common.getEvaCoef)
 // user-用户管理
 router.post(api.userLogin, user.login);
 router.post(api.userLogout, user.logout);

@@ -149,7 +149,7 @@ export function genPerformanceScore (tableData, QYEvaScoreData, QTEvaScoreData, 
     }
     tableData = sortObjectArrayByParams(JSON.parse(JSON.stringify(tableData)), 'PMScoreUnN', 'totalWorkTime')
     for (let i = 0; i < tableData.length; i++) {
-      tableData[i].PMScoreRank = i + 1 // 绩效排名计算
+      tableData[i].PMRank = i + 1 // 绩效排名计算
       tableData[i].initPMRank = i + 1 // 初始绩效排名
       tableData[i].PMScoreNor = NorCal(tableData.length + 1, i + 1)
     }
@@ -293,30 +293,38 @@ export function calPMData (applyDate) {
 export function savePMData (applyDate, PMData) {
   return new Promise(function (resolve, reject) {
     let url = urlSavePMData
+    let PMDataTmp = []
+    // 只挑有用的数据上传
+    for (let PMDataItem of PMData) {
+      let obj = {
+        userID: PMDataItem.id,
+        totalWorkTime: PMDataItem.totalWorkTime,
+        QYEvaRank: PMDataItem.QYEvaRank,
+        QYEvaScoreNor: PMDataItem.QYEvaScoreNor,
+        CSQTEvaScoreUnN: PMDataItem.CSQTEvaScoreUnN,
+        CSQTEvaScoreNor: PMDataItem.CSQTEvaScoreNor,
+        CSQTEvaRank: PMDataItem.CSQTEvaRank,
+        MGQTEvaScoreUnN: PMDataItem.MGQTEvaScoreUnN,
+        MGQTEvaRank: PMDataItem.MGQTEvaRank,
+        MGQTEvaScoreNor: PMDataItem.MGQTEvaScoreNor,
+        AMEvaScoreUnN: PMDataItem.AMEvaScoreUnN,
+        AMEvaScoreNor: PMDataItem.AMEvaScoreNor,
+        AMEvaRank: PMDataItem.AMEvaRank,
+        PMScoreUnN: PMDataItem.PMScoreUnN,
+        PMScoreNor: PMDataItem.PMScoreNor,
+        PMRank: PMDataItem.PMRank,
+        dimension1CSAveStar: PMDataItem.AMD1CSEvaAveStar,
+        dimension1GPEvaStar: PMDataItem.AMD1GPEvaStar,
+        dimension2CSAveStar: PMDataItem.AMD2CSEvaAveStar,
+        dimension2GPEvaStar: PMDataItem.AMD2GPEvaStar,
+        userDuty: PMDataItem.duty,
+        userJob: PMDataItem.job
+      }
+      PMDataTmp.push(JSON.parse(JSON.stringify(obj)))
+    }
     let params = {
       applyDate: applyDate,
-      userID: PMData.id,
-      userJob: PMData.userJob,
-      userDuty: PMData.userDuty,
-      totalWorkTime: PMData.totalWorkTime,
-      QYEvaRank: PMData.QYEvaRank,
-      QYEvaScoreNor: PMData.QYEvaScoreNor,
-      CSQTEvaScoreUnN: PMData.CSQTEvaScoreUnN,
-      CSQTEvaScoreNor: PMData.CSQTEvaScoreNor,
-      CSQTEvaRank: PMData.CSQTEvaRank,
-      MGQTEvaScoreUnN: PMData.MGQTEvaScoreUnN,
-      MGQTEvaRank: PMData.MGQTEvaRank,
-      MGQTEvaScoreNor: PMData.MGQTEvaScoreNor,
-      AMEvaScoreUnN: PMData.AMEvaScoreUnN,
-      AMEvaScoreNor: PMData.AMEvaScoreNor,
-      AMEvaRank: PMData.AMEvaRank,
-      PMScoreUnN: PMData.PMScoreUnN,
-      PMScoreNor: PMData.PMScoreNor,
-      PMRank: PMData.PMRank,
-      dimension1CSAveStar: PMData.dimension1CSAveStar,
-      dimension1GPEvaStar: PMData.dimension1GPEvaStar,
-      dimension2CSAveStar: PMData.dimension2CSAveStar,
-      dimension2GPEvaStar: PMData.dimension2GPEvaStar
+      PMData: PMDataTmp
     }
     http(url, params).then(response => {
       if (response.code === 1) {
@@ -334,28 +342,35 @@ export function savePMData (applyDate, PMData) {
 export function updatePMData (PMData) {
   return new Promise(function (resolve, reject) {
     let url = urlUpdatePMData
+    let PMDataTmp = []
+    // 只挑有用的数据上传
+    for (let PMDataItem of PMData) {
+      let obj = {
+        totalWorkTime: PMDataItem.totalWorkTime,
+        QYEvaRank: PMDataItem.QYEvaRank,
+        QYEvaScoreNor: PMDataItem.QYEvaScoreNor,
+        CSQTEvaScoreUnN: PMDataItem.CSQTEvaScoreUnN,
+        CSQTEvaScoreNor: PMDataItem.CSQTEvaScoreNor,
+        CSQTEvaRank: PMDataItem.CSQTEvaRank,
+        MGQTEvaScoreUnN: PMDataItem.MGQTEvaScoreUnN,
+        MGQTEvaRank: PMDataItem.MGQTEvaRank,
+        MGQTEvaScoreNor: PMDataItem.MGQTEvaScoreNor,
+        AMEvaScoreUnN: PMDataItem.AMEvaScoreUnN,
+        AMEvaScoreNor: PMDataItem.AMEvaScoreNor,
+        AMEvaRank: PMDataItem.AMEvaRank,
+        PMScoreUnN: PMDataItem.PMScoreUnN,
+        PMScoreNor: PMDataItem.PMScoreNor,
+        PMRank: PMDataItem.PMRank,
+        dimension1CSAveStar: PMDataItem.AMD1CSEvaAveStar,
+        dimension1GPEvaStar: PMDataItem.AMD1GPEvaStar,
+        dimension2CSAveStar: PMDataItem.AMD2CSEvaAveStar,
+        dimension2GPEvaStar: PMDataItem.AMD2GPEvaStar,
+        id: PMDataItem.id
+      }
+      PMDataTmp.push(JSON.parse(JSON.stringify(obj)))
+    }
     let params = {
-      id: PMData.id,
-      userID: PMData.userID,
-      totalWorkTime: PMData.totalWorkTime,
-      QYEvaRank: PMData.QYEvaRank,
-      QYEvaScoreNor: PMData.QYEvaScoreNor,
-      CSQTEvaScoreUnN: PMData.CSQTEvaScoreUnN,
-      CSQTEvaScoreNor: PMData.CSQTEvaScoreNor,
-      CSQTEvaRank: PMData.CSQTEvaRank,
-      MGQTEvaScoreUnN: PMData.MGQTEvaScoreUnN,
-      MGQTEvaRank: PMData.MGQTEvaRank,
-      MGQTEvaScoreNor: PMData.MGQTEvaScoreNor,
-      AMEvaScoreUnN: PMData.AMEvaScoreUnN,
-      AMEvaScoreNor: PMData.AMEvaScoreNor,
-      AMEvaRank: PMData.AMEvaRank,
-      PMScoreUnN: PMData.PMScoreUnN,
-      PMScoreNor: PMData.PMScoreNor,
-      PMRank: PMData.PMRank,
-      dimension1CSAveStar: PMData.dimension1CSAveStar,
-      dimension1GPEvaStar: PMData.dimension1GPEvaStar,
-      dimension2CSAveStar: PMData.dimension2CSAveStar,
-      dimension2GPEvaStar: PMData.dimension2GPEvaStar
+      PMData: PMDataTmp
     }
     http(url, params).then(response => {
       if (response.code === 1) {

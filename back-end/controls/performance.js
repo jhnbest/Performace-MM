@@ -1117,34 +1117,46 @@ const performance = {
     savePMData (req, res) {
         let sendData = req.body
         let sql = $sql.performance.savePMData
-        let arrayParams = [sendData.userID, sendData.applyDate, sendData.totalWorkTime, sendData.QYEvaRank,
-                           sendData.QYEvaScoreNor, sendData.CSQTEvaScoreUnN, sendData.CSQTEvaScoreNor,
-                           sendData.CSQTEvaRank, sendData.MGQTEvaScoreUnN, sendData.MGQTEvaRank,
-                           sendData.MGQTEvaScoreNor, sendData.AMEvaScoreUnN, sendData.AMEvaScoreNor,
-                           sendData.AMEvaRank, sendData.PMScoreUnN, sendData.PMScoreNor, sendData.PMRank,
-                           sendData.dimension1CSAveStar, sendData.dimension1GPEvaStar,
-                           sendData.dimension2CSAveStar, sendData.dimension2GPEvaStar, sendData.userDuty, sendData.userJob]
-        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
-            return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
-        }).catch(RCPDDatabaseErr => {
-            return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+        let promise = []
+        let count = 0
+        let arrayParams = []
+        for (let PMDataItem of sendData.PMData) {
+          arrayParams = [PMDataItem.userID, sendData.applyDate, PMDataItem.totalWorkTime, PMDataItem.QYEvaRank,
+            PMDataItem.QYEvaScoreNor, PMDataItem.CSQTEvaScoreUnN, PMDataItem.CSQTEvaScoreNor,
+            PMDataItem.CSQTEvaRank, PMDataItem.MGQTEvaScoreUnN, PMDataItem.MGQTEvaRank,
+            PMDataItem.MGQTEvaScoreNor, PMDataItem.AMEvaScoreUnN, PMDataItem.AMEvaScoreNor,
+            PMDataItem.AMEvaRank, PMDataItem.PMScoreUnN, PMDataItem.PMScoreNor, PMDataItem.PMRank,
+            PMDataItem.dimension1CSAveStar, PMDataItem.dimension1GPEvaStar,
+            PMDataItem.dimension2CSAveStar, PMDataItem.dimension2GPEvaStar, PMDataItem.userDuty, PMDataItem.userJob]
+          promise[count++] = RCPDDatabase(sql, arrayParams)
+        }
+        Promise.all(promise).then(allResponse => {
+          return $http.writeJson(res, {code: 1, data: allResponse, message: 'success'})
+        }).catch(err => {
+          return $http.writeJson(res, {code: -2, err: err, message: 'false'})
         })
     },
     // 更新绩效数据
     updatePMData (req, res) {
         let sendData = req.body
         let sql = $sql.performance.updatePMData
-        let arrayParams = [sendData.totalWorkTime, sendData.QYEvaRank, sendData.QYEvaScoreNor,
-                           sendData.CSQTEvaScoreUnN, sendData.CSQTEvaScoreNor,
-                           sendData.CSQTEvaRank, sendData.MGQTEvaScoreUnN, sendData.MGQTEvaRank,
-                           sendData.MGQTEvaScoreNor, sendData.AMEvaScoreUnN, sendData.AMEvaScoreNor,
-                           sendData.AMEvaRank, sendData.PMScoreUnN, sendData.PMScoreNor, sendData.PMRank,
-                           sendData.dimension1CSAveStar, sendData.dimension1GPEvaStar,
-                           sendData.dimension2CSAveStar, sendData.dimension2GPEvaStar, sendData.id]
-        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
-            return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
-        }).catch(RCPDDatabaseErr => {
-            return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+        let promise = []
+        let count = 0
+        let arrayParams = []
+        for (let PMDataItem of sendData.PMData) {
+          arrayParams = [PMDataItem.totalWorkTime, PMDataItem.QYEvaRank, PMDataItem.QYEvaScoreNor,
+            PMDataItem.CSQTEvaScoreUnN, PMDataItem.CSQTEvaScoreNor,
+            PMDataItem.CSQTEvaRank, PMDataItem.MGQTEvaScoreUnN, PMDataItem.MGQTEvaRank,
+            PMDataItem.MGQTEvaScoreNor, PMDataItem.AMEvaScoreUnN, PMDataItem.AMEvaScoreNor,
+            PMDataItem.AMEvaRank, PMDataItem.PMScoreUnN, PMDataItem.PMScoreNor, PMDataItem.PMRank,
+            PMDataItem.dimension1CSAveStar, PMDataItem.dimension1GPEvaStar,
+            PMDataItem.dimension2CSAveStar, PMDataItem.dimension2GPEvaStar, PMDataItem.id]
+          promise[count++] = RCPDDatabase(sql, arrayParams)
+        }
+        Promise.all(promise).then(allResponse => {
+          return $http.writeJson(res, {code: 1, data: allResponse, message: 'success'})
+        }).catch(err => {
+          return $http.writeJson(res, {code: -2, err: err, message: 'false'})
         })
     },
     // 获取绩效数据

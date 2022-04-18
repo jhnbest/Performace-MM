@@ -49,6 +49,25 @@ const common = {
         }).catch(RCPDDatabaseErr => {
             return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
         })
+    },
+    // 从数据库获取各种评价系数
+    getEvaCoef (req, res) {
+      let sql = $sql.common.getGlobalFlagByType
+      let evaCoefType = ['CSMutualCoef', 'MGEvaCoef', 'quantitativeCoef', 'PMEvaCoef', 'CSManagerAMEvaCoef'
+      , 'CSGroupLeaderAMEvaCoef', 'CScommonStaffAMEvaCoef', 'GPManagerAMEvaCoef', 'GPCommonStaffAMEvaCoef'
+      , 'AMBuildBoutiqueProjectCoef', 'AMBuildProTeamCoef']
+      let arrayParams = []
+      let promise = []
+      let count = 0
+      for (let item of evaCoefType) {
+        arrayParams = [item]
+        promise[count++] = RCPDDatabase(sql, arrayParams)
+      }
+      Promise.all(promise).then(allResponse => {
+        return $http.writeJson(res, {code: 1, data: allResponse, message: 'success'})
+      }).catch(err => {
+        return $http.writeJson(res, {code: -2, err: err, message: 'false'})
+      })
     }
 }
 module.exports = common

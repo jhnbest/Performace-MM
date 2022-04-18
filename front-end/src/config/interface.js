@@ -3,6 +3,7 @@
 export const urlGetTypeGlobalFlag = '/common/getTypeGlobalFlag'
 export const urlGetGlobalFlagByType = '/common/getGlobalFlagByType'
 export const urlUpdateGlobalFlagVal = '/common/updateGlobalFlagVal' // 更新某种类型的全局标志位
+export const urlGetEvaCoef = '/common/getEvaCoef' // 从数据库获取各种评价系数
 
 export const userLogin = '/user/login' // 用户登录
 export const userLogout = '/user/logout' // 用户登出
