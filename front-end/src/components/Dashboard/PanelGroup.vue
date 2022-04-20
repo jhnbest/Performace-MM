@@ -240,8 +240,6 @@ export default {
   methods: {
     // 初始化
     init () {
-      console.log('document.Cookies')
-      console.log(document.cookie)
       if (typeof (Cookies.get('hMon')) === 'undefined') {
         Cookies.set('hMon', this.title)
       }

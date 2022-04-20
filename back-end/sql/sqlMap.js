@@ -1,7 +1,7 @@
 const sqlMap = {
   common: {
     getTypeGlobalFlag: 'select * from globalflag where year(setTime) = ? and month(setTime) = ? and flagType = ?',
-    getGlobalFlagByType: 'select * from globalflag where flagType = ?',
+    getGlobalFlagByType: 'select * from globalflag where flagType in (?)',
     updateGlobalFlagVal: 'update globalflag set flagValue = ? where flagType = ?'
   },
   user: {
@@ -252,7 +252,7 @@ const sqlMap = {
     getPreMonthEva: 'select mr.*, u.name as ratedPersionName from mutualrate mr left join users u on mr.ratedPersion = ' +
         'u.id where mr.rateMonth = ? and mr.ratePersion = ?',
     handleFillMul: 'select count(*) as totalCount from mutualrate where ratePersion = ? and rateMonth = ?',
-    handleFillMulCheck: 'select * from mutualrate where ratePersion = ? and rateMonth = "2022-01"',
+    handleFillMulCheck: 'select * from mutualrate where ratePersion = ? and rateMonth = ?',
     handleFillMulFill: 'insert into mutualrate (ratePersion, ratedPersion, rateMonth, rate, rateType, rateTime, updateTime) ' +
         'values (?, ?, ?, ?, ?, ?, ?)',
     getPerformanceRates: 'select pr.*, u.name as ratedPersionName, u.duty from performancerate pr left join users u on pr.ratedPersion = u.id ' +
@@ -278,11 +278,11 @@ const sqlMap = {
     ' dimension, content, submitTime, updateTime, MGEvaStar, submitStatus) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
     updateMonthConclusionNew: 'update newconclusion set content = ?, submitStatus = ?, updateTime = ? where id = ?',
     getCurMonthConclusionOverviewDataNew: 'select nc.*, u.name from newconclusion nc left join users u on' +
-    ' nc.userID = u.id where nc.conclusionYear = ? and nc.conclusionMonth = ? and nc.userID = ?'
+    ' nc.userID = u.id where nc.conclusionYear = ? and nc.conclusionMonth = ? and nc.userID in (?)'
   },
   achievementsEva: {
     getUserofAchievementToAnotherUser: 'select nce.*, u.name from newconclusionevadata nce left join users u on' +
-                        ' nce.evaUserID = u.id where nce.dimensionID = ? and evaUserID = ?',
+                        ' nce.evaUserID = u.id where nce.dimensionID in (?) and evaUserID = ?',
     submitAMEvaData: 'insert into newconclusionevadata (evaUserID, dimensionID, evaStar, submitTime, updateTime)' +
                     ' values (?, ?, ?, ?, ?)',
     updateAMEvaData: 'update newconclusionevadata set evaStar = ?, updateTime = ? where id = ?',
@@ -295,8 +295,9 @@ const sqlMap = {
                      ' n.id = nc.dimensionID left join users u1 on n.userID = u1.id left join users u2 on nc.evaUserID = u2.id' +
                      ' where n.userID = ? and n.conclusionYear = ? and n.conclusionMonth = ? and n.dimension != 3 and n.dimension != 4',
     getOtherUserConclusionEvaedData: 'select nce.*, u.name as evaUserName, u.duty as evaUserDuty, u.groupName as' +
-                     ' evaUserGroupID, nc.dimension from newconclusionevadata nce left join users u on nce.evaUserID = u.id left join' +
-                     ' newconclusion nc on nce.dimensionID = nc.id where nce.dimensionID = ?'
+                     ' evaUserGroupID, nc.dimension, nc.userID as evaedUserID from newconclusionevadata nce left' +
+                     ' join users u on nce.evaUserID = u.id left join' +
+                     ' newconclusion nc on nce.dimensionID = nc.id where nce.dimensionID in (?)'
   }
 }
 module.exports = sqlMap;

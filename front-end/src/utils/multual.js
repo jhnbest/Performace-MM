@@ -238,8 +238,6 @@ function calQTRateMid (rate, rateType) {
 
 // 生成定性评价数据
 export function genQualiEvaData (QTEvaedData, QYEvaScoreData) {
-  console.log('QTEvaedData')
-  console.log(QTEvaedData)
   let QTEvaScoreData = []
   let SEGroupQTEvaData = [] // 技术标准和工程组互评数据
   let CMGroupQTEvaData = [] // 通信组互评数据
@@ -298,8 +296,6 @@ export function genQualiEvaData (QTEvaedData, QYEvaScoreData) {
     QTEvaScoreData[i].MGQualiEvaScoreRank = i + 1
     QTEvaScoreData[i].MGQualiEvaScoreNor = NorCal(QTEvaScoreData.length + 1, i + 1)
   }
-  console.log('QTEvaScoreData')
-  console.log(QTEvaScoreData)
 
   return QTEvaScoreData
 }

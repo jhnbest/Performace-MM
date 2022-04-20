@@ -520,34 +520,21 @@ export function getEvaCoef () {
   let params = {}
   return new Promise(function (resolve, reject) {
     http(url, params).then(result => {
-      console.log('result')
-      console.log(result)
       let resultData = result.data
-      let allEvaCoefExist = true
-      for (let item of resultData) {
-        if (item.length === 0) {
-          allEvaCoefExist = false
-          break
-        }
+      let obj = {
+        CSMutualCoef: resultData.find(item => { return item.flagType === 'CSMutualCoef' }).flagValue,
+        MGEvaCoef: resultData.find(item => { return item.flagType === 'MGEvaCoef' }).flagValue,
+        quantitativeCoef: resultData.find(item => { return item.flagType === 'quantitativeCoef' }).flagValue,
+        PMEvaCoef: resultData.find(item => { return item.flagType === 'PMEvaCoef' }).flagValue,
+        CSManagerAMEvaCoef: resultData.find(item => { return item.flagType === 'CSManagerAMEvaCoef' }).flagValue,
+        CSGroupLeaderAMEvaCoef: resultData.find(item => { return item.flagType === 'CSGroupLeaderAMEvaCoef' }).flagValue,
+        CScommonStaffAMEvaCoef: resultData.find(item => { return item.flagType === 'CScommonStaffAMEvaCoef' }).flagValue,
+        GPManagerAMEvaCoef: resultData.find(item => { return item.flagType === 'GPManagerAMEvaCoef' }).flagValue,
+        GPCommonStaffAMEvaCoef: resultData.find(item => { return item.flagType === 'GPCommonStaffAMEvaCoef' }).flagValue,
+        AMBuildBoutiqueProjectCoef: resultData.find(item => { return item.flagType === 'AMBuildBoutiqueProjectCoef' }).flagValue,
+        AMBuildProTeamCoef: resultData.find(item => { return item.flagType === 'AMBuildProTeamCoef' }).flagValue
       }
-      if (allEvaCoefExist) {
-        let obj = {
-          CSMutualCoef: resultData[0][0].flagValue,
-          MGEvaCoef: resultData[1][0].flagValue,
-          quantitativeCoef: resultData[2][0].flagValue,
-          PMEvaCoef: resultData[3][0].flagValue,
-          CSManagerAMEvaCoef: resultData[4][0].flagValue,
-          CSGroupLeaderAMEvaCoef: resultData[5][0].flagValue,
-          CScommonStaffAMEvaCoef: resultData[6][0].flagValue,
-          GPManagerAMEvaCoef: resultData[7][0].flagValue,
-          GPCommonStaffAMEvaCoef: resultData[8][0].flagValue,
-          AMBuildBoutiqueProjectCoef: resultData[9][0].flagValue,
-          AMBuildProTeamCoef: resultData[10][0].flagValue
-        }
-        resolve(obj)
-      } else {
-        reject(new Error('系数不存在'))
-      }
+      resolve(obj)
     }).catch(err => {
       reject(err)
     })

@@ -76,13 +76,6 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="管理者评分" align="center">
-        <template slot-scope="scope">
-          <el-rate v-if="scope.row.managerRateStar" :disabled="true" v-model="scope.row.managerRateStar" slot="reference" style="size: 50px"></el-rate>
-          <span v-else>暂未评分</span>
-        </template>
-      </el-table-column>
-      <!-- <el-table-column label="获得工时" align="center" prop="getWorkTime" width="100"></el-table-column> -->
       <el-table-column label="操作" align="center" width="250">
         <template slot-scope="scope">
 <!--          点击预览-->
@@ -199,6 +192,8 @@
         this.reqFlag.getCurApplyAbleMonth = false
         // 获取年内所有月总结概览数据
         getCurYearConclusionOverviewData(this.title, this.curUser).then((response) => {
+          console.log('response')
+          console.log(response)
           // 初始化默认数据
           this.initDefaultData()
           for (let i = 0; i < response.length; i++) {
@@ -218,8 +213,9 @@
                 this.rateTableData[i].managerEva = response[i].data.managerEva
               }
             } else {
-              if (response[i].data.length !== 0) {
-                this.rateTableData[i].conclusionTitle = response[i].data[0].conclusionType === 1 ? this.rateTableData[i].conclusionTitle : null
+              if (response[i].data.conclusionData.length !=12123= 0) {
+                this.rateTableData[i].conclusionTitle = response[i].data.conclusionData[0].conclusionType === 1
+                  ? this.rateTableData[i].conclusionTitle : null
                 this.rateTableData[i].submitMonth = response[i].data[0].conclusionMonth
                 this.rateTableData[i].submitStatus = response[i].data[0].submitStatus
                 this.rateTableData[i].managerRateStar = response[i].data[0].MGEvaStar

@@ -37,12 +37,12 @@ export function getCurMonthConclusionOverviewData (submitMonth, submitYear, subm
 }
 
 // 获取月总结概览信息（新）
-export function getCurMonthConclusionOverviewDataNew (conclusionYear, conclusionMonth, userID, evaUserID, evaUserDuty) {
+export function getCurMonthConclusionOverviewDataNew (conclusionYear, conclusionMonth, checkUserID, evaUserID, evaUserDuty) {
   const url = urlGetCurMonthConclusionOverviewDataNew
   let params = {
     conclusionYear: conclusionYear,
     conclusionMonth: conclusionMonth,
-    userID: userID,
+    checkUserID: checkUserID,
     evaUserID: evaUserID,
     evaUserDuty: evaUserDuty
   }
@@ -69,7 +69,7 @@ export function getCurYearConclusionOverviewData (submitYear, submitter) {
       if (moment(titleMonth).isBefore(store.state.newRulesDate)) { // 请求的月份再新规则实施月份之前
         promise[i] = getCurMonthConclusionOverviewData(i + 1, submitYear, submitter)
       } else {
-        promise[i] = getCurMonthConclusionOverviewDataNew(submitYear, i + 1, submitter)
+        promise[i] = getCurMonthConclusionOverviewDataNew(submitYear, i + 1, [submitter])
       }
     }
     Promise.all(promise).then(result => {

@@ -353,7 +353,6 @@ export default {
     // 初始化显示数据
     initData (conclusionYear, conclusionMonth, SEGroup, CMGroup, usersList) {
       // 先生成表格初始数据（获取其他人的月总结以及对其他的月总结评价
-      let start = new Date()
       this.genTableData(conclusionYear, conclusionMonth, SEGroup, CMGroup).then(tableData => {
         // 普通员工
         if (store.state.userInfo.duty !== 1) {
@@ -398,8 +397,6 @@ export default {
           // 首先判断绩效信息发布状态并获取每条月总结对应的所有评价，如果绩效已发布，则显示已经发布的绩效数据；
           getPerformanceIsPublish(conclusionYear, conclusionMonth).then(response => {
             this.PMPublishStatusData = response // 绩效发布状态
-            console.log('tableData')
-            console.log(JSON.parse(JSON.stringify(tableData)))
             // =============================计算绩效评价相关信息====================================
             if (this.PMPublishStatusData.length > 0) { // 绩效数据库中已有相关数据
               this.PMPublishStatus = this.PMPublishStatusData[0].flagValue !== 0 // 绩效发布状态设置
@@ -421,8 +418,6 @@ export default {
                 }
                 // 排序
                 tableData.sort(sortByAscend('PMRank'))
-                console.log('tableData2')
-                console.log(tableData)
                 this.initPMData = JSON.parse(JSON.stringify(tableData))
                 // 显示第一个已提交的用户信息
                 for (let i = 0; i < tableData.length; i++) {
@@ -478,7 +473,6 @@ export default {
               let count = 0
               promises[count++] = getAllWorkTimeList(this.title) // 获取工时申报情况
               promises[count++] = getAllQTEvaedData(usersList, this.title) // 获取定性评价情况
-              // promises[count++] = getAllUserRates(usersList, this.title) // 获取定性评价情况
               promises[count++] = getEvaCoef() // 获取各种系数
               Promise.all(promises).then(allResponse => {
                 let allWorkTimeList = allResponse[0]
@@ -543,7 +537,6 @@ export default {
                   this.forceRefresh = true
                 })
                 this.getDataLoading = true
-                console.log('总花费时间： ' + String(new Date() - start) + 'ms')
               })
             }
           }) // 获取绩效信息发布状态
@@ -626,38 +619,35 @@ export default {
       if (findIndex !== -1) {
         allconclusionAndEvaData.splice(findIndex, 1)
       }
-      // 根据构造的表格数据单元获取每个用户的月总结及对应的评价
-      let promise = []
-      let count = 0
-      for (let item of allconclusionAndEvaData) {
-        promise[count++] = getCurMonthConclusionOverviewDataNew(conclusionYear, conclusionMonth, item.id, store.state.userInfo.id,
-          store.state.userInfo.duty)
-      }
-      let start = new Date()
-      // ======================判断月总结提交状态并对已提交总结的用户获取月总结内容对应的该用户的评价结果======================
       return new Promise(function (resolve, reject) {
-        Promise.all(promise).then(allResponse => {
-          console.log('获取月总结所花费时间: ' + String(new Date() - start) + 'ms')
-          console.log('allResponse')
-          console.log(allResponse)
+        // 根据构造的表格数据单元获取每个用户的月总结及对应的评价
+        let evaUserID = store.state.userInfo.id
+        let evaUserDuty = store.state.userInfo.duty
+        let checkUserID = []
+        for (let allconclusionAndEvaDataItem of allconclusionAndEvaData) {
+          checkUserID.push(allconclusionAndEvaDataItem.id)
+        }
+        getCurMonthConclusionOverviewDataNew(conclusionYear, conclusionMonth, checkUserID, evaUserID, evaUserDuty).then(response => {
+          let responseData = response.data
+          // ======================判断月总结提交状态并对已提交总结的用户获取月总结内容对应的该用户的评价结果======================
           for (let i = 0; i < allconclusionAndEvaData.length; i++) {
-            allconclusionAndEvaData[i].submitStatus = allResponse[i].data.conclusionData.length > 0 ? 1 : 0
-            allconclusionAndEvaData[i].conclusionContent = allResponse[i].data.conclusionData
+            allconclusionAndEvaData[i].submitStatus = typeof (responseData.conclusionData.find(item => {
+              return item.userID === allconclusionAndEvaData[i].id
+            })) !== 'undefined' ? 1 : 0
+            allconclusionAndEvaData[i].conclusionContent = responseData.conclusionData.filter(item => {
+              return item.userID === allconclusionAndEvaData[i].id
+            })
             if (store.state.userInfo.duty !== 1) { // 普通成员
-              allconclusionAndEvaData[i].evaStatus = allResponse[i].data.AMEvaedData.length > 0 ? 1 : 0
-              allconclusionAndEvaData[i].conclusionEva = allResponse[i].data.AMEvaedData
+              allconclusionAndEvaData[i].evaStatus = responseData.AMEvaedData.length > 0 ? 1 : 0
+              allconclusionAndEvaData[i].conclusionEva = responseData.AMEvaedData
             } else { // 处经理
-              let conclusionEva = []
-              if (allResponse[i].data.AMEvaedData.length > 0) {
-                for (let AMEvaedDataItem of allResponse[i].data.AMEvaedData) {
-                  if (AMEvaedDataItem.evaUserID === store.state.userInfo.id) {
-                    conclusionEva.push(AMEvaedDataItem)
-                  }
-                }
-              }
-              allconclusionAndEvaData[i].evaStatus = conclusionEva.length > 0 ? 1 : 0
-              allconclusionAndEvaData[i].conclusionEva = conclusionEva
-              allconclusionAndEvaData[i].allAMEvaedData = allResponse[i].data.AMEvaedData
+              allconclusionAndEvaData[i].conclusionEva = responseData.AMEvaedData.filter(item => {
+                return (item.evaUserID === store.state.userInfo.id && item.evaedUserID === allconclusionAndEvaData[i].id)
+              })
+              allconclusionAndEvaData[i].evaStatus = allconclusionAndEvaData[i].conclusionEva.length > 0 ? 1 : 0
+              allconclusionAndEvaData[i].allAMEvaedData = responseData.AMEvaedData.filter(item => {
+                return item.evaedUserID === allconclusionAndEvaData[i].id
+              })
             }
           }
           // =============================判断各位用户是否已经评价完其他人=========================
@@ -689,8 +679,6 @@ export default {
             }
           }
           resolve(allconclusionAndEvaData)
-        }).catch(err => {
-          reject(err)
         })
       })
     },
@@ -855,7 +843,6 @@ export default {
           // 把构建的处经理虚拟评价插入表格数据中
           this.PMData[this.table1CurShowIndex].allAMEvaedData.push(JSON.parse(JSON.stringify(obj)))
         }
-
         // ====================================构建并插入评价维度2的评价详情进conclusionEva========================================
         obj.id = allResponse[1].insertId
         obj.evaStar = this.buildProTeamStar.evaStar
@@ -880,7 +867,7 @@ export default {
           this.PMData[this.table1CurShowIndex].allAMEvaedData.push(JSON.parse(JSON.stringify(obj)))
         }
         // 重置初始绩效数据为已提交的数据
-        this.initPMData = this.PMData
+        this.initPMData = JSON.parse(JSON.stringify(this.PMData))
 
         this.toDoEvaNum -= 1
         this.doneEvaNum += 1
@@ -945,6 +932,7 @@ export default {
           this.dimension2CSAveStar = 0
           this.dimension2GPEvaStar = 0
         }
+
         this.submitEvaDataFlag = true
         this.forceRefresh = false
         this.$nextTick(() => {
@@ -995,8 +983,9 @@ export default {
           this.PMData[this.table1CurShowIndex].allAMEvaedData.find(item => {
             return item.dimension === 2 && item.evaUserID === store.state.userInfo.id
           }).evaStar = this.buildProTeamStar.evaStar
+          this.PMData[this.table1CurShowIndex].isShow = false
           // 重置初始绩效数据为已提交的数据
-          this.initPMData = this.PMData
+          this.initPMData = JSON.parse(JSON.stringify(this.PMData))
         }
         Notification.success({
           title: '成功',
