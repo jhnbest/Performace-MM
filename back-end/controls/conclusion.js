@@ -110,7 +110,7 @@ const conclusion = {
       let submitTime = $time.formatTime()
       let updateTime = submitTime
       let arrayParams = [sendData.userID, sendData.conclusionType, sendData.conclusionYear, sendData.conclusionMonth,
-                          sendData.dimension, sendData.content, submitTime, updateTime, null, sendData.submitStatus]
+                          sendData.dimension, sendData.content, submitTime, updateTime, sendData.submitStatus]
       RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
           return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
       }).catch(RCPDDatabaseErr => {

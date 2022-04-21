@@ -192,8 +192,6 @@
         this.reqFlag.getCurApplyAbleMonth = false
         // 获取年内所有月总结概览数据
         getCurYearConclusionOverviewData(this.title, this.curUser).then((response) => {
-          console.log('response')
-          console.log(response)
           // 初始化默认数据
           this.initDefaultData()
           for (let i = 0; i < response.length; i++) {
@@ -213,16 +211,13 @@
                 this.rateTableData[i].managerEva = response[i].data.managerEva
               }
             } else {
-              if (response[i].data.conclusionData.length !=12123= 0) {
+              if (response[i].data.conclusionData.length !== 0) {
                 this.rateTableData[i].conclusionTitle = response[i].data.conclusionData[0].conclusionType === 1
                   ? this.rateTableData[i].conclusionTitle : null
-                this.rateTableData[i].submitMonth = response[i].data[0].conclusionMonth
-                this.rateTableData[i].submitStatus = response[i].data[0].submitStatus
-                this.rateTableData[i].managerRateStar = response[i].data[0].MGEvaStar
-                // this.rateTableData[i].getWorkTime = response[i].data.getWorkTime
-                this.rateTableData[i].conclusionType = response[i].data[0].conclusionType
-                this.rateTableData[i].moreDetailData = response[i].data
-                this.rateTableData[i].id = response[i].data[0].id
+                this.rateTableData[i].submitMonth = response[i].data.conclusionData[0].conclusionMonth
+                this.rateTableData[i].submitStatus = 1
+                this.rateTableData[i].conclusionType = response[i].data.conclusionData[0].conclusionType
+                this.rateTableData[i].moreDetailData = response[i].data.conclusionData
               }
             }
           }

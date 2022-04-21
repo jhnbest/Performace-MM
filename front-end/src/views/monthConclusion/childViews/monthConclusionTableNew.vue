@@ -87,8 +87,6 @@
 <script>
   import editorVue from '../../../components/monthConclusion/editor'
   import {
-    submitMonthConclusionData,
-    updateMonthConclusionData,
     submitMonthConclusionNew,
     updateMonthConclusionNew } from '@/utils/conclusion'
   import store from '@/store'
