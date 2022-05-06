@@ -24,9 +24,6 @@
         <el-col :xs="9" :sm="9" :lg="{span: 9, offset: 2}" :xl="{span: 10, offset: 2}">
           <span style="font-size: 22px">{{formData.projectName  + '计划&实际进展填报'}}</span>
         </el-col>
-<!--        <el-col :xs="3" :sm="3" :lg="{span: 3, offset: 1}" :xl="{span: 2, offset: 3}">-->
-<!--          <el-button size="medium" type="warning" @click="genWorkTimePlanApply">生成项目计划</el-button>-->
-<!--        </el-col>-->
         <el-col :xs="3" :sm="3" :lg="{span: 3}" :xl="{span: 2}">
           <el-button size="medium" type="primary" @click="genWorkTimeApply">生成工时申报</el-button>
         </el-col>

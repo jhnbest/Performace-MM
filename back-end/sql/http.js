@@ -34,28 +34,28 @@ const $http = {
     },
     // user验证
     userVerify(req, res, cb) {
-        let params = req.body
-        let userId = params.userId
-        let resultData = {}
-        let token=req.headers.token //获取前端请求头发送过来的token
-        let decoded = jwt.decode(token, app.get('jwtTokenSecret'))
-        if (!userId || decoded.iss!=userId) {
+      let params = req.body
+      let userId = params.userId
+      let resultData = {}
+      let token=req.headers.token //获取前端请求头发送过来的token
+      let decoded = jwt.decode(token, app.get('jwtTokenSecret'))
+      if (!userId || decoded.iss!=userId) {
+        resultData = {
+          code: 2,
+          message: 'userId有误'
+        }
+        $http.writeJson(res, resultData)
+      } else {
+        if(decoded.exp <= Date.now()){
           resultData = {
-            code: 2,
-            message: 'userId有误'
+            code: 20,
+            message: '登录过期'
           }
           $http.writeJson(res, resultData)
         } else {
-          if(decoded.exp <= Date.now()){
-            resultData = {
-              code: 20,
-              message: '登录过期'
-            }
-            $http.writeJson(res, resultData)
-          } else {
-            cb()
-          }
+          cb()
         }
+      }
     }
 };
 

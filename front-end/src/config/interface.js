@@ -111,3 +111,4 @@ export const urlUpdateWorkTimeListIdOfConclusion = '/conclusion/updateWorkTimeLi
 export const urlSubmitMonthConclusionNew = '/conclusion/submitMonthConclusionNew' // 提交月总结（新）
 export const urlUpdateMonthConclusionNew = '/conclusion/updateMonthConclusionNew' // 更新月总结（新）
 export const urlGetCurMonthConclusionOverviewDataNew = '/conclusion/getCurMonthConclusionOverviewDataNew' // 获取月总结概览信息（新）
+export const urlGetCurYearConclusionOverviewData = '/conclusion/getCurYearConclusionOverviewData' // 获取本年份总结概览数据

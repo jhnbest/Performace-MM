@@ -196,28 +196,29 @@
           this.initDefaultData()
           for (let i = 0; i < response.length; i++) {
             let titleMonth = this.$moment(String(this.title) + '-' + String(i + 1)).format('YYYY-MM')
-            if (this.$moment(titleMonth).isBefore(store.state.newRulesDate)) { // 请求的月份再新规则实施月份之前
-              if (response[i].data) {
-                this.rateTableData[i].conclusionTitle = response[i].data.conclusionTitle
-                this.rateTableData[i].submitMonth = response[i].data.submitMonth
-                this.rateTableData[i].submitStatus = response[i].data.submitStatus
-                this.rateTableData[i].managerRateStar = response[i].data.managerRateStar
-                this.rateTableData[i].getWorkTime = response[i].data.getWorkTime
-                this.rateTableData[i].conclusionType = response[i].data.conclusionType
-                this.rateTableData[i].id = response[i].data.id
-                this.rateTableData[i].curConclusion = response[i].data.curConclusion
-                this.rateTableData[i].nextPlan = response[i].data.nextPlan
-                this.rateTableData[i].curAdvice = response[i].data.curAdvice
-                this.rateTableData[i].managerEva = response[i].data.managerEva
+            if (this.$moment(titleMonth).isBefore(store.state.newRulesDate)) { // 请求的月份在新规则实施月份之前
+              if (response[i].length > 0) {
+                this.rateTableData[i].conclusionTitle = response[i][0].conclusionTitle
+                this.rateTableData[i].submitMonth = response[i][0].submitMonth
+                this.rateTableData[i].submitStatus = response[i][0].submitStatus
+                this.rateTableData[i].managerRateStar = response[i][0].managerRateStar
+                this.rateTableData[i].getWorkTime = response[i][0].getWorkTime
+                this.rateTableData[i].conclusionType = response[i][0].conclusionType
+                this.rateTableData[i].id = response[i][0].id
+                this.rateTableData[i].curConclusion = response[i][0].curConclusion
+                this.rateTableData[i].nextPlan = response[i][0].nextPlan
+                this.rateTableData[i].curAdvice = response[i][0].curAdvice
+                this.rateTableData[i].managerEva = response[i][0].managerEva
               }
             } else {
-              if (response[i].data.conclusionData.length !== 0) {
-                this.rateTableData[i].conclusionTitle = response[i].data.conclusionData[0].conclusionType === 1
+              if (response[i].conclusionData.length !== 0) {
+                this.rateTableData[i].conclusionTitle = response[i].conclusionData[0].conclusionType === 1
                   ? this.rateTableData[i].conclusionTitle : null
-                this.rateTableData[i].submitMonth = response[i].data.conclusionData[0].conclusionMonth
+                this.rateTableData[i].submitMonth = response[i].conclusionData[0].conclusionMonth
                 this.rateTableData[i].submitStatus = 1
-                this.rateTableData[i].conclusionType = response[i].data.conclusionData[0].conclusionType
-                this.rateTableData[i].moreDetailData = response[i].data.conclusionData
+                this.rateTableData[i].id = response[i].conclusionData[0].id
+                this.rateTableData[i].conclusionType = response[i].conclusionData[0].conclusionType
+                this.rateTableData[i].moreDetailData = response[i].conclusionData
               }
             }
           }

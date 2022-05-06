@@ -9,7 +9,8 @@ import {
   urlSubmitMonthConclusionNew,
   urlUpdateWorkTimeListIdOfConclusion,
   urlUpdateMonthConclusionNew,
-  urlGetCurMonthConclusionOverviewDataNew
+  urlGetCurMonthConclusionOverviewDataNew,
+  urlGetCurYearConclusionOverviewData
 } from '../config/interface'
 import { conclusionManagerEvaStarToWorkTime } from '@/utils/common'
 import store from '@/store'
@@ -61,22 +62,36 @@ export function getCurMonthConclusionOverviewDataNew (conclusionYear, conclusion
 
 // 获取本年份总结概览数据
 export function getCurYearConclusionOverviewData (submitYear, submitter) {
-  let promise = []
-  let titleMonth = null
+  const url = urlGetCurYearConclusionOverviewData
+  let params = {
+    submitYear: submitYear,
+    submitter: submitter,
+    newRulesDate: store.state.newRulesDate
+  }
+  let start = new Date()
   return new Promise(function (resolve, reject) {
-    for (let i = 0; i < 12; i++) {
-      titleMonth = moment(String(submitYear) + '-' + String(i + 1)).format('YYYY-MM')
-      if (moment(titleMonth).isBefore(store.state.newRulesDate)) { // 请求的月份再新规则实施月份之前
-        promise[i] = getCurMonthConclusionOverviewData(i + 1, submitYear, submitter)
-      } else {
-        promise[i] = getCurMonthConclusionOverviewDataNew(submitYear, i + 1, [submitter])
-      }
-    }
-    Promise.all(promise).then(result => {
-      resolve(result)
+    http(url, params).then(res => {
+      resolve(res.data)
     }).catch(err => {
       reject(err)
     })
+    // for (let i = 0; i < 12; i++) {
+    //   titleMonth = moment(String(submitYear) + '-' + String(i + 1)).format('YYYY-MM')
+    //   if (moment(titleMonth).isBefore(store.state.newRulesDate)) { // 请求的月份在新规则实施月份之前
+    //     promise[i] = getCurMonthConclusionOverviewData(i + 1, submitYear, submitter)
+    //   } else {
+    //     promise[i] = getCurMonthConclusionOverviewDataNew(submitYear, i + 1, [submitter])
+    //   }
+    // }
+    // let start = new Date()
+    // Promise.all(promise).then(result => {
+    //   console.log('result')
+    //   console.log(result)
+    //   console.log('获取本年份总结概览数据耗时： ' + String(new Date() - start) + 'ms')
+    //   resolve(result)
+    // }).catch(err => {
+    //   reject(err)
+    // })
   })
 }
 

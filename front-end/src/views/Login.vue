@@ -71,9 +71,10 @@ export default {
               name: this.formData.name,
               password: this.$md5(this.formData.password)
             }
-            this.$http(url, params)
-            .then(res => {
+            this.$http(url, params).then(res => {
               if (res.code === 1) {
+                console.log('res')
+                console.log(res)
                 if (this.rememberUser) {
                   // 传入账号名，密码，和保存天数3个参数
                   this.setCookie(this.formData.name, this.formData.password, 2)
@@ -91,6 +92,9 @@ export default {
                 })
               }
               this.reqFlag.login = true
+            }).catch(err => {
+              console.log(err)
+              this.$common.toast('登陆失败', 'error', false)
             })
           }
         } else {

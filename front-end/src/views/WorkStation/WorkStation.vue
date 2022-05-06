@@ -30,16 +30,13 @@
           <el-button type="primary"
                      size="medium" @click="handleAddNew">工时申报(新增项目)</el-button>
         </el-col>
-<!--        <el-col :xs="{span: 5, offset: 3}" :sm="{span: 4, offset: 6}" :lg="{span: 1, offset: 1}" :xl="{span: 1, offset: 1}">-->
-<!--          <el-button type="warning"-->
-<!--                     size="medium" @click="handlePlanAdd">计划申报(新增项目)</el-button>-->
-<!--        </el-col>-->
       </el-row>
     </div>
     <!-- 分割线 start -->
     <div class="hr-10" style="margin-top: 20px"></div>
     <!-- 分割线 end -->
     <div v-if="showFlag" style="margin-top: 20px;">
+      <!-- 普通员工页面 -->
       <div v-if="this.$store.state.userInfo.id !== 26">
         <el-tabs type="border-card" v-model="selectProjectType" stretch style="width: 99%;margin:auto">
           <el-tab-pane
@@ -56,6 +53,7 @@
           </el-tab-pane>
         </el-tabs>
       </div>
+      <!-- 处经理页面 -->
       <div v-else>
         <el-tabs type="border-card" v-model="selectProjectType" stretch style="width: 99%;margin:auto">
           <el-tab-pane
@@ -87,46 +85,6 @@
         formData: {
           selectType: '未填报',
           title: this.$moment().format('YYYY-MM')
-        },
-        pickerOptions: {
-          disabledDate (time) {
-            return time.getTime() > Date.now()
-          }
-        },
-        JJData: {
-          projectTypeID: 173,
-          searchType: 'unFilled',
-          color: '#67d4f6'
-        },
-        XXData: {
-          projectTypeID: 172,
-          searchType: 'unFilled',
-          color: '#67d4f6'
-        },
-        JCPTData: {
-          projectTypeID: 213,
-          searchType: 'unFilled',
-          color: '#67d4f6'
-        },
-        JCPTTXData: {
-          projectTypeID: 275,
-          searchType: 'unFilled',
-          color: '#67d4f6'
-        },
-        XSData: {
-          projectTypeID: 249,
-          searchType: 'unFilled',
-          color: '#67d4f6'
-        },
-        OtherStandData: {
-          projectTypeID: 4,
-          searchType: 'unFilled',
-          color: '#67d4f6'
-        },
-        OtherUnStandData: {
-          projectTypeID: 5,
-          searchType: 'unFilled',
-          color: '#67d4f6'
         },
         showFlag: true,
         unFilledTotalCount: 0,

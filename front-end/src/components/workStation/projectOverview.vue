@@ -28,11 +28,6 @@
           </div>
         </template>
       </el-table-column>
-<!--      <el-table-column v-if="$store.state.userInfo.role === '管理员'" label="当前阶段完成度" align="center" width="80">-->
-<!--        <template slot-scope="scope">-->
-<!--          <el-progress :text-inside="true" :stroke-width="26" :percentage="scope.row.process"></el-progress>-->
-<!--        </template>-->
-<!--      </el-table-column>-->
       <el-table-column label="总完成度" align="center" width="80">
         <template slot-scope="scope">
           <el-progress :text-inside="true" :stroke-width="26" :percentage="scope.row.process"></el-progress>

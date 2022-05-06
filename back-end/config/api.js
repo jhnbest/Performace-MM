@@ -1,5 +1,5 @@
-// let path = '/demo-weekly/back-end/api'; // 线下
-let path = '/api'; // 线上
+let path = '/demo-weekly/back-end/api'; // 线下
+// let path = '/api'; // 线上
 
 module.exports = {
     // 通用模块
@@ -113,5 +113,6 @@ module.exports = {
     updateWorkTimeListIdOfConclusion: path + '/conclusion/updateWorkTimeListIdOfConclusion', // 更新总结对应的工时ID
     submitMonthConclusionNew: path + '/conclusion/submitMonthConclusionNew', // 提交月总结（新）
     updateMonthConclusionNew: path + '/conclusion/updateMonthConclusionNew', // 更新月总结（新）
-    getCurMonthConclusionOverviewDataNew: path + '/conclusion/getCurMonthConclusionOverviewDataNew' // 获取月总结概览信息（新）
+    getCurMonthConclusionOverviewDataNew: path + '/conclusion/getCurMonthConclusionOverviewDataNew', // 获取月总结概览信息（新）
+    getCurYearConclusionOverviewData: path + '/conclusion/getCurYearConclusionOverviewData' // 获取本年份总结概览数据
 };
