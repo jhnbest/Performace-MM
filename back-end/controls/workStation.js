@@ -1,7 +1,6 @@
 const $sql = require('../sql/sqlMap')
 const $http = require('../sql/http')
 const $time = require('../utils/time')
-const $user = require('./user.js')
 const moment = require('moment')
 
 function formatData(rows) {
@@ -109,115 +108,65 @@ function fillFactMonthData(obj, preResult, year, aPDID) {
     Object.assign(obj, preResult, fillData)
 }
 
-// function getMonthProcess(id, year, preResult, resultData) {
-//     return new Promise(function (resolve, reject) {
-//         let sql = $sql.workStation.getMonthProcess
-//         let arrayParams = [id, year]
-//         $http.connPool(sql, arrayParams, (err, result) => {
-//             if (err) {
-//                 reject(-1)
-//             } else  {
-//                 result = JSON.parse(JSON.stringify(result))
-//                 if (result.length === 0) { //无任何进展数据
-//                     let obj = {}
-//                     fillPlanMonthData(obj, preResult, year, id)
-//                     resultData.push(obj)
-//                     obj = {}
-//                     fillFactMonthData(obj, preResult, year, id)
-//                     resultData.push(obj)
-//                     resolve(1)
-//                 } else if (result.length === 1) { //仅有一个进展数据
-//                     if (result[0].type === 'plan') { // 计划进展在前
-//                         let obj = {}
-//                         Object.assign(obj, preResult, result[0])
-//                         resultData.push(obj)
-//                         obj = {}
-//                         fillFactMonthData(obj, preResult, year, id)
-//                         resultData.push(obj)
-//                         resolve(1)
-//                     } else if (result[0].type === 'fact') { //实际进展在前
-//                         let obj = {}
-//                         fillPlanMonthData(obj, preResult, year, id)
-//                         resultData.push(obj)
-//                         obj = {}
-//                         Object.assign(obj, preResult, result[0])
-//                         resultData.push(obj)
-//                         resolve(1)
-//                     }
-//                 } else { //有完整进展数据
-//                     for (let i = 0; i < result.length;i++) {
-//                         let obj = {}
-//                         Object.assign(obj, preResult, result[i])
-//                         resultData.push(obj)
-//                         if (i === result.length - 1) {
-//                             resolve(1)
-//                         }
-//                     }
-//                 }
-//             }
-//         })
-//     })
-// }
-
 function getMonthProcess(id, year, preResult, resultData) {
-    return new Promise(function (resolve, reject) {
-        let sql = $sql.workStation.getMonthProcess
-        let arrayParams = [id, year]
-        $http.connPool(sql, arrayParams, (err, result) => {
-            if (err) {
-                reject(-1)
-            } else  {
-                result = JSON.parse(JSON.stringify(result))
-                if (result.length === 0) { //无任何进展数据
-                    let obj = {}
-                    fillPlanMonthData(obj, preResult, year, id)
-                    resultData.push(obj)
-                    obj = {}
-                    fillFactMonthData(obj, preResult, year, id)
-                    resultData.push(obj)
-                    resolve(1)
-                } else if (result.length === 1) { //仅有一个进展数据
-                    if (result[0].type === 'plan') { // 计划进展在前
-                        let obj = {}
-                        Object.assign(obj, preResult, result[0])
-                        resultData.push(obj)
-                        obj = {}
-                        fillFactMonthData(obj, preResult, year, id)
-                        resultData.push(obj)
-                        resolve(1)
-                    } else if (result[0].type === 'fact') { //实际进展在前
-                        let obj = {}
-                        fillPlanMonthData(obj, preResult, year, id)
-                        resultData.push(obj)
-                        obj = {}
-                        Object.assign(obj, preResult, result[0])
-                        resultData.push(obj)
-                        resolve(1)
-                    }
-                } else { //有完整进展数据
-                    if (result[0].type === 'fact') { // 实际进展在前
-                        for (let i = result.length - 1; i >= 0; i--) {
-                            let obj = {}
-                            Object.assign(obj, preResult, result[i])
-                            resultData.push(obj)
-                            if (i === 0) {
-                                resolve(1)
-                            }
-                        }
-                    } else {
-                        for (let i = 0; i < result.length;i++) {
-                            let obj = {}
-                            Object.assign(obj, preResult, result[i])
-                            resultData.push(obj)
-                            if (i === result.length - 1) {
-                                resolve(1)
-                            }
-                        }
-                    }
-                }
+  return new Promise(function (resolve, reject) {
+    let sql = $sql.workStation.getMonthProcess
+    let arrayParams = [id, year]
+    $http.connPool(sql, arrayParams, (err, result) => {
+      if (err) {
+        reject(-1)
+      } else {
+        result = JSON.parse(JSON.stringify(result))
+        if (result.length === 0) { //无任何进展数据
+          let obj = {}
+          fillPlanMonthData(obj, preResult, year, id)
+          resultData.push(obj)
+          obj = {}
+          fillFactMonthData(obj, preResult, year, id)
+          resultData.push(obj)
+          resolve(1)
+        } else if (result.length === 1) { //仅有一个进展数据
+          if (result[0].type === 'plan') { // 计划进展在前
+            let obj = {}
+            Object.assign(obj, preResult, result[0])
+            resultData.push(obj)
+            obj = {}
+            fillFactMonthData(obj, preResult, year, id)
+            resultData.push(obj)
+            resolve(1)
+          } else if (result[0].type === 'fact') { //实际进展在前
+            let obj = {}
+            fillPlanMonthData(obj, preResult, year, id)
+            resultData.push(obj)
+            obj = {}
+            Object.assign(obj, preResult, result[0])
+            resultData.push(obj)
+            resolve(1)
+          }
+        } else { //有完整进展数据
+          if (result[0].type === 'fact') { // 实际进展在前
+            for (let i = result.length - 1; i >= 0; i--) {
+              let obj = {}
+              Object.assign(obj, preResult, result[i])
+              resultData.push(obj)
+              if (i === 0) {
+                resolve(1)
+              }
             }
-        })
+          } else {
+            for (let i = 0; i < result.length;i++) {
+              let obj = {}
+              Object.assign(obj, preResult, result[i])
+              resultData.push(obj)
+              if (i === result.length - 1) {
+                resolve(1)
+              }
+            }
+          }
+        }
+      }
     })
+  })
 }
 
 async function getAssignProjectDetailMonthProcess(result, resultData, data, res) {
@@ -545,15 +494,48 @@ const workStation = {
     },
     // 获取未完成的指派项目明细
     getAssignProjectDetail (req, res) {
-        $http.userVerify(req, res, () => {
-            let data = req.body
-            let sql = $sql.workStation.getAssignProjectDetail
-            let arrayParams = [data.id]
-            RCPDDatabase(sql, arrayParams).then(res0 => {
-                let resultData = []
-                getAssignProjectDetailMonthProcess(res0, resultData, data, res)
-            })
+      $http.userVerify(req, res, () => {
+        let data = req.body
+        let sql = $sql.workStation.getAssignProjectDetail
+        let arrayParams = [data.id]
+        RCPDDatabase(sql, arrayParams).then(res0 => {
+          let resultData = []
+          getAssignProjectDetailMonthProcess(res0, resultData, data, res)
+        }).catch(err => {
+          return $http.writeJson(res, {code: -2, err: err, message: 'err'})
         })
+      })
+    },
+    // 获取未完成的指派项目明细
+    getAssignProjectDetailV2 (req, res) {
+      $http.userVerify(req, res, () => {
+        let sendData = req.body
+        let sql = $sql.workStation.getAssignProjectDetail
+        let arrayParams = [sendData.id]
+        RCPDDatabase(sql, arrayParams).then(response1 => {
+          let projectDetail = response1
+          let checkApdID = []
+          for (let item of projectDetail) {
+            item.monthProcess = []
+            checkApdID.push(item.apdID)
+          }
+          sql = $sql.workStation.getMonthProcessV2
+          arrayParams = [checkApdID, sendData.year]
+          RCPDDatabase(sql, arrayParams).then(response2 => {
+            let monthProcess = response2
+            for (let item of projectDetail) {
+              item.monthProcess = monthProcess.filter(monthProcessItem => {
+                return monthProcessItem.aPDID === item.apdID
+              })
+            }
+            return $http.writeJson(res, {code: 1, data: projectDetail, message: '成功'})
+          }).catch(err => {
+            return $http.writeJson(res, {code: -2, err: err, message: 'err'})
+          })
+        }).catch(err => {
+          return $http.writeJson(res, {code: -2, err: err, message: 'err'})
+        })
+      })
     },
     // 获取项目阶段列表
     getAssignProjectStageList (req, res) {

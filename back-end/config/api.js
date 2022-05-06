@@ -1,5 +1,5 @@
-let path = '/demo-weekly/back-end/api'; // 线下
-// let path = '/api'; // 线上
+// let path = '/demo-weekly/back-end/api'; // 线下
+let path = '/api'; // 线上
 
 module.exports = {
     // 通用模块
@@ -56,6 +56,7 @@ module.exports = {
     // workStation-个人工作台
     getAssignProjectList: path + '/workStation/getAssignProjectList',
     getAssignProjectDetail: path + '/workStation/getAssignProjectDetail', // 获取未完成的指派项目明细
+    getAssignProjectDetailV2: path + '/workStation/getAssignProjectDetailV2', // 获取未完成的指派项目明细
     submitPlanProcess: path + '/workStation/submitPlanProcess', //保存计划进展
     submitAssignWorkDetail: path + '/workStation/submitAssignWorkDetail', //保存指派项目
     getMonthProcessDiff: path + '/workStation/getMonthProcessDiff', // 获取每月进展对应工时

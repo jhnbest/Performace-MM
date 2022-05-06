@@ -63,6 +63,7 @@ router.post(api.getPMData, performance.getPMData)
 // workStation-个人工作台
 router.post(api.getAssignProjectList, workStation.getAssignProjectList)
 router.post(api.getAssignProjectDetail, workStation.getAssignProjectDetail)
+router.post(api.getAssignProjectDetailV2, workStation.getAssignProjectDetailV2)
 router.post(api.submitPlanProcess, workStation.submitPlanProcess)
 router.post(api.submitAssignWorkDetail, workStation.submitAssignWorkDetail)
 router.post(api.getMonthProcessDiff, workStation.getMonthProcessDiff)

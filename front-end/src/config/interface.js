@@ -54,6 +54,7 @@ export const urlGetPMData = '/performance/getPMData' // 获取绩效数据
 
 export const getAssignProjectList = '/workStation/getAssignProjectList' // 获取未完成的指派项目列表
 export const getAssignProjectDetail = '/workStation/getAssignProjectDetail' // 获取未完成的指派项目明细
+export const urlgetAssignProjectDetailV2 = '/workStation/getAssignProjectDetailV2' // 获取未完成的指派项目明细
 export const submitPlanProcess = '/workStation/submitPlanProcess' // 保存计划和进展
 export const submitAssignWorkDetail = '/workStation/submitAssignWorkDetail' // 保存指派项目
 export const getMonthProcessDiff = '/workStation/getMonthProcessDiff' // 获取每月进展对应工时

@@ -1,8 +1,8 @@
 import { http } from '../config/http'
 import {
-  urlGetTypeProjectList
+  urlGetTypeProjectList,
+  urlgetAssignProjectDetailV2
 } from '../config/interface'
-import store from '@/store'
 
 // 获取特定类型的项目列表
 export function getTypeProjectList (projectType, isFinish, curApplyYear) {
@@ -23,4 +23,24 @@ export function getTypeProjectList (projectType, isFinish, curApplyYear) {
       reject(err)
     })
   })
+}
+
+ // 获取指派项目计划&进展明细
+ export function getAssignProjectDetailV2 (projectID, yearNum) {
+   return new Promise(function (resolve, reject) {
+    const url = urlgetAssignProjectDetailV2
+    let params = {
+      id: projectID,
+      year: yearNum
+    }
+    http(url, params).then(res => {
+      if (res.code === 1) {
+        resolve(res.data)
+      } else {
+        reject(res.err)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+   })
 }

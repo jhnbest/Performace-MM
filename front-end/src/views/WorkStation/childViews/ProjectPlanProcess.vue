@@ -199,7 +199,7 @@
               <span v-else>该阶段已完成</span>
             </el-button>
             <div v-if="scope.row.editable && scope.row.process !== 100">
-              <el-button size="mini" type="warning" @click="handleSave(scope.row, scope.$index)">保存</el-button>
+              <el-button size="mini" type="success" @click="handleSave(scope.row, scope.$index)">保存</el-button>
               <el-button size="mini" type="danger" @click="handleCancel(scope.row, scope.$index)">取消</el-button>
             </div>
           </template>
@@ -356,16 +356,16 @@
     getMonthProcessDiff,
     submitPlanProcess,
     updateAssignProjectFilled,
-    workTimeTemporary,
     workTimeSubmit,
     getIsSubmitAllow,
-    getCurApplyAbleMonth,
     projectDetailIsApplyWorkTime,
-    submitProjectWorkTimeApply
+    submitProjectWorkTimeApply,
+    urlGetCurApplyAbleMonth
   } from '@/config/interface'
   import Assign from '@/components/Cop/workTimeAssign'
   import Cop from '@/components/Cop/Cop'
-  import { urlGetCurApplyAbleMonth } from '../../../config/interface'
+  import { getAssignProjectDetailV2 } from '@/utils/workStation'
+  import { http } from '@/config/http'
   export default {
       data () {
         return {
@@ -471,9 +471,73 @@
         init () {
           this.formData.projectType = this.$route.query.projectType
           this.formData.projectName = this.$route.query.projectName
-          this.getAssignProjectDetail(this.$route.query.projectID)
+          this.initData(this.$route.query.projectID, this.formData.yearNum)
           this.getCurApplyAbleMonth().then(getCurApplyAbleMonthRes => {
             this.curApplyMonth = this.$moment(getCurApplyAbleMonthRes[0].setTime).format('YYYY-MM')
+          })
+        },
+        initData (projectID, yearNum) {
+          getAssignProjectDetailV2(projectID, yearNum).then(response => {
+            // 构造表格模板数据
+            let tableData = []
+            let monthProcessObj = {
+              id: null,
+              type: null,
+              year: yearNum,
+              aPDID: null,
+              January: null,
+              February: null,
+              March: null,
+              April: null,
+              May: null,
+              June: null,
+              July: null,
+              August: null,
+              September: null,
+              October: null,
+              November: null,
+              December: null
+            }
+            for (let responseItem of response) {
+              responseItem.editable = false
+              // 展开项目阶段在各个月份的计划、实际进展数据
+              for (let i = 0; i < responseItem.monthProcess.length; i++) {
+                let obj = JSON.parse(JSON.stringify(responseItem))
+                obj = Object.assign(obj, responseItem.monthProcess[i])
+                tableData.push(JSON.parse(JSON.stringify(obj)))
+              }
+              // 根据月份计划、进展的数量进行相应调整
+              if (responseItem.monthProcess.length === 0) {
+                let obj = JSON.parse(JSON.stringify(responseItem))
+                monthProcessObj.type = 'plan'
+                monthProcessObj.aPDID = responseItem.apdID
+                obj = Object.assign(obj, monthProcessObj)
+                tableData.push(JSON.parse(JSON.stringify(obj)))
+
+                obj = JSON.parse(JSON.stringify(responseItem))
+                monthProcessObj.type = 'fact'
+                obj = Object.assign(obj, monthProcessObj)
+                tableData.push(JSON.parse(JSON.stringify(obj)))
+              } else if (responseItem.monthProcess.length === 1) {
+                if (responseItem.monthProcess[0].type === 'fact') {
+                  let obj = JSON.parse(JSON.stringify(responseItem))
+                  monthProcessObj.type = 'plan'
+                  monthProcessObj.aPDID = responseItem.apdID
+                  obj = Object.assign(obj, monthProcessObj)
+                  let tmpObj = tableData.pop() // 调换fact和plan的顺序
+                  tableData.push(JSON.parse(JSON.stringify(obj)))
+                  tableData.push(JSON.parse(JSON.stringify(tmpObj)))
+                } else {
+                  let obj = JSON.parse(JSON.stringify(responseItem))
+                  monthProcessObj.type = 'fact'
+                  monthProcessObj.aPDID = responseItem.apdID
+                  obj = Object.assign(obj, monthProcessObj)
+                  tableData.push(JSON.parse(JSON.stringify(obj)))
+                }
+              }
+            }
+            this.formData.tableData = tableData
+            this.formData.tableDataCache = JSON.parse(JSON.stringify(this.formData.tableData))
           })
         },
         // 获取当前月份能否申报的标志
@@ -606,9 +670,15 @@
           let year = this.$moment(this.dialogForm.title).format('YYYY')
           let promises = []
           let count = 0
-          this.httpGetAssignProjectDetail(this.$route.query.projectID, year).then(res => { // 获取项目的所有阶段信息
+          const url = getAssignProjectDetail
+          let params = {
+            id: this.$route.query.projectID,
+            year: year
+          }
+          this.$http(url, params).then(res => { // 获取项目的所有阶段信息
+            let data = res.data
             this.dialogFormVisible = true
-            this.applyMonthPlanProcess = res
+            this.applyMonthPlanProcess = data
             let searchData = []
             let applyMonth = this.$moment(this.dialogForm.title).toObject()
             let applyMonthString = this.$common.MonthToString(String(applyMonth.months + 1))
@@ -671,9 +741,15 @@
           let year = this.$moment(this.dialogForm.title).format('YYYY')
           let promises = []
           let count = 0
-          this.httpGetAssignProjectDetail(this.$route.query.projectID, year).then(res => {
+          const url = getAssignProjectDetail
+          let params = {
+            id: this.$route.query.projectID,
+            year: year
+          }
+          http(url, params).then(res => {
+            let data = res
             this.dialogPlanFormVisible = true
-            this.applyMonthPlanProcess = res
+            this.applyMonthPlanProcess = data
             let searchData = []
             let applyMonth = this.$moment(this.dialogForm.title).toObject()
             let applyMonthString = this.$common.MonthToString(String(applyMonth.months + 1))
@@ -814,45 +890,15 @@
         handleDecYear () {
           if (this.reqFlag.getAssignProjectDetail) {
             this.formData.yearNum -= 1
-            this.getAssignProjectDetail(this.$route.query.projectID)
+            this.initData(this.$route.query.projectID, this.formData.yearNum)
           }
         },
         // 下一年度进展
         handleAddYear () {
           if (this.reqFlag.getAssignProjectDetail) {
             this.formData.yearNum += 1
-            this.getAssignProjectDetail(this.$route.query.projectID)
+            this.initData(this.$route.query.projectID, this.formData.yearNum)
           }
-        },
-        // 获取指派项目计划&进展明细操作
-        httpGetAssignProjectDetail (id, yearNum) {
-          let _this = this
-          return new Promise(function (resolve, reject) {
-            if (_this.reqFlag.getAssignProjectDetail) {
-              _this.reqFlag.getAssignProjectDetail = false
-              const url = getAssignProjectDetail
-              let params = {
-                id: id,
-                year: yearNum
-              }
-              _this.$http(url, params).then(res => {
-                if (res.code === 1) {
-                  _this.reqFlag.getAssignProjectDetail = true
-                  resolve(res.data)
-                }
-              })
-            }
-          })
-        },
-        // 获取指派项目计划&进展明细
-        getAssignProjectDetail (id) {
-          this.httpGetAssignProjectDetail(id, this.formData.yearNum).then(res => {
-            for (let item of res) {
-              item.editable = false
-            }
-            this.formData.tableData = res
-            this.formData.tableDataCache = JSON.parse(JSON.stringify(this.formData.tableData))
-          })
         },
         // 表格编辑按钮
         handleEdit (row, index) {
@@ -880,7 +926,7 @@
               if (res.code === 1) {
                 let data = res.data
                 row.monthID = data.monthID
-                this.getAssignProjectDetail(this.$route.query.projectID)
+                this.initData(this.$route.query.projectID, this.formData.yearNum)
                 this.reqFlag.savePlanProcess = true
                 this.$common.toast('保存成功', 'success', false)
               }

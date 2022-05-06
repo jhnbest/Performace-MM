@@ -140,9 +140,10 @@ const sqlMap = {
     getAssignProjectDetail: 'select apd.id as apdID, apd.projectStage as projectStageID, apd.kValue, apd.coefficient, apd.avaiableWorkTime, ' +
         'apd.process, apd.baseWorkTime, apd.projectStageName, apd.isFinish, pjn.dynamicKValue, pjn.isConference, pjn.defaultAssignWorkTime ' +
         'from assignprojectdetail apd left join projecttypenew pjn on apd.projectStage = pjn.projectTypeID where apd.aPLID = ? and apd.obsoleteStatus != 1',
-    getMonthProcess: 'select id, aPDID, year, type, January, February, March, April, May, June, July, August, September, ' +
-        'October, November, December from monthprocess where aPDID = ? and year = ? and obsoleteStatus != 1',
-    // getProjectDetailProcess: 'select id, aPDID, year, type, months, process from monthprocess where aPDID = ? and year = ?',
+    // getMonthProcess: 'select id, aPDID, year, type, January, February, March, April, May, June, July, August, September, ' +
+    //     'October, November, December from monthprocess where aPDID = ? and year = ? and obsoleteStatus != 1',
+    getMonthProcess: 'select * from monthprocess where aPDID = ? and year = ? and obsoleteStatus != 1',
+    getMonthProcessV2: 'select * from monthprocess where aPDID in (?) and year = ? and obsoleteStatus != 1',
     submitPlanProcessE: 'update assignprojectdetail set kValue = ?, coefficient = ?, isFinish = ? where id = ?;' +
         'update monthprocess set January = ?, February = ?, March = ?, April = ?, May = ?, June = ?, July = ?, August = ?, ' +
         'September = ?, October = ?, November = ?, December = ? where id = ?',
@@ -281,8 +282,8 @@ const sqlMap = {
     ' nc.userID = u.id where nc.conclusionYear = ? and nc.conclusionMonth = ? and nc.userID in (?)'
   },
   achievementsEva: {
-    getUserofAchievementToAnotherUser: 'select nce.*, u.name from newconclusionevadata nce left join users u on' +
-                        ' nce.evaUserID = u.id where nce.dimensionID in (?) and evaUserID = ?',
+    getUserofAchievementToAnotherUser: 'select nce.*, u.name, nc.userID as evaedUserID from newconclusionevadata nce left join users u on' +
+                        ' nce.evaUserID = u.id left join newconclusion nc on nce.dimensionID = nc.id where nce.dimensionID in (?) and evaUserID = ?',
     submitAMEvaData: 'insert into newconclusionevadata (evaUserID, dimensionID, evaStar, submitTime, updateTime)' +
                     ' values (?, ?, ?, ?, ?)',
     updateAMEvaData: 'update newconclusionevadata set evaStar = ?, updateTime = ? where id = ?',

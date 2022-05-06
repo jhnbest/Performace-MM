@@ -638,8 +638,10 @@ export default {
               return item.userID === allconclusionAndEvaData[i].id
             })
             if (store.state.userInfo.duty !== 1) { // 普通成员
-              allconclusionAndEvaData[i].evaStatus = responseData.AMEvaedData.length > 0 ? 1 : 0
-              allconclusionAndEvaData[i].conclusionEva = responseData.AMEvaedData
+              allconclusionAndEvaData[i].conclusionEva = responseData.AMEvaedData.filter(item => {
+                return (item.evaUserID === store.state.userInfo.id && item.evaedUserID === allconclusionAndEvaData[i].id)
+              })
+              allconclusionAndEvaData[i].evaStatus = allconclusionAndEvaData[i].conclusionEva.length > 0 ? 1 : 0
             } else { // 处经理
               allconclusionAndEvaData[i].conclusionEva = responseData.AMEvaedData.filter(item => {
                 return (item.evaUserID === store.state.userInfo.id && item.evaedUserID === allconclusionAndEvaData[i].id)
