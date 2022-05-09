@@ -1,8 +1,9 @@
 import { http } from '../config/http'
 import {
   urlGetTypeProjectList,
-  urlgetAssignProjectDetailV2
-} from '../config/interface'
+  urlgetAssignProjectDetailV2,
+  urlProjectDetailIsApplyWorkTime
+} from '@/config/interface'
 
 // 获取特定类型的项目列表
 export function getTypeProjectList (projectType, isFinish, curApplyYear) {
@@ -43,4 +44,24 @@ export function getTypeProjectList (projectType, isFinish, curApplyYear) {
       reject(err)
     })
    })
+}
+
+// 查看项目阶段当月是否已填报工时
+export function projectDetailIsApplyWorkTime (searchData, type, applyMonth) {
+  const url = urlProjectDetailIsApplyWorkTime
+  let params = {
+    projectDetailID: [],
+    applyMonth: applyMonth,
+    type: type
+  }
+  for (let searchDataItem of searchData) {
+    params.projectDetailID.push(searchDataItem.apdID)
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(res => {
+      resolve(res.data)
+    }).catch(err => {
+      reject(new Error('projectDetailIsApplyWorkTime send error!' + err))
+    })
+  })
 }

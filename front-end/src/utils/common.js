@@ -493,6 +493,69 @@ export function smallNumToL (num) {
   }
 }
 
+// 月份转换成英文
+export function MonthToString (month) {
+  switch (month) {
+    case '1':
+      return 'January'
+    case '2':
+      return 'February'
+    case '3':
+      return 'March'
+    case '4':
+      return 'April'
+    case '5':
+      return 'May'
+    case '6':
+      return 'June'
+    case '7':
+      return 'July'
+    case '8':
+      return 'August'
+    case '9':
+      return 'September'
+    case '10':
+      return 'October'
+    case '11':
+      return 'November'
+    case '12':
+      return 'December'
+    default:
+      return 'error'
+  }
+}
+// 月份转换成英文
+export function mStringToNumber (mString) {
+  switch (mString) {
+    case 'January':
+      return '01'
+    case 'February':
+      return '02'
+    case 'March':
+      return '03'
+    case 'April':
+      return '04'
+    case 'May':
+      return '05'
+    case 'June':
+      return '06'
+    case 'July':
+      return '07'
+    case 'August':
+      return '08'
+    case 'September':
+      return '09'
+    case 'October':
+      return '10'
+    case 'November':
+      return '11'
+    case 'December':
+      return '12'
+    default:
+      return 'error'
+  }
+}
+
 // 数据排序方法(从大到小)
 export function compare (params) {
   return function (o, p) {

@@ -360,7 +360,6 @@
           this.$router.push({
             path: '/home/projectPlanProcess',
             query: {
-              projectType: this.fatherParams.projectTypeID,
               projectName: row.projectName,
               projectID: row.id,
               process: row.process

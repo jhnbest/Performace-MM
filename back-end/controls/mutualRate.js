@@ -1,6 +1,7 @@
 const $sql = require('../sql/sqlMap')
 const $http = require('../sql/http')
 const $time = require('../utils/time')
+const moment = require('moment')
 
 function starToRates(star) {
     switch (star) {
@@ -219,9 +220,10 @@ const mutualRate = {
         }
         for (let resultItem of result) {
           if (resultItem[0].totalCount === 0) {
-              sql = $sql.mutualRates.handleFillMulCheck // 找上上月份的评价数据
-              arrayParams = [resultItem[0].userID, '2022-02']
-              promises2[count2++] = RCPDDatabase(sql, arrayParams)
+            let preMonth = moment(sendData.rateMonth).subtract(1, 'months').format('YYYY-MM')
+            sql = $sql.mutualRates.handleFillMulCheck // 找上上月份的评价数据
+            arrayParams = [resultItem[0].userID, preMonth]
+            promises2[count2++] = RCPDDatabase(sql, arrayParams)
           }
         }
         Promise.all(promises2).then(result2 => {
@@ -229,7 +231,7 @@ const mutualRate = {
           for (let result2Item of result2) {
             for (let result2ItemItem of result2Item) {
               sql = $sql.mutualRates.handleFillMulFill // 填充需要填充的月份的数据
-              arrayParams = [result2ItemItem.ratePersion, result2ItemItem.ratedPersion, '2022-03', result2ItemItem.rate,
+              arrayParams = [result2ItemItem.ratePersion, result2ItemItem.ratedPersion, sendData.rateMonth, result2ItemItem.rate,
                   result2ItemItem.rateType, rateTime, rateTime]
               promise3[count3++] = RCPDDatabase(sql, arrayParams)
             }

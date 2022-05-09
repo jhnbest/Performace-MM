@@ -78,6 +78,7 @@ export const urlGetPerformanceIsPublish = '/workStation/getPerformanceIsPublish'
 export const performanceInfoPublish = '/workStation/performanceInfoPublish' // 是否发布首页绩效信息
 export const getUnFilledProjectList = '/workStation/getUnFilledProjectList' // 获取未填报的项目列表
 export const projectDetailIsApplyWorkTime = '/workStation/projectDetailIsApplyWorkTime' // 查看项目阶段当月是否已填报工时
+export const urlProjectDetailIsApplyWorkTime = '/workStation/projectDetailIsApplyWorkTime' // 查看项目阶段当月是否已填报工时
 export const repairErrorData = '/workStation/repairErrorData' // 修复错误数据
 export const repairErrorData2 = '/workStation/repairErrorData2' // 修复错误数据2
 export const urlSetProjectFinish = '/workStation/setProjectFinish' // 将项目置为已完成状态
