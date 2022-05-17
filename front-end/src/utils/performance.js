@@ -4,7 +4,9 @@ import {
     urlSavePMData,
     performanceInfoPublish,
     urlUpdatePMData,
-    urlGetPMData
+    urlGetPMData,
+    urlGetWorkAssign,
+    ulrDeleteProject
 } from '../config/interface'
 import { getUsersList } from '@/utils/users'
 import { getPerformanceIsPublish,
@@ -418,6 +420,45 @@ export function publishPMData (applyYear, applyMonth, publishID, flagValue) {
         resolve(response)
       } else {
         reject(response.err)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
+// 获取工时分配结果
+export function getWorkTimeAssign (projectID, searchType) {
+  const url = urlGetWorkAssign
+  let params = {
+    projectID: projectID,
+    searchType: searchType
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(res => {
+      if (res.code === 1) {
+        resolve(res.data)
+      } else {
+        reject(res.err)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
+// 删除工时申报
+export function deleteWorkTimeSubmit (id) {
+  const url = ulrDeleteProject
+  let params = {
+    id: id
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(res => {
+      if (res.code === 1) {
+        resolve(res.data)
+      } else {
+        reject(res.err)
       }
     }).catch(err => {
       reject(err)

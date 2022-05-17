@@ -80,6 +80,7 @@ module.exports = {
     performanceInfoPublish: path + '/workStation/performanceInfoPublish', // 是否发布首页绩效信息
     getUnFilledProjectList: path + '/workStation/getUnFilledProjectList', // 获取未填报的项目列表
     projectDetailIsApplyWorkTime: path + '/workStation/projectDetailIsApplyWorkTime', // 查看项目阶段当月是否已填报工时
+    projectDetailIsApplyWorkTimeV2: path + '/workStation/projectDetailIsApplyWorkTimeV2', // 查看项目阶段当月是否已填报工时
     repairErrorData: path + '/workStation/repairErrorData', // 修复错误数据
     repairErrorData2: path + '/workStation/repairErrorData2', // 修复错误数据2
     setProjectFinish: path + '/workStation/setProjectFinish', // 将项目置为已完成状态

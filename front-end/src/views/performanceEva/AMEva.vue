@@ -61,7 +61,6 @@
             highlight-current-row
             style="width: 100%;"
             size="mini"
-            :height="600"
             ref = "PMDataTable">
             <el-table-column label="姓名" prop="name" align="center"></el-table-column>
             <el-table-column label="月总结提交状态" prop="submitStatus" align="center" width="70px">

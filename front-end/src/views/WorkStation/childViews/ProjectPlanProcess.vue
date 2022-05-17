@@ -22,7 +22,7 @@
                      :disabled="!this.reqFlag.getAssignProjectDetail"></el-button>
         </el-col>
         <el-col :xs="9" :sm="9" :lg="{span: 9, offset: 3}" :xl="{span: 10, offset: 3}">
-          <span style="font-size: 22px;font-weight:bold">{{projectName  + '计划&实际进展填报'}}</span>
+          <span style="font-size: 22px;font-weight:bold">{{projectName  + ' 计划&实际进展填报'}}</span>
         </el-col>
         <el-col :xs="3" :sm="3" :lg="{span: 3, offset: 4}" :xl="{span: 2}">
           <el-button size="medium" type="primary" @click="genWorkTimeApply">生成工时申报</el-button>
@@ -56,154 +56,45 @@
         </template>
       </el-table-column>
       <el-table-column label="项目进度" align="center">
-        <el-table-column label="1月" align="center" width="73%">
+        <el-table-column v-for="month in months"
+                         :key="month.key"
+                         :name="String(month.name)"
+                         :label="month.name"
+                         align="center">
           <template slot-scope="scope">
-            <el-input v-if="scope.row.editable && scope.row.isApplyWorkTime === 0"
-                      v-model.number="scope.row.January"
-                      size="mini"
-                      type="number"
-                      :disabled="monthIsEditable(scope.row, 'January')"></el-input>
-            <span v-if="scope.row.editable && scope.row.isApplyWorkTime > 0 && curApplyMonthNum === 1" style="color:red">该月已申报工时</span>
-            <span v-if="!scope.row.editable">{{scope.row.January}}</span>
-            <span v-if="!scope.row.editable && scope.row.January !== null && scope.row.January !== ''">%</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="2月" align="center" prop="February" width="73%">
-          <template slot-scope="scope">
-            <el-input v-if="scope.row.editable"
-                      v-model.number="scope.row.February"
-                      size="mini"
-                      type="number"
-                      :disabled="monthIsEditable(scope.row, 'February')"></el-input>
-            <span v-else>{{scope.row.February}}</span>
-            <span v-if="!scope.row.editable && scope.row.February !== null && scope.row.February !== ''">%</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="3月" align="center" prop="March" width="73%">
-          <template slot-scope="scope">
-            <el-input v-if="scope.row.editable"
-                      v-model.number="scope.row.March"
-                      size="mini"
-                      type="number"
-                      :disabled="monthIsEditable(scope.row, 'March')"></el-input>
-            <span v-else>{{scope.row.March}}</span>
-            <span v-if="!scope.row.editable && scope.row.March !== null && scope.row.March !== ''">%</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="4月" align="center" prop="April" width="73%">
-          <template slot-scope="scope">
-            <el-input v-if="scope.row.editable && scope.row.isApplyWorkTime === 0"
-                      v-model.number="scope.row.April"
-                      size="mini"
-                      type="number"
-                      :disabled="monthIsEditable(scope.row, 'April')"></el-input>
-            <div v-if="scope.row.editable && scope.row.isApplyWorkTime > 0 && curApplyMonthNum === 4">
+            <!-- 在编辑状态下，如果该月未申报工时，则显示输入框 -->
+            <div v-if="scope.row.editable">
+              <el-select v-model="scope.row[month.propName]"
+                         placeholder=""
+                         size="mini"
+                         :disabled="monthIsEditable(scope.row, month.propName)"
+                         filterable
+                         @visible-change="handleSelectVisibleChange($event, scope.row.preMonthProcess)">
+                <el-option
+                  v-for="item in progress"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                  :disabled="item.disable">
+                </el-option>
+              </el-select>
               <el-popover
+                v-if="scope.row.isApplyWorkTime > 0 && curApplyMonthNum === month.key"
                 placement="bottom"
-                width="400"
                 trigger="click">
-                <el-table :data="gridData">
-                  <el-table-column width="150" property="date" label="日期"></el-table-column>
-                  <el-table-column width="100" property="name" label="姓名"></el-table-column>
-                  <el-table-column width="300" property="address" label="地址"></el-table-column>
-                </el-table>
-                <span slot="reference" class="link-type" @click="handleClickCheckSubmitWorkTime(row)">该月已申报工时</span>
+                <work-time-table ref="refWorkTimeInfo" @workTimeTableDelete="handleChildEvent()"></work-time-table>
+                <span slot="reference" class="link-type" @click="handleClickCheckSubmitWorkTime(scope.row)">该月已申报工时</span>
               </el-popover>
             </div>
-            <span v-else>{{scope.row.April}}</span>
-            <span v-if="!scope.row.editable && scope.row.April !== null && scope.row.April !== ''">%</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="5月" align="center" prop="May" width="73%">
-          <template slot-scope="scope">
-            <el-input v-if="scope.row.editable"
-                      v-model.number="scope.row.May"
-                      size="mini"
-                      type="number"
-                      :disabled="monthIsEditable(scope.row, 'May')"></el-input>
-            <span v-else>{{scope.row.May}}</span>
-            <span v-if="!scope.row.editable && scope.row.May !== null && scope.row.May !== ''">%</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="6月" align="center" prop="June" width="73%">
-          <template slot-scope="scope">
-            <el-input v-if="scope.row.editable"
-                      v-model.number="scope.row.June"
-                      size="mini"
-                      type="number"
-                      :disabled="monthIsEditable(scope.row, 'June')"></el-input>
-            <span v-else>{{scope.row.June}}</span>
-            <span v-if="!scope.row.editable && scope.row.June !== null && scope.row.June !== ''">%</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="7月" align="center" prop="July" width="73%">
-          <template slot-scope="scope">
-            <el-input v-if="scope.row.editable"
-                      v-model.number="scope.row.July"
-                      size="mini"
-                      type="number"
-                      :disabled="monthIsEditable(scope.row, 'July')"></el-input>
-            <span v-else>{{scope.row.July}}</span>
-            <span v-if="!scope.row.editable && scope.row.July !== null && scope.row.July !== ''">%</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="8月" align="center" prop="August" width="73%">
-          <template slot-scope="scope">
-            <el-input v-if="scope.row.editable"
-                      v-model.number="scope.row.August"
-                      size="mini"
-                      type="number"
-                      :disabled="monthIsEditable(scope.row, 'August')"></el-input>
-            <span v-else>{{scope.row.August}}</span>
-            <span v-if="!scope.row.editable && scope.row.August !== null && scope.row.August !== ''">%</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="9月" align="center" prop="September" width="73%">
-          <template slot-scope="scope">
-            <el-input v-if="scope.row.editable"
-                      v-model.number="scope.row.September"
-                      size="mini"
-                      type="number"
-                      :disabled="monthIsEditable(scope.row, 'September')"></el-input>
-            <span v-else>{{scope.row.September}}</span>
-            <span v-if="!scope.row.editable && scope.row.September !== null && scope.row.September !== ''">%</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="10月" align="center" prop="October" width="73%">
-          <template slot-scope="scope">
-            <el-input v-if="scope.row.editable"
-                      v-model.number="scope.row.October"
-                      size="mini"
-                      type="number"
-                      :disabled="monthIsEditable(scope.row, 'October')"></el-input>
-            <span v-else>{{scope.row.October}}</span>
-            <span v-if="!scope.row.editable && scope.row.October !== null && scope.row.October !== ''">%</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="11月" align="center" prop="November" width="73%">
-          <template slot-scope="scope">
-            <el-input v-if="scope.row.editable"
-                      v-model.number="scope.row.November"
-                      size="mini"
-                      type="number"
-                      :disabled="monthIsEditable(scope.row, 'November')"></el-input>
-            <span v-else>{{scope.row.November}}</span>
-            <span v-if="!scope.row.editable && scope.row.November !== null && scope.row.November !== ''">%</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="12月" align="center" prop="December" width="73%">
-          <template slot-scope="scope">
-            <el-input v-if="scope.row.editable"
-                      v-model.number="scope.row.December"
-                      size="mini"
-                      type="number"
-                      :disabled="monthIsEditable(scope.row, 'December')"></el-input>
-            <span v-else>{{scope.row.December}}</span>
-            <span v-if="!scope.row.editable && scope.row.December !== null && scope.row.December !== ''">%</span>
+            <!-- 不在编辑状态下,直接显示月份进度值 -->
+            <div v-if="!scope.row.editable">
+              <span>{{scope.row[month.propName]}}</span>
+              <span v-if="scope.row[month.propName] !== null && scope.row[month.propName] !== ''">%</span>
+            </div>
           </template>
         </el-table-column>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="150" fixed="right">
+      <el-table-column label="操作" align="center" width="145" fixed="right">
         <template slot="header" slot-scope="scope">
           <span style="font-size:15px;">操作</span>
           <br>
@@ -276,7 +167,6 @@
                   placement="right"
                   trigger="hover">
                   <el-table :data="scope.row.submitedData">
-<!--                    <el-table-column label="项目阶段" align="center" prop="projectStageName"></el-table-column>-->
                     <el-table-column label="上月进展" align="center">
                       <template slot-scope="scope">
                         <span>{{scope.row.lastProcess + '%'}}</span>
@@ -324,6 +214,7 @@
       </div>
       <Assign v-if="showFlag.workTimeAssign" ref="workTimeAssign" @assignDetail="handleAssign"/>
     </el-dialog>
+    <!-- 工时分配对话框 -->
     <Cop v-if="showFlag.cop" ref="cop"/>
     <!-----------------------------------------------生成项目计划对话框---------------------------------------------------->
     <el-dialog :visible.sync="dialogPlanFormVisible" width="65%" :title="projectName + '项目计划'">
@@ -384,11 +275,11 @@
   } from '@/config/interface'
   import Assign from '@/components/Cop/workTimeAssign'
   import Cop from '@/components/Cop/Cop'
-  import { getAssignProjectDetailV2, projectDetailIsApplyWorkTime } from '@/utils/workStation'
-  import { getCurApplyAbleMonth, mStringToNumber } from '@/utils/common'
-  import { http } from '@/config/http'
+  import { getAssignProjectDetailV2, projectDetailIsApplyWorkTime, projectDetailIsApplyWorkTimeV2 } from '@/utils/workStation'
+  import { getCurApplyAbleMonth, mStringToNumber, MonthToString } from '@/utils/common'
   import { Notification } from 'element-ui'
-  import { moment } from 'moment'
+  import workTimeTable from '@/components/common/workTimeTable.vue'
+  import moment from 'moment'
   export default {
     data () {
       return {
@@ -397,7 +288,6 @@
         isHideProjectStage: false,
         yearNum: this.$moment().year(),
         projectName: '',
-        initTableData: [],
         formRules: {
           January: [
             { required: false },
@@ -460,7 +350,8 @@
           genWorkTimeApply: true
         },
         isShowFlag: {
-          table: true
+          table: true,
+          workTimeTable: false
         },
         dialogFormVisible: false,
         dialogPlanFormVisible: false,
@@ -480,7 +371,98 @@
         },
         tableHeight: null,
         curApplyMonth: null,
-        curApplyMonthNum: null
+        curApplyMonthNum: null,
+        workTimeInfo: null, // 传给workTimeTable子组件的参数
+        months: [{
+          name: '1月',
+          key: 1,
+          propName: 'January'
+        }, {
+          name: '2月',
+          key: 2,
+          propName: 'February'
+        }, {
+          name: '3月',
+          key: 3,
+          propName: 'March'
+        }, {
+          name: '4月',
+          key: 4,
+          propName: 'April'
+        }, {
+          name: '5月',
+          key: 5,
+          propName: 'May'
+        }, {
+          name: '6月',
+          key: 6,
+          propName: 'June'
+        }, {
+          name: '7月',
+          key: 7,
+          propName: 'July'
+        }, {
+          name: '8月',
+          key: 8,
+          propName: 'August'
+        }, {
+          name: '9月',
+          key: 9,
+          propName: 'September'
+        }, {
+          name: '10月',
+          key: 10,
+          propName: 'October'
+        }, {
+          name: '11月',
+          key: 11,
+          propName: 'November'
+        }, {
+          name: '12月',
+          key: 12,
+          propName: 'December'
+        }],
+        progress: [{
+          value: 10,
+          label: '10%',
+          disable: false
+        }, {
+          value: 20,
+          label: '20%',
+          disable: false
+        }, {
+          value: 30,
+          label: '30%',
+          disable: false
+        }, {
+          value: 40,
+          label: '40%',
+          disable: false
+        }, {
+          value: 50,
+          label: '50%',
+          disable: false
+        }, {
+          value: 60,
+          label: '60%',
+          disable: false
+        }, {
+          value: 70,
+          label: '70%',
+          disable: false
+        }, {
+          value: 80,
+          label: '80%',
+          disable: false
+        }, {
+          value: 90,
+          label: '90%',
+          disable: false
+        }, {
+          value: 100,
+          label: '100%',
+          disable: false
+        }]
       }
     },
     methods: {
@@ -497,16 +479,15 @@
       // 初始化
       init () {
         this.projectName = this.$route.query.projectName
-        this.initData(this.$route.query.projectID, this.yearNum)
         getCurApplyAbleMonth().then(getCurApplyAbleMonthRes => {
           this.curApplyMonth = this.$moment(getCurApplyAbleMonthRes[0].setTime).format('YYYY-MM')
-          this.curApplyMonthNum = this.$moment(getCurApplyAbleMonthRes[0].setTime).months() + 1
-          console.log('this.curApplyMonthNum')
-          console.log(this.curApplyMonthNum)
+          this.dialogForm.title = this.curApplyMonth
+          this.curApplyMonthNum = this.$moment(getCurApplyAbleMonthRes[0].setTime).month() + 1
+          this.initData(this.$route.query.projectID, this.yearNum, this.curApplyMonthNum, this.curApplyMonth)
         })
       },
       // 初始化默认数据
-      initData (projectID, yearNum) {
+      initData (projectID, yearNum, curApplyMonthNum, curApplyMonth) {
         getAssignProjectDetailV2(projectID, yearNum).then(response => {
           // 构造表格模板数据
           let tableData = []
@@ -537,7 +518,7 @@
               obj = Object.assign(obj, responseItem.monthProcess[i])
               tableData.push(JSON.parse(JSON.stringify(obj)))
             }
-            // 根据月份计划、进展的数量进行相应调整
+            // 根据月份计划、进展的数量进行相应调整,使计划在前，实际进展在后
             if (responseItem.monthProcess.length === 0) {
               let obj = JSON.parse(JSON.stringify(responseItem))
               monthProcessObj.type = 'plan'
@@ -567,7 +548,42 @@
               }
             }
           }
-          this.initTableData = JSON.parse(JSON.stringify(tableData))
+          // =====================================查询各个项目阶段在当前申报月份下的工时申报情况
+          let checkApdID = []
+          console.log('111tableData')
+          console.log(tableData)
+          for (let tableItem of tableData) {
+            // =======================插入需要查询的当月是否申报工时的项目阶段ID和上月进展
+            if (tableItem.type === 'fact' && tableItem.aPDID !== null) {
+              checkApdID.push(JSON.parse(JSON.stringify(tableItem)))
+              let preMonth = moment(curApplyMonth).subtract(1, 'months').month() + 1
+              if (preMonth === 12) { // 上个月为去年的十二月份
+                if (tableItem.preMonthProcess.length > 0) {
+                  tableItem.preMonthProcess = tableItem.preMonthProcess[0].December === null ? 0 : tableItem.preMonthProcess[0].December
+                } else {
+                  tableItem.preMonthProcess = 0
+                }
+              } else { // 在本年度
+                if (tableItem.monthProcess.length > 0) {
+                  tableItem.preMonthProcess = tableItem.monthProcess[0][MonthToString(String(preMonth))] === null
+                   ? 0 : tableItem.monthProcess[0][MonthToString(String(preMonth))]
+                } else {
+                  tableItem.preMonthProcess = 0
+                }
+              }
+            } else {
+              tableItem.preMonthProcess = 0
+            }
+          }
+          projectDetailIsApplyWorkTimeV2(checkApdID, 'fact', curApplyMonth).then(response => {
+            for (let tableDataItem of tableData) {
+              let findIndex = response.findIndex(item => {
+                return item.apdID === tableDataItem.apdID
+              })
+              tableDataItem.isApplyWorkTime = findIndex === -1 ? 0 : 1
+              tableDataItem.workTimeInfo = findIndex === -1 ? [] : response[findIndex]
+            }
+          })
           console.log('tableData')
           console.log(tableData)
           // 如果项目阶段数目>10个，先隐藏已完成的项目阶段
@@ -590,9 +606,9 @@
           this.tableDataCache = JSON.parse(JSON.stringify(this.tableData))
         })
       },
-      // 是否是当前月份
-      isCurMonth (month) {
-        return moment(this.curApplyMonth).months() + 1 === month
+      // 子组件回调函数
+      handleChildEvent () {
+        this.initData(this.$route.query.projectID, this.yearNum, this.curApplyMonthNum, this.curApplyMonth)
       },
       // 点击隐藏项目阶段事件
       handleClikHideProjectStage () {
@@ -616,7 +632,8 @@
       },
       // 点击该月已申报工时事件
       handleClickCheckSubmitWorkTime (row) {
-
+        this.workTimeInfo = row.workTimeInfo
+        this.$refs.refWorkTimeInfo[0].init(row.workTimeInfo)
       },
       // 获取当前月份能否申报的标志
       getIsSubmitAllow () {
@@ -639,6 +656,17 @@
             reject(new Error('getIsSubmitAllow send error!'))
           })
         })
+      },
+      // 月度进展下拉框下拉时触发
+      handleSelectVisibleChange ($event, preMonthProcess) {
+        if ($event) {
+          for (let item of this.progress) {
+            item.disable = false
+            if (item.value < preMonthProcess) {
+              item.disable = true
+            }
+          }
+        }
       },
       // 提交工时申报
       handleWorkTimeApply (formData) {
@@ -790,71 +818,6 @@
           }
         })
       },
-      // 生成项目计划
-      genWorkTimePlanApply () {
-        let year = this.$moment(this.dialogForm.title).format('YYYY')
-        let promises = []
-        let count = 0
-        const url = getAssignProjectDetail
-        let params = {
-          id: this.$route.query.projectID,
-          year: year
-        }
-        http(url, params).then(res => {
-          let data = res
-          this.dialogPlanFormVisible = true
-          this.applyMonthPlanProcess = data
-          let searchData = []
-          let applyMonth = this.$moment(this.dialogForm.title).toObject()
-          let applyMonthString = this.$common.MonthToString(String(applyMonth.months + 1))
-          for (let item of this.applyMonthPlanProcess) {
-            if (item.isFinish !== 1 && item.type === 'plan' && item[applyMonthString] !== null) {
-              searchData.push(item)
-            }
-          }
-          this.submitParams = {
-            data: []
-          }
-          if (searchData.length === 0) {
-            this.reqFlag.genWorkTimeApply = false
-            this.applyMonthPlanProcessTableData = []
-            this.$common.toast(this.dialogForm.title + '月份未填报计划进展', 'error', 'true')
-          } else {
-            promises[count++] = projectDetailIsApplyWorkTime(searchData, 'plan', this.dialogForm.title)
-            promises[count++] = this.getMonthProcess('plan', searchData)
-            Promise.all(promises).then(result => {
-              let submitParamsTmp = result[1]
-              for (let i = 0; i < result[0].length; i++) {
-                if (result[0][i].length > 0) {
-                  if (result[0][i][0].applyProcess !== submitParamsTmp.data[i].applyMonthProcess) { // 现申报进展与已申报进展不等
-                    submitParamsTmp.data[i].isApplyWorkTime = result[0][i].length
-                    submitParamsTmp.data[i].id = []
-                    submitParamsTmp.data[i].submitedData = []
-                    for (let resultItem of result[0][i]) {
-                      submitParamsTmp.data[i].id.push(resultItem.id)
-                      resultItem.projectStageName = ''
-                      submitParamsTmp.data[i].submitedData.push(resultItem)
-                    }
-                  } else {
-                    submitParamsTmp.data[i] = []
-                  }
-                } else {
-                  submitParamsTmp.data[i].isApplyWorkTime = result[0][i].length
-                  submitParamsTmp.data[i].id = null
-                }
-              }
-              for (let i = 0; i < submitParamsTmp.data.length; i++) {
-                if (submitParamsTmp.data[i].length === 0) {
-                  submitParamsTmp.data.splice(i, 1)
-                  i--
-                }
-              }
-              this.applyMonthPlanProcessTableData = submitParamsTmp.data
-              this.submitParams = submitParamsTmp
-            })
-          }
-        })
-      },
       // 获取申报月份进展数据
       getMonthProcess (type, searchData) {
         let _this = this
@@ -944,23 +907,27 @@
       handleDecYear () {
         if (this.reqFlag.getAssignProjectDetail) {
           this.yearNum -= 1
-          this.initData(this.$route.query.projectID, this.yearNum)
+          this.initData(this.$route.query.projectID, this.yearNum, this.curApplyMonthNum, this.curApplyMonth)
         }
       },
       // 下一年度进展
       handleAddYear () {
         if (this.reqFlag.getAssignProjectDetail) {
           this.yearNum += 1
-          this.initData(this.$route.query.projectID, this.yearNum)
+          this.initData(this.$route.query.projectID, this.yearNum, this.curApplyMonthNum, this.curApplyMonth)
         }
       },
       // 表格编辑按钮
       handleEdit (row, index) {
         if (row.type === 'fact') {
-          projectDetailIsApplyWorkTime([row], 'fact', this.curApplyMonth).then(projectDetailIsApplyWorkTimeRes => {
-            row.isApplyWorkTime = projectDetailIsApplyWorkTimeRes[0].length
+          // projectDetailIsApplyWorkTime([row], 'fact', this.curApplyMonth).then(projectDetailIsApplyWorkTimeRes => {
+          //   row.isApplyWorkTime = projectDetailIsApplyWorkTimeRes[0].length
             row.editable = true
-          })
+          //   row.workTimeInfo = projectDetailIsApplyWorkTimeRes[0][0]
+          //   console.log('projectDetailIsApplyWorkTimeRes')
+          //   console.log(projectDetailIsApplyWorkTimeRes)
+          //   row.currentMontProgress = row.isApplyWorkTime > 0 ? projectDetailIsApplyWorkTimeRes[0][0][MonthToString(String(this.curApplyMonthNum))] : 0
+          // })
         } else {
           row.editable = true
         }
@@ -980,7 +947,7 @@
             if (res.code === 1) {
               let data = res.data
               row.monthID = data.monthID
-              this.initData(this.$route.query.projectID, this.yearNum)
+              this.initData(this.$route.query.projectID, this.yearNum, this.curApplyMonthNum, this.curApplyMonth)
               this.reqFlag.savePlanProcess = true
               this.$common.toast('保存成功', 'success', false)
             }
@@ -1063,13 +1030,12 @@
           }
         })
       },
-      // 月份是否可编辑进度
+      // 是否禁用月份进展编辑框
       monthIsEditable (row, month) {
         if (row.type === 'plan') {
           return false
         } else if (row.type === 'fact') {
-          return this.$moment(this.yearNum + '-' + mStringToNumber(month)).isBefore(this.curApplyMonth) ||
-            this.$moment(this.yearNum + '-' + mStringToNumber(month)).isAfter(this.curApplyMonth) || row.isApplyWorkTime > 0
+          return !this.$moment(this.yearNum + '-' + mStringToNumber(month)).isSame(this.curApplyMonth) || row.isApplyWorkTime > 0
         }
       },
       // 当月已申报点击事件
@@ -1102,7 +1068,8 @@
     },
     components: {
       Assign,
-      Cop
+      Cop,
+      workTimeTable
     },
     filters: {
       processTypeFilter (type) {

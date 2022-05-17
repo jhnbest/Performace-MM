@@ -143,7 +143,7 @@ const sqlMap = {
     // getMonthProcess: 'select id, aPDID, year, type, January, February, March, April, May, June, July, August, September, ' +
     //     'October, November, December from monthprocess where aPDID = ? and year = ? and obsoleteStatus != 1',
     getMonthProcess: 'select * from monthprocess where aPDID = ? and year = ? and obsoleteStatus != 1',
-    getMonthProcessV2: 'select * from monthprocess where aPDID in (?) and year = ? and obsoleteStatus != 1',
+    getMonthProcessV2: 'select * from monthprocess where aPDID in (?) and year in (?) and obsoleteStatus != 1',
     submitPlanProcessE: 'update assignprojectdetail set kValue = ?, coefficient = ?, isFinish = ? where id = ?;' +
         'update monthprocess set January = ?, February = ?, March = ?, April = ?, May = ?, June = ?, July = ?, August = ?, ' +
         'September = ?, October = ?, November = ?, December = ? where id = ?',
@@ -207,7 +207,10 @@ const sqlMap = {
     getUnFilledProjectList: 'select * from assignprojectlist where userID = ? and isFilled = 0 and obsoleteStatus != 1 and process != 100.0',
     getFilledProjectList: 'select * from assignprojectlist where userID = ? and isFilled = 1 and obsoleteStatus != 1 and process != 100.0',
     getCompleteProjectList: 'select * from assignprojectlist where userID = ? and obsoleteStatus != 1 and process = 100.0',
-    projectDetailIsApplyWorkTime: 'select * from worktimelist where apdID = ? and applyMonth = ? and applyType = ? and obsoleteStatus != 1',
+    projectDetailIsApplyWorkTime: 'select wl.*, apl.projectName, apd.projectStageName from worktimelist wl left join assignprojectdetail apd on wl.apdID = apd.id left join' +
+    ' assignprojectlist apl on wl.aplID = apl.id where wl.apdID = ? and wl.applyMonth = ? and wl.applyType = ? and wl.obsoleteStatus != 1',
+    projectDetailIsApplyWorkTimeV2: 'select wl.*, apl.projectName, apd.projectStageName from worktimelist wl left join assignprojectdetail apd on wl.apdID = apd.id left join' +
+    ' assignprojectlist apl on wl.aplID = apl.id where wl.apdID in (?) and wl.applyMonth = ? and wl.applyType = ? and wl.obsoleteStatus != 1',
     repairErrorDataCheck: 'select count(*) as totalCount from monthprocess where aPDID = ? and type = "fact" and obsoleteStatus != 1;' +
         'select id, type, year, aPDID from monthprocess where aPDID = ? and obsoleteStatus != 1',
     repairErrorData2Check: 'select mp.*, wl.applyProcess from monthprocess mp left join worktimelist wl on mp.aPDID = wl.apdID where ' +

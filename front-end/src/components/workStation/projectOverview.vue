@@ -570,7 +570,7 @@
           default: null
         }
       },
-      name: 'test.vue'
+      name: 'projectOverview.vue'
     }
 </script>
 

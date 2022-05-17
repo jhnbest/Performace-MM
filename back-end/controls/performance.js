@@ -812,30 +812,30 @@ const performance = {
     },
     // 获取工时分配信息
     getWorkAssign (req, res) {
-        let data = req.body
-        $http.userVerify(req, res, () => {
-            let checkID = data.projectID
-            let sql = $sql.performance.getWorkAssign
-            let arrayParams = [checkID]
+      let data = req.body
+      $http.userVerify(req, res, () => {
+        let checkID = data.projectID
+        let sql = $sql.performance.getWorkAssign
+        let arrayParams = [checkID]
+        if (data.searchType === 'applyer') {
+          let sqlGetReviewStatus = $sql.performance.getReviewStatus
+          sql = sql + ';' + sqlGetReviewStatus
+          arrayParams.push(checkID)
+        }
+        $http.connPool(sql, arrayParams, (err, result) =>{
+          if (err) {
+            return $http.writeJson(res, {code: -2, message: '失败'})
+          } else {
             if (data.searchType === 'applyer') {
-                let sqlGetReviewStatus = $sql.performance.getReviewStatus
-                sql = sql + ';' + sqlGetReviewStatus
-                arrayParams.push(checkID)
+                result[0] = formatData(result[0])
+                result[1] = formatData(result[1])
+            } else {
+                result = formatData(result)
             }
-            $http.connPool(sql, arrayParams, (err, result) =>{
-                if (err) {
-                    return $http.writeJson(res, {code: -2, message: '失败'})
-                } else {
-                    if (data.searchType === 'applyer') {
-                        result[0] = formatData(result[0])
-                        result[1] = formatData(result[1])
-                    } else {
-                        result = formatData(result)
-                    }
-                    return $http.writeJson(res, {code: 1, data: result, message: '获取工时分配成功'})
-                }
-            })
+            return $http.writeJson(res, {code: 1, data: result, message: '获取工时分配成功'})
+          }
         })
+      })
     },
     // 获取项目信息
     getProjectInfo (req, res) {
@@ -882,20 +882,20 @@ const performance = {
     },
     // 删除项目
     deleteProject (req, res) {
-        $http.userVerify(req, res, () => {
-            let data = req.body
-            let sqlDeleteProject = $sql.performance.deleteProject
-            let deleteWorkTimeAssign = $sql.performance.deleteWorkTimeAssign
-            let arrayParams = [data.id, data.id]
-            let sql = sqlDeleteProject + ';' + deleteWorkTimeAssign
-            $http.connPool(sql, arrayParams, (err, result) => {
-                if (err) {
-                    return $http.writeJson(res, {code: -2, message: '失败'})
-                } else {
-                    return $http.writeJson(res, {code: 1, message: '删除成功'})
-                }
-            })
+      $http.userVerify(req, res, () => {
+        let data = req.body
+        let sqlDeleteProject = $sql.performance.deleteProject
+        let deleteWorkTimeAssign = $sql.performance.deleteWorkTimeAssign
+        let arrayParams = [data.id, data.id]
+        let sql = sqlDeleteProject + ';' + deleteWorkTimeAssign
+        $http.connPool(sql, arrayParams, (err, result) => {
+          if (err) {
+            return $http.writeJson(res, {code: -2, message: '失败'})
+          } else {
+            return $http.writeJson(res, {code: 1, message: '删除成功'})
+          }
         })
+      })
     },
     // 提交工时分配审核结果
     updateWorkTimeAssignReview (req, res) {

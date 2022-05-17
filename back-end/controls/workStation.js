@@ -517,15 +517,23 @@ const workStation = {
           let checkApdID = []
           for (let item of projectDetail) {
             item.monthProcess = []
+            item.preMonthProcessArray = []
             checkApdID.push(item.apdID)
           }
           sql = $sql.workStation.getMonthProcessV2
-          arrayParams = [checkApdID, sendData.year]
+          let preYear = sendData.year - 1
+          console.log('==========================preYear')
+          console.log(preYear)
+          let years = [sendData.year, preYear]
+          arrayParams = [checkApdID, years]
           RCPDDatabase(sql, arrayParams).then(response2 => {
             let monthProcess = response2
             for (let item of projectDetail) {
               item.monthProcess = monthProcess.filter(monthProcessItem => {
-                return monthProcessItem.aPDID === item.apdID
+                return (monthProcessItem.aPDID === item.apdID && monthProcessItem.year === sendData.year)
+              })
+              item.preMonthProcessArray = monthProcess.filter(monthProcessItem => {
+                return (monthProcessItem.aPDID === item.apdID && monthProcessItem.year === preYear)
               })
             }
             return $http.writeJson(res, {code: 1, data: projectDetail, message: '成功'})
@@ -1052,6 +1060,17 @@ const workStation = {
         promises[count++] = RCPDDatabase(sql, arrayParams)
       }
       Promise.all(promises).then(result => {
+        return $http.writeJson(res, { code: 1, data: result, message: 'success' })
+      }).catch(error => {
+        return $http.writeJson(res, { code: -2, data: error, message: 'error' })
+      })
+    },
+    // 查看项目阶段当月是否已填报工时V2
+    projectDetailIsApplyWorkTimeV2 (req, res) {
+      let sendData = req.body
+      let sql = $sql.workStation.projectDetailIsApplyWorkTimeV2
+      let arrayParams = [sendData.projectDetailID, sendData.applyMonth, sendData.type]
+      RCPDDatabase(sql, arrayParams).then(result => {
         return $http.writeJson(res, { code: 1, data: result, message: 'success' })
       }).catch(error => {
         return $http.writeJson(res, { code: -2, data: error, message: 'error' })
