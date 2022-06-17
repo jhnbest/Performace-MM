@@ -57,9 +57,8 @@ module.exports = {
     getAssignProjectList: path + '/workStation/getAssignProjectList',
     getAssignProjectDetail: path + '/workStation/getAssignProjectDetail', // 获取未完成的指派项目明细
     getAssignProjectDetailV2: path + '/workStation/getAssignProjectDetailV2', // 获取未完成的指派项目明细
-    submitPlanProcess: path + '/workStation/submitPlanProcess', //保存计划进展
+    submitProcess: path + '/workStation/submitProcess', //提交进展
     submitAssignWorkDetail: path + '/workStation/submitAssignWorkDetail', //保存指派项目
-    getMonthProcessDiff: path + '/workStation/getMonthProcessDiff', // 获取每月进展对应工时
     getAssignedProject: path + '/workStation/getAssignedProject', // 获取每月进展对应工时
     updateAssignProjectList: path + '/workStation/updateAssignProjectList', // 更新已指派项目
     deleteAssignProject: path + '/workStation/deleteAssignProject', // 删除已指派项目

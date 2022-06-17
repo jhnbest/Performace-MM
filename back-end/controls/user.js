@@ -95,8 +95,8 @@ const user = {
         //if(data.type > 1) data.role = '普通用户'
         //data.role = '管理员'
         delete data[0].password
-        /**设置token 1周后过期**/
-        let expires = moment().add(1, 'week').valueOf()
+        /**设置token 1天后过期**/
+        let expires = moment().add(1, 'days').valueOf()
         let token = jwt.encode({
           iss: data[0].id,
           exp: expires,

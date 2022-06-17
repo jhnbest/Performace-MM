@@ -3,7 +3,9 @@ import {
   urlGetTypeProjectList,
   urlgetAssignProjectDetailV2,
   urlProjectDetailIsApplyWorkTime,
-  urlProjectDetailIsApplyWorkTimeV2
+  urlProjectDetailIsApplyWorkTimeV2,
+  urlSubmitProcess,
+  urlSubmitProjectWorkTimeApply
 } from '@/config/interface'
 
 // 获取特定类型的项目列表
@@ -82,6 +84,42 @@ export function projectDetailIsApplyWorkTimeV2 (searchData, type, applyMonth) {
       resolve(res.data)
     }).catch(err => {
       reject(new Error('projectDetailIsApplyWorkTime send error!' + err))
+    })
+  })
+}
+
+// 提交项目阶段进展
+export function submitProcess (processData) {
+  const url = urlSubmitProcess
+  let params = processData
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(res => {
+      if (res.code === 1) {
+        resolve(res.data)
+      } else {
+        reject(res.err)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
+export function submitProjectWorkTimeApply (workTimeInfo, projectID) {
+  let url = urlSubmitProjectWorkTimeApply
+  let params = {
+    workTimeInfo: workTimeInfo,
+    projectID: projectID
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(res => {
+      if (res.code === 1) {
+        resolve()
+      } else {
+        reject(res.err)
+      }
+    }).catch(err => {
+      reject(err)
     })
   })
 }

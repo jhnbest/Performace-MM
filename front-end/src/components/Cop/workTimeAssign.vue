@@ -103,7 +103,7 @@
 </template>
 
 <script>
-import { userDetail, userUpdateInfo, urlGetUsersList } from '../../config/interface'
+import { urlGetUsersList } from '../../config/interface'
 export default {
   data () {
     return {

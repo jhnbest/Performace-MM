@@ -159,7 +159,7 @@
 
 <script>
   import { workTimeSubmit, getProjectInfo, urlGetUsersList, getProjectType, getWorkTimeNew, workTimeTemporary,
-    updateAssignWork, getAssignWorkDetail, getIsSubmitAllow } from '@/config/interface'
+    updateAssignWork, getAssignWorkDetail, urlGetIsSubmitAllow } from '@/config/interface'
   import Assign from '@/components/Cop/workTimeAssign'
     export default {
       data () {
@@ -297,7 +297,7 @@
         },
         // 获取当前月份能否申报的标志
         getIsSubmitAllow () {
-          const url = getIsSubmitAllow
+          const url = urlGetIsSubmitAllow
           let params = {
             applyYear: this.$moment(this.formData.title).year(),
             applyMonth: this.$moment(this.formData.title).month() + 1,

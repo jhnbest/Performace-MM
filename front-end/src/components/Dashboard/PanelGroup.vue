@@ -349,7 +349,6 @@ export default {
         promises1[i] = getPerformanceIsPublish(applyYear, this.$moment(quarterMonth[i]).month() + 1)
       }
       Promise.all(promises1).then(allResponse1 => {
-        console.log('获取季度绩效信息耗时： ' + String(new Date() - start) + 'ms')
         let PMDataPublishInfo = allResponse1
         let isAllPMDataPublish = true
         // 判断所有月份的绩效是否已经发布

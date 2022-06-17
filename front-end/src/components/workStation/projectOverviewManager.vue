@@ -52,7 +52,7 @@
 </template>
 
 <script>
-  import { getCurApplyAbleMonth, monthNumToMonthString } from '../../utils/common'
+  import { getCurApplyAbleMonth, MonthToString } from '../../utils/common'
   import { getTypeProjectList } from '../../utils/workStation'
   import projectProcessDetail from './projectProcessDetail'
   export default {
@@ -121,7 +121,7 @@
               if (monthProcessItem.length !== 0) {
                 for (let monthProcessItemItem of monthProcessItem) {
                   if (monthProcessItemItem.type === 'plan') {
-                    if (monthProcessItemItem[monthNumToMonthString(curApplyMonth + 1)] !== null) {
+                    if (monthProcessItemItem[MonthToString(String(curApplyMonth + 1))] !== null) {
                       obj.planProjectStage = monthProcessItemItem.projectStageName
                     }
                   }

@@ -78,47 +78,47 @@ function workTimeAssignDelete(id) {
 
 function workTimeAssign(projectInsertID, data, i, j) {
     return new Promise(function(resolve, reject) {
-        let sql = null
-        let userID = data.data[i].workTimeAssign[j].id
-        let projectID = projectInsertID
-        let workTime = data.data[i].workTimeAssign[j].assignWorkTime
-        let assignRole = data.data[i].workTimeAssign[j].applyRole
-        let reviewWorkTime = data.data[i].workTimeAssign[j].reviewWorkTime
-        let arrayParams = []
-        if (data.submitType === 'insert') {
-            sql = $sql.performance.addWorkAssign
-            arrayParams = [userID, projectID, workTime, assignRole, reviewWorkTime]
-        } else if (data.submitType === 'update') {
-            if (j + 1 > data.data[i].workTimeAssignInsertID.length) {
-                sql = $sql.performance.addWorkAssign
-                arrayParams = [userID, projectID, workTime, assignRole, reviewWorkTime]
-            } else {
-                sql = $sql.performance.updateWorkAssignEdit
-                arrayParams = [userID, projectID, workTime, assignRole, reviewWorkTime, data.data[i].workTimeAssignInsertID[j]]
-            }
+      let sql = null
+      let userID = data.data[i].workTimeAssign[j].id
+      let projectID = projectInsertID
+      let workTime = data.data[i].workTimeAssign[j].assignWorkTime
+      let assignRole = data.data[i].workTimeAssign[j].applyRole
+      let reviewWorkTime = data.data[i].workTimeAssign[j].reviewWorkTime
+      let arrayParams = []
+      if (data.submitType === 'insert') {
+          sql = $sql.performance.addWorkAssign
+          arrayParams = [userID, projectID, workTime, assignRole, reviewWorkTime]
+      } else if (data.submitType === 'update') {
+          if (j + 1 > data.data[i].workTimeAssignInsertID.length) {
+              sql = $sql.performance.addWorkAssign
+              arrayParams = [userID, projectID, workTime, assignRole, reviewWorkTime]
+          } else {
+              sql = $sql.performance.updateWorkAssignEdit
+              arrayParams = [userID, projectID, workTime, assignRole, reviewWorkTime, data.data[i].workTimeAssignInsertID[j]]
+          }
+      }
+      $http.connPool(sql, arrayParams, (err, result) => {
+        if (err) {
+          let returnData = {
+              result: result,
+              err: err
+          }
+          reject(returnData)
+        } else if (result.affectedRows !== 1) {
+          let returnData = {
+              result: result,
+              err: err
+          }
+          resolve(returnData);
+        } else {
+          result = JSON.parse(JSON.stringify(result))
+          let returnData = {
+              result: result,
+              err: err
+          }
+          resolve(returnData);
         }
-        $http.connPool(sql, arrayParams, (err, result) => {
-            if (err) {
-                let returnData = {
-                    result: result,
-                    err: err
-                }
-                resolve(returnData)
-            } else if (result.affectedRows !== 1) {
-                let returnData = {
-                    result: result,
-                    err: err
-                }
-                resolve(returnData);
-            } else {
-                result = JSON.parse(JSON.stringify(result))
-                let returnData = {
-                    result: result,
-                    err: err
-                }
-                resolve(returnData);
-            }
-        })
+      })
     })
 }
 
@@ -234,34 +234,34 @@ async function workTimeInsert(sendData, res, operate) {
 }
 
 function workTimeInsertTmp(sendData, operate) {
-    let promises1 = []
-    let promises2 = []
-    let count1 = 0
-    let count2 = 0
-    return new Promise(function (resolve, reject) {
-        for (let i = 0; i < sendData.data.length; i++) { // 逐条插入工时项目
-            promises1[count1++] = workTimeInsertOP(sendData, i, operate)
+  let promises1 = []
+  let promises2 = []
+  let count1 = 0
+  let count2 = 0
+  return new Promise(function (resolve, reject) {
+    for (let i = 0; i < sendData.data.length; i++) { // 逐条插入工时项目
+      promises1[count1++] = workTimeInsertOP(sendData, i, operate)
+    }
+    Promise.all(promises1).then(result1 => {
+      // 插入/更新工时分配信息
+      for (let i = 0; i < sendData.data.length; i++) {
+        for (let j = 0;j < sendData.data[i].workTimeAssign.length; j++) {
+          let insertID = null
+          if (sendData.submitType === 'insert') {
+            insertID = result1[i].result.insertId
+          } else if (sendData.submitType === 'update') {
+            insertID = sendData.projectID
+          }
+          promises2[count2++] = workTimeAssign(insertID, sendData, i, j)
         }
-        Promise.all(promises1).then(result1 => {
-            // 插入/更新工时分配信息
-            for (let i = 0; i < sendData.data.length; i++) {
-                for (let j = 0;j < sendData.data[i].workTimeAssign.length; j++) {
-                    let insertID = null
-                    if (sendData.submitType === 'insert') {
-                        insertID = result1[i].result.insertId
-                    } else if (sendData.submitType === 'update') {
-                        insertID = sendData.projectID
-                    }
-                    promises2[count2++] = workTimeAssign(insertID, sendData, i, j)
-                }
-            }
-            Promise.all(promises2).then(result2 => {
-                resolve(result2)
-            }).catch(err2 => {
-                reject(new Error(err2))
-            })
-        })
+      }
+      Promise.all(promises2).then(result2 => {
+        resolve(result2)
+      }).catch(err2 => {
+        reject(new Error(err2))
+      })
     })
+  })
 }
 
 function getGroupID(groupName) {
@@ -580,30 +580,30 @@ function updateAssignProjectFilled (assignProjectID) {
 }
 
 function deleteExistWorkTimeSubmit(workTimeSubmitData) {
-    let promises = []
-    let count = 0
-    return new Promise(function (resolve, reject) {
-        for (let workTimeSubmitDataItem of workTimeSubmitData) {
-            if (workTimeSubmitDataItem.isApplyWorkTime > 0) {
-                for (let workTimeSubmitDataItemID of workTimeSubmitDataItem.id) {
-                    let sqlDeleteProject = $sql.performance.deleteProject
-                    let deleteWorkTimeAssign = $sql.performance.deleteWorkTimeAssign
-                    let arrayParams = [workTimeSubmitDataItemID, workTimeSubmitDataItemID]
-                    let sql = sqlDeleteProject + ';' + deleteWorkTimeAssign
-                    promises[count++] = RCPDDatabase(sql, arrayParams)
-                }
-            }
+  let promises = []
+  let count = 0
+  return new Promise(function (resolve, reject) {
+    for (let workTimeSubmitDataItem of workTimeSubmitData) {
+      if (workTimeSubmitDataItem.isApplyWorkTime > 0) {
+        for (let workTimeSubmitDataItemID of workTimeSubmitDataItem.id) {
+          let sqlDeleteProject = $sql.performance.deleteProject
+          let deleteWorkTimeAssign = $sql.performance.deleteWorkTimeAssign
+          let arrayParams = [workTimeSubmitDataItemID, workTimeSubmitDataItemID]
+          let sql = sqlDeleteProject + ';' + deleteWorkTimeAssign
+          promises[count++] = RCPDDatabase(sql, arrayParams)
         }
-        if (count > 0) {
-            Promise.all(promises).then(result => {
-                resolve(result)
-            }).catch(error => {
-                reject(new Error(error))
-            })
-        } else {
-            resolve()
-        }
-    })
+      }
+    }
+    if (count > 0) {
+      Promise.all(promises).then(result => {
+        resolve(result)
+      }).catch(error => {
+        reject(new Error(error))
+      })
+    } else {
+      resolve()
+    }
+  })
 }
 
 const performance = {
@@ -1014,21 +1014,17 @@ const performance = {
     },
     // 提交项目工时申报
     submitProjectWorkTimeApply (req, res) {
-        let sendData = req.body
-        sendData.workTimeInfo.userId = sendData.userId
-        workTimeInsertTmp(sendData.workTimeInfo, '1').then(() => {
-            deleteExistWorkTimeSubmit(sendData.workTimeInfo.data).then(() => {
-                updateAssignProjectFilled(sendData.projectID).then((updateAssignProjectFilledRes) => {
-                    return $http.writeJson(res, {code: 1, data: updateAssignProjectFilledRes, message: 'success'})
-                }).catch(updateAssignProjectFilledErr => {
-                    return $http.writeJson(res, {code: -2, data: updateAssignProjectFilledErr, message: 'err'})
-                })
-            }).catch(deleteExistWorkTimeSubmitErr => {
-                return $http.writeJson(res, {code: -2, data: deleteExistWorkTimeSubmitErr, message: 'err'})
-            })
-        }).catch(workTimeInsertTmpErr => {
-            return $http.writeJson(res, {code: -2, data: workTimeInsertTmpErr, message: 'err'})
+      let sendData = req.body
+      sendData.workTimeInfo.userId = sendData.userId
+      workTimeInsertTmp(sendData.workTimeInfo, '1').then(() => {
+        updateAssignProjectFilled(sendData.projectID).then((updateAssignProjectFilledRes) => {
+            return $http.writeJson(res, {code: 1, data: updateAssignProjectFilledRes, message: 'success'})
+        }).catch(updateAssignProjectFilledErr => {
+            return $http.writeJson(res, {code: -2, data: updateAssignProjectFilledErr, message: 'err'})
         })
+      }).catch(workTimeInsertTmpErr => {
+          return $http.writeJson(res, {code: -2, data: workTimeInsertTmpErr, message: 'err'})
+      })
     },
     // 修复错误数据
     repairErrorData3 (req, res) {
@@ -1080,95 +1076,95 @@ const performance = {
     },
     // 更新工时条目审核状态
     updateWorkTimeListReviewStatus (req, res) {
-        let sendData = req.body
-        let sql = $sql.performance.updateWorkTimeListReviewStatus
-        let reviewTime = $time.formatTime()
-        let arrayParams = [sendData.reviewKValue, sendData.reviewCofficient, sendData.reviewer, reviewTime,
-            sendData.reviewStatus, sendData.id, sendData.id]
-        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
-            return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
-        }).catch(RCPDDatabaseErr => {
-            return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
-        })
+      let sendData = req.body
+      let sql = $sql.performance.updateWorkTimeListReviewStatus
+      let reviewTime = $time.formatTime()
+      let arrayParams = [sendData.reviewKValue, sendData.reviewCofficient, sendData.reviewer, reviewTime,
+          sendData.reviewStatus, sendData.id, sendData.id]
+      RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+          return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
+      }).catch(RCPDDatabaseErr => {
+          return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+      })
     },
     // 获取工时分配信息
     getWorkTimeAssignInfo (req, res) {
-        let sendData = req.body
-        let sql = $sql.performance.getWorkTimeAssignInfo
-        let arrayParams = [sendData.workTimeListId]
-        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
-            return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
-        }).catch(RCPDDatabaseErr => {
-            return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
-        })
+      let sendData = req.body
+      let sql = $sql.performance.getWorkTimeAssignInfo
+      let arrayParams = [sendData.workTimeListId]
+      RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+          return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
+      }).catch(RCPDDatabaseErr => {
+          return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+      })
     },
     // 获取工时分配信息
     getWorkTimeListInfo (req, res) {
-        let sendData = req.body
-        let sql = $sql.performance.getWorkTimeListInfo
-        let arrayParams = [sendData.workTimeListId]
-        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
-            return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
-        }).catch(RCPDDatabaseErr => {
-            return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
-        })
+      let sendData = req.body
+      let sql = $sql.performance.getWorkTimeListInfo
+      let arrayParams = [sendData.workTimeListId]
+      RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+          return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
+      }).catch(RCPDDatabaseErr => {
+          return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+      })
     },
     // 写入绩效数据
     savePMData (req, res) {
-        let sendData = req.body
-        let sql = $sql.performance.savePMData
-        let promise = []
-        let count = 0
-        let arrayParams = []
-        for (let PMDataItem of sendData.PMData) {
-          arrayParams = [PMDataItem.userID, sendData.applyDate, PMDataItem.totalWorkTime, PMDataItem.QYEvaRank,
-            PMDataItem.QYEvaScoreNor, PMDataItem.CSQTEvaScoreUnN, PMDataItem.CSQTEvaScoreNor,
-            PMDataItem.CSQTEvaRank, PMDataItem.MGQTEvaScoreUnN, PMDataItem.MGQTEvaRank,
-            PMDataItem.MGQTEvaScoreNor, PMDataItem.AMEvaScoreUnN, PMDataItem.AMEvaScoreNor,
-            PMDataItem.AMEvaRank, PMDataItem.PMScoreUnN, PMDataItem.PMScoreNor, PMDataItem.PMRank,
-            PMDataItem.dimension1CSAveStar, PMDataItem.dimension1GPEvaStar,
-            PMDataItem.dimension2CSAveStar, PMDataItem.dimension2GPEvaStar, PMDataItem.userDuty, PMDataItem.userJob]
-          promise[count++] = RCPDDatabase(sql, arrayParams)
-        }
-        Promise.all(promise).then(allResponse => {
-          return $http.writeJson(res, {code: 1, data: allResponse, message: 'success'})
-        }).catch(err => {
-          return $http.writeJson(res, {code: -2, err: err, message: 'false'})
-        })
+      let sendData = req.body
+      let sql = $sql.performance.savePMData
+      let promise = []
+      let count = 0
+      let arrayParams = []
+      for (let PMDataItem of sendData.PMData) {
+        arrayParams = [PMDataItem.userID, sendData.applyDate, PMDataItem.totalWorkTime, PMDataItem.QYEvaRank,
+          PMDataItem.QYEvaScoreNor, PMDataItem.CSQTEvaScoreUnN, PMDataItem.CSQTEvaScoreNor,
+          PMDataItem.CSQTEvaRank, PMDataItem.MGQTEvaScoreUnN, PMDataItem.MGQTEvaRank,
+          PMDataItem.MGQTEvaScoreNor, PMDataItem.AMEvaScoreUnN, PMDataItem.AMEvaScoreNor,
+          PMDataItem.AMEvaRank, PMDataItem.PMScoreUnN, PMDataItem.PMScoreNor, PMDataItem.PMRank,
+          PMDataItem.dimension1CSAveStar, PMDataItem.dimension1GPEvaStar,
+          PMDataItem.dimension2CSAveStar, PMDataItem.dimension2GPEvaStar, PMDataItem.userDuty, PMDataItem.userJob]
+        promise[count++] = RCPDDatabase(sql, arrayParams)
+      }
+      Promise.all(promise).then(allResponse => {
+        return $http.writeJson(res, {code: 1, data: allResponse, message: 'success'})
+      }).catch(err => {
+        return $http.writeJson(res, {code: -2, err: err, message: 'false'})
+      })
     },
     // 更新绩效数据
     updatePMData (req, res) {
-        let sendData = req.body
-        let sql = $sql.performance.updatePMData
-        let promise = []
-        let count = 0
-        let arrayParams = []
-        for (let PMDataItem of sendData.PMData) {
-          arrayParams = [PMDataItem.totalWorkTime, PMDataItem.QYEvaRank, PMDataItem.QYEvaScoreNor,
-            PMDataItem.CSQTEvaScoreUnN, PMDataItem.CSQTEvaScoreNor,
-            PMDataItem.CSQTEvaRank, PMDataItem.MGQTEvaScoreUnN, PMDataItem.MGQTEvaRank,
-            PMDataItem.MGQTEvaScoreNor, PMDataItem.AMEvaScoreUnN, PMDataItem.AMEvaScoreNor,
-            PMDataItem.AMEvaRank, PMDataItem.PMScoreUnN, PMDataItem.PMScoreNor, PMDataItem.PMRank,
-            PMDataItem.dimension1CSAveStar, PMDataItem.dimension1GPEvaStar,
-            PMDataItem.dimension2CSAveStar, PMDataItem.dimension2GPEvaStar, PMDataItem.id]
-          promise[count++] = RCPDDatabase(sql, arrayParams)
-        }
-        Promise.all(promise).then(allResponse => {
-          return $http.writeJson(res, {code: 1, data: allResponse, message: 'success'})
-        }).catch(err => {
-          return $http.writeJson(res, {code: -2, err: err, message: 'false'})
-        })
+      let sendData = req.body
+      let sql = $sql.performance.updatePMData
+      let promise = []
+      let count = 0
+      let arrayParams = []
+      for (let PMDataItem of sendData.PMData) {
+        arrayParams = [PMDataItem.totalWorkTime, PMDataItem.QYEvaRank, PMDataItem.QYEvaScoreNor,
+          PMDataItem.CSQTEvaScoreUnN, PMDataItem.CSQTEvaScoreNor,
+          PMDataItem.CSQTEvaRank, PMDataItem.MGQTEvaScoreUnN, PMDataItem.MGQTEvaRank,
+          PMDataItem.MGQTEvaScoreNor, PMDataItem.AMEvaScoreUnN, PMDataItem.AMEvaScoreNor,
+          PMDataItem.AMEvaRank, PMDataItem.PMScoreUnN, PMDataItem.PMScoreNor, PMDataItem.PMRank,
+          PMDataItem.dimension1CSAveStar, PMDataItem.dimension1GPEvaStar,
+          PMDataItem.dimension2CSAveStar, PMDataItem.dimension2GPEvaStar, PMDataItem.id]
+        promise[count++] = RCPDDatabase(sql, arrayParams)
+      }
+      Promise.all(promise).then(allResponse => {
+        return $http.writeJson(res, {code: 1, data: allResponse, message: 'success'})
+      }).catch(err => {
+        return $http.writeJson(res, {code: -2, err: err, message: 'false'})
+      })
     },
     // 获取绩效数据
     getPMData (req, res) {
-        let sendData = req.body
-        let sql = $sql.performance.getPMData
-        let arrayParams = [sendData.applyDate]
-        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
-            return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
-        }).catch(RCPDDatabaseErr => {
-            return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
-        })
+      let sendData = req.body
+      let sql = $sql.performance.getPMData
+      let arrayParams = [sendData.applyDate]
+      RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+        return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
+      }).catch(RCPDDatabaseErr => {
+        return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+      })
     }
 }
 

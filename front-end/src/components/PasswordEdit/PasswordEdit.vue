@@ -3,7 +3,7 @@
     <div>
       <el-form :model="formData" :rules="formRules" ref="formData" label-position="left" label-width="0px">
         <el-form-item prop="account">
-          <el-input v-model="formData.account" placeholder="账号" clearable></el-input>
+          <el-input v-model="formData.account" placeholder="工号" clearable></el-input>
         </el-form-item>
         <el-form-item prop="oldPassword">
           <el-input type="password" v-model="formData.oldPassword" placeholder="旧密码" clearable></el-input>
@@ -30,14 +30,15 @@
   import { getWorkAssign, updateNewPassword, oldPasswordAuth } from '../../config/interface'
     export default {
       data () {
-        const reg = /^[0-9a-zA-Z~!·@#$%^&*()_+-= <>,.:;'"]*$/
+        // const reg = /^[0-9a-zA-Z~!·@#$%^&*()_+-= <>,.:;'"]*$/
+        const reg = /(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[^a-zA-Z0-9]).{8,30}/
         let validateNewPassword = (rule, value, callback) => {
           if (!value) {
             callback(new Error('请输入内容'))
           } else if (value === this.formData.oldPassword) {
             callback(new Error('新密码不能与原密码相同!'))
           } else if (!reg.test(value)) {
-            callback(new Error('内容需为字母或数字或常规特殊字符'))
+            callback(new Error('密码长度至少8位以上，且应由大小写字母及特殊字符组合'))
           } else {
             callback()
           }
@@ -89,7 +90,8 @@
       },
       methods: {
         // 初始化
-        init () {
+        init (account) {
+          this.formData.account = account
           this.$nextTick(() => {
             this.changeShowFlag()
           })

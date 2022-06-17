@@ -249,7 +249,7 @@
     workTimeSubmit,
     submitAssignWorkDetail,
     submitMonthPlanProcess,
-    getIsSubmitAllow,
+    urlGetIsSubmitAllow,
     urlGetUsersList,
     getProjectType,
     getWorkTimeNew,
@@ -427,7 +427,7 @@
         },
         // 获取当前月份能否申报的标志
         getIsSubmitAllow () {
-          const url = getIsSubmitAllow
+          const url = urlGetIsSubmitAllow
           let params = {
             applyYear: this.$moment(this.formData.title).year(),
             applyMonth: this.$moment(this.formData.title).month() + 1,

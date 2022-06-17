@@ -213,7 +213,7 @@
     submitRatesResult,
     updateUserRate,
     getCurMutualRate,
-    getIsSubmitAllow,
+    urlGetIsSubmitAllow,
     getIsWorkTimeReviewFinish,
     getAllUserRates,
     performanceInfoPublish,
@@ -1106,7 +1106,7 @@
       },
       // 获取当前月份能否申报工时的标志
       getIsWorkTimeSubmitAllow () {
-        const url = getIsSubmitAllow
+        const url = urlGetIsSubmitAllow
         let params = {
           applyYear: this.$moment(this.formData.title).year(),
           applyMonth: this.$moment(this.formData.title).month() + 1,
@@ -1128,7 +1128,7 @@
       },
       // 获取当前月份能否申报互评的标志
       getIsSubmitMultualEvaAllow () {
-        const url = getIsSubmitAllow
+        const url = urlGetIsSubmitAllow
         let params = {
           applyYear: this.$moment(this.formData.title).year(),
           applyMonth: this.$moment(this.formData.title).month() + 1,

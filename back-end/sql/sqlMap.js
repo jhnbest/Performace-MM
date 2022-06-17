@@ -137,7 +137,7 @@ const sqlMap = {
     getAssignProjectListAllCount: 'select count(*) as totalCount from assignprojectlist apl where ' +
         'apl.userID = ? and apl.projectType = ? and apl.obsoleteStatus != 1',
     // getAssignProjectDetail: 'select id, projectStage, baseWorkTime, kValue, coefficient, avaiableWorkTime, process from assignprojectdetail where aPLID = ?',
-    getAssignProjectDetail: 'select apd.id as apdID, apd.projectStage as projectStageID, apd.kValue, apd.coefficient, apd.avaiableWorkTime, ' +
+    getAssignProjectDetail: 'select apd.aPLID as aplID, apd.id as apdID, apd.projectStage as projectStageID, apd.kValue, apd.coefficient, apd.avaiableWorkTime, ' +
         'apd.process, apd.baseWorkTime, apd.projectStageName, apd.isFinish, pjn.dynamicKValue, pjn.isConference, pjn.defaultAssignWorkTime ' +
         'from assignprojectdetail apd left join projecttypenew pjn on apd.projectStage = pjn.projectTypeID where apd.aPLID = ? and apd.obsoleteStatus != 1',
     // getMonthProcess: 'select id, aPDID, year, type, January, February, March, April, May, June, July, August, September, ' +

@@ -194,7 +194,7 @@
     import Cop from '@/components/Cop/Cop'
     import CountTo from 'vue-count-to'
     import { getProjectType, getProjectList, changeSubmitStatus, deleteProject,
-      getAssignWorkTime, workTimeSubmit, workTimeTemporary, getWorkAssign, getGroupWorkTimeList, getIsSubmitAllow } from '@/config/interface'
+      getAssignWorkTime, workTimeSubmit, workTimeTemporary, getWorkAssign, getGroupWorkTimeList, urlGetIsSubmitAllow } from '@/config/interface'
     export default {
       data () {
         return {
@@ -262,7 +262,7 @@
         },
         // 获取当前月份能否申报的标志
         getIsSubmitAllow () {
-          const url = getIsSubmitAllow
+          const url = urlGetIsSubmitAllow
           let params = {
             applyYear: this.$moment(this.formData.title).year(),
             applyMonth: this.$moment(this.formData.title).month() + 1,

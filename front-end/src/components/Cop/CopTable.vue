@@ -1,3 +1,4 @@
+<!-- 仅显示状态下的工时分配组件 -->
 <template>
   <div>
     <el-table

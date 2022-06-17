@@ -2,10 +2,7 @@ import { http } from '../config/http'
 import {
   urlGetAllUserRates, urlGetAllQTEvaedData
 } from '@/config/interface'
-import { compare, sortObjectArrayByParams, NorCal } from '@/utils/common'
-import store from '@/store'
-import { groupName2String } from '@/utils/users'
-import { apply } from 'core-js/fn/reflect'
+import { sortObjectArrayByParams, NorCal } from '@/utils/common'
 
 // 获取全处员工定性评价数据(已评价人为对象)
 export function getAllUserRates (users, rateMonth) {

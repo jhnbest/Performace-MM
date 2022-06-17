@@ -3,7 +3,7 @@
     <el-form class="login-main sub-center-center" :model="formData" :rules="formRules" ref="formData" label-position="left" label-width="0px">
       <h2 class="title">通信工程处绩效管理系统</h2>
       <el-form-item prop="name">
-        <el-input type="text" v-model="formData.name" placeholder="账号" clearable></el-input>
+        <el-input type="text" v-model="formData.name" placeholder="工号" clearable></el-input>
       </el-form-item>
       <el-form-item prop="password">
         <el-input type="password"
@@ -26,6 +26,7 @@
 <script>
 import { userLogin } from '@/config/interface'
 import PasswordEdit from '@/components/PasswordEdit/PasswordEdit'
+import store from '@/store'
 export default {
   data () {
     const validate = (rule, value, callback) => {
@@ -73,23 +74,30 @@ export default {
             }
             this.$http(url, params).then(res => {
               if (res.code === 1) {
-                console.log('res')
-                console.log(res)
-                if (this.rememberUser) {
-                  // 传入账号名，密码，和保存天数3个参数
-                  this.setCookie(this.formData.name, this.formData.password, 2)
+                let pwdRegex = new RegExp('(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[^a-zA-Z0-9]).{8,30}')
+                if (!pwdRegex.test(this.formData.password)) {
+                  alert('您的密码复杂度太低（密码中必须包含大小写字母、数字、特殊字符），请修改密码后登录！')
+                  this.showFlag.passwordEdit = true
+                  this.$nextTick(() => {
+                    this.$refs.passwordEdit.init(this.formData.name)
+                  })
                 } else {
-                  // 清空Cookie
-                  this.clearCookie()
+                  if (this.rememberUser) {
+                  // 传入账号名，密码，和保存天数3个参数
+                    this.setCookie(this.formData.name, this.formData.password, 7)
+                  } else {
+                    // 清空Cookie
+                    this.clearCookie()
+                  }
+                  let data = res.data
+                  localStorage.setItem('userInfo', JSON.stringify(data))
+                  this.$store.dispatch('saveUserInfo', data)
+                  this.$common.toast('登陆成功', 'success', false)
+                  this.$router.push({
+                    path: '/home/dashboard',
+                    query: {}
+                  })
                 }
-                let data = res.data
-                localStorage.setItem('userInfo', JSON.stringify(data))
-                this.$store.dispatch('saveUserInfo', data)
-                this.$common.toast('登陆成功', 'success', false)
-                this.$router.push({
-                  path: '/home/dashboard',
-                  query: {}
-                })
               }
               this.reqFlag.login = true
             }).catch(err => {

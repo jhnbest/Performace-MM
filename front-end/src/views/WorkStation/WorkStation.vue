@@ -211,9 +211,7 @@
                 if (projectTypesFindResults) {
                   projectTypesFindResults.count += 1
                 }
-                if (_this.selectProjectType === '-1') {
-                  _this.selectProjectType = String(projectTypesFindResults.projectTypeID)
-                }
+                _this.selectProjectType = String(projectTypesFindResults.projectTypeID)
               }
               resolve(res.data)
             } else {
@@ -245,9 +243,7 @@
                 if (projectTypesFindResults) {
                   projectTypesFindResults.count += 1
                 }
-                if (_this.selectProjectType === '-1') {
-                  _this.selectProjectType = String(projectTypesFindResults.projectTypeID)
-                }
+                _this.selectProjectType = String(projectTypesFindResults.projectTypeID)
               }
               resolve(res.data)
             } else {
