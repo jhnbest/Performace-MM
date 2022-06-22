@@ -194,43 +194,43 @@ function workTimeInsertOP(params, i, operate) {
 }
 
 async function workTimeInsert(sendData, res, operate) {
-    let workTimeInsertResult = null
-    let workTimeAssignResult = null
-    for (let i = 0; i < sendData.data.length; i++) { // 逐条插入工时项目
-        workTimeInsertResult = await workTimeInsertOP(sendData, i, operate)
-        if (workTimeInsertResult.err) {
-            return $http.writeJson(res, {code: -2, message: '失败', errMsg: workTimeInsertResult.err})
-        } else if (workTimeInsertResult.result.affectedRows !== 1 && sendData.submitType === 'insert') {
-            return $http.writeJson(res, {code: 2, message: '添加工时记录失败'})
-        }
-        // 插入/更新工时分配信息
-        for (let j = 0;j < sendData.data[i].workTimeAssign.length; j++) {
-            let insertID = null
-            if (sendData.submitType === 'insert') {
-                insertID = workTimeInsertResult.result.insertId
-            } else if (sendData.submitType === 'update') {
-                insertID = sendData.projectID
-            }
-            workTimeAssignResult = await workTimeAssign(insertID, sendData, i, j)
-            if (workTimeAssignResult.err) {
-                return $http.writeJson(res, {code: -2, message: '失败', errMsg: workTimeInsertResult.err})
-            } else if (workTimeAssignResult.result.affectedRows !== 1 && sendData.submitType === 'insert') {
-                return $http.writeJson(res, {code: 2, message: '添加协作记录失败'})
-            }
-            if (i === sendData.data.length - 1 && j === sendData.data[i].workTimeAssign.length - 1) {
-                // 更新的工时分配信息小于修改前
-                if (sendData.submitType === 'update') {
-                    if (sendData.data[i].workTimeAssign.length < sendData.data[i].workTimeAssignInsertID.length) {  //更新的工时分配信息条数小于修改前，删除多余的条目
-                        for (let k = 0; k < sendData.data[i].workTimeAssignInsertID.length - sendData.data[i].workTimeAssign.length; k++) {
-                            await workTimeAssignDelete(sendData.data[i].workTimeAssignInsertID[sendData.data[i].workTimeAssign.length + k])
-                        }
-                    }
-                }
-                let result = {insertID: insertID}
-                return $http.writeJson(res, {code: 1, data: result,message: '提交成功'})
-            }
-        }
+  let workTimeInsertResult = null
+  let workTimeAssignResult = null
+  for (let i = 0; i < sendData.data.length; i++) { // 逐条插入工时项目
+    workTimeInsertResult = await workTimeInsertOP(sendData, i, operate)
+    if (workTimeInsertResult.err) {
+        return $http.writeJson(res, {code: -2, message: '失败', errMsg: workTimeInsertResult.err})
+    } else if (workTimeInsertResult.result.affectedRows !== 1 && sendData.submitType === 'insert') {
+        return $http.writeJson(res, {code: 2, message: '添加工时记录失败'})
     }
+    // 插入/更新工时分配信息
+    for (let j = 0;j < sendData.data[i].workTimeAssign.length; j++) {
+      let insertID = null
+      if (sendData.submitType === 'insert') {
+        insertID = workTimeInsertResult.result.insertId
+      } else if (sendData.submitType === 'update') {
+        insertID = sendData.projectID
+      }
+      workTimeAssignResult = await workTimeAssign(insertID, sendData, i, j)
+      if (workTimeAssignResult.err) {
+          return $http.writeJson(res, {code: -2, message: '失败', errMsg: workTimeInsertResult.err})
+      } else if (workTimeAssignResult.result.affectedRows !== 1 && sendData.submitType === 'insert') {
+          return $http.writeJson(res, {code: 2, message: '添加协作记录失败'})
+      }
+      if (i === sendData.data.length - 1 && j === sendData.data[i].workTimeAssign.length - 1) {
+        // 更新的工时分配信息小于修改前
+        if (sendData.submitType === 'update') {
+          if (sendData.data[i].workTimeAssign.length < sendData.data[i].workTimeAssignInsertID.length) {  //更新的工时分配信息条数小于修改前，删除多余的条目
+            for (let k = 0; k < sendData.data[i].workTimeAssignInsertID.length - sendData.data[i].workTimeAssign.length; k++) {
+              await workTimeAssignDelete(sendData.data[i].workTimeAssignInsertID[sendData.data[i].workTimeAssign.length + k])
+            }
+          }
+        }
+        let result = {insertID: insertID}
+        return $http.writeJson(res, {code: 1, data: result,message: '提交成功'})
+      }
+    }
+  }
 }
 
 function workTimeInsertTmp(sendData, operate) {
@@ -743,20 +743,20 @@ const performance = {
     },
     // 获取项目类型对应的工时详情
     async getWorkTimeNew (req, res) {
-        let data = req.body
-        let sql = $sql.performance.selectProjectTime
-        let resultData = []
-        for (let i = 0; i < data.checkID.length; i++) {
-            await getWorkTimeNewOP(data.checkID[i], sql, req, res).then(result => {
-                resultData.push(result)
-                if (i === data.checkID.length - 1) {
-                    getWorkTimeNewOP(data.parentID, sql, req, res).then(result => {
-                        resultData.push(result.projectName)
-                        return $http.writeJson(res, {code: 1, data: resultData, message: '获取列表成功'})
-                    })
-                }
+      let data = req.body
+      let sql = $sql.performance.selectProjectTime
+      let resultData = []
+      for (let i = 0; i < data.checkID.length; i++) {
+        await getWorkTimeNewOP(data.checkID[i], sql, req, res).then(result => {
+          resultData.push(result)
+          if (i === data.checkID.length - 1) {
+            getWorkTimeNewOP(data.parentID, sql, req, res).then(result => {
+              resultData.push(result.projectName)
+              return $http.writeJson(res, {code: 1, data: resultData, message: '获取列表成功'})
             })
-        }
+          }
+        })
+      }
     },
     // 新增工时申报
     workTimeSubmit (req, res) {
@@ -770,45 +770,45 @@ const performance = {
     },
     // 获取工时申报详情
     getProjectList (req, res) {
-        let data = req.body
-        $http.userVerify(req, res, () => {
-            let searchID = data.searchID
-            let searchMon = data.searchMon
-            let pageNum = data.pageNum
-            let pageSize = data.pageSize
-            // 分页查询入参 start
-            let limitFirst = (pageNum - 1) * pageSize
-            let limitLast = pageSize
-            let arrayParams = [searchID, searchMon, searchID, searchMon]
-            let sqlGetProjectList = $sql.performance.getProjectList
-            let sqlGetProjectTotal = $sql.performance.getProjectListTotal
-            let sql = ''
-            if (data.searchType === 'review') {  //审核页面请求
-                if (data.reviewType === 'unReview') {
-                    sql= sqlGetProjectTotal + ' and reviewStatus = 0' + '; ' +
-                        sqlGetProjectList + ' and wl.submitStatus = 1' + ' and wl.reviewStatus = 0'
-                } else if (data.reviewType === 'reviewed') {
-                    sql= sqlGetProjectTotal + ' and reviewStatus != 0' + '; ' +
-                        sqlGetProjectList + ' and wl.submitStatus = 1' + ' and wl.reviewStatus != 0'
-                }
-            } else {  //申报页面请求
-                sqlGetProjectTotal = $sql.performance.getProjectListTotalNew
-                sqlGetProjectList = $sql.performance.getProjectListNew
-                sql= sqlGetProjectTotal + '; ' + sqlGetProjectList
-                arrayParams = [searchID, searchMon, searchID, searchMon]
+      let data = req.body
+      $http.userVerify(req, res, () => {
+        let searchID = data.searchID
+        let searchMon = data.searchMon
+        let pageNum = data.pageNum
+        let pageSize = data.pageSize
+        // 分页查询入参 start
+        let limitFirst = (pageNum - 1) * pageSize
+        let limitLast = pageSize
+        let arrayParams = [searchID, searchMon, searchID, searchMon]
+        let sqlGetProjectList = $sql.performance.getProjectList
+        let sqlGetProjectTotal = $sql.performance.getProjectListTotal
+        let sql = ''
+        if (data.searchType === 'review') {  //审核页面请求
+            if (data.reviewType === 'unReview') {
+                sql= sqlGetProjectTotal + ' and reviewStatus = 0' + '; ' +
+                    sqlGetProjectList + ' and wl.submitStatus = 1' + ' and wl.reviewStatus = 0'
+            } else if (data.reviewType === 'reviewed') {
+                sql= sqlGetProjectTotal + ' and reviewStatus != 0' + '; ' +
+                    sqlGetProjectList + ' and wl.submitStatus = 1' + ' and wl.reviewStatus != 0'
             }
-            sql = sql + " order by submitTime desc" // 提交时间倒序排
-            $http.connPool(sql, arrayParams, (err, result) => {
-                if (err) {
-                    return $http.writeJson(res, {code:-2, message:'失败'})
-                } else {
-                    let resultData = {}
-                    resultData.totalCount = result[0][0]['totalCount']
-                    resultData.list = formatData(result[1])
-                    return $http.writeJson(res, {code: 1, data: resultData, message: '获取工时申报成功'})
-                }
-            })
+        } else {  //申报页面请求
+            sqlGetProjectTotal = $sql.performance.getProjectListTotalNew
+            sqlGetProjectList = $sql.performance.getProjectListNew
+            sql= sqlGetProjectTotal + '; ' + sqlGetProjectList
+            arrayParams = [searchID, searchMon, searchID, searchMon]
+        }
+        sql = sql + " order by submitTime desc" // 提交时间倒序排
+        $http.connPool(sql, arrayParams, (err, result) => {
+            if (err) {
+                return $http.writeJson(res, {code:-2, message:'失败'})
+            } else {
+                let resultData = {}
+                resultData.totalCount = result[0][0]['totalCount']
+                resultData.list = formatData(result[1])
+                return $http.writeJson(res, {code: 1, data: resultData, message: '获取工时申报成功'})
+            }
         })
+      })
     },
     // 获取工时分配信息
     getWorkAssign (req, res) {

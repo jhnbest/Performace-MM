@@ -27,7 +27,7 @@
 </template>
 
 <script>
-  import { getWorkAssign, updateNewPassword, oldPasswordAuth } from '../../config/interface'
+  import { urlUpdateNewPassword, urlOldPasswordAuth } from '../../config/interface'
     export default {
       data () {
         // const reg = /^[0-9a-zA-Z~!·@#$%^&*()_+-= <>,.:;'"]*$/
@@ -111,7 +111,7 @@
         oldPasswordAuth () {
           let it = this
           return new Promise(function (resolve, reject) {
-            const url = oldPasswordAuth
+            const url = urlOldPasswordAuth
             if (it.reqFlag.oldPasswordAuth) {
               it.reqFlag.oldPasswordAuth = false
               let params = {
@@ -133,7 +133,7 @@
         updateNewPassword () {
           let it = this
           return new Promise(function (resolve, reject) {
-            const url = updateNewPassword
+            const url = urlUpdateNewPassword
             if (it.reqFlag.updateNewPassword) {
               it.reqFlag.updateNewPassword = false
               let params = {

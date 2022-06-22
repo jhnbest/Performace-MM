@@ -4,7 +4,7 @@
                 :data="tableData"
                 size="medium"
                 style="margin: auto"
-                v-loading="!reqFlag.getProjectList" >
+                v-loading="!reqFlag.reqGetProjectList" >
         <el-table-column type="index" label="序号" width="60" align="center"></el-table-column>
         <el-table-column label="项目名称" align="center" prop="projectName" show-overflow-tooltip width="200"></el-table-column>
         <el-table-column label="项目级别" align="center">
@@ -62,7 +62,7 @@
           curApplyYear: null,
           curApplyMonth: null,
           reqFlag: {
-            getProjectList: true
+            reqGetProjectList: true
           },
           tableDataCache: [],
           projectProcessDetail: false,
@@ -81,15 +81,15 @@
       methods: {
         // 初始化
         init () {
-          if (this.reqFlag.getProjectList) {
-            this.reqFlag.getProjectList = false
+          if (this.reqFlag.reqGetProjectList) {
+            this.reqFlag.reqGetProjectList = false
             getCurApplyAbleMonth().then(getCurApplyAbleMonthRes => {
               this.curApplyYear = this.$moment(getCurApplyAbleMonthRes[0].setTime).year()
               this.curApplyMonth = this.$moment(getCurApplyAbleMonthRes[0].setTime).month()
               getTypeProjectList(this.fatherParams.projectTypeID, 0, this.curApplyYear)
                 .then(getTypeProjectListRes => {
                   this.genTableData(getTypeProjectListRes, this.curApplyMonth)
-                  this.reqFlag.getProjectList = true
+                  this.reqFlag.reqGetProjectList = true
                 })
             })
           }

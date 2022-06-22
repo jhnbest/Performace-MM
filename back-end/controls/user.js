@@ -271,7 +271,7 @@ const user = {
         let sql= sqlSelectTotal + '; ' + sqlSelectList
         sql += " order by id desc limit ?,?"; // id倒序排
         let arrayParams = [limitFirst, limitLast]
-        
+
         $http.connPool(sql, arrayParams, (err, result) => {
           if(err) {
             return $http.writeJson(res, {code:-2, message:'失败'})
@@ -280,7 +280,7 @@ const user = {
             resultData.totalCount = result[0][0]['totalCount']
             resultData.list = formatData(result[1])
             return $http.writeJson(res, {code: 1, data: resultData, message: '获取用户列表成功'})
-          } 
+          }
         })
       }
     })
@@ -342,7 +342,7 @@ const user = {
         } else {
           let resultData = {}
           resultData.list = formatData(result)
-          return $http.writeJson(res, {code: 1, data: resultData, message: '获取用户姓名成功'})
+          return $http.writeJson(res, {code: 1, data: resultData, message: '获取用户信息成功'})
         }
       })
     })

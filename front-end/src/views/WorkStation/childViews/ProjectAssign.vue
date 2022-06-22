@@ -390,8 +390,9 @@
 </template>
 
 <script>
-  import { urlGetUsersList, getProjectType, getWorkTimeNew, submitAssignWorkDetail,
+  import { urlGetUsersList, ulrGetWorkTimeNew, submitAssignWorkDetail,
     getAssignedProject, updateAssignProjectList, deleteAssignProject, getAssignProjectDetail } from '@/config/interface'
+  import { getProjectType } from '@/utils/performance'
   import Sortable from 'sortablejs'
     export default {
       data () {
@@ -432,7 +433,6 @@
           },
           reqFlag: {
             getUserName: true,
-            getProjectType: true,
             handleAssign: true,
             deleteAssignProject: true,
             getAssignProjectDetail: true
@@ -508,7 +508,9 @@
         // 初始化
         init () {
           this.getUsersName()
-          this.getProjectType()
+          getProjectType().then(getProjectTypeRes => {
+            this.projectTypeOptions = getProjectTypeRes
+          })
         },
         // 表格拖拽初始化
         setSort () {
@@ -555,24 +557,6 @@
               })
           }
         },
-        // 获取项目类型
-        getProjectType () {
-          const url = getProjectType
-          if (this.reqFlag.getProjectType) {
-            this.reqFlag.getProjectType = false
-            let params = {
-              projectParentID: this.$store.state.userInfo.groupName
-            }
-            this.$http(url, params)
-              .then(res => {
-                if (res.code === 1) {
-                  let data = res.data
-                  this.projectTypeOptions = data
-                  this.reqFlag.getProjectType = true
-                }
-              })
-          }
-        },
         // 指派按钮
         handleAssign (formData) {
           this.$refs[formData].validate((valid) => {
@@ -580,7 +564,7 @@
               let selectLen = this.formData.projectType.length
               let selectItems = []
               let params = {}
-              let url = getWorkTimeNew
+              let url = ulrGetWorkTimeNew
               for (let i = 0; i < selectLen; i++) {
                 selectItems.push(this.formData.projectType[i][this.formData.projectType[i].length - 1]) // 数组最后一位即为项目最底级ID
               }

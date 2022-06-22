@@ -58,7 +58,7 @@
 </template>
 
 <script>
-import { userLogout } from '@/config/interface'
+import { urlUserLogout } from '@/config/interface'
 export default {
   data () {
     return {
@@ -97,7 +97,7 @@ export default {
     },
     // 登出
     loginOut () {
-      const url = userLogout
+      const url = urlUserLogout
       if (this.reqFlag.logout) {
         this.reqFlag.logout = false
         let params = {}

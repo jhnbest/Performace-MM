@@ -460,11 +460,6 @@ const performance = {
         let data = req.body
         workTimeInsert(data, res, '1')
     },
-    /* 暂存工时申报 */
-    workTimeTemporary (req, res) {
-        let data = req.body
-        workTimeInsert(data, res, '0')
-    },
     /* 获取工时申报详情 */
     getProjectList (req, res) {
         let data = req.body

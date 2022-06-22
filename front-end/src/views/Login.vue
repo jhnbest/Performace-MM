@@ -24,9 +24,8 @@
 </template>
 
 <script>
-import { userLogin } from '@/config/interface'
+import { urlUserLogin } from '@/config/interface'
 import PasswordEdit from '@/components/PasswordEdit/PasswordEdit'
-import store from '@/store'
 export default {
   data () {
     const validate = (rule, value, callback) => {
@@ -65,7 +64,7 @@ export default {
     submitLogin (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          const url = userLogin
+          const url = urlUserLogin
           if (this.reqFlag.login) {
             this.reqFlag.login = false
             let params = {

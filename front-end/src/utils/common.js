@@ -1,8 +1,6 @@
 import { http } from '../config/http'
 import {
   urlGetCurApplyAbleMonth,
-  urlGetAllUsersInfo,
-  workTimeSubmit,
   urlUpdateWorkTimeListReviewStatus,
   submitAssignWorkDetail,
   urlGetWorkTimeAssignInfo,
@@ -20,23 +18,6 @@ import store from '@/store'
 // 获取当前可申报的月份
 export function getCurApplyAbleMonth () {
   const url = urlGetCurApplyAbleMonth
-  let params = {}
-  return new Promise(function (resolve, reject) {
-    http(url, params).then(res => {
-      if (res.code === 1) {
-        resolve(res.data)
-      } else {
-        reject(res.data)
-      }
-    }).catch(err => {
-      reject(err)
-    })
-  })
-}
-
-// 获取全处员工信息
-export function getAllUsersInfo () {
-  const url = urlGetAllUsersInfo
   let params = {}
   return new Promise(function (resolve, reject) {
     http(url, params).then(res => {
@@ -74,30 +55,6 @@ export function conclusionManagerEvaStarToWorkTime (managerEvaStar) {
     case 5:
       return store.state.defaultConclusionGetWorkTime + 10
   }
-}
-
-// 插入工时申报
-export function workTimeListInsert (projectID, submitType, submitDate, applyType, userId, data) {
-  const url = workTimeSubmit
-  let params = {
-    projectID: projectID,
-    submitType: submitType,
-    submitDate: submitDate,
-    data: data,
-    applyType: applyType,
-    userId: userId
-  }
-  return new Promise(function (resolve, reject) {
-    http(url, params).then(res => {
-      if (res.code === 1) {
-        resolve(res.data)
-      } else {
-        reject(res.data)
-      }
-    }).catch(err => {
-      reject(err)
-    })
-  })
 }
 
 // 更新工时条目审核状态

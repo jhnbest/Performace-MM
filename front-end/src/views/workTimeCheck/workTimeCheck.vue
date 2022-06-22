@@ -19,7 +19,7 @@
     <div class="hr-10"></div>
     <!-- 分割线 end -->
     <div class="main-content">
-      <el-radio-group v-model="formData.selectType" @change="handleSelectTypeChange" :disabled="!reqFlag.getProjectList">
+      <el-radio-group v-model="formData.selectType" @change="handleSelectTypeChange" :disabled="!reqFlag.reqGetProjectList">
         <el-radio-button label="技术标准组"
                          v-if="$store.state.userInfo.groupName === '技术标准组'
                           || $store.state.userInfo.groupName === '处经理'"></el-radio-button>
@@ -49,7 +49,7 @@
 </template>
 
 <script>
-  import { getGroupUserName, getUnReviewProjectCount, getGroupWorkTimeList } from '@/config/interface'
+  import { getGroupWorkTimeList } from '@/config/interface'
   export default {
     data () {
       return {
@@ -59,7 +59,7 @@
         },
         tableData: [],
         reqFlag: {
-          getProjectList: true
+          reqGetProjectList: true
         }
       }
     },
@@ -108,8 +108,8 @@
       // 获取已审项目列表
       getGroupWorkTimeList (groupID) {
         const url = getGroupWorkTimeList
-        if (this.reqFlag.getProjectList) {
-          this.reqFlag.getProjectList = false
+        if (this.reqFlag.reqGetProjectList) {
+          this.reqFlag.reqGetProjectList = false
           let params = {
             groupID: groupID,
             applyMonth: this.formData.title
@@ -159,7 +159,7 @@
                 }
                 this.tableData = totalWorkTimeCal
               }
-              this.reqFlag.getProjectList = true
+              this.reqFlag.reqGetProjectList = true
             })
         }
       },

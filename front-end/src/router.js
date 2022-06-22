@@ -42,12 +42,6 @@ export default new Router({
           meta: { pagePath: '/home/dashboard' }
         },
         {
-          path: 'users',
-          name: 'users',
-          component: () => import('./views/User/Users.vue'),
-          meta: { pagePath: '/home/users' }
-        },
-        {
           path: 'workStation',
           name: 'workStation',
           component: () => import('./views/WorkStation/WorkStation.vue'),
@@ -128,11 +122,6 @@ export default new Router({
           name: 'monthConclusionTable',
           component: () => import('./views/monthConclusion/childViews/monthConclusionTable.vue'),
           meta: { pagePath: '/home/monthConclusion' }
-        },{
-          path: 'conclusionEva',
-          name: 'conclusionEva',
-          component: () => import('./views/monthConclusion/conclusionEva.vue'),
-          meta: { pagePath: '/home/conclusionEva' }
         },{
           path: 'PerformanceEvaNew',
           name: 'PerformanceEvaNew',

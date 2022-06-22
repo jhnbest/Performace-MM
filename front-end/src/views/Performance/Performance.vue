@@ -1,19 +1,18 @@
 <template>
   <div>
     <el-form class="main-search" :inline="true">
-      <el-form-item label="申报月份：" prop="title">
+      <el-form-item label="申报月份：">
         <el-button size="mini"
                    type="danger"
                    style="margin-right: 10px"
                    @click="handlePreMonth"
                    :disabled="!reqFlag.handelDateChange">上月</el-button>
         <el-date-picker
-          v-model="formData.title"
+          v-model="title"
           type="month"
           format="yyyy 第 MM 月"
           value-format="yyyy-MM"
           placeholder="选择月"
-          :picker-options="pickerOptions"
           style="width: 150px"
           @change="handelDateChange">
         </el-date-picker>
@@ -25,23 +24,14 @@
       </el-form-item>
       <el-form-item style="margin-left: 30px">
         <span v-if="formData.selectType === '工时查询'" style="font-size: 21px;font-weight: bold">本月实际获得工时:
-<!--          <span style="color: #F56C6C;margin-left: 10px;font-size: 25px">{{formData.totalWorkTime}}</span>-->
         <count-to
           :start-val="0"
           :end-val="formData.totalWorkTime"
           :duration="1000"
           :decimals="1"
           style="color: #F56C6C;margin-left: 10px;font-size: 25px"/>
-<!--          <span style="font-size: 21px;font-weight: bold;margin-left: 30px">本月小组排名:-->
-<!--            <count-to-->
-<!--              :start-val="0"-->
-<!--              :end-val="formData.rank"-->
-<!--              :duration="2600"-->
-<!--              style="color: #F56C6C;margin-left: 10px;font-size: 25px"/>-->
-<!--          </span>-->
         </span>
         <span v-if="formData.selectType === '计划查询'" style="font-size: 21px;font-weight: bold">本月预计获得工时:
-<!--          <span style="color: #F56C6C;margin-left: 10px;font-size: 25px">{{planGetWorkTime}}</span>-->
         <count-to
           :start-val="0"
           :end-val="planGetWorkTime"
@@ -49,10 +39,6 @@
           :decimals="1"
           style="color: #F56C6C;margin-left: 10px;font-size: 25px"/></span>
       </el-form-item>
-      <el-radio-group v-model="formData.selectType" @change="handleSelectTypeChange" style="margin-left: 50px">
-        <el-radio-button label="计划查询" :disabled="true"></el-radio-button>
-        <el-radio-button label="工时查询"></el-radio-button>
-      </el-radio-group>
     </el-form>
     <!-- 分割线 start -->
     <div class="hr-10"></div>
@@ -156,36 +142,6 @@
         </el-table-column>
       </el-table>
     </div>
-    <!---------------------------------------------计划表格--------------------------------------------------->
-    <div>
-      <el-table :data="workPlanTableData" v-if="showFlag.planTableShow"
-                style="width: 99%;margin: auto;margin-top: 20px"
-                border
-                :span-method="planTableSpanMethod"
-                :header-cell-style="{ backgroundColor:'#48bfe5', color: '#333' }">
-        <el-table-column label="序号" align="center" type="index" width="60%"></el-table-column>
-<!--        <el-table-column label="申报月份" align="center" prop="applyMonth"></el-table-column>-->
-        <el-table-column label="项目名称" align="center" prop="projectName"></el-table-column>
-        <el-table-column label="项目阶段" align="center" prop="projectStageName"></el-table-column>
-        <el-table-column label="计划进展" align="center" prop="applyProcess" width="100%">
-          <template slot-scope="scope">
-            <span>{{scope.row.applyProcess + '%'}}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="预计工时" align="center" prop="avaiableWorkTime" width="100%"></el-table-column>
-        <el-table-column label="操作" align="center" width="200">
-          <template slot-scope="scope">
-            <div v-if="!scope.row.processEditable">
-              <el-button type="primary"
-                         :disabled="!reqFlag.complete"
-                         size="mini"
-                         @click="handleComplete(scope.row)">生成工时申报</el-button>
-              <el-button type="danger" size="mini" @click="handleDeletePlanItem(scope.row, scope.$index)">删除</el-button>
-            </div>
-          </template>
-        </el-table-column>
-      </el-table>
-    </div>
     <Cop v-if="showFlag.cop" ref="cop"/>
   </div>
 </template>
@@ -193,12 +149,13 @@
 <script>
     import Cop from '@/components/Cop/Cop'
     import CountTo from 'vue-count-to'
-    import { getProjectType, getProjectList, changeSubmitStatus, deleteProject,
-      getAssignWorkTime, workTimeSubmit, workTimeTemporary, getWorkAssign, getGroupWorkTimeList, urlGetIsSubmitAllow } from '@/config/interface'
+    import { changeSubmitStatus, deleteProject,
+      getAssignWorkTime, getWorkAssign, getGroupWorkTimeList, urlGetIsSubmitAllow } from '@/config/interface'
+    import { getProjectList } from '@/utils/performance'
+    import store from '@/store'
     export default {
       data () {
         return {
-          projectTypeOptions: [],
           props: {
             multiple: true,
             value: 'projectTypeID',
@@ -206,8 +163,8 @@
           },
           WorkTimeItem: [],
           declareTime: [],
+          title: this.$moment().format('YYYY-MM'),
           formData: {
-            title: this.$moment().format('YYYY-MM'),
             projectType: [],
             isShowTable: true,
             totalWorkTime: 0,
@@ -220,8 +177,7 @@
             planTableShow: false
           },
           reqFlag: {
-            getProjectType: true,
-            getProjectList: true,
+            reqGetProjectList: true,
             changeSubmitStatus: true,
             deleteProject: true,
             complete: true,
@@ -233,11 +189,6 @@
           pageNum: 1, // 请求第几页
           pageSize: this.$store.state.pageSize, // 每页请求多少条
           currentPage: 1, // 初始时在第几页
-          pickerOptions: {
-            // disabledDate (time) {
-            //   return time.getTime() > Date.now()
-            // }
-          },
           workDetailTable: [],
           workPlanTableData: [],
           planGetWorkTime: 0
@@ -247,25 +198,14 @@
         // 初始化
         init () {
           this.getCookie()
-          let promises = []
-          let count = 0
-          if (this.reqFlag.handelDateChange) {
-            this.reqFlag.handelDateChange = false
-            this.getProjectList().then(res => {
-              promises[count++] = this.getGroupWorkTimeList(this.$store.state.userInfo.groupID)
-              promises[count++] = this.getAssignWorkTimes(res)
-              Promise.all(promises).then(() => {
-                this.reqFlag.handelDateChange = true
-              })
-            })
-          }
+          this.fillTableData()
         },
         // 获取当前月份能否申报的标志
         getIsSubmitAllow () {
           const url = urlGetIsSubmitAllow
           let params = {
-            applyYear: this.$moment(this.formData.title).year(),
-            applyMonth: this.$moment(this.formData.title).month() + 1,
+            applyYear: this.$moment(this.title).year(),
+            applyMonth: this.$moment(this.title).month() + 1,
             flagType: 'workTimeSubmit'
           }
           let _this = this
@@ -281,24 +221,6 @@
               reject(new Error('getIsSubmitAllow send error!'))
             })
           })
-        },
-        // 获取项目类型
-        getProjectType () {
-          const url = getProjectType
-          if (this.reqFlag.getProjectType) {
-            this.reqFlag.getProjectType = false
-            let params = {
-              projectParentID: this.$store.state.userInfo.groupName
-            }
-            this.$http(url, params)
-              .then(res => {
-                if (res.code === 1) {
-                  let data = res.data
-                  this.projectTypeOptions = data
-                }
-                this.reqFlag.getProjectType = true
-              })
-          }
         },
         // 审核表格合并前处理
         handleTable (Table) {
@@ -320,53 +242,44 @@
           }
         },
         // 获取工时申报列表
-        getProjectList () {
+        fillTableData () {
           this.workPlanTableData = []
           this.workDetailTable = []
-          let it = this
-          return new Promise(function (resolve, reject) {
-            const url = getProjectList
-            if (it.reqFlag.getProjectList) {
-              it.reqFlag.getProjectList = false
-              let params = {
-                searchID: it.$store.state.userInfo.id,
-                searchMon: it.formData.title,
-                pageNum: it.pageNum,
-                pageSize: it.pageSize
+          getProjectList(store.state.userInfo.id, this.title, this.pageNum, this.pageSize).then(res => {
+            let factWorkTimeList = []
+            let planWorkTimeList = []
+            this.planGetWorkTime = 0
+            for (let item of res.list) {
+              item.assignWorkTime = null
+              if (item.applyType === 'fact') { // 实际进展表格数据
+                factWorkTimeList.push(item)
+              } else if (item.applyType === 'plan') { // 计划进展表格数据
+                this.planGetWorkTime += item.avaiableWorkTime
+                planWorkTimeList.push(item)
               }
-              it.$http(url, params)
-                .then(res => {
-                  if (res.code === 1) {
-                    let data = res.data
-                    let factWorkTimeList = []
-                    let planWorkTimeList = []
-                    it.planGetWorkTime = 0
-                    for (let item of data.list) {
-                      item.assignWorkTime = null
-                      if (item.applyType === 'fact') { // 实际进展表格数据
-                        factWorkTimeList.push(item)
-                      } else if (item.applyType === 'plan') { // 计划进展表格数据
-                        it.planGetWorkTime += item.avaiableWorkTime
-                        planWorkTimeList.push(item)
-                      }
-                    }
-                    factWorkTimeList.sort(it.compare('aplID'))
-                    planWorkTimeList.sort(it.compare('aplID'))
-                    it.handleTable(factWorkTimeList)
-                    it.handleTable(planWorkTimeList)
-                    it.workPlanTableData = JSON.parse(JSON.stringify(planWorkTimeList))
-                    it.workDetailTable = JSON.parse(JSON.stringify(factWorkTimeList))
-                    it.totalCount = data.totalCount
-                    it.currentPage = it.pageNum
-                    if (it.formData.selectType === '工时查询') {
-                      resolve(factWorkTimeList)
-                    } else if (it.formData.selectType === '计划查询') {
-                      resolve(planWorkTimeList)
-                    }
-                  }
-                  it.reqFlag.getProjectList = true
-                })
             }
+            factWorkTimeList.sort(this.compare('aplID'))
+            planWorkTimeList.sort(this.compare('aplID'))
+            this.handleTable(factWorkTimeList)
+            this.handleTable(planWorkTimeList)
+            this.workPlanTableData = JSON.parse(JSON.stringify(planWorkTimeList))
+            this.workDetailTable = JSON.parse(JSON.stringify(factWorkTimeList))
+            this.totalCount = res.totalCount
+            this.currentPage = this.pageNum
+            let result = null
+            if (this.formData.selectType === '工时查询') {
+              result = factWorkTimeList
+            } else if (this.formData.selectType === '计划查询') {
+              result = planWorkTimeList
+            }
+            let promises = []
+            let count = 0
+            promises[count++] = this.getGroupWorkTimeList(this.$store.state.userInfo.groupID)
+            promises[count++] = this.getAssignWorkTimes(result)
+            Promise.all(promises).then(() => {}).catch(err => { console.log(err) })
+          }).catch(err => {
+            this.$common.toast('错误', 'error', 'true')
+            console.log(err)
           })
         },
         // 表格数据排序
@@ -404,26 +317,16 @@
               let arr2 = arr[i].split('=') // 再次切割
               // 判断查找相对应的值
               if (arr2[0] === 'pMonth') {
-                this.formData.title = arr2[1] // 保存到保存数据的地方
+                this.title = arr2[1] // 保存到保存数据的地方
               }
             }
           }
         },
         // 申报月份变化
         handelDateChange () {
-          this.setCookie(this.formData.title, 7)
-          let promises = []
-          let count = 0
-          if (this.reqFlag.handelDateChange) {
-            this.reqFlag.handelDateChange = false
-            this.getProjectList().then(res => {
-              promises[count++] = this.getGroupWorkTimeList(this.$store.state.userInfo.groupID)
-              promises[count++] = this.getAssignWorkTimes(res)
-              Promise.all(promises).then(() => {
-                this.reqFlag.handelDateChange = true
-              })
-            })
-          }
+          this.setCookie(this.title, 7)
+          this.reqFlag.handelDateChange = false
+          this.fillTableData(store.state.userInfo.id, this.title, this.pageNum, this.pageSize)
         },
         handleAddNew () {
           this.$router.push({ path: '/home/PerformanceAddNew' })
@@ -473,7 +376,7 @@
                 })
               }
             } else {
-              this.$common.toast(this.formData.title + '月已截止申报工时', 'error', true)
+              this.$common.toast(this.title + '月已截止申报工时', 'error', true)
             }
           })
         },
@@ -536,19 +439,6 @@
             })
           }
         },
-        // 切换标签事件
-        handleSelectTypeChange (selectType) {
-          this.getProjectList().then(res => {
-            this.getAssignWorkTimes(res)
-            if (selectType === '工时查询') {
-              this.showFlag.factTableShow = true
-              this.showFlag.planTableShow = false
-            } else if (selectType === '计划查询') {
-              this.showFlag.factTableShow = false
-              this.showFlag.planTableShow = true
-            }
-          })
-        },
         // 获取工时分配信息
         getWorkTimeAssign (id) {
           const url = getWorkAssign
@@ -571,99 +461,9 @@
             }
           })
         },
-        // 生成工时申报按钮
-        handleComplete (row) {
-          this.getIsSubmitAllow().then(getIsSubmitAllowRes => {
-            if (getIsSubmitAllowRes.length === 0 || this.$store.state.userInfo.id === 26) {
-              this.getWorkTimeAssign(row.id).then(workTimeAssign => {
-                const url = workTimeTemporary
-                if (this.reqFlag.complete) {
-                  this.reqFlag.complete = false
-                  let title = this.formData.title
-                  let params = {
-                    submitType: 'insert',
-                    submitDate: title,
-                    data: [],
-                    applyType: 'fact'
-                  }
-                  // let defaultCurrentUserWorkTime = {
-                  //   id: this.$store.state.userInfo.id,
-                  //   groupName: this.$store.state.userInfo.groupName,
-                  //   name: this.$store.state.userInfo.name,
-                  //   applyRole: '组织者',
-                  //   assignWorkTime: row.avaiableWorkTime,
-                  //   deleteAble: false
-                  // }
-                  row.workTimeAssign = []
-                  for (let item of workTimeAssign) {
-                    item.assignWorkTime = item.workTime
-                    item.deleteAble = false
-                    item.id = item.userID
-                    item.applyRole = item.assignRole
-                    row.workTimeAssign.push(item)
-                  }
-                  row.defaultCofficient = row.applyCofficient
-                  row.defaultKValue = row.applyKValue
-                  row.baseWorkTime = row.applyBaseWorkTime
-                  row.monthID = null
-                  params.data.push(row)
-                  this.$http(url, params)
-                    .then(res => {
-                      if (res.code === 1) {
-                        this.$common.toast('生成成功', 'success', false)
-                      } else {
-                        this.$common.toast('提交失败', 'error', false)
-                      }
-                      this.reqFlag.complete = true
-                    })
-                }
-              })
-            } else {
-              this.$common.toast(this.formData.title + '月已截止申报工时', 'error', true)
-            }
-          }).catch(err => {
-            this.$common.toast(err, 'error', true)
-          })
-        },
-        // 保存按钮
-        handleSave (row) {
-          row.processEditable = false
-          row.avaiableWorkTime = row
-        },
-        // 删除按钮
-        handleDeletePlanItem (row, index) {
-          this.$common.msgBox('confirm', '操作提示', '确定删除？', () => {
-            if (this.reqFlag.deleteProject) {
-              this.reqFlag.deleteProject = false
-              const url = deleteProject
-              this.workPlanTableData.splice(index, 1)
-              let params = {
-                id: row.id
-              }
-              this.$http(url, params)
-                .then(res => {
-                  if (res.code === 1) {
-                    this.$common.toast('操作成功', 'success', false)
-                  } else {
-                    this.$common.toast('操作失败', 'danger', false)
-                  }
-                  this.reqFlag.deleteProject = true
-                })
-            }
-          })
-        },
         // 表格合并方法
         objectSpanMethod ({ row, column, rowIndex, columnIndex }) {
           if (columnIndex === 2 || columnIndex === 3) {
-            return {
-              rowspan: row.rowSpan,
-              colspan: row.colSpan
-            }
-          }
-        },
-        // 计划表格合并方法
-        planTableSpanMethod ({ row, column, rowIndex, columnIndex }) {
-          if (columnIndex === 1) {
             return {
               rowspan: row.rowSpan,
               colspan: row.colSpan
@@ -677,7 +477,7 @@
             this.reqFlag.getGroupWorkTimeList = false
             let params = {
               groupID: groupID,
-              applyMonth: this.formData.title
+              applyMonth: this.title
             }
             let _this = this
             return new Promise(function (resolve, reject) {
@@ -762,12 +562,12 @@
         },
         // 上一月
         handlePreMonth () {
-          this.formData.title = this.$moment(this.formData.title).subtract(1, 'months').format('YYYY-MM')
+          this.title = this.$moment(this.title).subtract(1, 'months').format('YYYY-MM')
           this.handelDateChange()
         },
         // 下一月
         handleNextMonth () {
-          this.formData.title = this.$moment(this.formData.title).add(1, 'months').format('YYYY-MM')
+          this.title = this.$moment(this.title).add(1, 'months').format('YYYY-MM')
           this.handelDateChange()
         }
       },

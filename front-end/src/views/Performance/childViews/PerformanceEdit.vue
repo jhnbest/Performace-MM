@@ -4,7 +4,7 @@
       <el-form :label-position="labelPosition" label-width="110px" ref="formData" :model="formData" :rules="formRules" :inline="true">
         <el-form-item label="申报月份" prop="title">
           <el-date-picker
-            v-model="formData.title"
+            v-model="title"
             type="month"
             format="yyyy 第 MM 月"
             value-format="yyyy-MM"
@@ -158,8 +158,8 @@
 </template>
 
 <script>
-  import { workTimeSubmit, getProjectInfo, urlGetUsersList, getProjectType, getWorkTimeNew, workTimeTemporary,
-    updateAssignWork, getAssignWorkDetail, urlGetIsSubmitAllow } from '@/config/interface'
+  import { getProjectInfo, urlGetUsersList, updateAssignWork, getAssignWorkDetail, urlGetIsSubmitAllow } from '@/config/interface'
+  import { getProjectType, workTimeListInsert, temporaryWorkTimeList } from '@/utils/performance'
   import Assign from '@/components/Cop/workTimeAssign'
     export default {
       data () {
@@ -203,33 +203,21 @@
           partTableData: [{
             workTime: undefined
           }],
+          title: this.$moment().format('YYYY-MM'),
           formData: {
-            title: this.$moment().format('YYYY-MM'),
             projectType: [],
             participant: [],
             usersList: [],
             partWorkTime: 0,
             partTableData: [],
-            workTypeTimeDetail: [],
             isShowProjectType: true,
             projectLevel: null,
-            isShowProjectLevel: true
+            isShowProjectLevel: true,
+            workTypeTimeDetail: []
           },
           formRules: {
             title: [
-              { required: true, message: '请选择填报月份', trigger: 'blur' }
-            ],
-            workTypeValue: [
-              { required: true, message: '请选择申报类型', trigger: 'change' }
-            ],
-            subWorkType1Value: [
-              { required: true, message: '请选择申报子类型1', trigger: 'change' }
-            ],
-            subWorkType2Value: [
-              { required: true, message: '请选择申报子类型2', trigger: 'change' }
-            ],
-            subWorkType3Value: [
-              { required: true, message: '请选择申报子类型3', trigger: 'change' }
+              { required: true, message: '请选择参与人员', trigger: 'change' }
             ],
             participant: [
               { required: true, message: '请选择参与人员', trigger: 'change' }
@@ -258,9 +246,7 @@
           },
           reqFlag: {
             edit: true,
-            usersName: true,
-            getProjectType: true,
-            getWorkTimeNew: true
+            usersName: true
           },
           showFlag: {
             workTimeAssign: false
@@ -290,7 +276,9 @@
         // 初始化
         init () {
           this.getUsersName()
-          this.getProjectType()
+          getProjectType(this.$store.state.userInfo.groupName).then(getProjectTypeRes => {
+            this.projectTypeOptions = getProjectTypeRes
+          })
           this.getProjectInfo().then(res => {
             this.getProjectDetail(res)
           })
@@ -299,8 +287,8 @@
         getIsSubmitAllow () {
           const url = urlGetIsSubmitAllow
           let params = {
-            applyYear: this.$moment(this.formData.title).year(),
-            applyMonth: this.$moment(this.formData.title).month() + 1,
+            applyYear: this.$moment(this.title).year(),
+            applyMonth: this.$moment(this.title).month() + 1,
             flagType: 'workTimeSubmit'
           }
           let _this = this
@@ -347,7 +335,7 @@
                 let defaultCurrentUserWorkTime = []
                 let workTimeAssignInsertID = []
                 let tmp = []
-                it.formData.title = data.workTimeList[0].applyMonth
+                it.title = data.workTimeList[0].applyMonth
                 it.isRejectWorkTimeSubmit = data.workTimeList[0].reviewStatus === 2
                 it.formData.projectType.push(data.projectTypeCheck) // get项目类型
                 it.formData.isShowProjectType = false
@@ -421,39 +409,6 @@
         },
         // 提交至工时明细列表
         onSubmitWorkTimeList (formData) {
-          const url = workTimeSubmit
-          if (this.reqFlag.edit) {
-            this.reqFlag.edit = false
-            let title = this.formData.title
-            let tableDataCopy = []
-            for (let item of this.formData.workTypeTimeDetail) {
-              item.avaiableWorkTime = Number(item.avaiableWorkTime)
-              if (item.avaiableWorkTime !== 0 && item.applyProcess !== 0) {
-                tableDataCopy.push(item)
-              }
-            }
-            if (tableDataCopy.length !== 0) {
-              let params = {
-                projectID: this.id,
-                submitType: 'update',
-                submitDate: title,
-                data: tableDataCopy
-              }
-              this.$http(url, params).then(res => {
-                if (res.code === 1) {
-                  this.$common.toast('提交成功', 'success', false)
-                  this.onCancel(formData)
-                } else {
-                  this.$common.toast('提交失败', 'success', false)
-                  this.onCancel(formData)
-                }
-                this.reqFlag.edit = true
-              })
-            } else {
-              this.reqFlag.edit = true
-              this.$common.toast('申报工时为0，请修改,', 'info', false)
-            }
-          }
         },
         // 提交至项目明细列表
         onSubmitProjectList () {
@@ -499,10 +454,34 @@
               this.getIsSubmitAllow().then(getIsSubmitAllowRes => {
                 if (getIsSubmitAllowRes.length === 0 || this.isRejectWorkTimeSubmit || this.$store.state.userInfo.id === 26) {
                   this.onSubmitProjectList().then(() => {
-                    this.onSubmitWorkTimeList(formData)
+                    if (this.reqFlag.edit) {
+                      this.reqFlag.edit = false
+                      let tableDataCopy = []
+                      for (let item of this.formData.workTypeTimeDetail) {
+                        item.avaiableWorkTime = Number(item.avaiableWorkTime)
+                        if (item.avaiableWorkTime !== 0 && item.applyProcess !== 0) {
+                          tableDataCopy.push(item)
+                        }
+                      }
+                      if (tableDataCopy.length !== 0) {
+                        workTimeListInsert(this.id, 'update', this.title, null, tableDataCopy).then(() => {
+                          this.reqFlag.edit = true
+                          this.$common.toast('提交成功', 'success', false)
+                          this.onCancel(formData)
+                        }).catch(err => {
+                          console.log(err)
+                          this.reqFlag.edit = true
+                          this.$common.toast('提交失败', 'success', false)
+                          this.onCancel(formData)
+                        })
+                      } else {
+                        this.reqFlag.edit = true
+                        this.$common.toast('申报工时为0，请修改,', 'info', false)
+                      }
+                    }
                   })
                 } else {
-                  this.$common.toast(this.formData.title + '月已截止申报工时', 'error', true)
+                  this.$common.toast(this.title + '月已截止申报工时', 'error', true)
                 }
               }).catch(err => {
                 this.$common.toast(err, 'error', true)
@@ -512,40 +491,6 @@
         },
         // 暂存至工时申报列表
         onTemporaryWorkTimeList (formData) {
-          const url = workTimeTemporary
-          if (this.reqFlag.edit) {
-            this.reqFlag.edit = false
-            let title = this.formData.title
-            let tableDataCopy = []
-            for (let item of this.formData.workTypeTimeDetail) {
-              item.avaiableWorkTime = Number(item.avaiableWorkTime)
-              if (item.avaiableWorkTime !== 0 && item.applyProcess !== 0) {
-                tableDataCopy.push(item)
-              }
-            }
-            if (tableDataCopy.length !== 0) {
-              let params = {
-                projectID: this.id,
-                submitType: 'update',
-                submitDate: title,
-                data: this.formData.workTypeTimeDetail
-              }
-              this.$http(url, params)
-                .then(res => {
-                  if (res.code === 1) {
-                    this.$common.toast('暂存成功', 'success', false)
-                    this.onCancel(formData)
-                  } else {
-                    this.$common.toast('暂存失败', 'success', false)
-                    this.onCancel(formData)
-                  }
-                  this.reqFlag.edit = true
-                })
-            } else {
-              this.$common.toast('申报工时为0，请修改,', 'warning', false)
-              this.reqFlag.edit = true
-            }
-          }
         },
         // 暂存工时申报
         onTemporaryWorkTime (formData) {
@@ -554,10 +499,34 @@
               this.getIsSubmitAllow().then(getIsSubmitAllowRes => {
                 if (getIsSubmitAllowRes.length === 0 || this.isRejectWorkTimeSubmit || this.$store.state.userInfo.id === 26) {
                   this.onSubmitProjectList().then(() => {
-                    this.onTemporaryWorkTimeList(formData)
+                    if (this.reqFlag.edit) {
+                      this.reqFlag.edit = false
+                      let tableDataCopy = []
+                      for (let item of this.formData.workTypeTimeDetail) {
+                        item.avaiableWorkTime = Number(item.avaiableWorkTime)
+                        if (item.avaiableWorkTime !== 0 && item.applyProcess !== 0) {
+                          tableDataCopy.push(item)
+                        }
+                      }
+                      if (tableDataCopy.length !== 0) {
+                        temporaryWorkTimeList(this.id, 'update', this.title, this.formData.workTypeTimeDetail, null).then(() => {
+                          this.$common.toast('暂存成功', 'success', false)
+                          this.reqFlag.edit = true
+                          this.onCancel(formData)
+                        }).catch(err => {
+                          console.log(err)
+                          this.$common.toast('暂存失败', 'success', false)
+                          this.reqFlag.edit = true
+                          this.onCancel(formData)
+                        })
+                      } else {
+                        this.$common.toast('申报工时为0，请修改,', 'warning', false)
+                        this.reqFlag.edit = true
+                      }
+                    }
                   })
                 } else {
-                  this.$common.toast(this.formData.title + '月已截止申报工时', 'error', true)
+                  this.$common.toast(this.title + '月已截止申报工时', 'error', true)
                 }
               }).catch(err => {
                 this.$common.toast(err, 'error', true)
@@ -569,24 +538,6 @@
         onCancel (formName) {
           this.$router.push({ path: '/home/Performance' })
           this.$refs[formName].resetFields()
-        },
-        // 获取申报类型
-        getProjectType () {
-          const url = getProjectType
-          if (this.reqFlag.getProjectType) {
-            this.reqFlag.getProjectType = false
-            let params = {
-              projectParentID: this.$store.state.userInfo.groupName
-            }
-            this.$http(url, params)
-              .then(res => {
-                if (res.code === 1) {
-                  let data = res.data
-                  this.projectTypeOptions = data
-                }
-                this.reqFlag.getProjectType = true
-              })
-          }
         },
         // 获取用户姓名
         getUsersName () {

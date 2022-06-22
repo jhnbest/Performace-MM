@@ -6,7 +6,11 @@ import {
     urlUpdatePMData,
     urlGetPMData,
     urlGetWorkAssign,
-    ulrDeleteProject
+    ulrDeleteProject,
+    urlGetProjectType,
+    urlWorkTimeSubmit,
+    urlWorkTimeTemporary,
+    urlGetProjectList
 } from '../config/interface'
 import { getUsersList } from '@/utils/users'
 import { getPerformanceIsPublish,
@@ -15,8 +19,7 @@ import { getPerformanceIsPublish,
         getEvaCoef,
         sortBy,
         sortObjectArrayByParams,
-        NorCal,
-        PMScoreNorCal } from '@/utils/common'
+        NorCal } from '@/utils/common'
 import { getAllUserRates, genQualiEvaData } from '@/utils/multual'
 import { getAllAchievements, genPerformanceEvaData } from '@/utils/performancerate'
 import store from '@/store'
@@ -39,6 +42,93 @@ export function getAllWorkTimeList (applyDate) {
       }
     }).catch((err) => {
       reject(new Error(err + '请求失败'))
+    })
+  })
+}
+
+// 获取项目列表
+export function getProjectList (searchID, searchMon, pageNum, pageSize) {
+  const url = urlGetProjectList
+  return new Promise(function (resolve, reject) {
+    let params = {
+      searchID: searchID,
+      searchMon: searchMon,
+      pageNum: pageNum,
+      pageSize: pageSize
+    }
+    http(url, params).then(res => {
+      if (res.code === 1) {
+        resolve(res.data)
+      } else {
+        reject(res.err)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
+// 获取工时标准
+export function getProjectType (groupName) {
+  const url = urlGetProjectType
+  let params = {
+    projectParentID: groupName
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(res => {
+      if (res.code === 1) {
+        resolve(res.data)
+      } else {
+        reject(res.err)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
+// 插入工时申报
+export function workTimeListInsert (projectID, submitType, submitDate, applyType, data) {
+  const url = urlWorkTimeSubmit
+  let params = {
+    projectID: projectID,
+    submitType: submitType,
+    submitDate: submitDate,
+    data: data,
+    applyType: applyType
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(res => {
+      if (res.code === 1) {
+        resolve(res.data)
+      } else {
+        reject(res.data)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
+// 暂存工时申报
+export function temporaryWorkTimeList (projectID, submitType, submitDate, data, applyType) {
+  const url = urlWorkTimeTemporary
+  return new Promise(function (resolve, reject) {
+    let params = {
+      projectID: projectID,
+      submitType: submitType,
+      submitDate: submitDate,
+      data: data,
+      applyType: applyType
+    }
+    http(url, params).then(res => {
+      if (res.code === 1) {
+        resolve(res.code)
+      } else {
+        reject(res.err)
+      }
+    }).catch(err => {
+      reject(err)
     })
   })
 }

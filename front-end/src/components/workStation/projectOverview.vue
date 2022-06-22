@@ -181,11 +181,11 @@
     import {
       getAssignProjectList,
       deleteAssignProject,
-      getProjectType,
-      getWorkTimeNew,
+      ulrGetWorkTimeNew,
       getAssignProjectStageList,
       getWorkTimeListOfProjectStage,
       updateEditProjectStage } from '@/config/interface'
+    import { getProjectType } from '@/utils/performance'
     export default {
       data () {
         return {
@@ -198,8 +198,7 @@
           },
           reqFlag: {
             getAssignProjectList: true,
-            deleteProject: true,
-            getProjectType: true
+            deleteProject: true
           },
           editProject: false,
           dialogProjectName: '',
@@ -226,7 +225,7 @@
           }).catch(getAssignProjectListErr => {
             this.$common.toast('初始化失败' + getAssignProjectListErr, 'error', true)
           })
-          this.getProjectType().then(getProjectTypeRes => { // 获取项目类型，编辑项目阶段用
+          getProjectType(this.$store.state.userInfo.groupName).then(getProjectTypeRes => { // 获取项目类型，编辑项目阶段用
             this.projectTypeOptions = getProjectTypeRes
           }).catch(getProjectTypeErr => {
             this.$common.toast('初始化失败' + getProjectTypeErr, 'error', true)
@@ -249,12 +248,12 @@
                   _this.$emit('countFeedback', res.data[1][0].totalCount)
                   resolve(res.data[0])
                 } else {
-                  reject(new Error(res.data))
+                  reject(res.err)
                 }
                 _this.reqFlag.getAssignProjectList = true
               }).catch(err => {
                 _this.reqFlag.getAssignProjectList = true
-                reject(new Error(err))
+                reject(err)
               })
             })
           }
@@ -285,33 +284,9 @@
         handleSaveProjectStageEdit (row) {
           row.editable = false
         },
-        // 获取申报类型
-        getProjectType () {
-          const url = getProjectType
-          if (this.reqFlag.getProjectType) {
-            this.reqFlag.getProjectType = false
-            let params = {
-              projectParentID: this.$store.state.userInfo.groupName
-            }
-            let _this = this
-            return new Promise(function (resolve, reject) {
-              _this.$http(url, params).then(res => {
-                if (res.code === 1) {
-                  resolve(res.data)
-                } else {
-                  reject(new Error('getProjectType error!'))
-                }
-                _this.reqFlag.getProjectType = true
-              }).catch(err => {
-                _this.reqFlag.getProjectType = true
-                reject(new Error(err))
-              })
-            })
-          }
-        },
         // 获取项目类型相关信息
         getProjectTypeInfo (projectStageID, parentID) {
-          const url = getWorkTimeNew
+          const url = ulrGetWorkTimeNew
           let params = {
             checkID: [projectStageID],
             parentID: parentID

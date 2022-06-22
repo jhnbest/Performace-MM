@@ -52,7 +52,7 @@
 
 <script>
   import PersionPlan from './childViews/PersionPlan'
-  import { getGroupUserName } from '@/config/interface'
+  import { urlGetGroupUserName } from '@/config/interface'
     export default {
       data () {
         return {
@@ -105,7 +105,7 @@
           return new Promise(function (resolve, reject) {
             if (it.reqFlag.getGroupUsers) {
               it.reqFlag.getGroupUsers = false
-              const url = getGroupUserName
+              const url = urlGetGroupUserName
               let params = {
                 role: it.$store.state.userInfo.role,
                 groupName: it.$options.filters['groupNameFilters'](it.$store.state.userInfo.groupName)

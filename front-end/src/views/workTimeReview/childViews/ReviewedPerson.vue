@@ -2,7 +2,7 @@
   <div>
     <el-form ref="formData" :model="formData" :rules="formRules">
       <el-table
-        v-loading="!reqFlag.getProjectList"
+        v-loading="!reqFlag.reqetProjectList"
         :data="formData.workDetailTable"
         stripe
         :span-method="objectSpanMethod"
@@ -248,7 +248,7 @@
 <script>
   import CopReview from '@/components/Cop/CopReview'
   import {
-    getProjectList,
+    urlGetProjectList,
     submitReviewPass,
     getWorkAssign,
     getAssignProjectDetail } from '@/config/interface'
@@ -271,7 +271,7 @@
           CopReview: true
         },
         reqFlag: {
-          getProjectList: true,
+          reqGetProjectList: true,
           getAssignProjectDetail: true
         },
         pageNum: 1, // 请求第几页
@@ -291,9 +291,9 @@
       },
       // 获取工时申报列表
       getProjectList (data) {
-        const url = getProjectList
-        if (this.reqFlag.getProjectList) {
-          this.reqFlag.getProjectList = false
+        const url = urlGetProjectList
+        if (this.reqFlag.reqGetProjectList) {
+          this.reqFlag.reqGetProjectList = false
           let params = {
             searchID: data.id,
             searchMon: data.title,
@@ -327,7 +327,7 @@
                 this.formData.workDetailTable = reviewTable
                 this.totalCount = data.totalCount
                 this.currentPage = this.pageNum
-                this.reqFlag.getProjectList = true
+                this.reqFlag.reqGetProjectList = true
               }
             })
         }
