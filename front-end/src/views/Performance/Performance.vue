@@ -149,8 +149,7 @@
 <script>
     import Cop from '@/components/Cop/Cop'
     import CountTo from 'vue-count-to'
-    import { changeSubmitStatus, deleteProject,
-      getAssignWorkTime, getWorkAssign, getGroupWorkTimeList, urlGetIsSubmitAllow } from '@/config/interface'
+    import { changeSubmitStatus, deleteProject, getAssignWorkTime, getGroupWorkTimeList, urlGetIsSubmitAllow } from '@/config/interface'
     import { getProjectList } from '@/utils/performance'
     import store from '@/store'
     export default {
@@ -181,7 +180,6 @@
             changeSubmitStatus: true,
             deleteProject: true,
             complete: true,
-            getWorkTimeAssign: true,
             getGroupWorkTimeList: true,
             getAssignWorkTimes: true,
             handelDateChange: true
@@ -245,7 +243,7 @@
         fillTableData () {
           this.workPlanTableData = []
           this.workDetailTable = []
-          getProjectList(store.state.userInfo.id, this.title, this.pageNum, this.pageSize).then(res => {
+          getProjectList(store.state.userInfo.id, this.title, this.pageNum, this.pageSize, null, null).then(res => {
             let factWorkTimeList = []
             let planWorkTimeList = []
             this.planGetWorkTime = 0
@@ -438,28 +436,6 @@
                 })
             })
           }
-        },
-        // 获取工时分配信息
-        getWorkTimeAssign (id) {
-          const url = getWorkAssign
-          let params = {
-            projectID: id,
-            searchType: 'applyer'
-          }
-          let it = this
-          return new Promise(function (resolve, reject) {
-            if (it.reqFlag.getWorkTimeAssign) {
-              it.reqFlag.getWorkTimeAssign = false
-              it.$http(url, params)
-                .then(res => {
-                  if (res.code === 1) {
-                    let data = res.data[0]
-                    it.reqFlag.getWorkTimeAssign = true
-                    resolve(data)
-                  }
-                })
-            }
-          })
         },
         // 表格合并方法
         objectSpanMethod ({ row, column, rowIndex, columnIndex }) {

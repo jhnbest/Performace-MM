@@ -78,7 +78,6 @@
           },
           reqFlag: {
             edit: true,
-            getWorkTimeAssign: true,
             updateNewPassword: true,
             oldPasswordAuth: true
           }

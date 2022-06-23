@@ -47,14 +47,16 @@ export function getAllWorkTimeList (applyDate) {
 }
 
 // 获取项目列表
-export function getProjectList (searchID, searchMon, pageNum, pageSize) {
+export function getProjectList (searchID, searchMon, pageNum, pageSize, searchType, reviewType) {
   const url = urlGetProjectList
   return new Promise(function (resolve, reject) {
     let params = {
       searchID: searchID,
       searchMon: searchMon,
       pageNum: pageNum,
-      pageSize: pageSize
+      pageSize: pageSize,
+      searchType: searchType,
+      reviewType: reviewType
     }
     http(url, params).then(res => {
       if (res.code === 1) {

@@ -8,8 +8,8 @@
     <div>
       <el-table
         height="400"
-        v-loading="!this.reqFlag.getWorkTimeAssign"
-        :data="formData.copInfoTable"
+        v-loading="!this.reqFlag.reqGetWorkTimeAssign"
+        :data="copInfoTable"
         style="width: 100%;margin: auto">
         <el-table-column label="序号" align="center" type="index"></el-table-column>
         <el-table-column label="姓名" prop="name" align="center"></el-table-column>
@@ -38,20 +38,16 @@
 </template>
 
 <script>
-import { getWorkAssign } from '../../config/interface'
+import { getWorkTimeAssign } from '@/utils/performance'
+
 export default {
   data () {
     return {
       showFlag: false,
-      formData: {
-        copInfoTable: [],
-        name: null,
-        password: null,
-        email: null
-      },
+      copInfoTable: [],
       reqFlag: {
         edit: true,
-        getWorkTimeAssign: true
+        reqGetWorkTimeAssign: true
       }
     }
   },
@@ -64,37 +60,18 @@ export default {
     init (row) {
       this.$nextTick(() => {
         this.changeShowFlag()
-        this.getWorkTimeAssign(row.id)
+        getWorkTimeAssign(row.id, 'applyer').then(res => {
+          this.copInfoTable = res[0]
+          for (let item of this.copInfoTable) { // 插入审核状态
+            item.reviewStatus = res[1][0].reviewStatus
+          }
+        }).catch(err => {
+          console.log(err)
+        })
       })
-    },
-    getWorkTimeAssign (id) {
-      const url = getWorkAssign
-      let params = {
-        projectID: id,
-        searchType: 'applyer'
-      }
-      if (this.reqFlag.getWorkTimeAssign) {
-        this.reqFlag.getWorkTimeAssign = false
-        this.$http(url, params)
-          .then(res => {
-            if (res.code === 1) {
-              let data = res.data
-              this.formData.copInfoTable = data[0]
-              for (let item of this.formData.copInfoTable) { // 插入审核状态
-                item.reviewStatus = data[1][0].reviewStatus
-              }
-              this.reqFlag.getWorkTimeAssign = true
-            }
-          })
-      }
     },
     changeShowFlag () {
       this.showFlag = !this.showFlag
-    },
-    // 取消
-    onCancel (formName) {
-      this.changeShowFlag()
-      this.$refs[formName].resetFields()
     },
     // 关闭弹出框
     closeDialog () {

@@ -72,10 +72,6 @@ export default {
   data () {
     return {
       tableData: [],
-      reqFlag: {
-        edit: true,
-        getWorkTimeAssign: true
-      },
       usersList: [],
       multiParticipant: false,
       avaiableWorkTime: null,

@@ -13,7 +13,6 @@
       <el-form ref="formData" :model="formData" :rules="formRules">
         <el-table
           height="360"
-          v-loading="!this.reqFlag.getWorkTimeAssign"
           :data="formData.copInfoTable"
           style="width: 100%;margin: auto">
           <el-table-column label="序号" align="center" type="index"></el-table-column>
@@ -49,7 +48,8 @@
 </template>
 
 <script>
-import { getWorkAssign, updateWorkTimeAssignReview } from '../../config/interface'
+import { updateWorkTimeAssignReview } from '../../config/interface'
+import { getWorkTimeAssign } from '@/utils/performance'
 export default {
   data () {
     return {
@@ -67,10 +67,6 @@ export default {
         totalWorkTime: 0,
         row: null
       },
-      reqFlag: {
-        edit: true,
-        getWorkTimeAssign: true
-      },
       formRules: {
         reviewWorkTime: [
           { required: true, message: '请填写审核工时', trigger: 'blur' }
@@ -87,43 +83,27 @@ export default {
     init (row, index, reviewType) {
       this.$nextTick(() => {
         this.changeShowFlag()
-        this.getWorkTimeAssign(row.id, row.scale, row.workTimeAssignReviewStatus, row.reviewStatus)
-        this.formData.selectIndex = index
-        this.formData.reviewStatus = row.reviewStatus
-        this.formData.reviewType = reviewType
-        this.formData.projectID = row.id
-        this.formData.isConference = row.isConference
-        this.formData.totalWorkTime = row.avaiableWorkTime
-        this.formData.row = row
-      })
-    },
-    // 获取工时分配详情
-    getWorkTimeAssign (id, scale, workTimeAssignReviewStatus, reviewStatus) {
-      const url = getWorkAssign
-      let params = {
-        projectID: id
-      }
-      if (this.reqFlag.getWorkTimeAssign) {
-        this.reqFlag.getWorkTimeAssign = false
-        this.$http(url, params)
-          .then(res => {
-            if (res.code === 1) {
-              let data = res.data
-              this.formData.totalReviewWorkTime = 0
-              for (let item of data) {
-                if (reviewStatus !== 1 && item.reviewWorkTime === null) {
-                  item.reviewWorkTime = item.workTime
-                }
-                if (workTimeAssignReviewStatus === 0) {
-                  item.reviewWorkTime = item.workTime * (1 + scale)
-                  item.reviewWorkTime = Number(Number(item.reviewWorkTime).toFixed(1))
-                }
-              }
-              this.formData.copInfoTable = data
+        getWorkTimeAssign(row.id, null).then((res) => {
+          this.formData.totalReviewWorkTime = 0
+          for (let item of res) {
+            if (row.reviewStatus !== 1 && item.reviewWorkTime === null) {
+              item.reviewWorkTime = item.workTime
             }
-            this.reqFlag.getWorkTimeAssign = true
-          })
-      }
+            if (row.workTimeAssignReviewStatus === 0) {
+              item.reviewWorkTime = item.workTime * (1 + row.scale)
+              item.reviewWorkTime = Number(Number(item.reviewWorkTime).toFixed(1))
+            }
+          }
+          this.formData.copInfoTable = res
+          this.formData.selectIndex = index
+          this.formData.reviewStatus = row.reviewStatus
+          this.formData.reviewType = reviewType
+          this.formData.projectID = row.id
+          this.formData.isConference = row.isConference
+          this.formData.totalWorkTime = row.avaiableWorkTime
+          this.formData.row = row
+        })
+      })
     },
     changeShowFlag () {
       this.showFlag = !this.showFlag

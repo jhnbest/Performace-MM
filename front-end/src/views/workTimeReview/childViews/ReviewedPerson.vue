@@ -2,7 +2,7 @@
   <div>
     <el-form ref="formData" :model="formData" :rules="formRules">
       <el-table
-        v-loading="!reqFlag.reqetProjectList"
+        v-loading="!reqFlag.reqGetProjectList"
         :data="formData.workDetailTable"
         stripe
         :span-method="objectSpanMethod"
@@ -247,11 +247,8 @@
 
 <script>
   import CopReview from '@/components/Cop/CopReview'
-  import {
-    urlGetProjectList,
-    submitReviewPass,
-    getWorkAssign,
-    getAssignProjectDetail } from '@/config/interface'
+  import { submitReviewPass, getAssignProjectDetail } from '@/config/interface'
+  import { getProjectList } from '@/utils/performance'
   export default {
     data () {
       return {
@@ -290,46 +287,33 @@
         })
       },
       // 获取工时申报列表
-      getProjectList (data) {
-        const url = urlGetProjectList
+      init (params) {
         if (this.reqFlag.reqGetProjectList) {
           this.reqFlag.reqGetProjectList = false
-          let params = {
-            searchID: data.id,
-            searchMon: data.title,
-            pageNum: this.pageNum,
-            pageSize: this.pageSize,
-            searchType: 'review',
-            reviewType: data.reviewType
-          }
-          this.$http(url, params)
-            .then(res => {
-              if (res.code === 1) {
-                let data = res.data
-                let reviewTable = []
-                for (let item of data.list) {
-                  item.tableData = []
-                  if (item.reviewKValue === null) {
-                    item.reviewKValue = item.applyKValue
-                  }
-                  if (item.reviewCofficient === null) {
-                    item.reviewCofficient = item.applyCofficient
-                  }
-                  if (item.applyType === 'fact') {
-                    data.totalCount -= 1
-                    reviewTable.push(item)
-                  }
-                  item.scale = 0
-                  item.avaiableWorkTimeTmp = item.avaiableWorkTime
-                }
-                reviewTable.sort(this.compare('aplID')) // 按照项目名称排序
-                this.handleReviewTable(reviewTable) // 表格按照项目名称合并前处理
-                this.formData.workDetailTable = reviewTable
-                this.totalCount = data.totalCount
-                this.currentPage = this.pageNum
-                this.reqFlag.reqGetProjectList = true
+          getProjectList(params.id, params.title, this.pageNum, this.pageSize, 'review', params.reviewType).then(res => {
+            let reviewTable = []
+            for (let item of res.list) {
+              item.tableData = []
+              if (item.reviewKValue === null) {
+                item.reviewKValue = item.applyKValue
               }
-            })
+              if (item.reviewCofficient === null) {
+                item.reviewCofficient = item.applyCofficient
+              }
+              if (item.applyType === 'fact') {
+                res.totalCount -= 1
+                reviewTable.push(item)
+              }
+              item.scale = 0
+              item.avaiableWorkTimeTmp = item.avaiableWorkTime
+            }
+            reviewTable.sort(this.compare('aplID')) // 按照项目名称排序
+            this.handleReviewTable(reviewTable) // 表格按照项目名称合并前处理
+            this.formData.workDetailTable = reviewTable
+            this.totalCount = res.totalCount
+            this.currentPage = this.pageNum
+            this.reqFlag.reqGetProjectList = true
+          })
         }
       },
       // 审核表格合并前处理
@@ -349,33 +333,6 @@
             count = 1
             preAplID = Table[i].aplID
           }
-        }
-      },
-      // 获取工时分配详情
-      getWorkTimeAssign (row) {
-        const url = getWorkAssign
-        let params = {
-          projectID: row.id
-        }
-        if (this.reqFlag.getWorkTimeAssign) {
-          this.reqFlag.getWorkTimeAssign = false
-          this.$http(url, params)
-            .then(res => {
-              if (res.code === 1) {
-                let data = res.data
-                this.formData.totalReviewWorkTime = 0
-                for (let item of data) {
-                  if (row.reviewStatus !== 1 && item.reviewWorkTime === null) {
-                    item.reviewWorkTime = item.workTime
-                  }
-                  if (row.workTimeAssignReviewStatus === 0) {
-                    item.reviewWorkTime = item.workTime * (1 + row.scale)
-                    item.reviewWorkTime = Number(Number(item.reviewWorkTime).toFixed(1))
-                  }
-                }
-              }
-              this.reqFlag.getWorkTimeAssign = true
-            })
         }
       },
       // 审核通过
@@ -403,7 +360,7 @@
             }
             this.$http(url, params).then(res => {
               if (res.code === 1) {
-                this.getProjectList(this.info)
+                this.init(this.info)
                 this.$emit('reviewPass')
                 this.$common.toast('通过成功', 'success', false)
               } else {
@@ -431,7 +388,7 @@
         this.$http(url, params)
           .then(res => {
             if (res.code === 1) {
-              this.getProjectList(this.info)
+              this.init(this.info)
               this.$emit('reviewPass')
               this.$common.toast('驳回成功', 'success', false)
             } else {
@@ -452,7 +409,7 @@
         this.$http(url, params)
           .then(res => {
             if (res.code === 1) {
-              this.getProjectList(this.info)
+              this.init(this.info)
               this.$emit('reviewPass')
               this.$common.toast('撤回成功', 'success', false)
             }
@@ -553,7 +510,7 @@
       }
     },
     created () {
-      this.getProjectList(this.info)
+      this.init(this.info)
     },
     mounted () {
     },

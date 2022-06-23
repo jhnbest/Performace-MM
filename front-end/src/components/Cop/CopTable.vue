@@ -32,11 +32,7 @@ import { getWorkTimeAssign } from '@/utils/performance'
 export default {
   data () {
     return {
-      tableData: [],
-      reqFlag: {
-        edit: true,
-        getWorkTimeAssign: true
-      }
+      tableData: []
     }
   },
   components: {

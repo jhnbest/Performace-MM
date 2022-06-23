@@ -839,25 +839,25 @@ const performance = {
     },
     // 获取项目信息
     getProjectInfo (req, res) {
-        let data = req.body
-        $http.userVerify(req, res, () => {
-            let checkID = data.id
-            let sqlGetProjectInfo = $sql.performance.getProjectInfo
-            let sqlGetWorkAssignInfo = $sql.performance.getWorkAssignInfo
-            let sql = sqlGetProjectInfo + ';' + sqlGetWorkAssignInfo
-            let arrayParams = [checkID, checkID]
-            $http.connPool(sql, arrayParams, (err, result) => {
-                if (err) {
-                    return $http.writeJson(res, {code: -2, message: '失败'})
-                } else {
-                    let resultData = {}
-                    resultData.workTimeList = formatData(result[0])
-                    resultData.workTimeAssign = formatData(result[1])
-                    resultData.projectTypeCheck = []
-                    getFullProjectType(res, resultData.workTimeList[0].projectTypeID, resultData)
-                }
-            })
+      let data = req.body
+      $http.userVerify(req, res, () => {
+        let checkID = data.id
+        let sqlGetProjectInfo = $sql.performance.getProjectInfo
+        let sqlGetWorkAssignInfo = $sql.performance.getWorkAssignInfo
+        let sql = sqlGetProjectInfo + ';' + sqlGetWorkAssignInfo
+        let arrayParams = [checkID, checkID]
+        $http.connPool(sql, arrayParams, (err, result) => {
+          if (err) {
+            return $http.writeJson(res, {code: -2, message: '失败'})
+          } else {
+            let resultData = {}
+            resultData.workTimeList = formatData(result[0])
+            resultData.workTimeAssign = formatData(result[1])
+            resultData.projectTypeCheck = []
+            getFullProjectType(res, resultData.workTimeList[0].projectTypeID, resultData)
+          }
         })
+      })
     },
     // 改变提交状态
     changeSubmitStatus (req, res) {
