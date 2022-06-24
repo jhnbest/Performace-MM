@@ -25,12 +25,12 @@ const $http = {
     },
     // json格式
     writeJson(res, result) {
-        if(typeof result === 'undefined') {
-            res.send('err')
-        } else {
-            res.json(result);
-            // res.send('ok')
-        }
+      if(typeof result === 'undefined') {
+        res.send('err')
+      } else {
+        res.json(result);
+        // res.send('ok')
+      }
     },
     // user验证
     userVerify(req, res, cb) {
