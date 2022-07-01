@@ -82,9 +82,7 @@ const sqlMap = {
     getProjectInfo: 'select wl.*, apd.projectStageName from worktimelist wl left join assignprojectdetail apd on ' +
         'wl.apdID = apd.id where wl.id = ? and wl.obsoleteStatus != 1',
     getWorkAssignInfo: 'select * from worktimeassign where projectID = ? and obsoleteStatus != 1',
-    getFullProjectType: 'select projectParentID, projectName, workTime, dynamicKValue, ' +
-        'isConference, defaultAssignWorkTime from projecttypenew ' +
-        'where projectTypeID = ?',
+    getFullProjectType: 'select * from projecttypenew where projectTypeID = ?',
     changeSubmitStatus: 'update worktimelist set submitStatus = ? where id = ?',
     changeRejectProjectSubmitStatus: 'update worktimelist set submitStatus = ?, updateTime = ?, reviewStatus = ? where id = ?',
     deleteProject: 'update worktimelist set obsoleteStatus = 1 where id = ?',
