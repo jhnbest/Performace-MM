@@ -73,14 +73,12 @@ export default {
             }
             this.$http(url, params).then(res => {
               if (res.code === 1) {
-                let pwdRegex = new RegExp('(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[^a-zA-Z0-9]).{8,30}')
-                if (!pwdRegex.test(this.formData.password)) {
-                  alert('您的密码复杂度太低（密码中必须包含大小写字母、数字、特殊字符），请修改密码后登录！')
-                  this.showFlag.passwordEdit = true
-                  this.$nextTick(() => {
-                    this.$refs.passwordEdit.init(this.formData.name)
-                  })
-                } else {
+                let pwdRegex = new RegExp('(?=.*[0-9])(?=.*[a-z])(?=.*[^a-zA-Z0-9]).{8,30}')
+                let pwdRegex2 = new RegExp('(?=.*[0-9])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,30}')
+                let pwdRegex3 = new RegExp('(?=.*[A-Z])(?=.*[a-z])(?=.*[^a-zA-Z0-9]).{8,30}')
+                let pwdRegex4 = new RegExp('(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z]).{8,30}')
+                if (pwdRegex.test(this.formData.password) || pwdRegex2.test(this.formData.password) ||
+                   pwdRegex3.test(this.formData.password) || pwdRegex4.test(this.formData.password)) {
                   if (this.rememberUser) {
                   // 传入账号名，密码，和保存天数3个参数
                     this.setCookie(this.formData.name, this.formData.password, 7)
@@ -95,6 +93,12 @@ export default {
                   this.$router.push({
                     path: '/home/dashboard',
                     query: {}
+                  })
+                } else {
+                  alert('密码需含8位以上字符，至少3种类型组合（小写字母、大写字母、数字、符号组成），请修改密码后登录！')
+                  this.showFlag.passwordEdit = true
+                  this.$nextTick(() => {
+                    this.$refs.passwordEdit.init(this.formData.name)
                   })
                 }
               }

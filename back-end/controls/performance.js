@@ -416,26 +416,26 @@ function getFullProjectTypeOPSQL(sql, arrayParams) {
 }
 
 async function getFullProjectType(res, projectTypeID, resultData) {
-    if (projectTypeID !== 0 && projectTypeID !== 1 && projectTypeID !== 2 && projectTypeID !== 3) {
-        let sql = $sql.performance.getFullProjectType
-        let arrayParams = [projectTypeID]
-        resultData.projectTypeCheck.push(projectTypeID) // 存储项目类型结构
-        let checkResult = await getFullProjectTypeOPSQL(sql, arrayParams)
-        if (checkResult.result[0].workTime !== 0) {  // 保存最后一级项目类型
-            resultData.projectName = checkResult.result[0].projectName
-            resultData.workTime = checkResult.result[0].workTime
-            resultData.dynamicKValue = checkResult.result[0].dynamicKValue
-            resultData.isConference = checkResult.result[0].isConference
-            resultData.defaultAssignWorkTime = checkResult.result[0].defaultAssignWorkTime
-        }
-        if (checkResult.err) {
-            return $http.writeJson(res, {code: -2, message: '失败', errMsg: checkResult.err})
-        }
-        await getFullProjectType(res, checkResult.result[0].projectParentID, resultData)  // 递归查询项目类型结构
-    } else {
-        resultData.projectTypeCheck.reverse()
-        return $http.writeJson(res, {code: 1, data: resultData, message: '成功'})
+  if (projectTypeID !== 0 && projectTypeID !== 1 && projectTypeID !== 2 && projectTypeID !== 3) {
+    let sql = $sql.performance.getFullProjectType
+    let arrayParams = [projectTypeID]
+    resultData.projectTypeCheck.push(projectTypeID) // 存储项目类型结构
+    let checkResult = await getFullProjectTypeOPSQL(sql, arrayParams)
+    if (checkResult.result[0].workTime !== 0) {  // 保存最后一级项目类型
+      resultData.projectName = checkResult.result[0].projectName
+      resultData.workTime = checkResult.result[0].workTime
+      resultData.dynamicKValue = checkResult.result[0].dynamicKValue
+      resultData.isConference = checkResult.result[0].isConference
+      resultData.defaultAssignWorkTime = checkResult.result[0].defaultAssignWorkTime
     }
+    if (checkResult.err) {
+      return $http.writeJson(res, {code: -2, message: '失败', errMsg: checkResult.err})
+    }
+    await getFullProjectType(res, checkResult.result[0].projectParentID, resultData)  // 递归查询项目类型结构
+  } else {
+    resultData.projectTypeCheck.reverse()
+    return $http.writeJson(res, {code: 1, data: resultData, message: '成功'})
+  }
 }
 
 async function workTimeAssignReview(data, projectID, res) {

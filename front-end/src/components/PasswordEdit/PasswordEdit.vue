@@ -31,16 +31,19 @@
     export default {
       data () {
         // const reg = /^[0-9a-zA-Z~!·@#$%^&*()_+-= <>,.:;'"]*$/
-        const reg = /(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[^a-zA-Z0-9]).{8,30}/
+        const reg = /(?=.*[0-9])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,30}/
+        const reg2 = /(?=.*[0-9])(?=.*[a-z])(?=.*[^a-zA-Z0-9]).{8,30}/
+        const reg3 = /(?=.*[A-Z])(?=.*[a-z])(?=.*[^a-zA-Z0-9]).{8,30}/
+        const reg4 = /(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z]).{8,30}/
         let validateNewPassword = (rule, value, callback) => {
           if (!value) {
             callback(new Error('请输入内容'))
           } else if (value === this.formData.oldPassword) {
             callback(new Error('新密码不能与原密码相同!'))
-          } else if (!reg.test(value)) {
-            callback(new Error('密码长度至少8位以上，且应由大小写字母及特殊字符组合'))
-          } else {
+          } else if (reg.test(value) || reg2.test(value) || reg3.test(value) || reg4.test(value)) {
             callback()
+          } else {
+            callback(new Error('密码需含8位以上字符，至少3种类型组合（小写字母、大写字母、数字、符号组成），请修改密码后登录！'))
           }
         }
         let validateConfirmPassword = (rule, value, callback) => {
