@@ -51,8 +51,6 @@
             callback(new Error('请输入内容'))
           } else if (value !== this.formData.newPassword) {
             callback(new Error('与新密码不一致!'))
-          } else if (!reg.test(value)) {
-            callback(new Error('内容需为字母或数字或常规特殊字符'))
           } else {
             callback()
           }

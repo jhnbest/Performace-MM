@@ -141,7 +141,7 @@ const sqlMap = {
     // getMonthProcess: 'select id, aPDID, year, type, January, February, March, April, May, June, July, August, September, ' +
     //     'October, November, December from monthprocess where aPDID = ? and year = ? and obsoleteStatus != 1',
     getMonthProcess: 'select * from monthprocess where aPDID = ? and year = ? and obsoleteStatus != 1',
-    getMonthProcessV2: 'select * from monthprocess where aPDID in (?) and year in (?) and obsoleteStatus != 1',
+    getMonthProcessV2: 'select * from monthprocess where aPDID in (?) and year in (?) and obsoleteStatus != 1 and type = "fact"',
     submitPlanProcessE: 'update assignprojectdetail set kValue = ?, coefficient = ?, isFinish = ? where id = ?;' +
         'update monthprocess set January = ?, February = ?, March = ?, April = ?, May = ?, June = ?, July = ?, August = ?, ' +
         'September = ?, October = ?, November = ?, December = ? where id = ?',
