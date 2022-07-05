@@ -520,8 +520,6 @@
               tableItem.submitComments = ''
               // =======================插入需要查询的当月是否申报工时的项目阶段ID和上月进展=========================
               if (tableItem.type === 'fact' && tableItem.aPDID !== null) {
-                console.log('tableItem')
-                console.log(tableItem)
                 checkApdID.push(JSON.parse(JSON.stringify(tableItem)))
                 let preMonth = moment(curApplyMonth).subtract(1, 'months').month() + 1
                 if (preMonth === 12) { // 上个月为去年的十二月份
@@ -678,8 +676,6 @@
             let getWorkTime = (tableDataItem[this.dialogTitleMonthEN] - tableDataItem.preMonthProcess) * 0.01 * tableDataItem.baseWorkTime *
               tableDataItem.coefficient * tableDataItem.kValue
             if (getWorkTime > 0) {
-              console.log('tableDataItem')
-              console.log(tableDataItem)
               obj.projectTypeID = tableDataItem.projectStageID
               obj.defaultKValue = tableDataItem.kValue
               obj.reviewKValue = null
