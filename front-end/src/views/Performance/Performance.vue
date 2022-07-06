@@ -241,6 +241,7 @@
         },
         // 获取工时申报列表
         fillTableData () {
+          this.reqFlag.handelDateChange = false
           this.workPlanTableData = []
           this.workDetailTable = []
           getProjectList(store.state.userInfo.id, this.title, this.pageNum, this.pageSize, null, null).then(res => {
@@ -274,8 +275,9 @@
             let count = 0
             promises[count++] = this.getGroupWorkTimeList(this.$store.state.userInfo.groupID)
             promises[count++] = this.getAssignWorkTimes(result)
-            Promise.all(promises).then(() => {}).catch(err => { console.log(err) })
+            Promise.all(promises).then(() => { this.reqFlag.handelDateChange = true }).catch(err => { this.reqFlag.handelDateChange = true; console.log(err) })
           }).catch(err => {
+            this.reqFlag.handelDateChange = true
             this.$common.toast('错误', 'error', 'true')
             console.log(err)
           })
@@ -323,7 +325,6 @@
         // 申报月份变化
         handelDateChange () {
           this.setCookie(this.title, 7)
-          this.reqFlag.handelDateChange = false
           this.fillTableData(store.state.userInfo.id, this.title, this.pageNum, this.pageSize)
         },
         handleAddNew () {
