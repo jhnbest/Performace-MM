@@ -197,8 +197,7 @@
             isFresh: true
           },
           reqFlag: {
-            getAssignProjectList: true,
-            deleteProject: true
+            getAssignProjectList: true
           },
           editProject: false,
           dialogProjectName: '',
@@ -338,32 +337,6 @@
               projectName: row.projectName,
               projectID: row.id,
               process: row.process
-            }
-          })
-        },
-        // 删除按钮
-        handleDelete (row) {
-          this.$common.msgBox('confirm', '操作提示', '此操作将删除所有与该项目相关的工时申报（包括已获得工时），确定删除？', () => {
-            if (this.reqFlag.deleteProject) {
-              this.reqFlag.deleteProject = false
-              const url = deleteAssignProject
-              let params = {
-                id: row.id
-              }
-              this.$http(url, params)
-                .then(res => {
-                  if (res.code === 1) {
-                    this.$common.toast('操作成功', 'success', false)
-                  } else {
-                    this.$common.toast('操作失败', 'danger', false)
-                  }
-                  this.showFlag.isFresh = false
-                  this.init()
-                  setTimeout(() => {
-                    this.showFlag.isFresh = true
-                  }, this.$store.state.refreshInterval)
-                  this.reqFlag.deleteProject = true
-                })
             }
           })
         },

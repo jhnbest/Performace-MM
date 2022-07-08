@@ -579,33 +579,6 @@ function updateAssignProjectFilled (assignProjectID) {
     })
 }
 
-function deleteExistWorkTimeSubmit(workTimeSubmitData) {
-  let promises = []
-  let count = 0
-  return new Promise(function (resolve, reject) {
-    for (let workTimeSubmitDataItem of workTimeSubmitData) {
-      if (workTimeSubmitDataItem.isApplyWorkTime > 0) {
-        for (let workTimeSubmitDataItemID of workTimeSubmitDataItem.id) {
-          let sqlDeleteProject = $sql.performance.deleteProject
-          let deleteWorkTimeAssign = $sql.performance.deleteWorkTimeAssign
-          let arrayParams = [workTimeSubmitDataItemID, workTimeSubmitDataItemID]
-          let sql = sqlDeleteProject + ';' + deleteWorkTimeAssign
-          promises[count++] = RCPDDatabase(sql, arrayParams)
-        }
-      }
-    }
-    if (count > 0) {
-      Promise.all(promises).then(result => {
-        resolve(result)
-      }).catch(error => {
-        reject(new Error(error))
-      })
-    } else {
-      resolve()
-    }
-  })
-}
-
 const performance = {
     // 加周报 start
     add (req, res) {
@@ -635,50 +608,50 @@ const performance = {
         let sql = ''
         let arrayParams = []
         if (params.queryType === 1) {
-            sql = $sql.performance.selectWorkTypeList
+          sql = $sql.performance.selectWorkTypeList
         }
         else if (params.queryType === 2) {
-            sql = $sql.performance.selectSubWorkType1List
+          sql = $sql.performance.selectSubWorkType1List
         }
         else if (params.queryType === 3) {
-            sql = $sql.performance.selectSubWorkType2List
+          sql = $sql.performance.selectSubWorkType2List
         }
         else if (params.queryType === 4) {
-            sql = $sql.performance.selectSubWorkType3List
+          sql = $sql.performance.selectSubWorkType3List
         }
         $http.userVerify(req, res, () => {
-            let pageNum = params.pageNum
-            let pageSize = !params.pageSize ? 10 : params.pageSize
-            if(!pageNum) {
-                $http.writeJson(res, {code: 2, message:'参数有误'})
-            } else {
-                // 分页查询入参 start
-                let limitFirst = (pageNum-1)*pageSize;
-                let limitLast = pageSize;
-                // 分页查询入参 end
-                sql += " order by id limit ?,?"; // id倒序排
-                if (params.queryType === 1) {
-                    arrayParams = [limitFirst, limitLast]
-                }
-                else if (params.queryType === 2) {        // 申报子类型1
-                    arrayParams = [params.workTypeLabel, limitFirst, limitLast]
-                }
-                else if (params.queryType === 3) {        // 申报子类型2
-                    arrayParams = [params.subWorkTypeL1abel, limitFirst, limitLast]
-                }
-                else if (params.queryType === 4) {        // 申报子类型3
-                    arrayParams = [params.subWorkTypeL1abel, params.subWorkTypeL2abel, limitFirst, limitLast]
-                }
-                $http.connPool(sql, arrayParams, (err, result) => {
-                    if(err) {
-                        return $http.writeJson(res, {code:-2, message:'失败'})
-                    } else {
-                        let resultData = {}
-                        resultData.list = result
-                        return $http.writeJson(res, {code: 1, data: resultData, message: '获取列表成功'})
-                    }
-                })
+          let pageNum = params.pageNum
+          let pageSize = !params.pageSize ? 10 : params.pageSize
+          if(!pageNum) {
+              $http.writeJson(res, {code: 2, message:'参数有误'})
+          } else {
+            // 分页查询入参 start
+            let limitFirst = (pageNum-1)*pageSize;
+            let limitLast = pageSize;
+            // 分页查询入参 end
+            sql += " order by id limit ?,?"; // id倒序排
+            if (params.queryType === 1) {
+                arrayParams = [limitFirst, limitLast]
             }
+            else if (params.queryType === 2) {        // 申报子类型1
+                arrayParams = [params.workTypeLabel, limitFirst, limitLast]
+            }
+            else if (params.queryType === 3) {        // 申报子类型2
+                arrayParams = [params.subWorkTypeL1abel, limitFirst, limitLast]
+            }
+            else if (params.queryType === 4) {        // 申报子类型3
+                arrayParams = [params.subWorkTypeL1abel, params.subWorkTypeL2abel, limitFirst, limitLast]
+            }
+            $http.connPool(sql, arrayParams, (err, result) => {
+                if(err) {
+                    return $http.writeJson(res, {code:-2, message:'失败'})
+                } else {
+                    let resultData = {}
+                    resultData.list = result
+                    return $http.writeJson(res, {code: 1, data: resultData, message: '获取列表成功'})
+                }
+            })
+          }
         })
     },
     // 计算工时数
@@ -880,20 +853,18 @@ const performance = {
             })
         })
     },
-    // 删除项目
-    deleteProject (req, res) {
+    // 删除申报的工时
+    deleteWorkTimeSubmit (req, res) {
       $http.userVerify(req, res, () => {
         let data = req.body
-        let sqlDeleteProject = $sql.performance.deleteProject
+        let sqlDeleteProject = $sql.performance.deleteWorkTimeSubmit
         let deleteWorkTimeAssign = $sql.performance.deleteWorkTimeAssign
         let arrayParams = [data.id, data.id]
         let sql = sqlDeleteProject + ';' + deleteWorkTimeAssign
-        $http.connPool(sql, arrayParams, (err, result) => {
-          if (err) {
-            return $http.writeJson(res, {code: -2, message: '失败'})
-          } else {
-            return $http.writeJson(res, {code: 1, message: '删除成功'})
-          }
+        RCPDDatabase(sql, arrayParams).then(result => {
+          return $http.writeJson(res, {code: 1, data: result, message: '删除成功'})
+        }).catch(err => {
+          return $http.writeJson(res, {code: -2, err: err, message: '失败'})
         })
       })
     },

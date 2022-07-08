@@ -14,8 +14,6 @@ const sqlMap = {
     updateInfo: 'update user set name = ?, password = ?, email = ?, update_time = ? where id = ? and type != 1 and status != 0',
     // 更改用户状态
     updateState: 'update user set status = ?, update_time = ? where id = ? and type != 1 and state != 0',
-    // 获取用户信息
-    getDetail: 'select * from user where id = ? and status != 0',
     // 查询周报列表条数
     selectTotal: 'select count(*) as totalCount from user where status != 0',
     // 用户列表
@@ -85,7 +83,7 @@ const sqlMap = {
     getFullProjectType: 'select * from projecttypenew where projectTypeID = ?',
     changeSubmitStatus: 'update worktimelist set submitStatus = ? where id = ?',
     changeRejectProjectSubmitStatus: 'update worktimelist set submitStatus = ?, updateTime = ?, reviewStatus = ? where id = ?',
-    deleteProject: 'update worktimelist set obsoleteStatus = 1 where id = ?',
+    deleteWorkTimeSubmit: 'update worktimelist set obsoleteStatus = 1 where id = ?',
     deleteWorkTimeAssign: 'update worktimeassign set obsoleteStatus = 1 where projectID = ?',
     getReviewStatus: 'select reviewStatus from worktimelist where id = ? and obsoleteStatus != 1',
     submitReviewPass: 'update worktimelist set reviewKValue = ?, reviewCofficient = ?, reviewStatus = ?, reviewTime = ?, reviewComments = ?, ' +

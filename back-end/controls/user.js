@@ -5,10 +5,13 @@ const $time = require('../utils/time')
 const jwt = require('jwt-simple')
 const express = require('express')
 const app = express()
+const $common = require('../utils/common')
 app.set('jwtTokenSecret', 'YOUR_SECRET_STRING')
 
 function formatData(rows) {
   return rows.map(row => {
+    console.log('row')
+    console.log(row)
     if(row.create_time) {
       row.create_time = $time.formatTime(row.create_time)
     }
@@ -77,19 +80,18 @@ const user = {
     let password = params.password
     let sql = $sql.user.login
     let arrayParams = [name, password]
-
-    $http.connPool(sql, arrayParams, (err, result) => {
-      if(err) {
-        return $http.writeJson(res, {code:-2, message:'失败',errMsg: err})
-      }
-      else if (!result.length) {
+    console.log('params')
+    console.log(params)
+    $common.RCPDDatabase(sql, arrayParams).then(result => {
+      if (!result.length) {
         return $http.writeJson(res, {code: 2, message:'用户或密码不正确'})
-      }
-      else {
+      } else {
+        console.log('result')
+        console.log(result)
         let resultData = {}
         resultData.code = 1
-        let data = result
-        data = formatData(data)
+        let data = formatData(result)
+        console.log('data')
         console.log(data)
         //data.create_time = $time.formatTime(data.create_time)
         //if(data.type > 1) data.role = '普通用户'
@@ -106,6 +108,8 @@ const user = {
         resultData.msg = '登录成功'
         return $http.writeJson(res, resultData)
       }
+    }).catch(err => {
+      return $http.writeJson(res, {code:-2, message:'失败',errMsg: err})
     })
   },
   /* 用户登录 end */
@@ -198,35 +202,6 @@ const user = {
     })
   },
   /*更新用户状态 end*/
-
-  /*获取用户信息 start*/
-  detail (req, res) {
-    let params = req.body
-    $http.userVerify(req, res, () => {
-      let userId = params.userId
-      let id = params.id
-      if(!id) {
-        $http.writeJson(res, {code: 2, message:'参数有误'})
-      } else {
-        let sql = $sql.user.getDetail
-        let arrayParams = [id]
-        $http.connPool(sql, arrayParams, (err, result) => {
-          if(err) {return $http.writeJson(res, {code:-2, message:'失败',errMsg: err})}
-          if(result.length != 1) {
-            return $http.writeJson(res, {code: 2, message:'获取用户信息不存在'})
-          } else {
-            let resultData = formatData(result)[0]
-            /*if((userId == 1 && userId == id) || userId!=1){
-              delete resultData.password
-            }*/
-            /*delete resultData.password*/
-            return $http.writeJson(res, {code: 1, data: resultData, message: '获取用户信息成功'})
-          }
-        })
-      }
-    })
-  },
-  /*获取用户信息 end*/
 
   /*获取用户列表 start*/
   list (req, res) {

@@ -22,8 +22,6 @@ router.post(api.userLogout, user.logout);
 router.post(api.userAdd, user.add);
 router.post(api.userUpdateInfo, user.updateInfo);
 router.post(api.userUpdateState, user.updateState);
-router.post(api.userDetail, user.detail);
-router.post(api.userList, user.list);
 router.post(api.usersList, user.listTest);
 router.post(api.getUsersList, user.getUsersList);
 router.post(api.getGroupUserName, user.getGroupUserName);
@@ -42,7 +40,7 @@ router.post(api.getProjectList, performance.getProjectList)
 router.post(api.getWorkAssign, performance.getWorkAssign)
 router.post(api.getProjectInfo, performance.getProjectInfo)
 router.post(api.changeSubmitStatus, performance.changeSubmitStatus)
-router.post(api.deleteProject, performance.deleteProject)
+router.post(api.deleteWorkTimeSubmit, performance.deleteWorkTimeSubmit)
 router.post(api.updateWorkTimeAssignReview, performance.updateWorkTimeAssignReview)
 router.post(api.getUnReviewProjectCount, performance.getUnReviewProjectCount)
 router.post(api.submitReviewPass, performance.submitReviewPass)

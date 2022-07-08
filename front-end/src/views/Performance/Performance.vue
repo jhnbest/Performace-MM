@@ -149,8 +149,8 @@
 <script>
     import Cop from '@/components/Cop/Cop'
     import CountTo from 'vue-count-to'
-    import { changeSubmitStatus, deleteProject, getAssignWorkTime, getGroupWorkTimeList, urlGetIsSubmitAllow } from '@/config/interface'
-    import { getProjectList } from '@/utils/performance'
+    import { changeSubmitStatus, ulrDeleteWorkTimeSubmit, getAssignWorkTime, getGroupWorkTimeList, urlGetIsSubmitAllow } from '@/config/interface'
+    import { getProjectList, deleteWorkTimeSubmit } from '@/utils/performance'
     import store from '@/store'
     export default {
       data () {
@@ -383,22 +383,17 @@
           this.$common.msgBox('confirm', '操作提示', '确定删除？', () => {
             if (this.reqFlag.deleteProject) {
               this.reqFlag.deleteProject = false
-              const url = deleteProject
               this.workDetailTable.splice(index, 1)
               this.workDetailTable.sort(this.compare('aplID'))
               this.handleTable(this.workDetailTable)
-              let params = {
-                id: row.id
-              }
-              this.$http(url, params)
-                .then(res => {
-                  if (res.code === 1) {
-                    this.$common.toast('操作成功', 'success', false)
-                  } else {
-                    this.$common.toast('操作失败', 'danger', false)
-                  }
-                  this.reqFlag.deleteProject = true
-                })
+              deleteWorkTimeSubmit(row.id).then(res => {
+                this.$common.toast('操作成功', 'success', false)
+                this.reqFlag.deleteProject = true
+              }).catch(err => {
+                console.log(err)
+                this.reqFlag.deleteProject = true
+                this.$common.toast('操作失败', 'danger', false)
+              })
             }
           })
         },

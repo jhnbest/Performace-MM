@@ -3,19 +3,6 @@ const $http = require('../sql/http')
 const $time = require('../utils/time')
 const res = require('express/lib/response')
 
-function RCPDDatabase(sql, arrayParams) {
-    return new Promise(function (resolve, reject) {
-        $http.connPool(sql, arrayParams, (err, result) => {
-            if (err) {
-                reject(err)
-            } else {
-                result = JSON.parse(JSON.stringify(result))
-                resolve(result)
-            }
-        })
-    })
-}
-
 const common = {
     // 根据时间获取某个类型数据的全局标志位
     getTypeGlobalFlag(req, res) {

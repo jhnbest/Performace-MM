@@ -14,8 +14,6 @@ module.exports = {
     userAdd: path + '/user/add', // 新增用户
     userUpdateInfo: path + '/user/updateInfo', // 更新用户信息
     userUpdateState: path + '/user/updateState', // 更新用户状态
-    userDetail: path + '/user/detail', // 获取用户详情
-    userList: path + '/user/list', // 获取用户列表
     usersList: path + '/user/listTest',
     getUsersList: path + '/user/getUsersList', //获取用户姓名
     getGroupUserName: path + '/user/getGroupUserName', // 获取组员信息
@@ -34,7 +32,7 @@ module.exports = {
     getWorkAssign: path + '/performance/getWorkAssign', // 获取工时分配信息
     getProjectInfo: path + '/performance/getProjectInfo', //获取项目信息
     changeSubmitStatus: path + '/performance/changeSubmitStatus', //改变提交状态
-    deleteProject: path + '/performance/deleteProject', // 删除项目
+    deleteWorkTimeSubmit: path + '/performance/deleteWorkTimeSubmit', // 删除项目
     updateWorkTimeAssignReview: path + '/performance/updateWorkTimeAssignReview', // 提交工时分配审核结果
     getUnReviewProjectCount: path + '/performance/getUnReviewProjectCount', // 获取待审数量
     submitReviewPass: path + '/performance/submitReviewPass', // 审核通过,

@@ -6,7 +6,7 @@ import {
     urlUpdatePMData,
     urlGetPMData,
     urlGetWorkAssign,
-    ulrDeleteProject,
+    urlDeleteWorkTimeSubmit,
     urlGetProjectType,
     urlWorkTimeSubmit,
     urlWorkTimeTemporary,
@@ -541,7 +541,7 @@ export function getWorkTimeAssign (projectID, searchType) {
 
 // 删除工时申报
 export function deleteWorkTimeSubmit (id) {
-  const url = ulrDeleteProject
+  const url = urlDeleteWorkTimeSubmit
   let params = {
     id: id
   }

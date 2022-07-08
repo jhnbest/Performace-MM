@@ -37,9 +37,9 @@ const $http = {
       let params = req.body
       let userId = params.userId
       let resultData = {}
-      let token=req.headers.token //获取前端请求头发送过来的token
+      let token = req.headers.token //获取前端请求头发送过来的token
       let decoded = jwt.decode(token, app.get('jwtTokenSecret'))
-      if (!userId || decoded.iss!=userId) {
+      if (!userId || decoded.iss != userId) {
         resultData = {
           code: 2,
           message: 'userId有误'
