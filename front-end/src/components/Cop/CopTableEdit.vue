@@ -137,7 +137,8 @@ export default {
         let organizer = this.tableData.splice(organizerIndex, 1)
         this.tableData.unshift(organizer[0])
       })
-      getUsersList().then(users => {
+      let checkGroupID = 0
+      getUsersList(checkGroupID).then(users => {
         this.usersList = users
         this.usersList.splice(this.usersList.findIndex(item => { return item.duty === 1 }), 1)
         this.userListOptions[1].options = JSON.parse(JSON.stringify(this.usersList))

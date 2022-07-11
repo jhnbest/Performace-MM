@@ -4,20 +4,22 @@ import {
 } from '@/config/interface'
 
 // 获取用户列表
-export function getUsersList () {
-    const url = urlGetUsersList
-    let params = {}
-    return new Promise(function (resolve, reject) {
-        http(url, params).then(res => {
-            if (res.code === 1) {
-                resolve(res.data.list)
-            } else {
-                reject(new Error(res.code))
-            }
-        }).catch(err => {
-            reject(err)
-        })
+export function getUsersList (checkGroupID) {
+  const url = urlGetUsersList
+  let params = {
+    checkGroupID: checkGroupID
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(res => {
+      if (res.code === 1) {
+        resolve(res.data.list)
+      } else {
+        reject(new Error(res.code))
+      }
+    }).catch(err => {
+      reject(err)
     })
+  })
 }
 
 // 组别代码文字转换

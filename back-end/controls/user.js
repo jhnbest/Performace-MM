@@ -10,8 +10,6 @@ app.set('jwtTokenSecret', 'YOUR_SECRET_STRING')
 
 function formatData(rows) {
   return rows.map(row => {
-    console.log('row')
-    console.log(row)
     if(row.create_time) {
       row.create_time = $time.formatTime(row.create_time)
     }
@@ -80,19 +78,13 @@ const user = {
     let password = params.password
     let sql = $sql.user.login
     let arrayParams = [name, password]
-    console.log('params')
-    console.log(params)
     $common.RCPDDatabase(sql, arrayParams).then(result => {
       if (!result.length) {
         return $http.writeJson(res, {code: 2, message:'用户或密码不正确'})
       } else {
-        console.log('result')
-        console.log(result)
         let resultData = {}
         resultData.code = 1
         let data = formatData(result)
-        console.log('data')
-        console.log(data)
         //data.create_time = $time.formatTime(data.create_time)
         //if(data.type > 1) data.role = '普通用户'
         //data.role = '管理员'
@@ -308,8 +300,9 @@ const user = {
   },
   /* 获取用户信息 */
   getUsersList (req, res) {
-    let sql = $sql.user.selectUsersList
-    let arrayParams = []
+    let sendData = req.body
+    let sql = sendData.checkGroupID === 0 ? $sql.user.selectUsersList1 : $sql.user.selectUsersList2
+    let arrayParams = sendData.checkGroupID === 0 ? [] : [sendData.checkGroupID]
     $http.userVerify(req, res, () => {
       $http.connPool(sql, arrayParams, (err, result) => {
         if(err) {

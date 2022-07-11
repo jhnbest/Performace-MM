@@ -50,6 +50,7 @@
 
 <script>
   import { urlGetUsersList, getAllUserRates } from '@/config/interface'
+  import { getUsersList } from '@/utils/users'
   export default {
     data () {
       return {
@@ -57,7 +58,6 @@
           title: this.$moment().format('YYYY-MM')
         },
         reqFlag: {
-          getUsersList: true,
           getAllUserRates: true
         },
         tableData: [],
@@ -78,7 +78,8 @@
       // 初始化
       init () {
         this.getCookie()
-        this.getUsersList().then(res1 => {
+        let checkGroupID = 0
+        getUsersList(checkGroupID).then(res1 => {
           this.usersList = res1
           this.getAllUserRates(res1).then((res2) => {
             let mutualRatesRankResult = this.calMutualRatesRank(res2)
@@ -377,24 +378,6 @@
           manageRate: manageRate
         }
         return obj
-      },
-      // 获取用户列表
-      getUsersList () {
-        const url = urlGetUsersList
-        let params = {}
-        let _this = this
-        if (this.reqFlag.getUsersList) {
-          this.reqFlag.getUsersList = false
-          return new Promise(function (resolve, reject) {
-            _this.$http(url, params)
-              .then(res => {
-                if (res.code === 1) {
-                  resolve(res.data.list)
-                }
-                _this.reqFlag.getUsersList = true
-              })
-          })
-        }
       },
       // 月份变化
       handelDateChange () {

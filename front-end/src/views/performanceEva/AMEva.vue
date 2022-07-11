@@ -335,7 +335,8 @@ export default {
       }
       this.title = Cookies.get('cookieAMEvaPageDate')
       this.getDataLoading = false
-      getUsersList().then(usersList => {
+      let checkGroupID = 0
+      getUsersList(checkGroupID).then(usersList => {
         for (let user of usersList) {
           if (user.groupName === '技术标准组' || user.groupName === '工程组') {
             this.standAndEngineerGroup.push(user)

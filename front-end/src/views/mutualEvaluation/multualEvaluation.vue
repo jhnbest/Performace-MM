@@ -481,7 +481,8 @@
         this.getCurApplyAbleMonth().then(getCurApplyAbleMonthRes => {
           this.formData.title = this.$moment(getCurApplyAbleMonthRes[0].setTime).format('YYYY-MM')
         })
-        getUsersList().then(userList => {
+        let checkGroupID = 0
+        getUsersList(checkGroupID).then(userList => {
           this.users = userList
           this.initData(userList)
         })

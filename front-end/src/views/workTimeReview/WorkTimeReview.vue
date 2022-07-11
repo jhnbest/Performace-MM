@@ -9,7 +9,6 @@
           format="yyyy 第 MM 月"
           value-format="yyyy-MM"
           placeholder="选择月"
-          :picker-options="pickerOptions"
           style="width: 150px"
           @change="handelDateChange">
         </el-date-picker>
@@ -60,40 +59,114 @@
 
 <script>
   import ReviewedPerson from './childViews/ReviewedPerson'
-  import { urlGetGroupUserName, getUnReviewProjectCount } from '@/config/interface'
-    export default {
-      data () {
-        return {
-          formData: {
-            title: this.$moment().format('YYYY-MM'),
-            reviewPerson: '',
-            reviewType: 'unReview',
-            refreshTabs: true,
-            selectType: '待审'
-          },
-          pickerOptions: {
-            // disabledDate (time) {
-            //   return time.getTime() > Date.now()
-            // }
-          },
-          reqFlag: {
-            getGroupUsers: true,
-            getUnReviewProjectCount: true,
-            getReviewedProjectCount: true
-          },
-          groupUsers: []
-        }
+  import { getSubmitWorkTimeCount } from '@/utils/performance'
+  import { getUsersList } from '@/utils/users'
+  export default {
+    data () {
+      return {
+        formData: {
+          title: this.$moment().format('YYYY-MM'),
+          reviewPerson: '',
+          reviewType: 'unReview',
+          refreshTabs: true,
+          selectType: '待审'
+        },
+        reqFlag: {
+          getGroupUsers: true,
+          getUnReviewProjectCount: true,
+          getReviewedProjectCount: true
+        },
+        groupUsers: [],
+        groupUserList: []
+      }
+    },
+    methods: {
+      // 初始化
+      init () {
+        this.getCookie()
+        let checkGroupID = this.$store.state.userInfo.groupID
+        checkGroupID = this.$store.state.userInfo.role === '管理员' ? 0 : checkGroupID
+        let start = new Date()
+        getUsersList(checkGroupID).then(res => {
+          this.groupUserList = res
+          getSubmitWorkTimeCount(this.groupUserList, this.formData.title).then(result => {
+            console.log('耗时： ' + String(new Date() - start) + 'ms')
+            this.groupUsers = result
+            for (let item of this.groupUsers) {
+              if (item.unReviewProjectCount !== 0) {
+                this.formData.reviewPerson = String(item.id)
+                break
+              }
+            }
+          })
+        })
       },
-      methods: {
-        // 初始化
-        init () {
-          if (this.$store.state.userInfo.role === '组长' || this.$store.state.userInfo.role === '管理员') {
-            this.getCookie()
+      handelDateChange () {
+        if (this.$store.state.userInfo.role === '组长' || this.$store.state.userInfo.role === '管理员') {
+          this.setCookie(this.formData.title, 7)
+          if (this.formData.reviewType === 'reviewed') {
             this.getGroupUsers().then(res => {
-              this.getUnReviewProjectCount(res).then(res => {
+              this.getReviewedProjectCount(res).then(res => {
                 this.groupUsers = res
                 for (let item of this.groupUsers) {
-                  if (item.unReviewProjectCount !== 0) {
+                  if (item.reviewedProjectCount !== 0) {
+                    this.formData.reviewPerson = String(item.id)
+                    break
+                  }
+                }
+                this.formData.refreshTabs = false
+                setTimeout(() => {
+                  this.formData.refreshTabs = true
+                }, this.$store.state.refreshInterval)
+              })
+            })
+          } else if (this.formData.reviewType === 'unReview') {
+            this.init()
+            this.formData.refreshTabs = false
+            setTimeout(() => {
+              this.formData.refreshTabs = true
+            }, this.$store.state.refreshInterval)
+          }
+        }
+      },
+      handleUnReview () {
+        this.formData.reviewType = 'unReview'
+        this.init()
+        this.formData.refreshTabs = false
+        setTimeout(() => {
+          this.formData.refreshTabs = true
+        }, this.$store.state.refreshInterval)
+      },
+      handleReviewed () {
+        this.formData.reviewType = 'reviewed'
+        if (this.$store.state.userInfo.role === '组长' || this.$store.state.userInfo.role === '管理员') {
+          this.getGroupUsers().then(res => {
+            this.getReviewedProjectCount(res).then(res => {
+              this.groupUsers = res
+            })
+          })
+        }
+        this.formData.refreshTabs = false
+        setTimeout(() => {
+          this.formData.refreshTabs = true
+        }, this.$store.state.refreshInterval)
+      },
+      // 子组件回调
+      handleReviewPass () {
+        this.getUnReviewProjectCount(this.groupUsers).then(res => {
+          this.groupUsers = res
+        })
+      },
+      // 审核类别标签切换事件
+      handleSelectTypeChange (params) {
+        if (params === '已审') {
+          this.formData.reviewType = 'reviewed'
+          if (this.$store.state.userInfo.role === '组长' || this.$store.state.userInfo.role === '管理员') {
+            this.getGroupUsers().then(res => {
+              this.getReviewedProjectCount(res).then(res => {
+                this.groupUsers = res
+                for (let item of this.groupUsers) {
+                  if (item.reviewedProjectCount !== 0) {
                     this.formData.reviewPerson = String(item.id)
                     break
                   }
@@ -101,238 +174,99 @@
               })
             })
           }
-        },
-        // 获取小组成员信息
-        getGroupUsers () {
-          let it = this
-          return new Promise(function (resolve, reject) {
-            if (it.reqFlag.getGroupUsers) {
-              it.reqFlag.getGroupUsers = false
-              const url = urlGetGroupUserName
-              let params = {
-                role: it.$store.state.userInfo.role,
-                groupName: it.$options.filters['groupNameFilters'](it.$store.state.userInfo.groupName)
-              }
-              it.$http(url, params)
-                .then(res => {
-                  if (res.code === 1) {
-                    let data = res.data
-                    resolve(data)
-                  }
-                  it.reqFlag.getGroupUsers = true
-                })
-            }
-          })
-        },
-        getUnReviewProjectCount (data) {
-          let it = this
-          return new Promise(function (resolve, reject) {
-            if (it.reqFlag.getUnReviewProjectCount) {
-              it.reqFlag.getUnReviewProjectCount = false
-              const url = getUnReviewProjectCount
-              let params = {
-                searchPerson: data,
-                applyMonth: it.formData.title,
-                type: 'unReview'
-              }
-              it.$http(url, params)
-                .then(res => {
-                  if (res.code === 1) {
-                    let data = res.data
-                    resolve(data)
-                  }
-                  it.reqFlag.getUnReviewProjectCount = true
-                })
-            }
-          })
-        },
-        getReviewedProjectCount (data) {
-          let it = this
-          return new Promise(function (resolve, reject) {
-            if (it.reqFlag.getReviewedProjectCount) {
-              it.reqFlag.getReviewedProjectCount = false
-              const url = getUnReviewProjectCount
-              let params = {
-                searchPerson: data,
-                applyMonth: it.formData.title,
-                type: 'reviewed'
-              }
-              it.$http(url, params)
-                .then(res => {
-                  if (res.code === 1) {
-                    let data = res.data
-                    resolve(data)
-                  }
-                  it.reqFlag.getReviewedProjectCount = true
-                })
-            }
-          })
-        },
-        handelDateChange () {
-          if (this.$store.state.userInfo.role === '组长' || this.$store.state.userInfo.role === '管理员') {
-            this.setCookie(this.formData.title, 7)
-            if (this.formData.reviewType === 'reviewed') {
-              this.getGroupUsers().then(res => {
-                this.getReviewedProjectCount(res).then(res => {
-                  this.groupUsers = res
-                  for (let item of this.groupUsers) {
-                    if (item.reviewedProjectCount !== 0) {
-                      this.formData.reviewPerson = String(item.id)
-                      break
-                    }
-                  }
-                  this.formData.refreshTabs = false
-                  setTimeout(() => {
-                    this.formData.refreshTabs = true
-                  }, this.$store.state.refreshInterval)
-                })
-              })
-            } else if (this.formData.reviewType === 'unReview') {
-              this.init()
-              this.formData.refreshTabs = false
-              setTimeout(() => {
-                this.formData.refreshTabs = true
-              }, this.$store.state.refreshInterval)
-            }
-          }
-        },
-        handleUnReview () {
+          this.formData.refreshTabs = false
+          setTimeout(() => {
+            this.formData.refreshTabs = true
+          }, this.$store.state.refreshInterval)
+        } else if (params === '待审') {
           this.formData.reviewType = 'unReview'
           this.init()
           this.formData.refreshTabs = false
           setTimeout(() => {
             this.formData.refreshTabs = true
           }, this.$store.state.refreshInterval)
-        },
-        handleReviewed () {
-          this.formData.reviewType = 'reviewed'
-          if (this.$store.state.userInfo.role === '组长' || this.$store.state.userInfo.role === '管理员') {
-            this.getGroupUsers().then(res => {
-              this.getReviewedProjectCount(res).then(res => {
-                this.groupUsers = res
-              })
-            })
-          }
-          this.formData.refreshTabs = false
-          setTimeout(() => {
-            this.formData.refreshTabs = true
-          }, this.$store.state.refreshInterval)
-        },
-        // 子组件回调
-        handleReviewPass () {
-          this.getUnReviewProjectCount(this.groupUsers).then(res => {
-            this.groupUsers = res
-          })
-        },
-        handleSelectTypeChange (params) {
-          if (params === '已审') {
-            this.formData.reviewType = 'reviewed'
-            if (this.$store.state.userInfo.role === '组长' || this.$store.state.userInfo.role === '管理员') {
-              this.getGroupUsers().then(res => {
-                this.getReviewedProjectCount(res).then(res => {
-                  this.groupUsers = res
-                  for (let item of this.groupUsers) {
-                    if (item.reviewedProjectCount !== 0) {
-                      this.formData.reviewPerson = String(item.id)
-                      break
-                    }
-                  }
-                })
-              })
-            }
-            this.formData.refreshTabs = false
-            setTimeout(() => {
-              this.formData.refreshTabs = true
-            }, this.$store.state.refreshInterval)
-          } else if (params === '待审') {
-            this.formData.reviewType = 'unReview'
-            this.init()
-            this.formData.refreshTabs = false
-            setTimeout(() => {
-              this.formData.refreshTabs = true
-            }, this.$store.state.refreshInterval)
-          }
-        },
-        // 设置cookie
-        setCookie (month, exdays) {
-          let exdate = new Date() // 获取时间
-          exdate.setTime(exdate.getTime() + 24 * 60 * 60 * 1000 * exdays) // 保存的天数
-          // 字符串拼接cookie
-          window.document.cookie = 'RMon' + '=' + month + ';path=/;expires=' + exdate.toGMTString()
-        },
-        // 读取cookie
-        getCookie: function () {
-          if (document.cookie.length > 0) {
-            let arr = document.cookie.split('; ') // 这里显示的格式需要切割一下自己可输出看下
-            for (let i = 0; i < arr.length; i++) {
-              let arr2 = arr[i].split('=') // 再次切割
-              // 判断查找相对应的值
-              if (arr2[0] === 'RMon') {
-                this.formData.title = arr2[1] // 保存到保存数据的地方
-              }
-            }
-          }
-        },
-        // 上一月
-        handlePreMonth () {
-          this.formData.title = this.$moment(this.formData.title).subtract(1, 'months').format('YYYY-MM')
-          this.handelDateChange()
-        },
-        // 下一月
-        handleNextMonth () {
-          this.formData.title = this.$moment(this.formData.title).add(1, 'months').format('YYYY-MM')
-          this.handelDateChange()
         }
       },
-      computed: {
-        unReviewProjectCount () {
-          let totalNum = 0
-          for (let item of this.groupUsers) {
-            totalNum += item.unReviewProjectCount
-          }
-          return totalNum
-        },
-        reviewedProjectCount () {
-          let totalNum = 0
-          for (let item of this.groupUsers) {
-            totalNum += item.reviewedProjectCount
-          }
-          return totalNum
-        },
-        isShowCount () {
-          return function (groupUser) {
-            if (this.formData.reviewType === 'unReview') {
-              return groupUser.unReviewProjectCount !== 0
-            } else if (this.formData.reviewType === 'reviewed') {
-              return groupUser.reviewedProjectCount !== 0
+      // 设置cookie
+      setCookie (month, exdays) {
+        let exdate = new Date() // 获取时间
+        exdate.setTime(exdate.getTime() + 24 * 60 * 60 * 1000 * exdays) // 保存的天数
+        // 字符串拼接cookie
+        window.document.cookie = 'RMon' + '=' + month + ';path=/;expires=' + exdate.toGMTString()
+      },
+      // 读取cookie
+      getCookie: function () {
+        if (document.cookie.length > 0) {
+          let arr = document.cookie.split('; ') // 这里显示的格式需要切割一下自己可输出看下
+          for (let i = 0; i < arr.length; i++) {
+            let arr2 = arr[i].split('=') // 再次切割
+            // 判断查找相对应的值
+            if (arr2[0] === 'RMon') {
+              this.formData.title = arr2[1] // 保存到保存数据的地方
             }
           }
         }
       },
-      components: {
-        ReviewedPerson
+      // 上一月
+      handlePreMonth () {
+        this.formData.title = this.$moment(this.formData.title).subtract(1, 'months').format('YYYY-MM')
+        this.handelDateChange()
       },
-      created () {
-        this.init()
+      // 下一月
+      handleNextMonth () {
+        this.formData.title = this.$moment(this.formData.title).add(1, 'months').format('YYYY-MM')
+        this.handelDateChange()
+      }
+    },
+    computed: {
+      unReviewProjectCount () {
+        let totalNum = 0
+        for (let item of this.groupUsers) {
+          totalNum += item.unReviewProjectCount
+        }
+        return totalNum
       },
-      filters: {
-        groupNameFilters (groupName) {
-          switch (groupName) {
-            case '技术标准组':
-              return 1
-            case '工程组':
-              return 2
-            case '通信组':
-              return 3
-            case '处经理':
-              return 4
-            default:
-              return -1
+      reviewedProjectCount () {
+        let totalNum = 0
+        for (let item of this.groupUsers) {
+          totalNum += item.reviewedProjectCount
+        }
+        return totalNum
+      },
+      isShowCount () {
+        return function (groupUser) {
+          if (this.formData.reviewType === 'unReview') {
+            return groupUser.unReviewProjectCount !== 0
+          } else if (this.formData.reviewType === 'reviewed') {
+            return groupUser.reviewedProjectCount !== 0
           }
         }
-      },
-      name: 'workTimeReview'
-    }
+      }
+    },
+    components: {
+      ReviewedPerson
+    },
+    created () {
+      this.init()
+    },
+    filters: {
+      groupNameFilters (groupName) {
+        switch (groupName) {
+          case '技术标准组':
+            return 1
+          case '工程组':
+            return 2
+          case '通信组':
+            return 3
+          case '处经理':
+            return 4
+          default:
+            return -1
+        }
+      }
+    },
+    name: 'workTimeReview'
+  }
 </script>
 
 <style scoped>

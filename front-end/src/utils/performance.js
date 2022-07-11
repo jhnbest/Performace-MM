@@ -10,7 +10,9 @@ import {
     urlGetProjectType,
     urlWorkTimeSubmit,
     urlWorkTimeTemporary,
-    urlGetProjectList
+    urlGetProjectList,
+    urlChangeSubmitStatus,
+    urlGetSubmitWorkTimeCount
 } from '../config/interface'
 import { getUsersList } from '@/utils/users'
 import { getPerformanceIsPublish,
@@ -339,12 +341,13 @@ export function calPMData (applyDate) {
   let count0 = 0
   let promises = []
   let count = 0
+  let checkGroupID = 0
   return new Promise(function (resolve, reject) {
     // 判断绩效是否已经发布
     getPerformanceIsPublish(applyYear, applyMonth).then(response => {
       if (response.length > 0 && response[0].flagValue > 0) {
         promises0[count0++] = getEvaCoef() // get各种系数
-        promises0[count0++] = getUsersList() // get用户列表
+        promises0[count0++] = getUsersList(checkGroupID) // get用户列表
         Promise.all(promises0).then(responseAll0 => {
           let evaCoef = responseAll0[0]
           let usersList = responseAll0[1]
@@ -544,6 +547,45 @@ export function deleteWorkTimeSubmit (id) {
   const url = urlDeleteWorkTimeSubmit
   let params = {
     id: id
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(res => {
+      if (res.code === 1) {
+        resolve(res.data)
+      } else {
+        reject(res.err)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
+// 改变工时申报提交状态
+export function changeSubmitStatus (id, submitStatus) {
+  const url = urlChangeSubmitStatus
+  let params = {
+    id: id,
+    submitStatus: submitStatus
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(res => {
+      if (res.code === 1) {
+        resolve()
+      } else {
+        reject(res.err)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
+export function getSubmitWorkTimeCount (searchUserID, applyMonth) {
+  const url = urlGetSubmitWorkTimeCount
+  let params = {
+    searchUserID: searchUserID,
+    applyMonth: applyMonth
   }
   return new Promise(function (resolve, reject) {
     http(url, params).then(res => {

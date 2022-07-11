@@ -30,7 +30,6 @@ router.post(api.updateNewPassword, user.updateNewPassword);
 
 // Performance-工时管理
 router.post(api.performanceAdd, performance.add);
-router.post(api.workTypeList, performance.workTypeList)
 router.post(api.getWorkTime, performance.getWorkTime)
 router.post(api.getProjectType, performance.getProjectType)
 router.post(api.getWorkTimeNew, performance.getWorkTimeNew)
@@ -42,7 +41,7 @@ router.post(api.getProjectInfo, performance.getProjectInfo)
 router.post(api.changeSubmitStatus, performance.changeSubmitStatus)
 router.post(api.deleteWorkTimeSubmit, performance.deleteWorkTimeSubmit)
 router.post(api.updateWorkTimeAssignReview, performance.updateWorkTimeAssignReview)
-router.post(api.getUnReviewProjectCount, performance.getUnReviewProjectCount)
+router.post(api.getSubmitWorkTimeCount, performance.getSubmitWorkTimeCount)
 router.post(api.submitReviewPass, performance.submitReviewPass)
 router.post(api.getAssignWorkTime, performance.getAssignWorkTime)
 router.post(api.getGroupWorkTimeList, performance.getGroupWorkTimeList)

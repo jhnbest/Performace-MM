@@ -323,31 +323,6 @@ function updateWorkTimeAssign(data) {
     })
 }
 
-function fGetUnReviewProjectOP(data, applyMonth, type) {
-    return new Promise(function (resolve, reject) {
-        let sqlGetUnReviewProjectTotal = $sql.performance.getUnReviewProjecTotal
-        let sqlGetReviewedProjectTotal = $sql.performance.getReviewedProjecTotal
-        let arrayParams = [data.id, applyMonth, data.id, applyMonth]
-        let sql = sqlGetUnReviewProjectTotal + ';' + sqlGetReviewedProjectTotal
-        $http.connPool(sql, arrayParams, (err, result) => {
-            if (err) {
-                let returnData = {
-                    result: result,
-                    err: err
-                }
-                resolve(returnData)
-            } else {
-                result = JSON.parse(JSON.stringify(result))
-                let returnData = {
-                    result: result,
-                    err: err
-                }
-                resolve(returnData);
-            }
-        })
-    })
-}
-
 function updateProjectWorkTimeAssignReviewStatus (projectID, status) {
     return new Promise(function (resolve, reject) {
         let sql = $sql.performance.updateProjectWorkTimeAssignReviewStatus
@@ -454,37 +429,6 @@ async function workTimeAssignReview(data, projectID, res) {
     } else {
         return $http.writeJson(res, {code: 1, message: '成功'})
     }
-}
-
-async function fGetUnReviewProject(data, res) {
-    let resultData = []
-    for (let item of data.searchPerson) {
-        let workTimeInsertResult = await fGetUnReviewProjectOP(item, data.applyMonth, data.type)
-        if (workTimeInsertResult.err) {
-            return $http.writeJson(res, {code: -2, message: '失败', errMsg: workTimeInsertResult.err})
-        } else {
-            let obj = {
-                id: item.id,
-                name: item.name,
-                unReviewProjectCount: workTimeInsertResult.result[0][0].totalCount,
-                reviewedProjectCount: workTimeInsertResult.result[1][0].totalCount
-            }
-            resultData.push(obj)
-        }
-    }
-    return $http.writeJson(res, {code: 1, data: resultData, message: '成功'})
-}
-
-function setWorkTimeListPass(sql, arrayParams) {
-    return new Promise(function (resolve, reject) {
-        $http.connPool(sql, arrayParams, (err, result) => {
-            if (err) {
-                reject(err)
-            } else {
-                resolve(result)
-            }
-        })
-    })
 }
 
 function updateProjectProcess(data, monthProcessExistParam) {
@@ -600,58 +544,6 @@ const performance = {
                     return $http.writeJson(res, {code: 1, message: '工时申报成功'})
                 })
             }
-        })
-    },
-    // 找申报工时类型
-    workTypeList (req, res) {
-        let params = req.body
-        let sql = ''
-        let arrayParams = []
-        if (params.queryType === 1) {
-          sql = $sql.performance.selectWorkTypeList
-        }
-        else if (params.queryType === 2) {
-          sql = $sql.performance.selectSubWorkType1List
-        }
-        else if (params.queryType === 3) {
-          sql = $sql.performance.selectSubWorkType2List
-        }
-        else if (params.queryType === 4) {
-          sql = $sql.performance.selectSubWorkType3List
-        }
-        $http.userVerify(req, res, () => {
-          let pageNum = params.pageNum
-          let pageSize = !params.pageSize ? 10 : params.pageSize
-          if(!pageNum) {
-              $http.writeJson(res, {code: 2, message:'参数有误'})
-          } else {
-            // 分页查询入参 start
-            let limitFirst = (pageNum-1)*pageSize;
-            let limitLast = pageSize;
-            // 分页查询入参 end
-            sql += " order by id limit ?,?"; // id倒序排
-            if (params.queryType === 1) {
-                arrayParams = [limitFirst, limitLast]
-            }
-            else if (params.queryType === 2) {        // 申报子类型1
-                arrayParams = [params.workTypeLabel, limitFirst, limitLast]
-            }
-            else if (params.queryType === 3) {        // 申报子类型2
-                arrayParams = [params.subWorkTypeL1abel, limitFirst, limitLast]
-            }
-            else if (params.queryType === 4) {        // 申报子类型3
-                arrayParams = [params.subWorkTypeL1abel, params.subWorkTypeL2abel, limitFirst, limitLast]
-            }
-            $http.connPool(sql, arrayParams, (err, result) => {
-                if(err) {
-                    return $http.writeJson(res, {code:-2, message:'失败'})
-                } else {
-                    let resultData = {}
-                    resultData.list = result
-                    return $http.writeJson(res, {code: 1, data: resultData, message: '获取列表成功'})
-                }
-            })
-          }
         })
     },
     // 计算工时数
@@ -834,24 +726,18 @@ const performance = {
     },
     // 改变提交状态
     changeSubmitStatus (req, res) {
-        let data = req.body
-        let sql = $sql.performance.changeSubmitStatus
-        let arrayParams = [data.submitStatus, data.id]
-        if (data.submitStatus) {
-            let updateTime = $time.formatTime()
-            let reviewStatus = 0
-            sql = $sql.performance.changeRejectProjectSubmitStatus
-            arrayParams = [data.submitStatus, updateTime, reviewStatus, data.id]
-        }
-        $http.userVerify(req, res, () => {
-            $http.connPool(sql, arrayParams, (err, result) => {
-                if (err) {
-                    return $http.writeJson(res, {code: -2, message: '失败'})
-                } else {
-                    return $http.writeJson(res, {code: 1, message: '改变提交状态成功'})
-                }
-            })
+      let data = req.body
+      let sql = $sql.performance.changeSubmitStatus
+      let updateTime = $time.formatTime()
+      let reviewStatus = 0
+      let arrayParams = [data.submitStatus, updateTime, reviewStatus, data.id]
+      $http.userVerify(req, res, () => {
+        RCPDDatabase(sql, arrayParams).then(() => {
+          return $http.writeJson(res, {code: 1, message: '操作成功'})
+        }).catch(err => {
+          return $http.writeJson(res, {code: -2, err: err, message: '操作失败'})
         })
+      })
     },
     // 删除申报的工时
     deleteWorkTimeSubmit (req, res) {
@@ -875,51 +761,88 @@ const performance = {
             workTimeAssignReview(data.reviewResult, data.projectID, res).then()
         })
     },
-    // 获取待审数量
-    getUnReviewProjectCount (req, res) {
-        $http.userVerify(req, res, () => {
-            let data = req.body
-            fGetUnReviewProject(data, res).then()
+    // 获取提交的工时申报数量
+    getSubmitWorkTimeCount (req, res) {
+      $http.userVerify(req, res, () => {
+        let data = req.body
+        let searchUserID = data.searchUserID
+        let applyMonth = data.applyMonth
+        let sql1 = $sql.performance.getReviewedProjecTotal
+        let sql2 = $sql.performance.getUnReviewProjecTotal
+        let sql = sql1 + ';' + sql2
+        let arrayParams = []
+        let promises = []
+        let count = 0
+        for (let user of searchUserID) {
+          arrayParams = [user.id, applyMonth, user.id, applyMonth]
+          promises[count++] = RCPDDatabase(sql, arrayParams)
+        }
+        let resultData = []
+        Promise.all(promises).then(result => {
+          for (let i = 0; i < result.length; i++) {
+            let obj = {
+              id: searchUserID[i].id,
+              name: searchUserID[i].name,
+              reviewedProjectCount: result[i][0][0].totalCount,
+              unReviewProjectCount: result[i][1][0].totalCount
+            }
+            resultData.push(obj)
+          }
+          return $http.writeJson(res, { code: 1, data: resultData, message: '成功' })
+        }).catch(err => {
+          return $http.writeJson(res, { code: -2, err: err, message: '操作失败' })
         })
+        // fGetUnReviewProject(data, res).then()
+      })
     },
     // 审核通过
     submitReviewPass (req, res) {
-        $http.userVerify(req, res, () => {
-            let curTime = $time.formatTime()
-            let data = req.body
-            let sql = null
-            let arrayParams = []
-            if (data.reviewStatus === 1) { // 审核通过
-                if (data.monthID === null) {  // 月份进展无记录时
-                    updateProjectProcess(data, null).then(res0 => {
-                        sql = $sql.performance.submitReviewPass
-                        arrayParams = [data.reviewKValue, data.reviewCofficient, data.reviewStatus, curTime, data.reviewComments,
-                            data.reviewer, res0.monthID, data.id]
-                        setWorkTimeListPass(sql, arrayParams).then(() => {
-                            return $http.writeJson(res, { code: 1, message: '成功' })
-                        })
-                    })
-                } else { // 更新已有的月份进展
-                    getMonthProcessByID(data.monthID).then(res0 => { // 获取已有月份进展
-                        updateProjectProcess(data, res0).then(res1 => {
-                            sql = $sql.performance.submitReviewPass
-                            arrayParams = [data.reviewKValue, data.reviewCofficient, data.reviewStatus, curTime, data.reviewComments,
-                                data.reviewer, res1.monthID, data.id]
-                            setWorkTimeListPass(sql, arrayParams).then(() => {
-                                return $http.writeJson(res, { code: 1, message: '成功' })
-                            })
-                        })
-                    })
-                }
-            } else { // 撤回或者驳回
-                sql = $sql.performance.submitReviewRejectOrWithdraw
-                arrayParams = [data.reviewKValue, data.reviewCofficient, data.reviewStatus, curTime, data.reviewComments, data.reviewer,
-                    data.id]
-                setWorkTimeListPass(sql, arrayParams).then(() => {
-                    return $http.writeJson(res, { code: 1, message: '成功' })
+      $http.userVerify(req, res, () => {
+        let curTime = $time.formatTime()
+        let data = req.body
+        let sql = null
+        let arrayParams = []
+        if (data.reviewStatus === 1) { // 审核通过
+          if (data.monthID === null) {  // 月份进展无记录时
+            updateProjectProcess(data, null).then(res0 => {
+              sql = $sql.performance.submitReviewPass
+              arrayParams = [data.reviewKValue, data.reviewCofficient, data.reviewStatus, curTime, data.reviewComments,
+                data.reviewer, res0.monthID, data.id]
+                RCPDDatabase(sql, arrayParams).then(() => {
+                  return $http.writeJson(res, { code: 1, message: '成功' })
+                }).catch(err => {
+                  return $http.writeJson(res, { code: -2, err: err, message: '操作失败' })
                 })
-            }
-        })
+            })
+          } else { // 更新已有的月份进展
+            getMonthProcessByID(data.monthID).then(res0 => { // 获取已有月份进展
+              updateProjectProcess(data, res0).then(res1 => {
+                sql = $sql.performance.submitReviewPass
+                arrayParams = [data.reviewKValue, data.reviewCofficient, data.reviewStatus, curTime, data.reviewComments,
+                  data.reviewer, res1.monthID, data.id]
+                RCPDDatabase(sql, arrayParams).then(() => {
+                  return $http.writeJson(res, { code: 1, message: '成功' })
+                }).catch(err => {
+                  return $http.writeJson(res, { code: -2, err: err, message: '操作失败' })
+                })
+              })
+            })
+          }
+        } else { // 撤回或者驳回
+          let submitStatus = 0
+          if (data.reviewStatus === 0) {
+            submitStatus = 1
+          }
+          sql = $sql.performance.submitReviewRejectOrWithdraw
+          arrayParams = [data.reviewKValue, data.reviewCofficient, data.reviewStatus, curTime, data.reviewComments, data.reviewer,
+            submitStatus, data.id]
+          RCPDDatabase(sql, arrayParams).then(() => {
+            return $http.writeJson(res, { code: 1, message: '成功' })
+          }).catch(err => {
+            return $http.writeJson(res, { code: -2, err: err, message: '操作失败' })
+          })
+        }
+      })
     },
     // 获取分配的工时
     async getAssignWorkTime (req, res) {

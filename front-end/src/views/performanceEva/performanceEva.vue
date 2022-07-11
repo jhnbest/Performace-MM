@@ -225,7 +225,6 @@
         ratesTableTmp: [],
         reqFlag: {
           getUserRates: true,
-          getUsersList: true,
           updateRateToUpdate: true,
           getPerformanceRates: true,
           getEvaCoef: true,
@@ -272,7 +271,8 @@
         // })
         this.getEvaCoef() // 获取各种评价系数
         // 获取用户列表
-        getUsersList().then(userList => {
+        let checkGroupID = 0
+        getUsersList(checkGroupID).then(userList => {
           this.users = userList
           this.usersNum = this.users.length
           this.initData(userList)

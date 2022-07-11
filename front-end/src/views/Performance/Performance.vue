@@ -128,12 +128,12 @@
                        :disabled="(scope.row.reviewStatus === 1 || isAssginer(scope.row.submitID))"
                        size="mini"
                        type="success"
-                       @click="handleSubmitStatus(scope.row, scope.$index)">提交</el-button>
+                       @click="handleSubmitStatus(scope.row)">提交</el-button>
             <el-button v-if="scope.row.submitStatus === 1"
                        :disabled="(scope.row.reviewStatus === 1 || isAssginer(scope.row.submitID))"
                        size="mini"
                        type="info"
-                       @click="handleSubmitStatus(scope.row,scope.$index)">暂存</el-button>
+                       @click="handleSubmitStatus(scope.row)">暂存</el-button>
             <el-button :disabled="(scope.row.reviewStatus === 1 || isAssginer(scope.row.submitID))"
                        size="mini"
                        type="danger"
@@ -149,23 +149,19 @@
 <script>
     import Cop from '@/components/Cop/Cop'
     import CountTo from 'vue-count-to'
-    import { changeSubmitStatus, ulrDeleteWorkTimeSubmit, getAssignWorkTime, getGroupWorkTimeList, urlGetIsSubmitAllow } from '@/config/interface'
-    import { getProjectList, deleteWorkTimeSubmit } from '@/utils/performance'
+    import { getAssignWorkTime, getGroupWorkTimeList, urlGetIsSubmitAllow } from '@/config/interface'
+    import { getProjectList, deleteWorkTimeSubmit, changeSubmitStatus } from '@/utils/performance'
+    import { getIsSubmitAllow } from '@/utils/common'
     import store from '@/store'
     export default {
       data () {
         return {
           props: {
-            multiple: true,
             value: 'projectTypeID',
             label: 'projectName'
           },
-          WorkTimeItem: [],
-          declareTime: [],
           title: this.$moment().format('YYYY-MM'),
           formData: {
-            projectType: [],
-            isShowTable: true,
             totalWorkTime: 0,
             selectType: '工时查询',
             rank: 0
@@ -176,10 +172,8 @@
             planTableShow: false
           },
           reqFlag: {
-            reqGetProjectList: true,
             changeSubmitStatus: true,
             deleteProject: true,
-            complete: true,
             getGroupWorkTimeList: true,
             getAssignWorkTimes: true,
             handelDateChange: true
@@ -197,28 +191,6 @@
         init () {
           this.getCookie()
           this.fillTableData()
-        },
-        // 获取当前月份能否申报的标志
-        getIsSubmitAllow () {
-          const url = urlGetIsSubmitAllow
-          let params = {
-            applyYear: this.$moment(this.title).year(),
-            applyMonth: this.$moment(this.title).month() + 1,
-            flagType: 'workTimeSubmit'
-          }
-          let _this = this
-          return new Promise(function (resolve, reject) {
-            _this.$http(url, params).then(res => {
-              if (res.code === 1) {
-                resolve(res.data)
-              } else {
-                reject(new Error('getIsSubmitAllow recv error!'))
-              }
-            }).catch(err => {
-              this.$common.toast(err, 'error', true)
-              reject(new Error('getIsSubmitAllow send error!'))
-            })
-          })
         },
         // 审核表格合并前处理
         handleTable (Table) {
@@ -346,31 +318,26 @@
             }
           })
         },
-        // 表格提交工时申报
-        handleSubmitStatus (row, index) {
-          this.getIsSubmitAllow().then(getIsSubmitAllowRes => {
+        // 提交工时申报
+        handleSubmitStatus (row) {
+          let applyYear = this.$moment(this.title).year()
+          let applyMonth = this.$moment(this.title).month() + 1
+          getIsSubmitAllow(applyYear, applyMonth).then(getIsSubmitAllowRes => {
             if (getIsSubmitAllowRes.length === 0 || row.reviewStatus === 2 || this.$store.state.userInfo.id === 26) {
               if (this.reqFlag.changeSubmitStatus) {
                 this.reqFlag.changeSubmitStatus = false
-                if (row.submitStatus === 1) {
-                  row.submitStatus = 0
-                } else if (row.submitStatus === 0) {
-                  row.submitStatus = 1
-                }
-                const url = changeSubmitStatus
-                let params = {
-                  submitStatus: row.submitStatus,
-                  id: row.id
-                }
-                this.$http(url, params).then(res => {
-                  if (res.code === 1) {
-                    if (row.submitStatus === 1) {
-                      row.reviewStatus = 0
-                    }
-                    this.$common.toast('操作成功', 'success', false)
-                  } else {
-                    this.$common.toast('操作失败', 'warning', false)
-                  }
+                row.submitStatus = row.submitStatus === 1 ? 0 : 1
+                changeSubmitStatus(row.id, row.submitStatus).then(() => {
+                  this.showFlag.factTableShow = false
+                  this.$nextTick(() => {
+                    this.showFlag.factTableShow = true
+                  })
+                  row.reviewStatus = row.submitStatus === 1 ? 0 : row.reviewStatus
+                  this.$common.toast('操作成功', 'success', false)
+                  this.reqFlag.changeSubmitStatus = true
+                }).catch(err => {
+                  console.log(err)
+                  this.$common.toast('操作失败', 'error', false)
                   this.reqFlag.changeSubmitStatus = true
                 })
               }
@@ -379,6 +346,7 @@
             }
           })
         },
+        // 删除工时申报
         handleDelete (row, index) {
           this.$common.msgBox('confirm', '操作提示', '确定删除？', () => {
             if (this.reqFlag.deleteProject) {
@@ -544,16 +512,6 @@
         }
       },
       computed: {
-        userPower: function () {
-          let userType = this.$store.state.userInfo.role
-          if (userType === '普通成员') {
-            return 0
-          } else if (userType === '组长') {
-            return 1
-          } else {
-            return 2
-          }
-        },
         roleStatusFilter () {
           return function (submitID) {
             if (Number(submitID) === this.$store.state.userInfo.id) {

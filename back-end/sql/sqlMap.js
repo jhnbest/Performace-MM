@@ -22,8 +22,10 @@ const sqlMap = {
     selectList1: 'select * from users where status != 0',
     // 查询周报列表条数Test
     selectTotal1: 'select count(*) as totalCount from users where status != 0',
-    // 查询用户信息
-    selectUsersList: 'select * from users where status != 0',
+    // 查询用户信息1
+    selectUsersList1: 'select * from users where status != 0',
+    // 查询用户信息2
+    selectUsersList2: 'select * from users where groupName = ? and status != 0',
     // 查询组员信息
     getGroupUserName: 'select id, name, groupName from users where groupName = ? and status != 0',
     // 查询全员信息
@@ -81,7 +83,7 @@ const sqlMap = {
         'wl.apdID = apd.id where wl.id = ? and wl.obsoleteStatus != 1',
     getWorkAssignInfo: 'select * from worktimeassign where projectID = ? and obsoleteStatus != 1',
     getFullProjectType: 'select * from projecttypenew where projectTypeID = ?',
-    changeSubmitStatus: 'update worktimelist set submitStatus = ? where id = ?',
+    changeSubmitStatus: 'update worktimelist set submitStatus = ?, updateTime = ?, reviewStatus = ? where id = ?',
     changeRejectProjectSubmitStatus: 'update worktimelist set submitStatus = ?, updateTime = ?, reviewStatus = ? where id = ?',
     deleteWorkTimeSubmit: 'update worktimelist set obsoleteStatus = 1 where id = ?',
     deleteWorkTimeAssign: 'update worktimeassign set obsoleteStatus = 1 where projectID = ?',
@@ -89,7 +91,7 @@ const sqlMap = {
     submitReviewPass: 'update worktimelist set reviewKValue = ?, reviewCofficient = ?, reviewStatus = ?, reviewTime = ?, reviewComments = ?, ' +
         'reviewer = ?, monthID = ? where id = ?',
     submitReviewRejectOrWithdraw: 'update worktimelist set reviewKValue = ?, reviewCofficient = ?, reviewStatus = ?, reviewTime = ?, reviewComments = ?, ' +
-        'reviewer = ? where id = ?',
+        'reviewer = ?, submitStatus = ? where id = ?',
     updateProjectWorkTimeAssignReviewStatus: 'update worktimelist set workTimeAssignReviewStatus = ? where id = ?',
     getAssignWorkTime: 'select reviewWorkTime from worktimeassign where projectID = ? and userID = ? and obsoleteStatus != 1',
     getGroupWorkTimeList: 'select u.id, u.name, wa.reviewWorkTime, wl.applyMonth from worktimeassign wa left join worktimelist ' +

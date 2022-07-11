@@ -23,7 +23,6 @@ module.exports = {
     // Performance-工时管理
     performanceAdd: path + '/performance/add',
     getProjectType: path + '/performance/projectType',
-    workTypeList: path + '/performance/workTypeList',
     getWorkTime: path + '/performance/getWorkTime', // 查询工时
     getWorkTimeNew: path + '/performance/getWorkTimeNew',
     workTimeSubmit: path + '/performance/workTimeSubmit', //新增工时申报
@@ -34,7 +33,7 @@ module.exports = {
     changeSubmitStatus: path + '/performance/changeSubmitStatus', //改变提交状态
     deleteWorkTimeSubmit: path + '/performance/deleteWorkTimeSubmit', // 删除项目
     updateWorkTimeAssignReview: path + '/performance/updateWorkTimeAssignReview', // 提交工时分配审核结果
-    getUnReviewProjectCount: path + '/performance/getUnReviewProjectCount', // 获取待审数量
+    getSubmitWorkTimeCount: path + '/performance/getSubmitWorkTimeCount', // 获取提交的工时申报数量
     submitReviewPass: path + '/performance/submitReviewPass', // 审核通过,
     getAssignWorkTime: path + '/performance/getAssignWorkTime', // 获取分配的工时数
     getGroupWorkTimeList: path + '/performance/getGroupWorkTimeList', // 获取小组已审工时列表
