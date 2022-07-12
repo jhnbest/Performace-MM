@@ -308,8 +308,6 @@
               item.avaiableWorkTimeTmp = item.avaiableWorkTime
             }
             reviewTable.sort(this.compare('aplID')) // 按照项目名称排序
-            console.log('reviewTable')
-            console.log(reviewTable)
             this.handleReviewTable(reviewTable) // 表格按照项目名称合并前处理
             this.formData.workDetailTable = reviewTable
             this.totalCount = res.totalCount

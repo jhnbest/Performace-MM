@@ -86,11 +86,9 @@
         this.getCookie()
         let checkGroupID = this.$store.state.userInfo.groupID
         checkGroupID = this.$store.state.userInfo.role === '管理员' ? 0 : checkGroupID
-        let start = new Date()
         getUsersList(checkGroupID).then(res => {
           this.groupUserList = res
           getSubmitWorkTimeCount(this.groupUserList, this.formData.title).then(result => {
-            console.log('耗时： ' + String(new Date() - start) + 'ms')
             this.groupUsers = result
             for (let item of this.groupUsers) {
               if (item.unReviewProjectCount !== 0) {
