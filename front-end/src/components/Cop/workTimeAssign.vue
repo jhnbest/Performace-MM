@@ -103,7 +103,7 @@
 </template>
 
 <script>
-import { urlGetUsersList } from '../../config/interface'
+import { getUsersList } from '@/utils/users'
 export default {
   data () {
     return {
@@ -146,7 +146,6 @@ export default {
         }],
         participant: [],
         selectIndex: null,
-        avaiableWorkTime: 0,
         isConference: false,
         defaultAssignWorkTime: 0
       },
@@ -178,11 +177,22 @@ export default {
     // 初始化
     init (params) {
       this.$nextTick(() => {
-        this.getUsersName()
+        getUsersList(0).then(users => {
+          let findIndex = users.findIndex(user => {
+            return user.account === '03515' // 去除经理
+          })
+          users.splice(findIndex, 1)
+          findIndex = users.findIndex(user => {
+            return user.account === this.$store.state.userInfo.account // 去除自己
+          })
+          users.splice(findIndex, 1)
+          this.formData.userListOptions[1].options = users
+          this.formData.usersList = this.formData.userListOptions
+        })
         this.formData.isConference = params.rowCop.isConference
         this.formData.defaultAssignWorkTime = params.rowCop.defaultAssignWorkTime
         this.formData.workTime = this.formData.defaultAssignWorkTime
-        this.formData.avaiableWorkTime = params.rowCop.avaiableWorkTime
+        this.formData.avaiableWorkTime = Number(params.rowCop.avaiableWorkTime.toFixed(2))
         this.formData.copInfoTable = params.rowCop.workTimeAssign
         this.formData.selectIndex = params.index
         this.formData.multiParticipant = params.rowCop.multipleAssign
@@ -196,37 +206,6 @@ export default {
     },
     // 分配工时变化
     handleAssignWorkTimeChange (row) {
-    },
-    // 获取用户姓名
-    getUsersName () {
-      const url = urlGetUsersList
-      if (this.formData.reqFlag.usersName) {
-        this.formData.reqFlag.usersName = false
-        let params = {}
-        let objList = []
-        this.$http(url, params)
-          .then(res => {
-            if (res.code === 1) {
-              let data = res.data
-              let list = data.list
-              for (let item of list) {
-                if (item.account !== this.$store.state.userInfo.account && item.account !== '03515') {
-                  let obj = {
-                    id: item.id,
-                    dept: item.dept,
-                    name: item.name,
-                    groupName: item.groupName,
-                    disabled: false
-                  }
-                  objList.push(obj)
-                }
-              }
-              this.formData.userListOptions[1].options = objList
-              this.formData.reqFlag.usersName = true
-            }
-            this.formData.usersList = this.formData.userListOptions
-          })
-      }
     },
     // 保存
     onSave (formData) {
@@ -404,9 +383,6 @@ export default {
     }
   },
   computed: {
-    avaiableWorkTime () {
-      return this.formData.avaiableWorkTime
-    },
     assignedWorkTime () {
       let assignedWorkTime = 0
       for (let item of this.formData.copInfoTable) {

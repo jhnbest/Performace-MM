@@ -49,7 +49,7 @@
 </template>
 
 <script>
-  import { urlGetUsersList, getAllUserRates } from '@/config/interface'
+  import { getAllUserRates } from '@/config/interface'
   import { getUsersList } from '@/utils/users'
   export default {
     data () {
