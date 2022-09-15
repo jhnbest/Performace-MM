@@ -215,7 +215,7 @@
                 this.rateTableData[i].conclusionTitle = response[i].conclusionData[0].conclusionType === 1
                   ? this.rateTableData[i].conclusionTitle : null
                 this.rateTableData[i].submitMonth = response[i].conclusionData[0].conclusionMonth
-                this.rateTableData[i].submitStatus = 1
+                this.rateTableData[i].submitStatus = response[i].conclusionData[0].submitStatus
                 this.rateTableData[i].id = response[i].conclusionData[0].id
                 this.rateTableData[i].conclusionType = response[i].conclusionData[0].conclusionType
                 this.rateTableData[i].moreDetailData = response[i].conclusionData

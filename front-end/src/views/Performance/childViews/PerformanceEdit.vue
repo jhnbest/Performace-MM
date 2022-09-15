@@ -158,8 +158,9 @@
 </template>
 
 <script>
-  import { getProjectInfo, urlGetUsersList, updateAssignWork, getAssignWorkDetail, urlGetIsSubmitAllow } from '@/config/interface'
+  import { getProjectInfo, updateAssignWork, getAssignWorkDetail, urlGetIsSubmitAllow } from '@/config/interface'
   import { getProjectType, workTimeListInsert, temporaryWorkTimeList } from '@/utils/performance'
+  import { getUsersList } from '@/utils/users'
   import Assign from '@/components/Cop/workTimeAssign'
     export default {
       data () {
@@ -275,7 +276,24 @@
       methods: {
         // 初始化
         init () {
-          this.getUsersName()
+          let checkGroupID = 0
+          getUsersList(checkGroupID).then(users => {
+            let objList = []
+            for (let user of users) {
+              if (user.account !== this.$store.state.userInfo.account) {
+                let obj = {
+                  id: user.id,
+                  dept: user.dept,
+                  name: user.name,
+                  groupName: user.groupName,
+                  disabled: false
+                }
+                objList.push(obj)
+              }
+            }
+            this.userListOptions[1].options = objList
+            this.formData.usersList = this.userListOptions
+          })
           getProjectType(this.$store.state.userInfo.groupName).then(getProjectTypeRes => {
             this.projectTypeOptions = getProjectTypeRes
           })
@@ -538,37 +556,6 @@
         onCancel (formName) {
           this.$router.push({ path: '/home/Performance' })
           this.$refs[formName].resetFields()
-        },
-        // 获取用户姓名
-        getUsersName () {
-          const url = urlGetUsersList
-          if (this.reqFlag.usersName) {
-            this.reqFlag.usersName = false
-            let params = {}
-            let objList = []
-            this.$http(url, params)
-              .then(res => {
-                if (res.code === 1) {
-                  let data = res.data
-                  let list = data.list
-                  for (let item of list) {
-                    if (item.account !== this.$store.state.userInfo.account) {
-                      let obj = {
-                        id: item.id,
-                        dept: item.dept,
-                        name: item.name,
-                        groupName: item.groupName,
-                        disabled: false
-                      }
-                      objList.push(obj)
-                    }
-                  }
-                  this.userListOptions[1].options = objList
-                }
-                this.reqFlag.usersName = true
-                this.formData.usersList = this.userListOptions
-              })
-          }
         },
         // 删除工时明细记录
         handleDeleteWorkDetail (row, index) {

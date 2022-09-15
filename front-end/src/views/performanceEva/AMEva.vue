@@ -543,6 +543,7 @@ export default {
         }
       })
     },
+
     // 获取月总结及相关评价数据，生成初始表格数据
     genTableData (conclusionYear, conclusionMonth, SEGroup, CMGroup) {
       // 初始化默认数据
@@ -631,9 +632,10 @@ export default {
           let responseData = response.data
           // ======================判断月总结提交状态并对已提交总结的用户获取月总结内容对应的该用户的评价结果======================
           for (let i = 0; i < allconclusionAndEvaData.length; i++) {
-            allconclusionAndEvaData[i].submitStatus = typeof (responseData.conclusionData.find(item => {
+            let findResult = responseData.conclusionData.find(item => {
               return item.userID === allconclusionAndEvaData[i].id
-            })) !== 'undefined' ? 1 : 0
+            })
+            allconclusionAndEvaData[i].submitStatus = typeof (findResult) !== 'undefined' ? findResult.submitStatus : 0
             allconclusionAndEvaData[i].conclusionContent = responseData.conclusionData.filter(item => {
               return item.userID === allconclusionAndEvaData[i].id
             })
@@ -684,6 +686,7 @@ export default {
         })
       })
     },
+
     // 点击显示
     table1HandleShow (row, index) {
       // 如果是经理，将显示的绩效数据设置为初始状态

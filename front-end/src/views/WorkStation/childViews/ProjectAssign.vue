@@ -390,9 +390,10 @@
 </template>
 
 <script>
-  import { urlGetUsersList, ulrGetWorkTimeNew, submitAssignWorkDetail,
+  import { ulrGetWorkTimeNew, submitAssignWorkDetail,
     getAssignedProject, updateAssignProjectList, deleteAssignProject, getAssignProjectDetail } from '@/config/interface'
   import { getProjectType } from '@/utils/performance'
+  import { getUsersList } from '@/utils/users'
   import Sortable from 'sortablejs'
     export default {
       data () {
@@ -507,7 +508,23 @@
       methods: {
         // 初始化
         init () {
-          this.getUsersName()
+          let checkGroupID = 0
+          getUsersList(checkGroupID).then(users => {
+            for (let user of users) {
+              if (user.groupName === '技术标准组') {
+                this.users[0].options.push(user)
+              } else if (user.groupName === '工程组') {
+                this.users[1].options.push(user)
+              } else if (user.groupName === '通信组') {
+                this.users[2].options.push(user)
+              }
+              let obj = {
+                value: user.id,
+                text: user.name
+              }
+              this.usersFilter.push(obj)
+            }
+          })
           getProjectType().then(getProjectTypeRes => {
             this.projectTypeOptions = getProjectTypeRes
           })
@@ -527,35 +544,6 @@
               this.tableData.splice(evt.newIndex, 0, targetRow)
             }
           })
-        },
-        // 获取人员信息
-        getUsersName () {
-          if (this.reqFlag.getUserName) {
-            this.reqFlag.getUserName = false
-            const url = urlGetUsersList
-            let params = {}
-            this.$http(url, params)
-              .then(res => {
-                if (res.code === 1) {
-                  this.reqFlag.getUserName = true
-                  let data = res.data
-                  for (let item of data.list) {
-                    if (item.groupName === '技术标准组') {
-                      this.users[0].options.push(item)
-                    } else if (item.groupName === '工程组') {
-                      this.users[1].options.push(item)
-                    } else if (item.groupName === '通信组') {
-                      this.users[2].options.push(item)
-                    }
-                    let obj = {
-                      value: item.id,
-                      text: item.name
-                    }
-                    this.usersFilter.push(obj)
-                  }
-                }
-              })
-          }
         },
         // 指派按钮
         handleAssign (formData) {

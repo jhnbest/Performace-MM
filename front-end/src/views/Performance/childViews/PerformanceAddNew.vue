@@ -247,7 +247,6 @@
     submitAssignWorkDetail,
     submitMonthPlanProcess,
     urlGetIsSubmitAllow,
-    urlGetUsersList,
     ulrGetWorkTimeNew,
     submitPersonalProject,
     urlGetCurApplyAbleMonth,
@@ -403,7 +402,6 @@
         this.getCurApplyAbleMonth().then(getCurApplyAbleMonthRes => {
           this.formData.title = this.$moment(getCurApplyAbleMonthRes[0].setTime).format('YYYY-MM')
         })
-        // this.getUsersName()
       },
       // 获取当前月份能否申报的标志
       getIsSubmitAllow () {
@@ -708,38 +706,6 @@
       onCancel (formName) {
         this.$router.push({ path: '/home/workStation' })
         this.$refs[formName].resetFields()
-      },
-      // 获取用户姓名
-      getUsersName () {
-        const url = urlGetUsersList
-        if (this.reqFlag.usersName) {
-          this.reqFlag.usersName = false
-          let params = {}
-          let objList = []
-          this.$http(url, params).then(res => {
-              if (res.code === 1) {
-                let data = res.data
-                let list = data.list
-                list.map((item) => {
-                  let disabled = false
-                  if (item.account !== this.$store.state.userInfo.account && item.account !== '03515') {
-                    let obj = {
-                      id: item.account,
-                      dept: item.dept,
-                      name: item.name,
-                      groupName: item.groupName,
-                      disabled: disabled
-                    }
-                    objList.push(obj)
-                  }
-                })
-                this.usersList = objList
-                this.userListOptions[1].options = objList
-              }
-              this.reqFlag.usersName = true
-              this.formData.usersList = this.userListOptions
-            })
-        }
       },
       // 获取项目明细
       handleProjectTypeChange (selectItem) {

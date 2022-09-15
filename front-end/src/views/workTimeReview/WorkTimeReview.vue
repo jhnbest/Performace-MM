@@ -72,21 +72,20 @@
           selectType: '待审'
         },
         reqFlag: {
-          getGroupUsers: true,
           getUnReviewProjectCount: true,
           getReviewedProjectCount: true
         },
         groupUsers: [],
-        groupUserList: []
+        groupUserList: [],
+        checkGroupID: null
       }
     },
     methods: {
       // 初始化
       init () {
         this.getCookie()
-        let checkGroupID = this.$store.state.userInfo.groupID
-        checkGroupID = this.$store.state.userInfo.role === '管理员' ? 0 : checkGroupID
-        getUsersList(checkGroupID).then(res => {
+        this.checkGroupID = this.$store.state.userInfo.role === '管理员' ? 0 : this.$store.state.userInfo.groupID
+        getUsersList(this.checkGroupID).then(res => {
           this.groupUserList = res
           getSubmitWorkTimeCount(this.groupUserList, this.formData.title).then(result => {
             this.groupUsers = result
@@ -103,7 +102,7 @@
         if (this.$store.state.userInfo.role === '组长' || this.$store.state.userInfo.role === '管理员') {
           this.setCookie(this.formData.title, 7)
           if (this.formData.reviewType === 'reviewed') {
-            this.getGroupUsers().then(res => {
+            getUsersList(this.checkGroupID).then(res => {
               this.getReviewedProjectCount(res).then(res => {
                 this.groupUsers = res
                 for (let item of this.groupUsers) {
@@ -138,7 +137,7 @@
       handleReviewed () {
         this.formData.reviewType = 'reviewed'
         if (this.$store.state.userInfo.role === '组长' || this.$store.state.userInfo.role === '管理员') {
-          this.getGroupUsers().then(res => {
+         getUsersList(this.checkGroupID).then(res => {
             this.getReviewedProjectCount(res).then(res => {
               this.groupUsers = res
             })
@@ -160,7 +159,7 @@
         if (params === '已审') {
           this.formData.reviewType = 'reviewed'
           if (this.$store.state.userInfo.role === '组长' || this.$store.state.userInfo.role === '管理员') {
-            this.getGroupUsers().then(res => {
+            getUsersList(this.checkGroupID).then(res => {
               this.getReviewedProjectCount(res).then(res => {
                 this.groupUsers = res
                 for (let item of this.groupUsers) {
