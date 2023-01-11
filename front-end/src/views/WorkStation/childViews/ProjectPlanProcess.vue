@@ -649,7 +649,6 @@
           }).catch(err => {
             console.log(err)
           })
-        } else { // 没有需要保存的阶段进展
         }
         let toSubmitWorkTime = []
         // 构造提交工时申报的数据格式
@@ -672,7 +671,7 @@
             id: null,
             workTimeAssign: null
           }
-          if (tableDataItem.type === 'fact' && tableDataItem.process != 100) {
+          if (tableDataItem.type === 'fact' && tableDataItem.process != 100 && tableDataItem.isApplyWorkTime != 1) {
             let getWorkTime = (tableDataItem[this.dialogTitleMonthEN] - tableDataItem.preMonthProcess) * 0.01 * tableDataItem.baseWorkTime *
               tableDataItem.coefficient * tableDataItem.kValue
             if (getWorkTime > 0) {

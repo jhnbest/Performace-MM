@@ -71,10 +71,6 @@
           refreshTabs: true,
           selectType: '待审'
         },
-        reqFlag: {
-          getUnReviewProjectCount: true,
-          getReviewedProjectCount: true
-        },
         groupUsers: [],
         groupUserList: [],
         checkGroupID: null
@@ -102,20 +98,18 @@
         if (this.$store.state.userInfo.role === '组长' || this.$store.state.userInfo.role === '管理员') {
           this.setCookie(this.formData.title, 7)
           if (this.formData.reviewType === 'reviewed') {
-            getUsersList(this.checkGroupID).then(res => {
-              this.getReviewedProjectCount(res).then(res => {
-                this.groupUsers = res
-                for (let item of this.groupUsers) {
-                  if (item.reviewedProjectCount !== 0) {
-                    this.formData.reviewPerson = String(item.id)
-                    break
-                  }
+            getSubmitWorkTimeCount(this.groupUserList, this.formData.title).then(res => {
+              this.groupUsers = res
+              for (let item of this.groupUsers) {
+                if (item.reviewedProjectCount !== 0) {
+                  this.formData.reviewPerson = String(item.id)
+                  break
                 }
-                this.formData.refreshTabs = false
-                setTimeout(() => {
-                  this.formData.refreshTabs = true
-                }, this.$store.state.refreshInterval)
-              })
+              }
+              this.formData.refreshTabs = false
+              setTimeout(() => {
+                this.formData.refreshTabs = true
+              }, this.$store.state.refreshInterval)
             })
           } else if (this.formData.reviewType === 'unReview') {
             this.init()
@@ -126,31 +120,9 @@
           }
         }
       },
-      handleUnReview () {
-        this.formData.reviewType = 'unReview'
-        this.init()
-        this.formData.refreshTabs = false
-        setTimeout(() => {
-          this.formData.refreshTabs = true
-        }, this.$store.state.refreshInterval)
-      },
-      handleReviewed () {
-        this.formData.reviewType = 'reviewed'
-        if (this.$store.state.userInfo.role === '组长' || this.$store.state.userInfo.role === '管理员') {
-         getUsersList(this.checkGroupID).then(res => {
-            this.getReviewedProjectCount(res).then(res => {
-              this.groupUsers = res
-            })
-          })
-        }
-        this.formData.refreshTabs = false
-        setTimeout(() => {
-          this.formData.refreshTabs = true
-        }, this.$store.state.refreshInterval)
-      },
       // 子组件回调
       handleReviewPass () {
-        this.getUnReviewProjectCount(this.groupUsers).then(res => {
+        getSubmitWorkTimeCount(this.groupUserList, this.formData.title).then(res => {
           this.groupUsers = res
         })
       },
@@ -159,16 +131,18 @@
         if (params === '已审') {
           this.formData.reviewType = 'reviewed'
           if (this.$store.state.userInfo.role === '组长' || this.$store.state.userInfo.role === '管理员') {
-            getUsersList(this.checkGroupID).then(res => {
-              this.getReviewedProjectCount(res).then(res => {
-                this.groupUsers = res
-                for (let item of this.groupUsers) {
-                  if (item.reviewedProjectCount !== 0) {
-                    this.formData.reviewPerson = String(item.id)
-                    break
-                  }
+            getSubmitWorkTimeCount(this.groupUserList, this.formData.title).then(res => {
+              this.groupUsers = res
+              for (let item of this.groupUsers) {
+                if (item.reviewedProjectCount !== 0) {
+                  this.formData.reviewPerson = String(item.id)
+                  break
                 }
-              })
+              }
+              this.formData.refreshTabs = false
+              setTimeout(() => {
+                this.formData.refreshTabs = true
+              }, this.$store.state.refreshInterval)
             })
           }
           this.formData.refreshTabs = false

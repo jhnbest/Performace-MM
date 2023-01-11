@@ -1,0 +1,51 @@
+Date : 2022-11-15 14:43:16
+Directory : d:\vscode_project\Performace-MM\back-end
+Total : 19 files,  4174 codes, 277 comments, 136 blanks, all 4587 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| JavaScript |         15 |      3,626 |        234 |        111 |      3,971 |
+| JSON       |          2 |        466 |          0 |          2 |        468 |
+| SQL        |          1 |         73 |         43 |         21 |        137 |
+| Markdown   |          1 |          9 |          0 |          2 |         11 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++----------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                 | files      | code       | comment    | blank      | total      |
++----------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                    |         19 |      4,174 |        277 |        136 |      4,587 |
+| config                                                               |          2 |        108 |         10 |          8 |        126 |
+| controls                                                             |          7 |      3,021 |        184 |         85 |      3,290 |
+| routes                                                               |          1 |        108 |          8 |          8 |        124 |
+| sql                                                                  |          3 |        413 |         68 |         24 |        505 |
+| utils                                                                |          2 |         39 |          4 |          4 |         47 |
++----------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++----------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                             | language   | code       | comment    | blank      | total      |
++----------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| d:\vscode_project\Performace-MM\back-end\README.md                   | Markdown   |          9 |          0 |          2 |         11 |
+| d:\vscode_project\Performace-MM\back-end\config\api.js               | JavaScript |        100 |          8 |          8 |        116 |
+| d:\vscode_project\Performace-MM\back-end\config\db.js                | JavaScript |          8 |          2 |          0 |         10 |
+| d:\vscode_project\Performace-MM\back-end\controls\achievementsEva.js | JavaScript |        101 |          6 |          3 |        110 |
+| d:\vscode_project\Performace-MM\back-end\controls\common.js          | JavaScript |         61 |          4 |          2 |         67 |
+| d:\vscode_project\Performace-MM\back-end\controls\conclusion.js      | JavaScript |        222 |         10 |         11 |        243 |
+| d:\vscode_project\Performace-MM\back-end\controls\mutualRate.js      | JavaScript |        244 |         10 |          6 |        260 |
+| d:\vscode_project\Performace-MM\back-end\controls\performance.js     | JavaScript |      1,005 |         39 |         21 |      1,065 |
+| d:\vscode_project\Performace-MM\back-end\controls\user.js            | JavaScript |        340 |         29 |         17 |        386 |
+| d:\vscode_project\Performace-MM\back-end\controls\workStation.js     | JavaScript |      1,048 |         86 |         25 |      1,159 |
+| d:\vscode_project\Performace-MM\back-end\index.js                    | JavaScript |         10 |          3 |          3 |         16 |
+| d:\vscode_project\Performace-MM\back-end\package-lock.json           | JSON       |        447 |          0 |          1 |        448 |
+| d:\vscode_project\Performace-MM\back-end\package.json                | JSON       |         19 |          0 |          1 |         20 |
+| d:\vscode_project\Performace-MM\back-end\routes\router.js            | JavaScript |        108 |          8 |          8 |        124 |
+| d:\vscode_project\Performace-MM\back-end\sql\demo_weekly.sql         | SQL        |         73 |         43 |         21 |        137 |
+| d:\vscode_project\Performace-MM\back-end\sql\http.js                 | JavaScript |         57 |          3 |          3 |         63 |
+| d:\vscode_project\Performace-MM\back-end\sql\sqlMap.js               | JavaScript |        283 |         22 |          0 |        305 |
+| d:\vscode_project\Performace-MM\back-end\utils\common.js             | JavaScript |         17 |          0 |          2 |         19 |
+| d:\vscode_project\Performace-MM\back-end\utils\time.js               | JavaScript |         22 |          4 |          2 |         28 |
+| Total                                                                |            |      4,174 |        277 |        136 |      4,587 |
++----------------------------------------------------------------------+------------+------------+------------+------------+------------+

@@ -152,7 +152,7 @@
   export default {
     data () {
       return {
-        title: this.$moment().format('YYYY'),
+        title: null,
         descriptionContent: '1、首先查看评价标准，了解',
         rateTableData: [],
         curUser: this.$store.state.userInfo.id,
@@ -181,11 +181,12 @@
         getCurApplyAbleMonth().then(getCurApplyAbleMonthRes => {
           this.curApplyYear = this.$moment(getCurApplyAbleMonthRes[0].setTime).year()
           this.curApplyMonth = this.$moment(getCurApplyAbleMonthRes[0].setTime).month() + 1
+          this.title = this.$moment(getCurApplyAbleMonthRes[0].setTime).format('YYYY')
+          // 生成表格数据
+          this.genConclusionTableData()
         }).catch(() => {
           this.$common.toast('获取当前申报月份错误', 'error', true)
         })
-        // 生成表格数据
-        this.genConclusionTableData()
       },
       // 生成表格数据
       genConclusionTableData () {

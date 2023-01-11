@@ -102,7 +102,7 @@ const sqlMap = {
         ' wl.reviewStatus = 1 and wa.obsoleteStatus != 1 and u.status != 0',
     getIsWorkTimeReviewFinish: 'select * from worktimelist where applyMonth = ? and obsoleteStatus != 1 and reviewStatus = 0 ' +
         'and applyType = "fact" and submitStatus = 1',
-    getCurApplyAbleMonth: 'select * from globalflag where flagType = "curApplyMonth"',
+    getCurApplyAbleMonth: 'select date_format((select setTime from globalflag where flagType = "curApplyMonth"), "%Y-%m-%d") as setTime',
     updateWorkTimeListReviewStatus: 'update worktimelist set reviewKValue = ?, reviewCofficient = ?, reviewer = ?, reviewTime = ? ' +
         ', reviewStatus = ? where id = ?; update worktimeassign set reviewWorkTime = workTime where projectID = ?',
     getWorkTimeAssignInfo: 'select * from worktimeassign where projectID = ?',

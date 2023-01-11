@@ -901,9 +901,9 @@ const performance = {
         let sql = $sql.performance.getCurApplyAbleMonth
         let arrayParams = []
         RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
-            return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
+          return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
         }).catch(RCPDDatabaseErr => {
-            return $http.writeJson(res, {code: -2, data: RCPDDatabaseErr, message: 'err'})
+          return $http.writeJson(res, {code: -2, data: RCPDDatabaseErr, message: 'err'})
         })
     },
     // 提交项目工时申报

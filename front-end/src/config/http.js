@@ -5,8 +5,8 @@ import common from '../assets/js/common.js'
 
 // axios.defaults.timeout = 180000
 axios.defaults.timeout = 5000
-// axios.defaults.baseURL = '/demo-weekly/back-end/api' // 测试接口域名线下
-axios.defaults.baseURL = '/api' // 测试接口域名线上
+axios.defaults.baseURL = '/demo-weekly/back-end/api' // 测试接口域名线下
+// axios.defaults.baseURL = '/api' // 测试接口域名线上
 export const baseURL = axios.defaults.baseURL
 
 // 配置请求拦截器
@@ -72,7 +72,7 @@ axios.interceptors.response.use(response => {
         common.toast(err.message, 'error', false)
     }
   } else {
-    err.message = '连接到服务器失败'
+    err.message = '服务器连接失败'
     common.toast(err.message, 'error', false)
   }
   return Promise.resolve(err.response)

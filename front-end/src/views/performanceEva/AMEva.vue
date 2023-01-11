@@ -28,9 +28,23 @@
             :disabled="!getDataLoading">下月
           </el-button>
         </el-col>
-        <el-col :md="13" :lg="{span: 7, offset: 5}" :xl="{span: 7, offset: 7}" v-if="$store.state.userInfo.duty === 1">
+        <el-col :md="13" :lg="{span: 6}" :xl="{span: 6}" v-if="$store.state.userInfo.duty === 1">
           <div>
-            <span style="font-weight:bold;">绩效信息发布状态：</span>
+            <span style="font-weight:bold;">全处工时审核状态：</span>
+            <span>
+              <span v-if="getDataLoading">
+                <span v-if="workTimeRWed" style="color: green;font-size: 23px;font-weight:bold">已完成</span>
+                <span v-else style="color: red;font-size: 23px;font-weight:bold">未完成</span>
+              </span>
+              <span v-else>
+                <span style="color: red;font-size: 23px;font-weight:bold">查询中...</span>
+              </span>
+            </span>
+          </div>
+        </el-col>
+        <el-col :md="13" :lg="{span: 7, offset: 1}" :xl="{span: 7, offset: 1}" v-if="$store.state.userInfo.duty === 1">
+          <div>
+            <span style="font-weight:bold;">绩效发布状态：</span>
             <span>
               <span v-if="getDataLoading">
                 <span v-if="PMPublishStatus" style="color: green;font-size: 23px;font-weight:bold">已发布</span>
@@ -40,12 +54,21 @@
                 <span style="color: red;font-size: 23px;font-weight:bold">查询中...</span>
               </span>
             </span>
-            <el-switch
-               :disabled="!getDataLoading || !publistPMDataFlag"
+            <span>
+              <el-switch
+               :disabled="!getDataLoading || !publistPMDataFlag || !workTimeRWed"
                v-model="PMPublishStatus"
                @change="handlePerformancePublish"
-               style="margin-left: 20px">
-            </el-switch>
+               style="margin-left: 10px">
+              </el-switch>
+            </span>
+            <el-popover
+              v-if="!workTimeRWed"
+              placement="bottom"
+              trigger="click">
+              <span>需全处工时完成审核后才能发布</span><br>
+              <span slot="reference" class="pointer-type"><i class="el-icon-warning" style="color:red"></i></span>
+            </el-popover>
           </div>
         </el-col>
       </el-row>
@@ -257,7 +280,8 @@ import { getAllWorkTimeList,
          savePMData,
          publishPMData,
          getPMData,
-         updatePMData } from '@/utils/performance'
+         updatePMData,
+         getSubmitWorkTimeCount } from '@/utils/performance'
 import { genQualiEvaData, getAllQTEvaedData } from '@/utils/multual'
 import { Notification } from 'element-ui'
 import { getUsersList } from '@/utils/users'
@@ -265,7 +289,7 @@ import { getCurMonthConclusionOverviewDataNew } from '@/utils/conclusion'
 import { submitAMEvaData,
          updateAMEvaData,
          genAMEvaScoreData } from '@/utils/achievementEva'
-import { getEvaCoef, sortObjectArrayByParams, getPerformanceIsPublish, sortBy, sortByAscend } from '@/utils/common'
+import { getEvaCoef, sortObjectArrayByParams, getPerformanceIsPublish, sortByAscend } from '@/utils/common'
 import store from '@/store'
 import Cookies from 'js-cookie'
 export default {
@@ -324,6 +348,7 @@ export default {
       dimension1GPEvaStar: 0, // 评价维度1组长评价星级
       dimension2GPEvaStar: 0, // 评价维度2组长评价星级
       PMPublishStatus: false, // 绩效信息发布状态
+      workTimeRWed: false, // 工时审核状态
       PMPublishStatusData: [] // 绩效发布状态数据
     }
   },
@@ -352,6 +377,16 @@ export default {
     },
     // 初始化显示数据
     initData (conclusionYear, conclusionMonth, SEGroup, CMGroup, usersList) {
+      // 获取全处工时审核状态
+      getSubmitWorkTimeCount(usersList, this.title).then(getSubmitWorkTimeCountRes => {
+        this.workTimeRWed = true
+        for (let item of getSubmitWorkTimeCountRes) {
+          if (item.unReviewProjectCount > 0) {
+            this.workTimeRWed = false
+            break
+          }
+        }
+      })
       // 先生成表格初始数据（获取其他人的月总结以及对其他的月总结评价
       this.genTableData(conclusionYear, conclusionMonth, SEGroup, CMGroup).then(tableData => {
         // 普通员工
