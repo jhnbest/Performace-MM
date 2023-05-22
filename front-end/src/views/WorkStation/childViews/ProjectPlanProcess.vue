@@ -346,84 +346,84 @@
           propName: 'December'
         }],
         progress: [{
-          value: 5,
-          label: '5%',
-          disable: false
-        }, {
-          value: 10,
-          label: '10%',
-          disable: false
-        }, {
-          value: 15,
-          label: '15%',
-          disable: false
-        }, {
-          value: 20,
-          label: '20%',
-          disable: false
-        }, {
-          value: 25,
-          label: '25%',
-          disable: false
-        }, {
-          value: 30,
-          label: '30%',
-          disable: false
-        }, {
-          value: 35,
-          label: '35%',
-          disable: false
-        }, {
-          value: 40,
-          label: '40%',
-          disable: false
-        }, {
-          value: 45,
-          label: '45%',
-          disable: false
-        }, {
-          value: 50,
-          label: '50%',
-          disable: false
-        }, {
-          value: 55,
-          label: '55%',
-          disable: false
-        }, {
-          value: 60,
-          label: '60%',
-          disable: false
-        }, {
-          value: 65,
-          label: '65%',
-          disable: false
-        }, {
-          value: 70,
-          label: '70%',
-          disable: false
-        }, {
-          value: 75,
-          label: '75%',
-          disable: false
-        }, {
-          value: 80,
-          label: '80%',
-          disable: false
-        }, {
-          value: 85,
-          label: '85%',
-          disable: false
-        }, {
-          value: 90,
-          label: '90%',
+          value: 100,
+          label: '100%',
           disable: false
         }, {
           value: 95,
           label: '95%',
           disable: false
         }, {
-          value: 100,
-          label: '100%',
+          value: 90,
+          label: '90%',
+          disable: false
+        }, {
+          value: 85,
+          label: '85%',
+          disable: false
+        }, {
+          value: 80,
+          label: '80%',
+          disable: false
+        }, {
+          value: 75,
+          label: '75%',
+          disable: false
+        }, {
+          value: 70,
+          label: '70%',
+          disable: false
+        }, {
+          value: 65,
+          label: '65%',
+          disable: false
+        }, {
+          value: 60,
+          label: '60%',
+          disable: false
+        }, {
+          value: 55,
+          label: '55%',
+          disable: false
+        }, {
+          value: 50,
+          label: '50%',
+          disable: false
+        }, {
+          value: 45,
+          label: '45%',
+          disable: false
+        }, {
+          value: 40,
+          label: '40%',
+          disable: false
+        }, {
+          value: 35,
+          label: '35%',
+          disable: false
+        }, {
+          value: 30,
+          label: '30%',
+          disable: false
+        }, {
+          value: 25,
+          label: '25%',
+          disable: false
+        }, {
+          value: 20,
+          label: '20%',
+          disable: false
+        }, {
+          value: 15,
+          label: '15%',
+          disable: false
+        }, {
+          value: 10,
+          label: '10%',
+          disable: false
+        }, {
+          value: 5,
+          label: '5%',
           disable: false
         }]
       }
@@ -523,8 +523,8 @@
                 checkApdID.push(JSON.parse(JSON.stringify(tableItem)))
                 let preMonth = moment(curApplyMonth).subtract(1, 'months').month() + 1
                 if (preMonth === 12) { // 上个月为去年的十二月份
-                  if (tableItem.preMonthProcess.length > 0) {
-                    tableItem.preMonthProcess = tableItem.preMonthProcess[0].December === null ? 0 : tableItem.preMonthProcess[0].December
+                  if (tableItem.preMonthProcessArray.length > 0) {
+                    tableItem.preMonthProcess = tableItem.preMonthProcessArray[0].December === null ? 0 : tableItem.preMonthProcessArray[0].December
                   } else {
                     tableItem.preMonthProcess = 0
                   }

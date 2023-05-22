@@ -86,7 +86,7 @@
             size="mini"
             ref = "PMDataTable">
             <el-table-column label="姓名" prop="name" align="center"></el-table-column>
-            <el-table-column label="月总结提交状态" prop="submitStatus" align="center" width="70px">
+            <el-table-column label="总结状态" prop="submitStatus" align="center" width="50px">
               <template slot-scope="scope">
                 <div v-if="scope.row.submitStatus === 1">
                   <svg-icon icon-class="greenPoint" style="fontSize:30px"/>
@@ -109,7 +109,7 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column v-if="$store.state.userInfo.duty === 1" label="是否已全部评价他人" align="center" width="80px">
+            <el-table-column v-if="$store.state.userInfo.duty === 1" label="互评状态" align="center" width="50px">
               <template slot-scope="scope">
                 <div v-if="scope.row.isEvaAllFinish">
                   <svg-icon icon-class="greenPoint" style="fontSize:30px"/>
@@ -120,20 +120,20 @@
               </template>
             </el-table-column>
             <el-table-column v-if="$store.state.userInfo.duty === 1"
-                              label="工时排名"
+                              label="工时排名(组内)"
                               prop="QYEvaRank"
-                              align="center" width="50px"></el-table-column>
+                              align="center" width="70px"></el-table-column>
             <el-table-column v-if="$store.state.userInfo.duty === 1"
-                              label="成效评价排名"
+                              label="成效评价排名(全处)"
                               prop="AMEvaRank"
-                              align="center" width="60px"></el-table-column>
+                              align="center" width="80px"></el-table-column>
             <el-table-column v-if="$store.state.userInfo.duty === 1"
                               label="标准化绩效得分"
                               prop="PMScoreNor"
                               align="center" width="70px"></el-table-column>
             <el-table-column v-if="$store.state.userInfo.duty === 1"
                               label="绩效排名"
-                              align="center" width="60px">
+                              align="center" width="50px">
               <template slot-scope="scope">
                 <span style="font-weight: bolder;color: red">{{scope.row.PMRank}}</span>
                 <i v-if="scope.row.PMRankChange < 0" class="el-icon-caret-top" style="color: red"></i>
@@ -174,7 +174,8 @@
               </el-table-column>
               <el-table-column label="评分" width="150px" align="center">
                 <template slot-scope="scope">
-                  <el-rate v-model="buildBoutiqueProjectStar.evaStar"
+                  <el-rate :disabled="PMPublishStatus"
+                           v-model="buildBoutiqueProjectStar.evaStar"
                            @change="handlebuildBoutiqueProjectStarChange(scope.row)"
                            slot="reference">
                   </el-rate>
@@ -199,7 +200,8 @@
               </el-table-column>
               <el-table-column label="评分" width="150px" align="center">
                 <template slot-scope="scope">
-                  <el-rate v-model="buildProTeamStar.evaStar"
+                  <el-rate :disabled="PMPublishStatus"
+                           v-model="buildProTeamStar.evaStar"
                            @change="handlebuildProTeamStarChange(scope.row)"
                            slot="reference">
                   </el-rate>
@@ -289,7 +291,7 @@ import { getCurMonthConclusionOverviewDataNew } from '@/utils/conclusion'
 import { submitAMEvaData,
          updateAMEvaData,
          genAMEvaScoreData } from '@/utils/achievementEva'
-import { getEvaCoef, sortObjectArrayByParams, getPerformanceIsPublish, sortByAscend } from '@/utils/common'
+import { getEvaCoef, sortObjectArrayByParams, getPerformanceIsPublish, sortByAscend, isUndefined } from '@/utils/common'
 import store from '@/store'
 import Cookies from 'js-cookie'
 export default {
@@ -349,7 +351,8 @@ export default {
       dimension2GPEvaStar: 0, // 评价维度2组长评价星级
       PMPublishStatus: false, // 绩效信息发布状态
       workTimeRWed: false, // 工时审核状态
-      PMPublishStatusData: [] // 绩效发布状态数据
+      PMPublishStatusData: [], // 绩效发布状态数据
+      publishedPMData: [] // 已发布的绩效数据
     }
   },
   methods: {
@@ -377,17 +380,7 @@ export default {
     },
     // 初始化显示数据
     initData (conclusionYear, conclusionMonth, SEGroup, CMGroup, usersList) {
-      // 获取全处工时审核状态
-      getSubmitWorkTimeCount(usersList, this.title).then(getSubmitWorkTimeCountRes => {
-        this.workTimeRWed = true
-        for (let item of getSubmitWorkTimeCountRes) {
-          if (item.unReviewProjectCount > 0) {
-            this.workTimeRWed = false
-            break
-          }
-        }
-      })
-      // 先生成表格初始数据（获取其他人的月总结以及对其他的月总结评价
+      // 生成表格初始数据（获取其他人的月总结以及对其他人的月总结评价）
       this.genTableData(conclusionYear, conclusionMonth, SEGroup, CMGroup).then(tableData => {
         // 普通员工
         if (store.state.userInfo.duty !== 1) {
@@ -432,9 +425,26 @@ export default {
           // 首先判断绩效信息发布状态并获取每条月总结对应的所有评价，如果绩效已发布，则显示已经发布的绩效数据；
           getPerformanceIsPublish(conclusionYear, conclusionMonth).then(response => {
             this.PMPublishStatusData = response // 绩效发布状态
-            // =============================计算绩效评价相关信息====================================
-            if (this.PMPublishStatusData.length > 0) { // 绩效数据库中已有相关数据
-              this.PMPublishStatus = this.PMPublishStatusData[0].flagValue !== 0 // 绩效发布状态设置
+            this.PMPublishStatus = false
+            if (this.PMPublishStatusData.length > 0) {
+              if (this.PMPublishStatusData[0].flagValue !== 0) {
+                this.PMPublishStatus = true // 绩效发布状态设置为已发布
+              }
+            }
+            // 获取全处工时审核状态
+            getSubmitWorkTimeCount(usersList, this.title).then(getSubmitWorkTimeCountRes => {
+              this.workTimeRWed = true
+              for (let item of getSubmitWorkTimeCountRes) {
+                if (item.unReviewProjectCount > 0 && !this.PMPublishStatus) {
+                  this.workTimeRWed = false
+                  break
+                }
+              }
+            })
+            // 根据绩效发布状态选择直接获取绩效库数据或是重新计算绩效数据
+            // 1、直接获取绩效数据：a.绩效库有数据且绩效发布状态为已发布
+            // 2、重新计算绩效数据：a.绩效库无数据；b.绩效库有数据但未发布
+            if (this.PMPublishStatus) { // 直接获取绩效数据->绩效库有数据且绩效发布状态为已发布
               getPMData(this.title).then(getPMDataRes => {
                 for (let tableDataItem of tableData) {
                   let findResult = getPMDataRes.find(getPMDataResItem => {
@@ -502,17 +512,22 @@ export default {
                 })
                 this.getDataLoading = true
               })
-            } else { // 绩效数据库中还未有相关数据
-              this.PMPublishStatus = false // 绩效发布状态设置为未发布
+            } else { // 重新计算绩效数据->绩效库无数据或绩效库有数据但未发布
               let promises = []
               let count = 0
               promises[count++] = getAllWorkTimeList(this.title) // 获取工时申报情况
               promises[count++] = getAllQTEvaedData(usersList, this.title) // 获取定性评价情况
               promises[count++] = getEvaCoef() // 获取各种系数
+              if (this.PMPublishStatusData.length > 0) { // 如果绩效数据库里面有绩效，则获取绩效数据
+                promises[count++] = getPMData(this.title)
+              }
               Promise.all(promises).then(allResponse => {
                 let allWorkTimeList = allResponse[0]
                 let QTEvaedData = allResponse[1]
                 this.evaCoefObj = allResponse[2]
+                if (this.PMPublishStatusData.length > 0) { // 如果绩效数据库里面有绩效，则获取
+                  this.publishedPMData = allResponse[3]
+                }
                 this.QYEvaScoreData = genQYEvaScoreData(usersList, allWorkTimeList, this.title) // 生成定量评价数据
                 this.QTEvaScoreData = genQualiEvaData(QTEvaedData, this.QYEvaScoreData) // 生成定性评价数据
                 tableData = genAMEvaScoreData(tableData,
@@ -1048,46 +1063,79 @@ export default {
     // 发布绩效信息
     handlePerformancePublish () {
       this.publistPMDataFlag = false
-      // ========================先把绩效信息写入数据库===================
-      let promise = []
-      let count = 0
-      let publishID = this.PMPublishStatusData.length > 0 ? this.PMPublishStatusData[0].id : -1 // 判断该月绩效是否已经发布
-      let applyYear = this.$moment(this.title).year()
-      let applyMonth = this.$moment(this.title).month() + 1
-      let flagValue = this.PMPublishStatus ? 1 : 0
-      if (publishID === -1) { // 该月绩效还未发布，插入绩效数据
-        promise[count++] = savePMData(this.title, this.PMData)
-        promise[count++] = publishPMData(applyYear, applyMonth, publishID, flagValue)
-      } else { // 数据库中有该字段
-        if (this.PMPublishStatus) { // 如果是发布绩效
-          promise[count++] = updatePMData(this.PMData)
-          promise[count++] = publishPMData(applyYear, applyMonth, publishID, flagValue)
-        }
-      }
-      Promise.all(promise).then((allResponse) => {
-        if (this.PMPublishStatusData.length === 0) {
-          let obj = {
-            id: allResponse[1].data.insertId,
-            flagValue: flagValue,
-            flagType: 'performanceInfoPublish'
+      // 判断按钮状态
+      if (this.PMPublishStatus) { // 如果是发布绩效
+        let promise = []
+        let count = 0
+        let publishID = this.PMPublishStatusData.length > 0 ? this.PMPublishStatusData[0].id : -1 // 判断该月绩效是否已经发布
+        let applyYear = this.$moment(this.title).year()
+        let applyMonth = this.$moment(this.title).month() + 1
+        let flagValue = this.PMPublishStatus ? 1 : 0
+
+        if (publishID === -1) { // 如果绩效数据内还没有相关数据，则插入绩效数据
+          promise[count++] = savePMData(this.title, this.PMData)
+        } else { // 数据库中有绩效数据
+          for (let PMDataItem of this.PMData) {
+            let findResult = this.publishedPMData.find(item => {
+              return item.userID === PMDataItem.id
+            })
+            if (!isUndefined(findResult)) {
+              PMDataItem.publishPMDataID = findResult.id
+            }
           }
-          this.PMPublishStatusData.push(obj)
-        } else {
-          this.PMPublishStatusData[0].flagValue = flagValue
+          promise[count++] = updatePMData(this.PMData)
         }
-        Notification.success({
-          title: '成功',
-          message: '操作成功'
+        promise[count++] = publishPMData(applyYear, applyMonth, publishID, flagValue) // 更新绩效发布标志位
+        Promise.all(promise).then((allResponse) => {
+          if (this.PMPublishStatusData.length === 0) {
+            let obj = {
+              id: allResponse[1].data.insertId,
+              flagValue: flagValue,
+              flagType: 'performanceInfoPublish'
+            }
+            this.PMPublishStatusData.push(obj)
+          } else {
+            this.PMPublishStatusData[0].flagValue = flagValue
+          }
+          Notification.success({
+            title: '成功',
+            message: '操作成功'
+          })
+          this.publistPMDataFlag = true
+        }).catch(err => {
+          console.log(err)
+          Notification.error({
+            title: '失败',
+            message: '绩效数据上传失败'
+          })
+          this.publistPMDataFlag = true
         })
-        this.publistPMDataFlag = true
-      }).catch(err => {
-        console.log(err)
-        Notification.error({
-          title: '失败',
-          message: '绩效数据上传失败'
+      } else { // 如果是取消发布绩效
+        let publishID = this.PMPublishStatusData.length > 0 ? this.PMPublishStatusData[0].id : -1 // 判断该月绩效是否已经发布
+        let applyYear = this.$moment(this.title).year()
+        let applyMonth = this.$moment(this.title).month() + 1
+        let flagValue = 0
+        publishPMData(applyYear, applyMonth, publishID, flagValue).then(() => {
+          this.publistPMDataFlag = true
+          this.clearEvaTable()
+          this.getDataLoading = false
+          let conclusionYear = this.$moment(this.title).year()
+          let conclusionMonth = this.$moment(this.title).month() + 1
+          this.initData(conclusionYear, conclusionMonth, this.standAndEngineerGroup, this.commuincationGroup, this.usersList)
+          Notification.success({
+            title: '成功',
+            message: '操作成功'
+          })
+        }).catch(err => {
+          console.log(err)
+          Notification.error({
+            title: '失败',
+            message: '取消发布失败'
+          })
+          this.publistPMDataFlag = true
         })
-        this.publistPMDataFlag = true
-      })
+      }
+      // ========================先把绩效信息写入数据库===================
     },
     // 日期发生变化
     handleDataChange () {

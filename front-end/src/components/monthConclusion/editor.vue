@@ -60,8 +60,8 @@
       return {
         init: {
           language_url: `${this.baseUrl}/tinymce/langs/zh_CN.js`, // 如果语言包不存在，指定一个语言包路径
-          // language_url: `workTimeMM/static/tinymce/langs/zh_CN.js`, // 如果语言包不存在，指定一个语言包路径
           skin_url: `${this.baseUrl}/tinymce/skins/ui/oxide`, // 如果主题不存在，指定一个主题路径
+          // language_url: `workTimeMM/static/tinymce/langs/zh_CN.js`, // 如果语言包不存在，指定一个语言包路径
           // skin_url: `workTimeMM/static/tinymce/skins/ui/oxide`, // 如果主题不存在，指定一个主题路径
           language: 'zh_CN', // 语言
           height: '300px',

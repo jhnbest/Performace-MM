@@ -462,7 +462,7 @@ export function updatePMData (PMData) {
         dimension1GPEvaStar: PMDataItem.AMD1GPEvaStar,
         dimension2CSAveStar: PMDataItem.AMD2CSEvaAveStar,
         dimension2GPEvaStar: PMDataItem.AMD2GPEvaStar,
-        id: PMDataItem.id
+        id: PMDataItem.publishPMDataID
       }
       PMDataTmp.push(JSON.parse(JSON.stringify(obj)))
     }

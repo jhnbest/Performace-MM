@@ -93,7 +93,6 @@ const sqlMap = {
     submitReviewRejectOrWithdraw: 'update worktimelist set reviewKValue = ?, reviewCofficient = ?, reviewStatus = ?, reviewTime = ?, reviewComments = ?, ' +
         'reviewer = ?, submitStatus = ? where id = ?',
     updateProjectWorkTimeAssignReviewStatus: 'update worktimelist set workTimeAssignReviewStatus = ? where id = ?',
-    getAssignWorkTime: 'select reviewWorkTime from worktimeassign where projectID = ? and userID = ? and obsoleteStatus != 1',
     getGroupWorkTimeList: 'select u.id, u.name, wa.reviewWorkTime, wl.applyMonth from worktimeassign wa left join worktimelist ' +
         'wl on wa.projectID = wl.id left join users u on wa.userID = u.id where wl.applyMonth = ? and u.groupName = ? and ' +
         ' wl.reviewStatus = 1 and wa.obsoleteStatus != 1 and u.status != 0',
@@ -115,7 +114,12 @@ const sqlMap = {
     + 'CSQTEvaScoreNor = ?, CSQTEvaRank = ?, MGQTEvaScoreUnN = ?, MGQTEvaRank = ?, MGQTEvaScoreNor = ?, AMEvaScoreUnN = ?, '
     + 'AMEvaScoreNor = ?, AMEvaRank = ?, PMScoreUnN = ?, PMScoreNor = ?, PMRank = ?, dimension1CSAveStar = ?, '
     + 'dimension1GPEvaStar = ?, dimension2CSAveStar = ?, dimension2GPEvaStar = ? where id = ?',
-    getPMData: 'select pm.*, u.name, u.groupName as groupID from performancedata pm left join users u on pm.userID = u.id where pm.applyDate = ?'
+    getPMData: 'select pm.*, u.name, u.groupName as groupID from performancedata pm left join users u on pm.userID = u.id where pm.applyDate = ?',
+    getWorkTimeAssign: 'select u.name, wa.* from worktimeassign wa left join users u on '
+    + 'wa.userID = u.id where wa.projectID in (?) and wa.obsoleteStatus != 1',
+    test1: 'select apd.id from monthprocess m left join assignprojectdetail apd on m.aPDID = apd.id where m.year = 2022 and' +
+          ' apd.process != 0 and apd.process != 100 and m.obsoleteStatus != 1',
+    test2: 'select * from monthprocess m where m.year = 2023 and m.aPDID = ? and m.obsoleteStatus != 1'
   },
   workStation: {
     getAssignProjectListUn: 'select apl.*, users.name as assigner from assignprojectlist apl left join users on apl.assignerID = users.id where ' +
@@ -251,8 +255,8 @@ const sqlMap = {
     getRateData: 'select ml.*, u.duty, u.groupName from mutualrate ml left join users u on ml.ratedPersion = u.id ' +
         'where ml.ratePersion = ? and ml.rateMonth = ?',
     getPerformanceIsCount: 'select * from globalflag where year(setTime) = ? and month(setTime) = ? and flagType = ?',
-    getPreMonthEva: 'select mr.*, u.name as ratedPersionName from mutualrate mr left join users u on mr.ratedPersion = ' +
-        'u.id where mr.rateMonth = ? and mr.ratePersion = ?',
+    getMonthEva: 'select mr.*, u.name as ratedPersionName from mutualrate mr left join users u on mr.ratedPersion = ' +
+        'u.id where mr.rateMonth = ? and mr.ratePersion = ? and u.status != 0',
     handleFillMul: 'select count(*) as totalCount from mutualrate where ratePersion = ? and rateMonth = ?',
     handleFillMulCheck: 'select * from mutualrate where ratePersion = ? and rateMonth = ?',
     handleFillMulFill: 'insert into mutualrate (ratePersion, ratedPersion, rateMonth, rate, rateType, rateTime, updateTime) ' +

@@ -127,13 +127,14 @@
                                 :conclusion-title="conclusionTitle"
                                 :id="selectId"
                                 :manager-eva="managerEva"
-                                :check-user-id="this.$store.state.userInfo.id"
+                                :check-user-id="$store.state.userInfo.id"
                                 @close="conclusionDialog = false"></month-conclusion-table-check>
   <!-- 月总结对话框（新） -->
   <month-conclusion-table-check-new v-if="conclusionDialogNew"
                                 :moreDetailData = moreDetailData
                                 :conclusionTitle="conclusionTitle"
                                 :checkUserId="$store.state.userInfo.id"
+                                :months="selectMonth"
                                 @close="conclusionDialogNew = false"></month-conclusion-table-check-new>
 </div>
 </template>
@@ -171,7 +172,8 @@
         curAdvice: null,
         selectId: null,
         managerEva: null,
-        moreDetailData: []
+        moreDetailData: [],
+        selectMonth: []
       }
     },
     methods: {
@@ -254,6 +256,8 @@
       },
       // 点击预览
       handlePreview (row) {
+        this.selectMonth = []
+        this.selectMonth.push(row.month)
         let titleMonth = this.$moment(String(this.title) + '-' + String(row.submitMonth)).format('YYYY-MM')
         if (this.$moment(titleMonth).isBefore(store.state.newRulesDate)) { // 请求的月份再新规则实施月份之前
           this.conclusionDialog = true

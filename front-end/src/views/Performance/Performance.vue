@@ -26,18 +26,11 @@
         <span v-if="formData.selectType === '工时查询'" style="font-size: 21px;font-weight: bold">本月实际获得工时:
         <count-to
           :start-val="0"
-          :end-val="formData.totalWorkTime"
+          :end-val="totalWorkTime"
           :duration="1000"
           :decimals="1"
           style="color: #F56C6C;margin-left: 10px;font-size: 25px"/>
         </span>
-        <span v-if="formData.selectType === '计划查询'" style="font-size: 21px;font-weight: bold">本月预计获得工时:
-        <count-to
-          :start-val="0"
-          :end-val="planGetWorkTime"
-          :duration="2600"
-          :decimals="1"
-          style="color: #F56C6C;margin-left: 10px;font-size: 25px"/></span>
       </el-form-item>
     </el-form>
     <!-- 分割线 start -->
@@ -49,7 +42,7 @@
         style="width: 99%;margin: auto; margin-top: 20px"
         border
         :span-method="objectSpanMethod"
-        :header-cell-style="{ backgroundColor:'#48bfe5', color: '#333' }">
+        :header-cell-style="{ backgroundColor:'#48bfe5', color: '#333' }" :cell-style="cellStyle3">
         <el-table-column type="expand">
           <template slot-scope="scope">
             <el-form label-position="left" inline class="demo-table-expand">
@@ -110,11 +103,49 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="审核状态" align="center" width="100%">
+        <!-- <el-table-column label="审核状态" align="center" width="100%">
           <template slot-scope="scope">
             <el-tag :type="scope.row.reviewStatus | reviewStatusFilter" size="medium">
               {{ scope.row.reviewStatus | reviewStatusTextFilter}}
             </el-tag>
+          </template>
+        </el-table-column> -->
+        <el-table-column label="审核状态" align="center" width="100%">
+          <template slot-scope="scope">
+            <div v-if="scope.row.reviewStatus === 0">
+              <el-tag type="info">未审核</el-tag>
+            </div>
+            <div v-else>
+              <div v-if="!scope.row.isYichang">
+                <svg-icon icon-class="dagou"/><span>审核通过</span>
+              </div>
+              <div v-else>
+                <svg-icon icon-class="guanbi"/>
+                <el-popover
+                  placement="top"
+                  trigger="hover">
+                  <!-- 如果工时申报被驳回 -->
+                  <div v-if="scope.row.reviewStatus == 2">
+                    <span style="font-weight:bold;color:red">工时申报被驳回(原因):</span>
+                    <span>{{ scope.row.reviewComments!== ''? scope.row.reviewComments : "无" }}</span>
+                  </div>
+                  <!-- 如果是审核工时异常 -->
+                  <el-table v-else-if="scope.row.workTimeyichang.length !== 0" :data="scope.row.workTimeyichang" :cell-style="cellStyle">
+                    <el-table-column label="序号" align="center" type="index" width="50%"></el-table-column>
+                    <el-table-column label="姓名" prop="name" align="center"></el-table-column>
+                    <el-table-column label="角色" prop="assignRole" align="center"></el-table-column>
+                    <el-table-column label="申报工时" prop="workTime" align="center"></el-table-column>
+                    <el-table-column label="审核工时" prop="reviewWorkTime" align="center"></el-table-column>
+                  </el-table>
+                  <!-- 如果是审核K值异常 -->
+                  <el-table v-else-if="scope.row.KValueyichang" :data="[scope.row]" :cell-style="cellStyle2">
+                    <el-table-column label="申报K值" prop="applyKValue" align="center"></el-table-column>
+                    <el-table-column label="审核K值" prop="reviewKValue" align="center"></el-table-column>
+                  </el-table>
+                  <span slot="reference" class="link-type">审核异常</span>
+                </el-popover>
+              </div>
+            </div>
           </template>
         </el-table-column>
         <el-table-column label="获得工时" align="center" prop="assignWorkTime" width="100%"></el-table-column>
@@ -149,9 +180,8 @@
 <script>
     import Cop from '@/components/Cop/Cop'
     import CountTo from 'vue-count-to'
-    import { getAssignWorkTime, getGroupWorkTimeList, urlGetIsSubmitAllow } from '@/config/interface'
     import { getProjectList, deleteWorkTimeSubmit, changeSubmitStatus } from '@/utils/performance'
-    import { getIsSubmitAllow } from '@/utils/common'
+    import { getIsSubmitAllow, isUndefined } from '@/utils/common'
     import store from '@/store'
     export default {
       data () {
@@ -161,8 +191,8 @@
             label: 'projectName'
           },
           title: this.$moment().format('YYYY-MM'),
+          totalWorkTime: 0, // 本月实际获得工时
           formData: {
-            totalWorkTime: 0,
             selectType: '工时查询',
             rank: 0
           },
@@ -175,15 +205,13 @@
             changeSubmitStatus: true,
             deleteProject: true,
             getGroupWorkTimeList: true,
-            getAssignWorkTimes: true,
             handelDateChange: true
           },
           pageNum: 1, // 请求第几页
           pageSize: this.$store.state.pageSize, // 每页请求多少条
           currentPage: 1, // 初始时在第几页
           workDetailTable: [],
-          workPlanTableData: [],
-          planGetWorkTime: 0
+          workPlanTableData: []
         }
       },
       methods: {
@@ -216,38 +244,47 @@
           this.reqFlag.handelDateChange = false
           this.workPlanTableData = []
           this.workDetailTable = []
+          this.totalWorkTime = 0
           getProjectList(store.state.userInfo.id, this.title, this.pageNum, this.pageSize, null, null).then(res => {
+            let totalWorkTimeAssign = res.workTimeAssign
+            let totalWorkTimeList = JSON.parse(JSON.stringify(res.list))
             let factWorkTimeList = []
-            let planWorkTimeList = []
-            this.planGetWorkTime = 0
-            for (let item of res.list) {
-              item.assignWorkTime = null
-              if (item.applyType === 'fact') { // 实际进展表格数据
-                factWorkTimeList.push(item)
-              } else if (item.applyType === 'plan') { // 计划进展表格数据
-                this.planGetWorkTime += item.avaiableWorkTime
-                planWorkTimeList.push(item)
+            this.totalWorkTime = 0
+            for (let item of totalWorkTimeList) {
+              item.assignWorkTime = 0
+              // 插入工时分配信息
+              let worktimeassign = totalWorkTimeAssign.filter(item2 => {
+                return item2.projectID === item.id
+              })
+              item.worktimeassign = worktimeassign
+              let findResult = worktimeassign.find(worktimeassignItem => {
+                  return worktimeassignItem.userID === store.state.userInfo.id
+              })
+              if (!isUndefined(findResult)) {
+                item.assignWorkTime = findResult.reviewWorkTime
+                this.totalWorkTime += findResult.reviewWorkTime
               }
+              let workTimeyichang = worktimeassign.filter(item3 => { // 查找申报工时和审核工时不一致的条目
+                return (item3.workTime !== item3.reviewWorkTime) && (item3.userID === store.state.userInfo.id)
+              })
+              item.workTimeyichang = workTimeyichang
+              item.KValueyichang = item.applyKValue !== item.reviewKValue // 判断审核K值是否存在异常
+              // 根据审核情况置审核异常标志位
+              if (item.reviewStatus !== 0) {
+                item.isYichang = !(workTimeyichang.length == 0 && !item.KValueyichang && item.reviewStatus !== 2) // 如果审核工时与K值与申报工时与K值一致且未驳回则审核无异常
+              } else {
+                item.isYichang = null
+              }
+              if (item.isYichang) {
+              }
+              factWorkTimeList.push(item)
             }
             factWorkTimeList.sort(this.compare('aplID'))
-            planWorkTimeList.sort(this.compare('aplID'))
             this.handleTable(factWorkTimeList)
-            this.handleTable(planWorkTimeList)
-            this.workPlanTableData = JSON.parse(JSON.stringify(planWorkTimeList))
             this.workDetailTable = JSON.parse(JSON.stringify(factWorkTimeList))
             this.totalCount = res.totalCount
             this.currentPage = this.pageNum
-            let result = null
-            if (this.formData.selectType === '工时查询') {
-              result = factWorkTimeList
-            } else if (this.formData.selectType === '计划查询') {
-              result = planWorkTimeList
-            }
-            let promises = []
-            let count = 0
-            promises[count++] = this.getGroupWorkTimeList(this.$store.state.userInfo.groupID)
-            promises[count++] = this.getAssignWorkTimes(result)
-            Promise.all(promises).then(() => { this.reqFlag.handelDateChange = true }).catch(err => { this.reqFlag.handelDateChange = true; console.log(err) })
+            this.reqFlag.handelDateChange = true
           }).catch(err => {
             this.reqFlag.handelDateChange = true
             this.$common.toast('错误', 'error', 'true')
@@ -292,6 +329,24 @@
                 this.title = arr2[1] // 保存到保存数据的地方
               }
             }
+          }
+        },
+        // 表格列样式
+        cellStyle ({ row, column, rowIndex, columnIndex }) {
+          if (columnIndex == 4) {
+            return 'color: red;font-weight:bold'
+          }
+        },
+        // 表格列样式2
+        cellStyle2 ({ row, column, rowIndex, columnIndex }) {
+          if (columnIndex == 1) {
+            return 'color: red;font-weight:bold'
+          }
+        },
+        // 表格列样式3
+        cellStyle3 ({ row, column, rowIndex, columnIndex }) {
+          if (row.isYichang) {
+            return 'background-color: #EEDC82'
           }
         },
         // 申报月份变化
@@ -365,42 +420,6 @@
             }
           })
         },
-        async getAssignWorkTimes (data) {
-          const url = getAssignWorkTime
-          let i = 0
-          this.formData.totalWorkTime = 0
-          let params = {
-            userID: this.$store.state.userInfo.id,
-            projectData: []
-          }
-          if (data.length !== 0) {
-            for (let item of data) {
-              if (item.reviewStatus === 1) {
-                item.index = i
-                params.projectData.push(item)
-              }
-              i++
-            }
-            let _this = this
-            return new Promise(function (resolve, reject) {
-              _this.$http(url, params)
-                .then(res => {
-                  if (res.code === 1) {
-                    let data = res.data
-                    let totalWorkTimeTmp = 0
-                    for (let item of data) {
-                      _this.workDetailTable[item.index].assignWorkTime = item.reviewWorkTime
-                      totalWorkTimeTmp += item.reviewWorkTime
-                    }
-                    _this.formData.totalWorkTime = totalWorkTimeTmp
-                    resolve(totalWorkTimeTmp)
-                  } else {
-                    reject(new Error('请求失败'))
-                  }
-                })
-            })
-          }
-        },
         // 表格合并方法
         objectSpanMethod ({ row, column, rowIndex, columnIndex }) {
           if (columnIndex === 2 || columnIndex === 3) {
@@ -408,96 +427,6 @@
               rowspan: row.rowSpan,
               colspan: row.colSpan
             }
-          }
-        },
-        // 获取已审项目列表
-        getGroupWorkTimeList (groupID) {
-          const url = getGroupWorkTimeList
-          if (this.reqFlag.getGroupWorkTimeList) {
-            this.reqFlag.getGroupWorkTimeList = false
-            let params = {
-              groupID: groupID,
-              applyMonth: this.title
-            }
-            let _this = this
-            return new Promise(function (resolve, reject) {
-              _this.$http(url, params).then(res => {
-                if (res.code === 1) {
-                  let data = res.data
-                  if (data.length > 0) {
-                    let userID = []
-                    let totalWorkTimeCal = []
-                    for (let item of data) { // 插入各组员总工时信息
-                      if (userID.indexOf(item.id) === -1) {
-                        userID.push(item.id)
-                        let obj = {
-                          id: item.id,
-                          name: item.name,
-                          totalWorkTime: item.reviewWorkTime
-                        }
-                        totalWorkTimeCal.push(obj)
-                      } else {
-                        totalWorkTimeCal.find(function (wItem) {
-                          if (wItem.id === item.id) {
-                            wItem.totalWorkTime += item.reviewWorkTime
-                            return wItem.totalWorkTime
-                          }
-                        })
-                      }
-                    }
-                    totalWorkTimeCal.sort(_this.compare('totalWorkTime')) // 根据总工时排序
-                    let preWorkTime = 0
-                    let preRank = 1
-                    let count = 1
-                    for (let item of totalWorkTimeCal) { // 计算排名
-                      if (item.totalWorkTime === preWorkTime) {
-                        item.rank = preRank
-                      } else {
-                        item.rank = count
-                        preRank = count
-                      }
-                      count++
-                      preWorkTime = item.totalWorkTime
-                    }
-                    _this.formData.rank = totalWorkTimeCal.find(item => {
-                      if (item.id === _this.$store.state.userInfo.id) {
-                        return item.rank
-                      }
-                    })
-                    if (!_this.formData.rank) {
-                      _this.formData.rank = 0
-                    } else {
-                      _this.formData.rank = _this.formData.rank.rank
-                    }
-                    let length = totalWorkTimeCal.length
-                    for (let item of totalWorkTimeCal) { // 计算定量指标得分
-                      let rankPercentage = item.rank / length
-                      if (rankPercentage < 0.1 || rankPercentage === 0.1) {
-                        item.quantitativeScore = 92.5
-                      } else if (rankPercentage < 0.3 || rankPercentage === 0.3) {
-                        item.quantitativeScore = 90
-                      } else if (rankPercentage < 0.7 || rankPercentage === 0.7) {
-                        item.quantitativeScore = 87.5
-                      } else if (rankPercentage < 0.9 || rankPercentage === 0.9) {
-                        item.quantitativeScore = 85
-                      } else if (rankPercentage < 1 || rankPercentage === 1) {
-                        item.quantitativeScore = 82.5
-                      }
-                      if (item.rank === 1) {
-                        item.quantitativeScore = 92.5
-                      }
-                    }
-                    _this.tableData = totalWorkTimeCal
-                  } else {
-                    _this.formData.rank = 0
-                  }
-                  resolve(1)
-                } else {
-                  reject(new Error('请求失败'))
-                }
-                _this.reqFlag.getGroupWorkTimeList = true
-                })
-            })
           }
         },
         // 上一月
@@ -545,6 +474,18 @@
         CountTo
       },
       filters: {
+        groupNameFilter (groupName) {
+          switch (groupName) {
+            case '技术标准组':
+              return 'success'
+            case '工程组':
+              return 'warning'
+            case '通信组':
+              return 'primary'
+            default:
+              return 'danger'
+          }
+        },
         submitStatusFilter (status) {
           if (status === 1) {
             return 'success'
@@ -594,4 +535,7 @@
 </script>
 
 <style scoped>
+  .spanStype:hover {
+    cursor:pointer;
+  }
 </style>

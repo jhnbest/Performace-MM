@@ -87,6 +87,8 @@ const mutualRate = {
         }
         Promise.all(promises).then(() => {
             return $http.writeJson(res, {code: 1, data: 'yes', message: '成功'})
+        }).catch(err => {
+          return $http.writeJson(res, {code: -2, err: err, message: 'false'})
         })
     },
     // 更新互评信息
@@ -187,10 +189,10 @@ const mutualRate = {
         })
     },
     // 提取上月互评结果
-    getPreMonthEva (req, res) {
+    getMonthEva (req, res) {
         let sendData = req.body
-        let sql = $sql.mutualRates.getPreMonthEva
-        let arrayParams = [sendData.rateMonth, sendData.userID]
+        let sql = $sql.mutualRates.getMonthEva
+        let arrayParams = [sendData.rateMonth, sendData.rateUserID]
         RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
             return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
         }).catch(RCPDDatabaseErr => {

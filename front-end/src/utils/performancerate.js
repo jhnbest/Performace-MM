@@ -3,7 +3,7 @@ import {
   urlGetAllAchievements
 } from '../config/interface'
 import { groupName2String } from './users'
-import { rateTypeSwitch, calGetScore, starToRates } from './common'
+import { rateTypeSwitch, calGetScore, starToRatesNew } from './common'
 import store from '@/store'
 
 // 计算成效评价分数
@@ -82,7 +82,7 @@ export function genPerformanceEvaData (performanceEvaData, evaCoefObj) {
     }
     // ==============================计算各评价人领导评价和普通员工评价平均分（未标准化的）===============================
     if (manageRate === 0) { // 领导者尚未评价,重置为默认评分
-      let defaultRate = starToRates(store.state.defaultStar)
+      let defaultRate = starToRatesNew(store.state.defaultStar)
       manageRate = calPerformanceEvaScore(defaultRate, defaultRate, defaultRate,
         defaultRate, defaultRate, defaultRate)
     }

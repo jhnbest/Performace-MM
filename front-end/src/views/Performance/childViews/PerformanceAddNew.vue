@@ -10,7 +10,8 @@
             format="yyyy 第 MM 月"
             value-format="yyyy-MM"
             placeholder="选择月"
-            style="width: 150px">
+            style="width: 150px"
+            @change="handleDateChange">
           </el-date-picker>
         </el-form-item>
         <el-form-item label="小组">
@@ -73,23 +74,6 @@
             <span v-else style="color: red">{{inputProjectNameWord + '/' + maxProjectName}}</span>
           </span>
         </el-form-item>
-<!--        <el-form-item v-if="selectProjectStageID === 400" label="项目经理">-->
-<!--          <el-select v-model="selectPersion"-->
-<!--                     size="medium"-->
-<!--                     placeholder="请选择"-->
-<!--                     clearable-->
-<!--                     filterable-->
-<!--                     collapse-tags-->
-<!--                     @change="handlePersionChange" style="width: 90%">-->
-<!--            <el-option-->
-<!--              v-for="item in usersList"-->
-<!--              :key="item.id"-->
-<!--              :label="item.name"-->
-<!--              :value="item.id"-->
-<!--              :disabled="item.disabled">-->
-<!--            </el-option>-->
-<!--          </el-select>-->
-<!--        </el-form-item>-->
         <br>
         <el-form-item label="项目级别" prop="projectLevel">
           <el-select v-model="formData.projectLevel" placeholder="请选择">
@@ -249,10 +233,11 @@
     urlGetIsSubmitAllow,
     ulrGetWorkTimeNew,
     submitPersonalProject,
-    urlGetCurApplyAbleMonth,
     getAssignProjectList } from '@/config/interface'
   import Assign from '@/components/Cop/workTimeAssign'
   import { getProjectType, workTimeListInsert, temporaryWorkTimeList } from '@/utils/performance'
+  import { isUndefined } from '@/utils/common'
+  import Cookies from 'js-cookie'
   export default {
     data () {
       return {
@@ -395,12 +380,12 @@
     methods: {
       // 初始化
       init () {
+        if (isUndefined(Cookies.get('pmadd'))) {
+          Cookies.set('pmadd', this.formData.title)
+        }
+        this.formData.title = Cookies.get('pmadd')
         getProjectType(this.$store.state.userInfo.groupName).then(getProjectTypeRes => {
           this.projectTypeOptions = getProjectTypeRes
-        })
-        // this.getCookie()
-        this.getCurApplyAbleMonth().then(getCurApplyAbleMonthRes => {
-          this.formData.title = this.$moment(getCurApplyAbleMonthRes[0].setTime).format('YYYY-MM')
         })
       },
       // 获取当前月份能否申报的标志
@@ -982,6 +967,16 @@
       addNewLine () {
         let tableLength = this.formData.workTypeTimeDetail.length
         let obj = JSON.parse(JSON.stringify(this.formData.workTypeTimeDetail[tableLength - 1]))
+        // 清空前一条工时申报数据
+        let tmp = obj.workTimeAssign[0]
+        tmp.assignWorkTime = 0
+        obj.workTimeAssign = []
+        obj.workTimeAssign.push(tmp)
+        obj.multipleSelect = []
+        obj.multipleAssign = false
+        obj.avaiableWorkTime = 0
+        obj.baseWorkTime = 0
+        obj.isConference = 0
         let selectLength = this.formData.projectType.length
         this.formData.workTypeTimeDetail.push(obj)
         obj = JSON.parse(JSON.stringify(this.formData.projectType[selectLength - 1]))
@@ -1023,25 +1018,8 @@
         }
       },
       // 申报月份变化
-      handleDataChange () {
-        this.setCookie(this.formData.title, 7)
-      },
-      // 获取当前可申报的月份
-      getCurApplyAbleMonth () {
-        const url = urlGetCurApplyAbleMonth
-        let params = {}
-        let _this = this
-        return new Promise(function (resolve, reject) {
-          _this.$http(url, params).then(res => {
-            if (res.code === 1) {
-              resolve(res.data)
-            } else {
-              reject(res.data)
-            }
-          }).catch(err => {
-            reject(err)
-          })
-        })
+      handleDateChange () {
+        Cookies.set('pmadd', this.formData.title)
       },
       // 人员选择变化处理
       handlePersionChange () {

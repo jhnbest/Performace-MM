@@ -6,10 +6,7 @@ import {
   urlGetAchievementEvaOfConclusionDimension,
   urlGetUserConclusionEvaedData
 } from '../config/interface'
-import { newStarToRates,
-         sortBy,
-         PMScoreNorCal,
-         sortObjectArrayByParams,
+import { sortObjectArrayByParams,
          NorCal,
          starToRatesNew } from '@/utils/common'
 import store from '@/store'
@@ -113,6 +110,8 @@ export function genAMEvaScoreData (tableData,
   for (let tableDataItem of tableData) {
     let allAMEvaedDataLength = tableDataItem.allAMEvaedData.length
     let AMCSEvaNum = 0
+    let AMGPEvaNum = 0
+    let AMMGEvaNum = 0
     tableDataItem.AMMGEvaScore = 0
     tableDataItem.AMGPEvaScore = 0
     tableDataItem.AMCSEvaTotalScore = 0
@@ -134,6 +133,8 @@ export function genAMEvaScoreData (tableData,
         // 记录组长的评价星级
         tableDataItem.AMD1GPEvaStar = dimension === 1 ? evaStar : tableDataItem.AMD1GPEvaStar
         tableDataItem.AMD2GPEvaStar = dimension === 2 ? evaStar : tableDataItem.AMD2GPEvaStar
+        // 计算组长的总评价人数（2倍）（临时措施，防止出现异常新增的组长评价数据）
+        AMGPEvaNum++
       } else { // 如果评价的人是普通成员或其他组组长
         // 计算普通成员的成效评价总分
         tableDataItem.AMCSEvaTotalScore += calAMRateMid(evaStar, dimension, AMBuildBoutiqueProjectCoef, AMBuildProTeamCoef)
@@ -144,12 +145,15 @@ export function genAMEvaScoreData (tableData,
         AMCSEvaNum++
       }
     }
-    tableDataItem.AMCSEvaAveScore = AMCSEvaNum === 0 ? 0 : tableDataItem.AMCSEvaTotalScore / (AMCSEvaNum / 2)
-    tableDataItem.AMD1CSEvaAveStar = AMCSEvaNum === 0 ? 0 : tableDataItem.AMD1CSEvaTotalStar / (AMCSEvaNum / 2)
-    tableDataItem.AMD2CSEvaAveStar = AMCSEvaNum === 0 ? 0 : tableDataItem.AMD2CSEvaTotalStar / (AMCSEvaNum / 2)
+    tableDataItem.AMCSEvaAveScore = AMCSEvaNum === 0 ? 0 : tableDataItem.AMCSEvaTotalScore / (AMCSEvaNum / 2) // 组员评价评价得分
+    tableDataItem.AMD1CSEvaAveStar = AMCSEvaNum === 0 ? 0 : tableDataItem.AMD1CSEvaTotalStar / (AMCSEvaNum / 2) // 组员对维度1的平均评价星级
+    tableDataItem.AMD2CSEvaAveStar = AMCSEvaNum === 0 ? 0 : tableDataItem.AMD2CSEvaTotalStar / (AMCSEvaNum / 2) // 组员对维度2的平均评价星级
+    // 计算组长的总评价人数（2倍）（临时措施，防止出现异常新增的组长评价数据）
+    tableDataItem.AMGPEvaScore = AMGPEvaNum === 0 ? 0 : tableDataItem.AMGPEvaScore / (AMGPEvaNum / 2)
+    // 查找总工时
     tableDataItem.totalWorkTime = QYEvaScoreData.find(item => { return item.id === tableDataItem.id }).totalWorkTime
 
-    // 如果处经理还未对该用户评价
+    // 如果处经理还未对该用户评价，则将处经理评价星级设置成员工和组长的平均评价星级
     if (tableDataItem.AMMGEvaScore === 0) {
       let AMD1AveStar = 0
       let AMD2AveStar = 0
@@ -191,10 +195,12 @@ export function genAMEvaScoreData (tableData,
   // ===================================================计算成效评价的标准化得分=========================================================
   for (let tableDataItem of tableData) {
     let evaedUserDuty = tableDataItem.duty
+    // 如果用户属于普通员工，则按照普通员工评价占比30%、组长评价占比30%、处经理评价占比40%进行加权得分
     if (evaedUserDuty === 3) {
       tableDataItem.AMEvaScoreUnN = tableDataItem.AMCSEvaAveScore * CScommonStaffAMEvaCoef +
                                     tableDataItem.AMGPEvaScore * CSGroupLeaderAMEvaCoef +
                                     tableDataItem.AMMGEvaScore * CSManagerAMEvaCoef
+    // 如果用户属于小组组长，则按照普通员工评价占比50%、处经理评价占比50%进行加权得分
     } else if (evaedUserDuty === 2) {
       tableDataItem.AMEvaScoreUnN = tableDataItem.AMCSEvaAveScore * GPCommonStaffAMEvaCoef +
                                     tableDataItem.AMMGEvaScore * GPManagerAMEvaCoef

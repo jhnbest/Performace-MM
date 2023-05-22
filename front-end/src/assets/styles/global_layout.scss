@@ -181,7 +181,8 @@ input[type="number"]{
   cursor: pointer;
   &:hover {
     color: rgb(32, 160, 255);
-  }
+  };
+  text-decoration:underline
 }
 .pointer-type,
 .pointer-type:focus {

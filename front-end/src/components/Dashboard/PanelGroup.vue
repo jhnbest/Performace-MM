@@ -24,34 +24,66 @@
         width="500"
         trigger="click">
         <span>1、各评价指标的计算标准参照手册《通信工程处绩效管理办法》</span><br>
-        <span slot="reference" @click="dashboardAbout" class="pointer-type" style="margin-left: 20px"><i class="el-icon-warning-outline"></i>相关说明</span>
+        <span slot="reference" class="pointer-type" style="margin-left: 20px"><i class="el-icon-warning-outline"></i>相关说明</span>
       </el-popover>
     </div>
     <div class="hr-10" style="margin-top: 20px; margin-bottom: 20px"></div>
     <!-- 季度、月度之星 -->
     <div>
       <el-row class="panel-group" :gutter="20">
-        <el-col :xs="12" :sm="12" :lg="12" :xl="12" class="card-panel-col">
+        <!-- 季度之星 -->
+        <el-col :xs="12" :sm="12" :lg="12" :xl="12">
           <div class="card-panel-large">
-            <div class="card-panel-icon-wrapper icon-people">
-              <span style="font-weight: bolder;font-size: 30px;margin-left: -10px">{{selectQuarterNum}}季度</span>
+            <!-- 图标 -->
+            <div class="card-panel-icon-wrapper">
+              <span style="font-weight: bolder;font-size: 30px;">季度</span>
               <br>
               <span style="font-weight: bolder;font-size: 30px">之星</span>
             </div>
-            <div class="card-panel-description">
-              <div class="card-panel-text icon-quarter" slot="reference">{{quarterStar.name}}</div>
+            <!-- 具体人员 -->
+            <div v-if="quarterStars.length !== 0">
+              <div class="card-panel-description" v-for="(quarterStar) in quarterStars" :key="quarterStar.name">
+                <el-card slot="reference" shadow="hover" class="card-panel-text" @click.native="handleQuarterStarTabClick(quarterStar)">
+                  {{quarterStar.name}}
+                </el-card>
+              </div>
+              <!-- 月总结对话框（新） -->
+              <month-conclusion-table-check-new-v-2 v-if="showConclusion"
+                                                  :checkUserID ="curQuarterStar"
+                                                  :months = "quarterMonth"
+                                                  @close="showConclusion = false">
+                                                </month-conclusion-table-check-new-v-2>
+            </div>
+            <!-- 季度数据未统计完毕 -->
+            <div v-else style="float: center;font-weight: bold;margin-top: 60px;color: black;font-size:27px;text-align:center">
+              暂未统计...
             </div>
           </div>
         </el-col>
-        <el-col :xs="12" :sm="12" :lg="12" :xl="12" class="card-panel-col">
+        <!-- 月度之星 -->
+        <el-col :xs="12" :sm="12" :lg="12" :xl="12">
           <div class="card-panel-large">
-            <div class="card-panel-icon-wrapper icon-month">
+            <div class="card-panel-icon-wrapper">
               <span style="font-weight: bolder;font-size: 30px">月度</span>
               <br>
               <span style="font-weight: bolder;font-size: 30px">之星</span>
             </div>
-            <div class="card-panel-description">
-              <div class="card-panel-text">{{monthStar.name}}</div>
+            <div v-if="isCount">
+              <div class="card-panel-description" v-for="(monthStar) in monthStars" :key="monthStar.name">
+                <el-card slot="reference" shadow="hover" class="card-panel-text" @click.native="handleMonthStarsTabClick(monthStar)">
+                  {{monthStar.name}}
+                </el-card>
+              </div>
+              <!-- 月总结对话框（新） -->
+              <month-conclusion-table-check-new-v-2 v-if="showConclusion2"
+                                                  :checkUserID ="curMonthStar"
+                                                  :months = "[title]"
+                                                  @close="showConclusion2 = false">
+                                                </month-conclusion-table-check-new-v-2>
+            </div>
+            <!-- 月度数据未统计完毕 -->
+            <div v-else style="float: center;font-weight: bold;margin-top: 60px;color: black;font-size:27px;text-align:center">
+              暂未统计...
             </div>
           </div>
         </el-col>
@@ -60,8 +92,8 @@
     <!-- 绩效 -->
     <div>
       <el-row :gutter="40" class="panel-group">
-        <el-col :xs="12" :sm="12" :lg="6" :xl="6" class="card-panel-col">
-          <div class="card-panel" @click="handleSetLineChartData('newVisitis')">
+        <el-col :xs="12" :sm="12" :lg="6" :xl="6">
+          <div class="card-panel">
             <div class="card-panel-icon-wrapper icon-people">
               <svg-icon icon-class="rank-new" class-name="card-panel-icon" />
             </div>
@@ -78,8 +110,8 @@
             </div>
           </div>
         </el-col>
-        <el-col :xs="12" :sm="12" :lg="6" :xl="6" class="card-panel-col">
-          <div class="card-panel" @click="handleSetLineChartData('messages')">
+        <el-col :xs="12" :sm="12" :lg="6" :xl="6">
+          <div class="card-panel">
             <div class="card-panel-icon-wrapper icon-message">
               <svg-icon icon-class="rank-new1" class-name="card-panel-icon" />
             </div>
@@ -98,8 +130,8 @@
           </div>
         </el-col>
     <!-- 成效 -->
-        <el-col :xs="6" :sm="6" :lg="6" :xl="6" class="card-panel-col">
-          <div class="card-panel" @click="handleSetLineChartData('purchases')">
+        <el-col :xs="6" :sm="6" :lg="6" :xl="6">
+          <div class="card-panel">
             <div class="card-panel-icon-wrapper icon-money">
               <svg-icon icon-class="rank-new" class-name="card-panel-icon" />
             </div>
@@ -116,8 +148,8 @@
             </div>
           </div>
         </el-col>
-        <el-col :xs="6" :sm="6" :lg="6" :xl="6" class="card-panel-col">
-          <div class="card-panel" @click="handleSetLineChartData('shoppings')">
+        <el-col :xs="6" :sm="6" :lg="6" :xl="6">
+          <div class="card-panel">
             <div class="card-panel-icon-wrapper icon-shopping">
               <svg-icon icon-class="rank-new1" class-name="card-panel-icon" />
             </div>
@@ -140,8 +172,8 @@
     <!-- 工时 -->
     <div>
       <el-row :gutter="40" class="panel-group">
-        <el-col :xs="8" :sm="8" :lg="8" :xl="8" class="card-panel-col">
-          <div class="card-panel" @click="handleSetLineChartData('purchases')">
+        <el-col :xs="8" :sm="8" :lg="8" :xl="8">
+          <div class="card-panel">
             <div class="card-panel-icon-wrapper icon-money">
               <svg-icon icon-class="rank-new" class-name="card-panel-icon" />
             </div>
@@ -158,8 +190,8 @@
             </div>
           </div>
         </el-col>
-        <el-col :xs="8" :sm="8" :lg="8" :xl="8" class="card-panel-col">
-          <div class="card-panel" @click="handleSetLineChartData('shoppings')">
+        <el-col :xs="8" :sm="8" :lg="8" :xl="8">
+          <div class="card-panel">
             <div class="card-panel-icon-wrapper icon-shopping">
               <svg-icon icon-class="rank-new1" class-name="card-panel-icon" />
             </div>
@@ -178,8 +210,8 @@
           </div>
         </el-col>
     <!-- 定性评价 -->
-        <el-col :xs="8" :sm="8" :lg="8" :xl="8" class="card-panel-col">
-          <div class="card-panel" @click="handleSetLineChartData('shoppings')">
+        <el-col :xs="8" :sm="8" :lg="8" :xl="8">
+          <div class="card-panel">
             <div class="card-panel-icon-wrapper icon-shopping">
               <svg-icon icon-class="rank-new" class-name="card-panel-icon" />
             </div>
@@ -203,8 +235,9 @@
 
 <script>
 import CountTo from 'vue-count-to'
-import { getPerformanceIsPublish, smallNumToL, getQuarterMon, sortObjectArrayByParams } from '@/utils/common'
+import { getPerformanceIsPublish, getQuarterMon, sortObjectArrayByParams, isUndefined } from '@/utils/common'
 import { getPMData } from '@/utils/performance'
+import monthConclusionTableCheckNewV2 from '@/views/monthConclusion/childViews/monthConclusionTableCheckNewV2.vue'
 import store from '@/store'
 import moment from 'moment'
 import Cookies from 'js-cookie'
@@ -225,17 +258,30 @@ export default {
       PMScoreUnN: null,
       AMEvaScoreUnN: 0,
       AMEvaRank: 0,
-      monthStar: {
-        name: '暂未统计'
-      },
-      quarterStar: {
-        name: '暂未统计'
-      },
-      selectQuarterNum: null
+      quarterStar1: '暂未统计',
+      quarterStar2: '暂未统计',
+      monthStar1: '暂未统计',
+      monthStar2: '暂未统计',
+      firstMonth: '',
+      secondMonth: '',
+      thirdMonth: '',
+      quarterMonth: [],
+      quarterStars: [],
+      monthStars: [],
+      isShowQuarterStar: false,
+      activeMonth: [],
+      showConclusion: false,
+      showConclusion2: false,
+      showConclusion3: false,
+      conclusionTitle: null,
+      curQuarterStar: null,
+      curMonthStar: null,
+      checkUser: null
     }
   },
   components: {
-    CountTo
+    CountTo,
+    monthConclusionTableCheckNewV2
   },
   methods: {
     // 初始化
@@ -248,13 +294,8 @@ export default {
     },
     // 初始化数据
     initData () {
-      this.monthStar = {
-        name: '加载中...'
-      }
-      this.quarterStar = {
-        name: '加载中...'
-      }
-      this.selectQuarterNum = smallNumToL(this.$moment(this.title).quarter()) // 当前选择的季度
+      this.quarterStars = []
+      this.monthStars = []
       this.reqFlag.getPerformanceScore = false
       let applyYear = this.$moment(this.title).year()
       let applyMonth = this.$moment(this.title).month() + 1
@@ -271,7 +312,7 @@ export default {
             let findResult = PMData.find(PMDataItem => {
               return PMDataItem.userID === store.state.userInfo.id
             })
-            if (findResult) {
+            if (!isUndefined(findResult)) {
               this.QYEvaRank = findResult.QYEvaRank
               this.totalWorkTime = findResult.totalWorkTime
               this.PMRank = findResult.PMRank
@@ -302,35 +343,19 @@ export default {
             }
             // ============================选取月度之星=============================
             let monthStarNum = this.$store.state.monthStarNum // 月度之星的人数
-            let monthStarPerson = ''
             for (let i = 0; i < monthStarNum; i++) {
-              monthStarPerson += PMData[i].name
-              if (i !== monthStarNum - 1) {
-                monthStarPerson += ','
-              }
+              this.monthStars.push(PMData[i])
             }
-            this.monthStar.name = monthStarPerson
+            // ============================选取季度之星=============================
             this.getQuarStar(applyYear, applyQuater) // 季度之星数据计算
             this.isCount = true
             this.reqFlag.getPerformanceScore = true
           })
         } else { // 绩效未发布
-          this.monthStar = {
-            name: '暂未统计'
-          }
-          this.quarterStar = {
-            name: '暂未统计'
-          }
           this.isCount = false
           this.reqFlag.getPerformanceScore = true
         }
       }).catch(err => {
-        this.monthStar = {
-          name: '暂未统计'
-        }
-        this.quarterStar = {
-          name: '暂未统计'
-        }
         this.isCount = false
         this.reqFlag.getPerformanceScore = true
         console.log(err)
@@ -341,12 +366,10 @@ export default {
       let quarterStarNum = this.$store.state.quarterStarNum
       let promises1 = []
       let promises2 = []
-      let quarterMonth = []
       let count = 0
-      quarterMonth = getQuarterMon(applyYear, applyQuater) // 获取季度对应的月份
-      let start = new Date()
-      for (let i = 0; i < quarterMonth.length; i++) { // 请求季度所有月份的绩效发布情况
-        promises1[i] = getPerformanceIsPublish(applyYear, this.$moment(quarterMonth[i]).month() + 1)
+      this.quarterMonth = getQuarterMon(applyYear, applyQuater) // 获取季度对应的月份
+      for (let i = 0; i < this.quarterMonth.length; i++) { // 请求季度所有月份的绩效发布情况
+        promises1[i] = getPerformanceIsPublish(applyYear, this.$moment(this.quarterMonth[i]).month() + 1)
       }
       Promise.all(promises1).then(allResponse1 => {
         let PMDataPublishInfo = allResponse1
@@ -365,7 +388,7 @@ export default {
         }
         if (isAllPMDataPublish) { // 该季度所有月份绩效已经发布
           for (let i = 0; i < PMDataPublishInfo.length; i++) {
-            promises2[count++] = getPMData(quarterMonth[i])
+            promises2[count++] = getPMData(this.quarterMonth[i])
           }
           Promise.all(promises2).then(allResponse2 => {
             let allPMData = allResponse2
@@ -409,22 +432,12 @@ export default {
               }
             }
             quarterPMData = sortObjectArrayByParams(quarterPMData, 'averagePMScoreUnN', 'totalWorkTime')
-            let quarterStarPerson = ''
-            this.quarterStar = {
-              name: ''
-            }
             for (let i = 0; i < quarterStarNum; i++) {
-              quarterStarPerson += quarterPMData[i].name
-              if (i !== quarterStarNum - 1) {
-                quarterStarPerson += ','
-              }
+              this.quarterStars.push(quarterPMData[i])
             }
-            this.quarterStar.name = quarterStarPerson
           })
         } else { // 尚有月份未发布绩效
-          this.quarterStar = {
-            name: '暂未统计'
-          }
+          this.quarterStars = []
         }
       })
     },
@@ -489,6 +502,11 @@ export default {
     },
     // 下一月
     handleNextMonth () {
+      // const url = '/performance/test'
+      // let params = {}
+      // http(url, params).then(res => {
+      //   console.log(res)
+      // })
       this.title = this.$moment(this.title).add(1, 'months').format('YYYY-MM')
       if (typeof (Cookies.get('hMon')) !== 'undefined') {
         Cookies.remove('hMon')
@@ -496,6 +514,7 @@ export default {
       Cookies.set('hMon', this.title)
       this.initData()
     },
+    // 日期变化调用
     handelDateChange () {
       if (typeof (Cookies.get('hMon')) !== 'undefined') {
         Cookies.remove('hMon')
@@ -503,30 +522,30 @@ export default {
       Cookies.set('hMon', this.title)
       this.initData()
     },
-    // 首页关于
-    dashboardAbout () {
+    // 查看季度之星月总结
+    handleQuarterStarTabClick (quarterStar) {
+      this.curQuarterStar = quarterStar
+      this.showConclusion = true
     },
-    handleSetLineChartData (type) {
-      this.$emit('handleSetLineChartData', type)
+    // 查看月度之星月总结
+    handleMonthStarsTabClick (monthStar) {
+      this.curMonthStar = { id: monthStar.userID, name: monthStar.name }
+      this.showConclusion2 = true
     }
   },
   created () {
     this.init()
+  },
+  computed: {
   }
 }
 </script>
 
 <style lang="scss" scoped>
 .panel-group {
-  margin-top: 1px;
-
-  .card-panel-col {
-    margin-bottom: 32px;
-  }
-
+  margin: 20px;
   .card-panel {
     height: 108px;
-    cursor: pointer;
     font-size: 12px;
     position: relative;
     overflow: hidden;
@@ -534,45 +553,6 @@ export default {
     background: #fff;
     box-shadow: 4px 4px 40px rgba(0, 0, 0, .05);
     border-color: rgba(0, 0, 0, .05);
-
-    &:hover {
-      .card-panel-icon-wrapper {
-        color: #fff;
-      }
-
-      .icon-people {
-        background: #40c9c6;
-      }
-
-      .icon-message {
-        background: #36a3f7;
-      }
-
-      .icon-money {
-        background: #f4516c;
-      }
-
-      .icon-shopping {
-        background: #34bfa3
-      }
-    }
-
-    .icon-people {
-      color: #40c9c6;
-    }
-
-    .icon-message {
-      color: #36a3f7;
-    }
-
-    .icon-money {
-      color: #f4516c;
-    }
-
-    .icon-shopping {
-      color: #34bfa3
-    }
-
     .card-panel-icon-wrapper {
       float: left;
       margin: 14px 0 0 14px;
@@ -606,112 +586,41 @@ export default {
       }
     }
   }
-
   .card-panel-large {
     height: 150px;
     font-size: 12px;
     position: relative;
     overflow: hidden;
-    color: #666;
+    color: #e50000;
     background: #fff;
-    box-shadow: 4px 4px 40px rgba(0, 0, 0, .05);
-    border-color: rgba(0, 0, 0, .05);
-
-    &:hover {
-      .card-panel-icon-wrapper {
-        color: #fff;
-      }
-
-      .icon-people {
-        background: #40c9c6;
-      }
-
-      .icon-message {
-        background: #36a3f7;
-      }
-
-      .icon-money {
-        background: #f4516c;
-      }
-
-      .icon-shopping {
-        background: #34bfa3;
-      }
-
-      .icon-month {
-        background: #34bfa3;
-      }
-    }
-
-    .icon-people {
-      color: #e50000;
-    }
-
-    .icon-month {
-      color: rgba(229, 179, 0, 0.99);
-    }
-
-    .icon-message {
-      color: #36a3f7;
-    }
-
-    .icon-money {
-      color: #f4516c;
-    }
-
-    .icon-shopping {
-      color: #34bfa3
-    }
+    border-radius: 4px;
 
     .card-panel-icon-wrapper {
       float: left;
-      margin: 24px 0 0 24px;
+      margin: 20px 0 0 24px;
       padding: 16px;
-      transition: all 0.38s ease-out;
-      border-radius: 6px;
     }
-
-    .card-panel-icon {
-      float: left;
-      font-size: 48px;
-    }
-
     .card-panel-description {
-      float: center;
+      width: 35%;
+      float: left;
       font-weight: bold;
-      margin: 26px;
-      margin-left: 0px;
-      margin-top: 60px;
+      margin-top: 50px;
+      margin-left: 10px;
 
       .card-panel-text {
-        line-height: 30px;
+        line-height: 20px;
         color: rgba(0, 0, 0, 1);
         font-size: 27px;
         text-align: center;
         cursor: pointer;
+        // &:hover {
+        //   color: rgb(1, 182, 253);
+        // }
       }
 
       .card-panel-num {
         font-size: 19px;
       }
-    }
-  }
-}
-@media (max-width:550px) {
-  .card-panel-description {
-    display: none;
-  }
-
-  .card-panel-icon-wrapper {
-    float: none !important;
-    width: 100%;
-    height: 100%;
-    margin: 0 !important;
-
-    .svg-icon {
-      display: block;
-      margin: 14px auto !important;
-      float: none !important;
     }
   }
 }

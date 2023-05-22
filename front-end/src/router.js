@@ -123,11 +123,6 @@ export default new Router({
           component: () => import('./views/monthConclusion/childViews/monthConclusionTable.vue'),
           meta: { pagePath: '/home/monthConclusion' }
         },{
-          path: 'PerformanceEvaNew',
-          name: 'PerformanceEvaNew',
-          component: () => import('./views/performanceEva/performanceEva.vue'),
-          meta: { pagePath: '/home/PerformanceEvaNew' }
-        },{
           path: 'PMDataFillUp',
           name: 'PMDataFillUp',
           component: () => import('./views/tmp/PMDataFillUp.vue'),

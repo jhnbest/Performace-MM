@@ -35,7 +35,6 @@ module.exports = {
     updateWorkTimeAssignReview: path + '/performance/updateWorkTimeAssignReview', // 提交工时分配审核结果
     getSubmitWorkTimeCount: path + '/performance/getSubmitWorkTimeCount', // 获取提交的工时申报数量
     submitReviewPass: path + '/performance/submitReviewPass', // 审核通过,
-    getAssignWorkTime: path + '/performance/getAssignWorkTime', // 获取分配的工时数
     getGroupWorkTimeList: path + '/performance/getGroupWorkTimeList', // 获取小组已审工时列表
     getAllWorkTimeList: path + '/performance/getAllWorkTimeList', // 获取全处已审工时列表
     getIsWorkTimeReviewFinish: path + '/performance/getIsWorkTimeReviewFinish', // 判断工时是否都已审核完毕
@@ -48,6 +47,7 @@ module.exports = {
     savePMData: path + '/performance/savePMData', // 写入绩效数据
     updatePMData: path + '/performance/updatePMData', // 更新绩效数据
     getPMData: path + '/performance/getPMData', // 获取绩效数据
+    test: path + '/performance/test', // 测试
 
 
     // workStation-个人工作台
@@ -89,7 +89,7 @@ module.exports = {
     getCurMutualRate: path + '/mutualRates/getCurMutualRate', // 获取本人互评得分
     getAllUserRates: path + '/mutualRates/getAllUserRates', // 获取本处员工互评得分
     getPerformanceIsCount: path + '/mutualRates/getPerformanceIsCount', // 获取绩效信息统计标志
-    getPreMonthEva: path + '/mutualRates/getPreMonthEva', // 提取上月互评结果
+    getMonthEva: path + '/mutualRates/getMonthEva', // 提取定性评价数据
     handleFillMul: path + '/mutualRates/handleFillMul', // 一键填充定性评价
     getPerformanceRates: path + '/mutualRates/getPerformanceRates', // 获取成效评价历史数据
     getAllQTEvaedData: path + '/mutualRates/getAllQTEvaedData', // 获取全处员工定性评价数据(被评价人为对象)

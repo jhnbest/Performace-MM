@@ -6,6 +6,9 @@
                :center="true"
                append-to-body
                :before-close="onClose">
+      <el-tabs v-model="activeMonth" @tab-click="handleTabClick(activeMonth)">
+        <el-tab-pane v-for="(month) in months" :key="month" :label= 'month' :name="month"></el-tab-pane>
+      </el-tabs>
       <div class="dialogDiv">
         <el-table :data="tableData1"
                   border
@@ -59,59 +62,12 @@
             </template>
           </el-table-column>
         </el-table>
-        <el-table v-if="isManagerEva"
-                  :data="tableData5"
-                  border
-                  stripe
-                  size="medium"
-                  :header-cell-style="{ background:'#ced1d4',color:'#000000',fontSize:'16px' }"
-                  style="margin: auto"
-                  highlight-current-row>
-          <el-table-column v-if="rateTableShow"
-                           label="管理者评分"
-                           align="center">
-            <template>
-              <el-rate v-model="managerRateStarCom"
-                       @change="managerRateStarSunChange"
-                       show-text
-                       :texts="managerRateStarText"></el-rate>
-            </template>
-          </el-table-column>
-        </el-table>
-        <el-table v-if="checkUserId === $store.state.userInfo.id || this.$store.state.userInfo.id === 26"
-                  :data="tableData6"
-                  border
-                  stripe
-                  size="medium"
-                  :header-cell-style="{ background:'#ced1d4',color:'#000000',fontSize:'16px' }"
-                  style="margin: auto"
-                  highlight-current-row>
-          <el-table-column label="管理者评价"
-                           align="center">
-            <template>
-              <editor-vue v-if="isManagerEva" :value="managerEva"
-                          @input="(res) =>{
-                            managerEvaTmp = res
-                            changeFlag = true
-                          }"></editor-vue>
-              <div v-else v-html="managerEva"></div>
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
-      <div v-if="isManagerEva" slot="footer" class="dialog-footer">
-        <el-button @click="handleCancel">取 消</el-button>
-        <el-button type="primary"
-                   @click="handleSave"
-                   :disabled="!changeFlag">提 交</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-    import editorVue from '../../../components/monthConclusion/editor'
-    import { conclusionManagerEvaStarToWorkTime } from '@/utils/common'
     export default {
       data () {
         return {
@@ -121,26 +77,18 @@
           tableData4: [{}],
           tableData5: [{}],
           tableData6: [{}],
-          managerEvaTmp: null,
           conclusionDialog: false,
-          changeFlag: false,
-          managerRateStarCom: null,
-          rateTableShow: true,
           buildBoutiqueProject: null,
           buildProTeam: null,
           nextPlan: null,
           curAdvice: null,
-          managerEva: null
+          activeMonth: null
         }
       },
       props: {
         moreDetailData: {
           type: Array,
           default: null
-        },
-        isManagerEva: {
-          type: Boolean,
-          default: false
         },
         conclusionTitle: {
           type: String,
@@ -149,17 +97,18 @@
         checkUserId: {
           type: Number,
           default: null
+        },
+        months: {
+          type: Array,
+          default: null
         }
       },
       methods: {
         // 初始化
         init () {
           this.$nextTick(() => {
+            this.activeMonth = this.months[0]
             this.conclusionDialog = !this.conclusionDialog
-            this.managerRateStarCom = this.managerRateStar
-            let test = this.moreDetailData.find(item => {
-              return item.dimension === 1
-            })
             if (this.moreDetailData.length !== 0) {
               this.buildBoutiqueProject = this.moreDetailData.find(item => {
                 return item.dimension === 1
@@ -176,55 +125,25 @@
             }
           })
         },
-        // 保存
-        handleSave () {
-          let emitData = {
-            id: this.id,
-            managerRateStar: this.managerRateStarCom,
-            managerEva: this.managerEvaTmp,
-            submitter: this.submitter
-          }
-          this.$emit('handleSaveEvaData', emitData)
-          this.onClose()
-        },
-        // 取消
-        handleCancel () {
-          this.onClose()
-        },
         // 关闭对话框
         onClose () {
           this.conclusionDialog = !this.conclusionDialog
           this.$emit('close')
         },
-        // 管理者星级评价改变
-        managerRateStarSunChange () {
-          this.changeFlag = true
-          this.rateTableShow = false
-          this.$nextTick(() => {
-            this.rateTableShow = true
-          })
+        // 点击标签事件
+        handleTabClick (activeMonth) {
+          this.$emit('clickActiveMonth', activeMonth)
         }
       },
       created () {
         this.init()
       },
       computed: {
-        managerRateStarText: function () {
-          let result = []
-          for (let i = 0; i < 5; i++) {
-            let getWorkTime = conclusionManagerEvaStarToWorkTime(i + 1) + '工时'
-            result.push(getWorkTime)
-          }
-          return result
-        }
       },
       components: {
-        editorVue
+        // editorVue
       },
       watch: {
-        managerRateStarCom (e) {
-          this.managerRateStarCom = e
-        }
       },
       name: 'monthConclusionTableCheckNew'
     }

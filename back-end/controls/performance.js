@@ -644,9 +644,10 @@ const performance = {
         // 分页查询入参 start
         let limitFirst = (pageNum - 1) * pageSize
         let limitLast = pageSize
-        let arrayParams = [searchID, searchMon, searchID, searchMon]
+        let arrayParams = [searchID, searchMon, searchID, searchMon, searchID, searchMon]
         let sqlGetProjectList = $sql.performance.getProjectList
         let sqlGetProjectTotal = $sql.performance.getProjectListTotal
+        let sqlGetWorkTimeAssign = $sql.performance.getWorkTimeAssign
         let sql = ''
         if (data.searchType === 'review') {  //审核页面请求
             if (data.reviewType === 'unReview') {
@@ -654,24 +655,41 @@ const performance = {
                     sqlGetProjectList + ' and wl.submitStatus = 1' + ' and wl.reviewStatus = 0'
             } else if (data.reviewType === 'reviewed') {
                 sql= sqlGetProjectTotal + ' and reviewStatus != 0' + '; ' +
-                    sqlGetProjectList + ' and wl.submitStatus = 1' + ' and wl.reviewStatus != 0'
+                    sqlGetProjectList + ' and wl.reviewStatus != 0'
             }
         } else {  //申报页面请求
             sqlGetProjectTotal = $sql.performance.getProjectListTotalNew
             sqlGetProjectList = $sql.performance.getProjectListNew
             sql= sqlGetProjectTotal + '; ' + sqlGetProjectList
-            arrayParams = [searchID, searchMon, searchID, searchMon]
         }
-        sql = sql + " order by submitTime desc" // 提交时间倒序排
-        $http.connPool(sql, arrayParams, (err, result) => {
-            if (err) {
-                return $http.writeJson(res, {code:-2, message:'失败'})
-            } else {
-                let resultData = {}
-                resultData.totalCount = result[0][0]['totalCount']
-                resultData.list = formatData(result[1])
-                return $http.writeJson(res, {code: 1, data: resultData, message: '获取工时申报成功'})
+        // sql = sql + " order by submitTime desc" // 提交时间倒序排
+        RCPDDatabase(sql, arrayParams).then((result) => {
+          let resultData = {}
+          resultData.totalCount = result[0][0]['totalCount']
+          resultData.list = formatData(result[1])
+          if (data.searchType !== 'review') {
+            sql = sqlGetWorkTimeAssign
+            arrayParams = [[]]
+            for (let i = 0; i < result[1].length; i++) {
+              arrayParams[0].push(result[1][i].id)
             }
+            if (arrayParams[0].length !== 0) {
+              RCPDDatabase(sql, arrayParams).then(result2 => {
+                resultData.workTimeAssign = formatData(result2)
+                return $http.writeJson(res, {code: 1, data: resultData, message: '获取工时申报成功'})
+              }).catch(err2 => {
+                return $http.writeJson(res, {code: -2, err: err2, message: '操作失败'})
+              })
+            }
+            else {
+              resultData.workTimeAssign = []
+              return $http.writeJson(res, {code: 1, data: resultData, message: '获取工时申报成功'})
+            }
+          } else {
+            return $http.writeJson(res, {code: 1, data: resultData, message: '获取工时申报成功'})
+          }
+        }).catch(err => {
+          return $http.writeJson(res, {code: -2, err: err, message: '操作失败'})
         })
       })
     },
@@ -843,23 +861,6 @@ const performance = {
           })
         }
       })
-    },
-    // 获取分配的工时
-    async getAssignWorkTime (req, res) {
-        $http.userVerify(req, res, async () => {
-            let data = req.body
-            let sql = $sql.performance.getAssignWorkTime
-            let arrayParams = []
-            let resultData = []
-            for (let item of data.projectData) {
-                arrayParams = [item.id, data.userID]
-                await RCPDDatabase(sql, arrayParams).then(res0 => {
-                    res0[0].index = item.index
-                    resultData.push(res0[0])
-                })
-            }
-            return $http.writeJson(res, {code: 1, data: resultData, message: '成功'})
-        })
     },
     // 获取小组申报工时列表
     getGroupWorkTimeList (req, res) {
@@ -1059,7 +1060,30 @@ const performance = {
       }).catch(RCPDDatabaseErr => {
         return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
       })
-    }
+    },
+    // 测试函数
+    test (req, res) {
+      let sendData = req.body
+      let sql = $sql.performance.test1
+      let arrayParams = []
+      RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+        arrayParams = RCPDDatabaseRes
+        sql = $sql.performance.test2
+        let promises = []
+        let count = 0
+        for (let i = 0; i < RCPDDatabaseRes.length; i++) {
+          arrayParams = [RCPDDatabaseRes[i].id]
+          promises[count++] = RCPDDatabase(sql, arrayParams)
+        }
+        Promise.all(promises).then(allRes => {
+          for (let i = 0; i < RCPDDatabaseRes.length; i++) {
+          }
+          return $http.writeJson(res, {code: 1, data: allRes, message: 'success'})
+        })
+      }).catch(RCPDDatabaseErr => {
+          return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+      })
+    },
 }
 
 module.exports = performance

@@ -312,43 +312,8 @@ export function rateTypeSwitch (rateType) {
   }
 }
 
-// 星级转评分
-export function starToRates (star) {
-  switch (star) {
-    case 5:
-      return 92.5
-    case 4:
-      return 90
-    case 3:
-      return 87.5
-    case 2:
-      return 85
-    case 1:
-      return 82.5
-    default:
-      return 87.5
-  }
-}
 // 星级转评分(新)
 export function starToRatesNew (star) {
-  switch (star) {
-    case 5:
-      return 95
-    case 4:
-      return 92.5
-    case 3:
-      return 90
-    case 2:
-      return 87.5
-    case 1:
-      return 85
-    default:
-      return 0
-  }
-}
-
-// 星级转评分
-export function newStarToRates (star) {
   switch (star) {
     case 5:
       return 95
@@ -368,15 +333,15 @@ export function newStarToRates (star) {
 // 评分转星级
 export function ratesToStar (rates) {
   switch (rates) {
-    case 92.5:
+    case 95:
       return 5
-    case 90:
+    case 92.5:
       return 4
-    case 87.5:
+    case 90:
       return 3
-    case 85:
+    case 87.5:
       return 2
-    case 82.5:
+    case 85:
       return 1
     default:
       return 4
@@ -450,7 +415,7 @@ export function MonthToString (month) {
       return 'error'
   }
 }
-// 月份转换成英文
+// 英文月份转换成数字
 export function mStringToNumber (mString) {
   switch (mString) {
     case 'January':
@@ -529,6 +494,7 @@ export function getEvaCoef () {
     })
   })
 }
+
 // 排序比较函数(从大到小)
 export function sortBy (props) {
   return function (a, b) {
@@ -590,4 +556,14 @@ export function getIsSubmitAllow (applyYear, applyMonth) {
       reject(err)
     })
   })
+}
+
+// 判断是否为undefined
+export function isUndefined (value) {
+  return typeof (value) === 'undefined'
+}
+
+// 判断是否为NULL
+export function isNull (value) {
+  return !value && typeof (value) !== 'undefined' && value !== 0
 }
