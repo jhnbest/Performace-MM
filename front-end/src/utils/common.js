@@ -486,7 +486,9 @@ export function getEvaCoef () {
         GPManagerAMEvaCoef: resultData.find(item => { return item.flagType === 'GPManagerAMEvaCoef' }).flagValue,
         GPCommonStaffAMEvaCoef: resultData.find(item => { return item.flagType === 'GPCommonStaffAMEvaCoef' }).flagValue,
         AMBuildBoutiqueProjectCoef: resultData.find(item => { return item.flagType === 'AMBuildBoutiqueProjectCoef' }).flagValue,
-        AMBuildProTeamCoef: resultData.find(item => { return item.flagType === 'AMBuildProTeamCoef' }).flagValue
+        AMBuildProTeamCoef: resultData.find(item => { return item.flagType === 'AMBuildProTeamCoef' }).flagValue,
+        AMDimension1CoefV2: resultData.find(item => { return item.flagType === 'AMDimension1CoefV2' }).flagValue,
+        AMDimension2CoefV2: resultData.find(item => { return item.flagType === 'AMDimension2CoefV2' }).flagValue
       }
       resolve(obj)
     }).catch(err => {

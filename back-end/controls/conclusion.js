@@ -220,6 +220,51 @@ const conclusion = {
       return $http.writeJson(res, {code: -2, err: err, message: 'err'})
     })
   },
+  // 获取月总结概览信息及相应的评价信息V2
+  getCurMonthConclusionOverviewDataNewV2 (req, res) {
+    let sendData = req.body
+    let sql1 = $sql.conclusion.getCurMonthConclusionOverviewDataNewV2
+    let arrayParams1 = [sendData.conclusionYear, sendData.conclusionMonth, sendData.checkUserID]
+    let sql2 = $sql.conclusion.getPreMonthConclusionOverviewDataNewV2
+    let arrayParams2 = [sendData.conclusionYear, sendData.conclusionMonth - 1, sendData.checkUserID]
+    let finalResult = {
+        conclusionData: [],
+        AMEvaedData: []
+    }
+    let count = 0
+    let promises = []
+    promises[count++] = RCPDDatabase(sql1, arrayParams1)
+    promises[count++] = RCPDDatabase(sql2, arrayParams2)
+    Promise.all(promises).then(allRes => {
+      let conclusionData = allRes[0].concat(allRes[1])
+      let checkConclusionID = []
+      for (let i = 0; i < conclusionData.length; i++) {
+        if (conclusionData[i].submitStatus === 1 &&
+            (conclusionData[i].dimension === 1 || conclusionData[i].dimension === 3)) { // 提交状态为已提交且类型为1或2的月总结
+            checkConclusionID.push(conclusionData[i].id)
+        }
+      }
+      if (checkConclusionID.length === 0) {
+        checkConclusionID = [-1]
+      }
+      if (sendData.evaUserDuty !== 1) { // 如果是普通成员，只获取本人对该用户的评价
+        sql = $sql.achievementsEva.getUserofAchievementToAnotherUser
+        arrayParams = [checkConclusionID, sendData.evaUserID]
+      } else { // 如果是处经理，获取所有人对该用户的评价
+        sql = $sql.achievementsEva.getOtherUserConclusionEvaedData
+        arrayParams = [checkConclusionID]
+      }
+      RCPDDatabase(sql, arrayParams).then(AMEvaedData => {
+        finalResult.conclusionData = conclusionData
+        finalResult.AMEvaedData = AMEvaedData
+        return $http.writeJson(res, {code: 1, data: finalResult, message: 'success'})
+      }).catch(err => {
+        return $http.writeJson(res, {code: -2, err: err, message: 'err'})
+      })
+    }).catch(err => {
+      return $http.writeJson(res, {code: -2, err: err, message: 'err'})
+    })
+  },
   // 获取本年份总结概览数据
   getCurYearConclusionOverviewData (req, res) {
     let sendData = req.body

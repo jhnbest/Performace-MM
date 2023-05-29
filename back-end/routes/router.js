@@ -119,6 +119,7 @@ router.post(api.updateWorkTimeListIdOfConclusion, conclusion.updateWorkTimeListI
 router.post(api.submitMonthConclusionNew, conclusion.submitMonthConclusionNew)
 router.post(api.updateMonthConclusionNew, conclusion.updateMonthConclusionNew)
 router.post(api.getCurMonthConclusionOverviewDataNew, conclusion.getCurMonthConclusionOverviewDataNew)
+router.post(api.getCurMonthConclusionOverviewDataNewV2, conclusion.getCurMonthConclusionOverviewDataNewV2)
 router.post(api.getCurYearConclusionOverviewData, conclusion.getCurYearConclusionOverviewData)
 
 module.exports = router;

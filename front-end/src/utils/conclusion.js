@@ -10,7 +10,8 @@ import {
   urlUpdateWorkTimeListIdOfConclusion,
   urlUpdateMonthConclusionNew,
   urlGetCurMonthConclusionOverviewDataNew,
-  urlGetCurYearConclusionOverviewData
+  urlGetCurYearConclusionOverviewData,
+  urlGetCurMonthConclusionOverviewDataNewV2
 } from '../config/interface'
 import { conclusionManagerEvaStarToWorkTime } from '@/utils/common'
 import store from '@/store'
@@ -40,6 +41,29 @@ export function getCurMonthConclusionOverviewData (submitMonth, submitYear, subm
 // 获取月总结概览信息（新）
 export function getCurMonthConclusionOverviewDataNew (conclusionYear, conclusionMonth, checkUserID, evaUserID, evaUserDuty) {
   const url = urlGetCurMonthConclusionOverviewDataNew
+  let params = {
+    conclusionYear: conclusionYear,
+    conclusionMonth: conclusionMonth,
+    checkUserID: checkUserID,
+    evaUserID: evaUserID,
+    evaUserDuty: evaUserDuty
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(res => {
+      if (res.code === 1) {
+        resolve(res)
+      } else {
+        reject(res)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
+// 获取月总结概览信息v2
+export function getCurMonthConclusionOverviewDataNewV2 (conclusionYear, conclusionMonth, checkUserID, evaUserID, evaUserDuty) {
+  const url = urlGetCurMonthConclusionOverviewDataNewV2
   let params = {
     conclusionYear: conclusionYear,
     conclusionMonth: conclusionMonth,

@@ -55,7 +55,7 @@ const common = {
       let sql = $sql.common.getGlobalFlagByType
       let checkType = ['CSMutualCoef', 'MGEvaCoef', 'quantitativeCoef', 'PMEvaCoef', 'CSManagerAMEvaCoef'
       , 'CSGroupLeaderAMEvaCoef', 'CScommonStaffAMEvaCoef', 'GPManagerAMEvaCoef', 'GPCommonStaffAMEvaCoef'
-      , 'AMBuildBoutiqueProjectCoef', 'AMBuildProTeamCoef']
+      , 'AMBuildBoutiqueProjectCoef', 'AMBuildProTeamCoef', 'AMDimension1CoefV2', 'AMDimension2CoefV2']
       let arrayParams = [checkType]
       RCPDDatabase(sql, arrayParams).then(allResponse => {
         return $http.writeJson(res, {code: 1, data: allResponse, message: 'success'})

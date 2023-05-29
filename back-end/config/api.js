@@ -112,5 +112,6 @@ module.exports = {
     submitMonthConclusionNew: path + '/conclusion/submitMonthConclusionNew', // 提交月总结（新）
     updateMonthConclusionNew: path + '/conclusion/updateMonthConclusionNew', // 更新月总结（新）
     getCurMonthConclusionOverviewDataNew: path + '/conclusion/getCurMonthConclusionOverviewDataNew', // 获取月总结概览信息（新）
+    getCurMonthConclusionOverviewDataNewV2: path + '/conclusion/getCurMonthConclusionOverviewDataNewV2', // 获取月总结概览信息V2
     getCurYearConclusionOverviewData: path + '/conclusion/getCurYearConclusionOverviewData' // 获取本年份总结概览数据
 };
