@@ -12,7 +12,8 @@ import {
     urlWorkTimeTemporary,
     urlGetProjectList,
     urlChangeSubmitStatus,
-    urlGetSubmitWorkTimeCount
+    urlGetSubmitWorkTimeCount,
+    urlMianshenheWorkTimeSubmit
 } from '../config/interface'
 import { getUsersList } from '@/utils/users'
 import { getPerformanceIsPublish,
@@ -585,6 +586,27 @@ export function getSubmitWorkTimeCount (searchUserID, applyMonth) {
   const url = urlGetSubmitWorkTimeCount
   let params = {
     searchUserID: searchUserID,
+    applyMonth: applyMonth
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(res => {
+      if (res.code === 1) {
+        resolve(res.data)
+      } else {
+        reject(res.err)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
+// ***提交免审核工时***
+export function mianshenheWorkTimeSubmit (submitID, projectTypeID, applyMonth) {
+  const url = urlMianshenheWorkTimeSubmit
+  let params = {
+    submitID: submitID,
+    projectTypeID: projectTypeID,
     applyMonth: applyMonth
   }
   return new Promise(function (resolve, reject) {

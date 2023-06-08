@@ -300,7 +300,7 @@
                       stripe
                       :height="220"
                       size="medium"
-                      :header-cell-style="{ background:'#19d1e3', color:'#000000', fontSize:'20px' }"
+                      :header-cell-style="{ background:'#00BFFF', color:'#000000', fontSize:'20px' }"
                       style="margin: auto"
                       highlight-current-row>
               <el-table-column label="上月计划 (评价标准参考：1、计划合理性；2、计划完成情况。)">
@@ -355,7 +355,7 @@
                       v-loading="!getDataLoading"
                       stripe
                       size="medium"
-                      :header-cell-style="{ background:'#19d1e3',color:'#000000',fontSize:'16px' }"
+                      :header-cell-style="{ background:'#00BFFF',color:'#000000',fontSize:'16px' }"
                       style="margin: auto"
                       highlight-current-row>
               <el-table-column label="对处室工作的意见/建议、不满/抱怨、工作/生活/学习中的烦恼和困难以及希望得到的帮助/支持/指导">
@@ -397,7 +397,8 @@ import { getAllWorkTimeList,
          publishPMData,
          getPMData,
          updatePMData,
-         getSubmitWorkTimeCount } from '@/utils/performance'
+         getSubmitWorkTimeCount,
+         mianshenheWorkTimeSubmit } from '@/utils/performance'
 import { genQualiEvaData, getAllQTEvaedData } from '@/utils/multual'
 import { Notification } from 'element-ui'
 import { getUsersList } from '@/utils/users'
@@ -406,7 +407,7 @@ import { submitAMEvaData,
          updateAMEvaData,
          genAMEvaScoreData,
          genAMEvaScoreDataV2 } from '@/utils/achievementEva'
-import { getEvaCoef, sortObjectArrayByParams, getPerformanceIsPublish, sortByAscend, isUndefined } from '@/utils/common'
+import { getEvaCoef, sortObjectArrayByParams, getPerformanceIsPublish, sortByAscend, isUndefined, getIsSubmitAllow, convertYearMonth2Nor, getGlobalFlagByType, getGlobalFlagByTime } from '@/utils/common'
 import store from '@/store'
 import Cookies from 'js-cookie'
 import moment from 'moment'
@@ -473,7 +474,6 @@ export default {
       dimension2IDV2: null, // 新版评价维度2 ID
       dimenision1EvaIDV2: null,
       dimenision2EvaIDV2: null
-
     }
   },
   methods: {
@@ -1630,6 +1630,7 @@ export default {
             title: '成功',
             message: '已全部评价完成'
           })
+
           // 显示组员平均评价星级和组长评价星级
           this.dimension1CSAveStar = 0
           this.dimension1GPEvaStar = 0
@@ -1765,6 +1766,27 @@ export default {
           this.dimension1GPEvaStar = 0
           this.dimension2CSAveStar = 0
           this.dimension2GPEvaStar = 0
+
+          if (store.state.userInfo.duty !== 1) {
+            let isEvaAll = true
+            for (let item of this.PMData) {
+              if (item.conclusionEva.length === 0) {
+                isEvaAll = false
+              }
+            }
+            if (isEvaAll) {
+              let year = moment(this.title).year()
+              let month = moment(this.title).month() + 1
+              // ***如果在截止日期前完成所有人评价提交，则自动提交一条奖励工时
+              getGlobalFlagByTime(year, month, ['AMEvaDeadline']).then(res => {
+                if (res.length === 0) {
+                  mianshenheWorkTimeSubmit(store.state.userInfo.id, 550, this.title).then(() => {}).catch(err => { console.log(err) })
+                } else if (res[0].flagValue !== 1) {
+                  mianshenheWorkTimeSubmit(store.state.userInfo.id, 550, this.title).then(() => {}).catch(err => { console.log(err) })
+                }
+              })
+            }
+          }
         }
 
         this.submitEvaDataFlag = true

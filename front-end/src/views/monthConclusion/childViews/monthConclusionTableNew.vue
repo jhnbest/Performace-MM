@@ -90,6 +90,8 @@
     submitMonthConclusionNew,
     updateMonthConclusionNew } from '@/utils/conclusion'
   import store from '@/store'
+import { convertYearMonth2Nor, getIsSubmitAllow } from '@/utils/common'
+import { mianshenheWorkTimeSubmit } from '@/utils/performance'
   export default {
     data () {
       return {
@@ -156,12 +158,22 @@
         let promises = []
         let count = 0
         if (this.moreDetailData.length === 0) { // 是否第一次提交
+          // ***如果在截止日期前提交申报，则自动提交一条奖励工时
+          getIsSubmitAllow(this.submitYear, this.submitMonth).then(res => {
+            if (res.length === 0) {
+              let applyMonth = convertYearMonth2Nor(this.submitYear, this.submitMonth)
+              mianshenheWorkTimeSubmit(store.state.userInfo.id, 549, applyMonth).then(() => {}).catch(err => { console.log(err) })
+            } else if (res[0].flagValue !== 1) {
+              let applyMonth = convertYearMonth2Nor(this.submitYear, this.submitMonth)
+              mianshenheWorkTimeSubmit(store.state.userInfo.id, 549, applyMonth).then(() => {}).catch(err => { console.log(err) })
+            }
+          })
           for (let item in this.conclusionTextNew) {
             promises[count++] = submitMonthConclusionNew(this.submitter, this.submitYear, this.submitMonth, store.state.monthConclusionType,
                                                         this.conclusionTextNew[item].dimension, this.conclusionTextNew[item].content,
                                                         submitStatus)
           }
-          Promise.all(promises).then(allResponses => {
+          Promise.all(promises).then(() => {
             this.$common.toast('提交成功', 'success', false)
             this.$router.push({
               path: '/home/monthConclusion'

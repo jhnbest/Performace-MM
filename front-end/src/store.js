@@ -49,7 +49,7 @@ export default new Vuex.Store({
     GPCommonStaffAMEvaCoef: 0.5, // 普通员工对组长的成效评价系数
     defaultStar: 3, // 默认评价星级
     newRulesDate: '2022-02', // 成效评价实施时间,
-    newRulesUpdateDate: '2023-03', // 成效评价更新1,
+    newRulesUpdateDate: '2023-05', // 成效评价更新1,
     monthConclusionType: 1,
     conclusionTextNew: {
       buildBoutiqueProject: {

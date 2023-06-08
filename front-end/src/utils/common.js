@@ -11,7 +11,8 @@ import {
   urlGetGlobalFlagByType,
   urlUpdateGlobalFlagVal,
   urlGetEvaCoef,
-  urlGetIsSubmitAllow
+  urlGetIsSubmitAllow,
+  urlGetGlobalFlagByTime
 } from '../config/interface'
 import store from '@/store'
 
@@ -274,11 +275,36 @@ export function getTypeGlobalFlag (applyYear, applyMonth, flagType) {
 }
 
 // 根据数据类型获取全局标志位
-export function getGlobalFlagByType (flagType) {
+export function getGlobalFlagByType (year, month, flagType) {
   const url = urlGetGlobalFlagByType
   let params = {
+    year: year,
+    month: month,
     flagType: flagType
   }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(res => {
+      if (res.code === 1) {
+        resolve(res.data)
+      } else {
+        reject(new Error('getGlobalFlagByType recv error!'))
+      }
+    }).catch(err => {
+      reject(new Error(err + 'getGlobalFlagByType send error!'))
+    })
+  })
+}
+
+// 根据数据类型获取全局标志位
+export function getGlobalFlagByTime (year, month, flagType) {
+  const url = urlGetGlobalFlagByTime
+  let params = {
+    year: year,
+    month: month,
+    flagType: flagType
+  }
+  console.log('params')
+  console.log(params)
   return new Promise(function (resolve, reject) {
     http(url, params).then(res => {
       if (res.code === 1) {
@@ -415,6 +441,7 @@ export function MonthToString (month) {
       return 'error'
   }
 }
+
 // 英文月份转换成数字
 export function mStringToNumber (mString) {
   switch (mString) {
@@ -568,4 +595,9 @@ export function isUndefined (value) {
 // 判断是否为NULL
 export function isNull (value) {
   return !value && typeof (value) !== 'undefined' && value !== 0
+}
+
+// 将单独的年份和月份转换成标准化字符串‘xxxx-xx-xx'
+export function convertYearMonth2Nor (year, month) {
+  return month < 10 ? String(year) + '-' + '0' + String(month) : String(year) + '-' + String(month)
 }

@@ -2,7 +2,8 @@ const sqlMap = {
   common: {
     getTypeGlobalFlag: 'select * from globalflag where year(setTime) = ? and month(setTime) = ? and flagType = ?',
     getGlobalFlagByType: 'select * from globalflag where flagType in (?)',
-    updateGlobalFlagVal: 'update globalflag set flagValue = ? where flagType = ?'
+    updateGlobalFlagVal: 'update globalflag set flagValue = ? where flagType = ?',
+    getGlobalFlagByTime: 'select * from globalflag where flagType in (?) and year(setTime) = ? and month(setTime) = ?'
   },
   user: {
     // 登陆
@@ -119,7 +120,12 @@ const sqlMap = {
     + 'wa.userID = u.id where wa.projectID in (?) and wa.obsoleteStatus != 1',
     test1: 'select apd.id from monthprocess m left join assignprojectdetail apd on m.aPDID = apd.id where m.year = 2022 and' +
           ' apd.process != 0 and apd.process != 100 and m.obsoleteStatus != 1',
-    test2: 'select * from monthprocess m where m.year = 2023 and m.aPDID = ? and m.obsoleteStatus != 1'
+    test2: 'select * from monthprocess m where m.year = 2023 and m.aPDID = ? and m.obsoleteStatus != 1',
+    mianshenheWorkTimeSubmit: 'insert into worktimelist (apdID, aplID, monthID, submitID, projectTypeID, applyKValue, '
+    + 'reviewKValue, applyCofficient, reviewCofficient, submitTime, updateTime, applyMonth, submitStatus, reviewStatus, reviewTime, '
+    + 'workTimeAssignReviewStatus, reviewer, avaiableWorkTime, applyProcess, lastProcess, applyType, applyBaseWorkTime, '
+    + 'obsoleteStatus) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    insertmianshenheWorktimeassign: 'insert into worktimeassign (userID, projectID, workTime, reviewWorkTime, assignRole) values (?, ?, ?, ?, ?)'
   },
   workStation: {
     getAssignProjectListUn: 'select apl.*, users.name as assigner from assignprojectlist apl left join users on apl.assignerID = users.id where ' +
@@ -242,7 +248,11 @@ const sqlMap = {
     getMonthProcessByProjectStageID: 'select m.*, apd.id as apdID, apd.projectStageName, apl.id as aplID, apl.projectName, ' +
         'apl.process as totalProjectStageProcess, u.name as projectManager from monthprocess m left join assignprojectdetail apd ' +
         'on m.aPDID = apd.id left join assignprojectlist apl on apd.aPLID = apl.id left join users u on apl.userID = u.id' +
-        ' where m.aPDID = ? and m.year = ?'
+        ' where m.aPDID = ? and m.year = ?',
+    mianshenheProjectInsert: 'insert into assignprojectlist (userID, assignDate, projectType, projectName, process, assignerID, totalWorkTime,'
+    + ' gettedWorkTime, isFilled, projectLevel, reviewStatus, obsoleteStatus) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    mianshenheProjectDetailInsert: 'insert into assignprojectdetail (aPLID, projectStage, projectStageName, baseWorkTime, kValue, coefficient,'
+    + ' avaiableWorkTime, process, obsoleteStatus, isFinish) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
   },
   mutualRates: {
     getUserRates: 'select mr.*, u.name as ratedPersionName from mutualrate mr left join users u on ' +

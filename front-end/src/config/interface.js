@@ -4,6 +4,7 @@ export const urlGetTypeGlobalFlag = '/common/getTypeGlobalFlag'
 export const urlGetGlobalFlagByType = '/common/getGlobalFlagByType'
 export const urlUpdateGlobalFlagVal = '/common/updateGlobalFlagVal' // 更新某种类型的全局标志位
 export const urlGetEvaCoef = '/common/getEvaCoef' // 从数据库获取各种评价系数
+export const urlGetGlobalFlagByTime = '/common/getGlobalFlagByTime' // 根据时间获取全局标志位
 
 export const urlUserLogin = '/user/login' // 用户登录
 export const urlUserLogout = '/user/logout' // 用户登出
@@ -36,6 +37,7 @@ export const urlGetWorkTimeListInfo = '/performance/getWorkTimeListInfo' // 获�
 export const urlSavePMData = '/performance/savePMData' // 写入绩效数据
 export const urlUpdatePMData = '/performance/updatePMData' // 更新绩效数据
 export const urlGetPMData = '/performance/getPMData' // 获取绩效数据
+export const urlMianshenheWorkTimeSubmit = '/performance/mianshenheWorkTimeSubmit' // 免审核工时提交
 
 export const getAssignProjectList = '/workStation/getAssignProjectList' // 获取未完成的指派项目列表
 export const getAssignProjectDetail = '/workStation/getAssignProjectDetail' // 获取未完成的指派项目明细

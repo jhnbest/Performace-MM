@@ -337,12 +337,10 @@ export function genAMEvaScoreDataV2 (tableData,
   for (let i = 0; i < tableData.length; i++) {
     tableData[i].AMEvaRank = i + 1
     tableData[i].AMEvaScoreNor = NorCal(tableData.length + 1, i + 1)
-    console.log(tableData[i].name + ' ' + '未标准化成效评价：' + tableData[i].AMEvaScoreUnN.toFixed(2) + ';' +
-     '标准化成效评价：' + tableData[i].AMEvaScoreNor.toFixed(2) + ';' +
-     '成效评价排名' + i)
+    // console.log(tableData[i].name + ' ' + '未标准化成效评价：' + tableData[i].AMEvaScoreUnN.toFixed(2) + ';' +
+    //  '标准化成效评价：' + tableData[i].AMEvaScoreNor.toFixed(2) + ';' +
+    //  '成效评价排名' + i)
   }
-  console.log('==tableData')
-  console.log(JSON.parse(JSON.stringify(tableData)))
 
   return tableData
 }

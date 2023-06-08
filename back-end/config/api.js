@@ -7,6 +7,7 @@ module.exports = {
     getGlobalFlagByType: path + '/common/getGlobalFlagByType',
     updateGlobalFlagVal: path + '/common/updateGlobalFlagVal',
     getEvaCoef: path + '/common/getEvaCoef',
+    getGlobalFlagByTime: path + '/common/getGlobalFlagByTime',
 
     // user-用户管理
     userLogin: path + '/user/login', // 用户登录
@@ -48,6 +49,7 @@ module.exports = {
     updatePMData: path + '/performance/updatePMData', // 更新绩效数据
     getPMData: path + '/performance/getPMData', // 获取绩效数据
     test: path + '/performance/test', // 测试
+    mianshenheWorkTimeSubmit: path + '/performance/mianshenheWorkTimeSubmit', // 提交免审核工时
 
 
     // workStation-个人工作台

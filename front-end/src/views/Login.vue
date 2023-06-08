@@ -89,7 +89,7 @@ export default {
                   let data = res.data
                   localStorage.setItem('userInfo', JSON.stringify(data))
                   this.$store.dispatch('saveUserInfo', data)
-                  this.$common.toast('登陆成功', 'success', false)
+                  this.$common.toast('登录成功', 'success', false)
                   this.$router.push({
                     path: '/home/dashboard',
                     query: {}
@@ -105,7 +105,7 @@ export default {
               this.reqFlag.login = true
             }).catch(err => {
               console.log(err)
-              this.$common.toast('登陆失败', 'error', false)
+              this.$common.toast('登录失败', 'error', false)
             })
           }
         } else {

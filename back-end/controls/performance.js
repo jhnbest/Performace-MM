@@ -1084,6 +1084,81 @@ const performance = {
           return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
       })
     },
+    // ***提交免审核工时
+    mianshenheWorkTimeSubmit (req, res) {
+      let sendData = req.body
+      let sql = $sql.performance.getFullProjectType
+      let projectTypeID = sendData.projectTypeID
+      let arrayParams = [projectTypeID]
+      // ***根据工时类型ID查找工时,给工时赋值
+      RCPDDatabase(sql, arrayParams).then(res1 => {
+        let avaiableWorkTime = res1[0].workTime
+        let projectStageName = res1[0].projectName
+        let submitID = sendData.submitID
+        let submitTime = $time.formatTime()
+        let projectName = '奖励工时（免审核）'
+        let process = 100
+        let assignerID = submitID
+        let isFilled = 1
+        let projectLevel = 1
+        let reviewStatus = 1
+        let obsoleteStatus = 0
+        sql = $sql.workStation.mianshenheProjectInsert
+        arrayParams = [submitID, submitTime, projectTypeID, projectName, process, assignerID, avaiableWorkTime,
+          avaiableWorkTime, isFilled, projectLevel, reviewStatus, obsoleteStatus]
+        // ***插入项目列表
+        RCPDDatabase(sql, arrayParams).then(res2 => {
+          let aplID = res2.insertId
+          let applyKValue = 1
+          let applyCofficient = 1
+          let isFinish = 1
+          sql = $sql.workStation.mianshenheProjectDetailInsert
+          arrayParams = [aplID, projectTypeID, projectStageName, avaiableWorkTime, applyKValue, applyCofficient, avaiableWorkTime,
+            process, obsoleteStatus, isFinish]
+          // ***插入项目阶段列表
+          RCPDDatabase(sql, arrayParams).then(res3 => {
+            let apdID = res3.insertId
+            let monthID = 0
+            let reviewKValue = applyKValue
+            let reviewCofficient = 1
+            let updateTime = submitTime
+            let applyMonth = sendData.applyMonth
+            let submitStatus = 1
+            let reviewTime = submitTime
+            let workTimeAssignReviewStatus = 1
+            let reviewer = 26
+            let applyProcess = 100
+            let lastProcess = 0
+            let applyType = 'fact'
+            let applyBaseWorkTime = avaiableWorkTime
+            sql = $sql.performance.mianshenheWorkTimeSubmit
+            arrayParams = [apdID, aplID, monthID, submitID, projectTypeID, applyKValue, reviewKValue, applyCofficient,
+              reviewCofficient, submitTime, updateTime, applyMonth, submitStatus, reviewStatus, reviewTime,
+              workTimeAssignReviewStatus, reviewer, avaiableWorkTime, applyProcess, lastProcess, applyType,
+              applyBaseWorkTime, obsoleteStatus]
+            // ***插入工时列表
+            RCPDDatabase(sql, arrayParams).then(res4 => {
+              sql = $sql.performance.insertmianshenheWorktimeassign
+              arrayParams = [submitID, res4.insertId, avaiableWorkTime, avaiableWorkTime, '组织者']
+              // ***插入工时分配列表
+              RCPDDatabase(sql, arrayParams).then(res5 => {
+                return $http.writeJson(res, {code: 1, data: res5, message: 'success'})
+              }).catch(RCPDDatabaseErr => {
+                return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+              })
+            }).catch(RCPDDatabaseErr => {
+              return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+            })
+          }).catch(RCPDDatabaseErr => {
+            return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+          })
+        }).catch(RCPDDatabaseErr => {
+          return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+        })
+      }).catch(RCPDDatabaseErr => {
+        return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+      })
+    },
 }
 
 module.exports = performance

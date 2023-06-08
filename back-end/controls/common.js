@@ -30,25 +30,25 @@ const common = {
     },
     // 根据数据类型获取全局标志位
     getGlobalFlagByType(req, res) {
-        let sendData = req.body
-        let sql = $sql.common.getGlobalFlagByType
-        let arrayParams = [sendData.flagType]
-        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
-            return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
-        }).catch(RCPDDatabaseErr => {
-            return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
-        })
+      let sendData = req.body
+      let sql = $sql.common.getGlobalFlagByType
+      let arrayParams = [sendData.flagType]
+      RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+        return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
+      }).catch(RCPDDatabaseErr => {
+        return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+      })
     },
     // 更新某种类型的全局标志位
     updateGlobalFlagVal (req, res) {
-        let sendData = req.body
-        let sql = $sql.common.updateGlobalFlagVal
-        let arrayParams = [sendData.flagValue, sendData.flagType]
-        RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
-            return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
-        }).catch(RCPDDatabaseErr => {
-            return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
-        })
+      let sendData = req.body
+      let sql = $sql.common.updateGlobalFlagVal
+      let arrayParams = [sendData.flagValue, sendData.flagType]
+      RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+          return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
+      }).catch(RCPDDatabaseErr => {
+          return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+      })
     },
     // 从数据库获取各种评价系数
     getEvaCoef (req, res) {
@@ -61,6 +61,17 @@ const common = {
         return $http.writeJson(res, {code: 1, data: allResponse, message: 'success'})
       }).catch(err => {
         return $http.writeJson(res, {code: -2, err: err, message: 'false'})
+      })
+    },
+    // ***根据时间获取全局标志位
+    getGlobalFlagByTime (req, res) {
+      let sendData = req.body
+      let sql = $sql.common.getGlobalFlagByTime
+      let arrayParams = [sendData.flagType, sendData.year, sendData.month]
+      RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+        return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
+      }).catch(RCPDDatabaseErr => {
+        return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
       })
     }
 }

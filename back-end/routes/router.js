@@ -16,6 +16,7 @@ router.post(api.getTypeGlobalFlag, common.getTypeGlobalFlag)
 router.post(api.getGlobalFlagByType, common.getGlobalFlagByType)
 router.post(api.updateGlobalFlagVal, common.updateGlobalFlagVal)
 router.post(api.getEvaCoef, common.getEvaCoef)
+router.post(api.getGlobalFlagByTime, common.getGlobalFlagByTime)
 // user-用户管理
 router.post(api.userLogin, user.login);
 router.post(api.userLogout, user.logout);
@@ -56,6 +57,7 @@ router.post(api.savePMData, performance.savePMData)
 router.post(api.updatePMData, performance.updatePMData)
 router.post(api.getPMData, performance.getPMData)
 router.post(api.test, performance.test)
+router.post(api.mianshenheWorkTimeSubmit, performance.mianshenheWorkTimeSubmit)
 
 // workStation-个人工作台
 router.post(api.getAssignProjectList, workStation.getAssignProjectList)
