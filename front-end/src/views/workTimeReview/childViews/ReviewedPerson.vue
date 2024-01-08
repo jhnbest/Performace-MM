@@ -249,6 +249,7 @@
   import CopReview from '@/components/Cop/CopReview'
   import { submitReviewPass, getAssignProjectDetail } from '@/config/interface'
   import { getProjectList } from '@/utils/performance'
+import { convertNorDate2YearMonth, MonthToStringV2 } from '@/utils/common'
   export default {
     data () {
       return {
@@ -376,6 +377,9 @@
       },
       // 驳回
       handleReviewReject (row) {
+        let yearMonth = convertNorDate2YearMonth(row.applyMonth)
+        let month = yearMonth.month
+        let monthEN = MonthToStringV2(month)
         const url = submitReviewPass
         let params = {
           id: row.id,
@@ -383,7 +387,10 @@
           reviewComments: row.reviewComments,
           reviewKValue: row.reviewKValue,
           reviewStatus: 2,
-          reviewer: this.$store.state.userInfo.id
+          reviewer: this.$store.state.userInfo.id,
+          lastProcess: row.lastProcess,
+          monthID: row.monthID,
+          monthEN: monthEN
         }
         this.$http(url, params)
           .then(res => {

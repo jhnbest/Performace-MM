@@ -347,32 +347,6 @@ function updateWorkTimeAssignObsoleteStatus(data) {
     })
 }
 
-function updateAssignWorkDetail(sql, arrayParams) {
-    return new Promise(function (resolve, reject) {
-        $http.connPool(sql, arrayParams, (err, result) => {
-            if (err) {
-                reject(err)
-            } else {
-                result[0] = JSON.parse(JSON.stringify(result[0]))
-                result[1] = JSON.parse(JSON.stringify(result[1]))
-                resolve(result)
-            }
-        })
-    })
-}
-
-function updateProjectTotalWorkTime(sql, arrayParams) {
-    return new Promise(function (resolve, reject) {
-        $http.connPool(sql, arrayParams, (err, result) => {
-            if (err) {
-                reject(err)
-            } else {
-                resolve(result)
-            }
-        })
-    })
-}
-
 function getAssignedProjects(data) {
     return new Promise(function (resolve, reject) {
         let sql = $sql.workStation.assignProjectList
@@ -421,12 +395,23 @@ function RCPDDatabase(sql, arrayParams) {
 function fGetProjectTypeList(projectType, isFinish) {
     let sql = null
     let arrayParams = [projectType]
-    if (isFinish === 0) { // 获取未完成项目
+    //***基础平台类项目同时查询工程组和通信组的 */
+    if (projectType === 213) {
+      if (isFinish === 0) { // 获取未完成项目
+        sql = $sql.workStation.getTypeProjectListUnV2
+      } else if (isFinish === 1) { // 获取已完成项目
+          sql = $sql.workStation.getTypeProjectListed
+      } else if (isFinish === -1) { // 获取所有项目
+          sql = $sql.workStation.getTypeProjectList
+      }
+    } else {
+      if (isFinish === 0) { // 获取未完成项目
         sql = $sql.workStation.getTypeProjectListUn
-    } else if (isFinish === 1) { // 获取已完成项目
-        sql = $sql.workStation.getTypeProjectListed
-    } else if (isFinish === -1) { // 获取所有项目
-        sql = $sql.workStation.getTypeProjectList
+      } else if (isFinish === 1) { // 获取已完成项目
+          sql = $sql.workStation.getTypeProjectListed
+      } else if (isFinish === -1) { // 获取所有项目
+          sql = $sql.workStation.getTypeProjectList
+      }
     }
     return new Promise(function (resolve, reject) {
         RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
@@ -855,41 +840,39 @@ const workStation = {
             })
         })
     },
-    // 更新项目阶段
-    updateAssignWork (req, res) {
-        let data = req.body
-        let sqlUpdateAssignWorkDetail = $sql.workStation.UpdateAssignWorkDetail
-        let sqlUpdateAssignWorkList = $sql.workStation.UpdateAssignWorkList
-        let sqlGetProjectTotalWorkTime = $sql.workStation.GetProjectTotalWorkTime
-        let sql = sqlUpdateAssignWorkDetail + ';' + sqlGetProjectTotalWorkTime
-        let kValue = data.tableData[0].kValue
-        let coefficient = data.tableData[0].coefficient
-        let avaiableWorkTime = data.tableData[0].avaiableWorkTime
-        let projectStageName = data.tableData[0].workType
-        let applyBaseWorkTime = data.tableData[0].applyBaseWorkTime
-        let arrayParams = [projectStageName, kValue, coefficient, avaiableWorkTime, applyBaseWorkTime, data.apdID, data.aplID]
-        updateAssignWorkDetail(sql, arrayParams).then((res1) => { // 更新项目明细
-            let totalWorkTime = res1[1][0].totalWorkTime
-            sql = sqlUpdateAssignWorkList
-            arrayParams = [totalWorkTime, data.aplID]
-            updateProjectTotalWorkTime(sql, arrayParams).then(() => {
-                return $http.writeJson(res, {code: 1, message: '成功' })
-            })
-        })
+    // ***更新项目阶段信息***
+    updateAssignProjectStageInfo (req, res) {
+      let data = req.body
+      let sqlUpdateAssignWorkDetail = $sql.workStation.updateAssignProjectStageInfo
+      let sqlUpdateAssignWorkList = $sql.workStation.UpdateAssignWorkList
+      let sqlGetProjectTotalWorkTime = $sql.workStation.GetProjectTotalWorkTime
+      let sql = sqlUpdateAssignWorkDetail
+      let kValue = data.assignProjectDetail.kValue
+      let coefficient = data.assignProjectDetail.coefficient
+      let avaiableWorkTime = data.assignProjectDetail.avaiableWorkTime
+      let projectStageName = data.assignProjectDetail.projectStageName
+      let applyBaseWorkTime = data.assignProjectDetail.applyBaseWorkTime
+      let apdID = data.assignProjectDetail.apdID
+      let arrayParams = [projectStageName, kValue, coefficient, avaiableWorkTime, applyBaseWorkTime, apdID]
+      RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+        return $http.writeJson(res, { code: 1, data: RCPDDatabaseRes, message: 'success' })
+      }).catch(RCPDDatabaseErr => {
+        return $http.writeJson(res, { code: -2, data: RCPDDatabaseErr, message: 'error' })
+      })
     },
-    // 获取项目明细
+    // ***获取项目明细
     getAssignWorkDetail (req, res) {
-        let data = req.body
-        let sql = $sql.workStation.getAssignWorkDetail
-        let arrayParams = [data.apdID]
-        $http.connPool(sql, arrayParams, (err, result) => {
-            if (err) {
-                return $http.writeJson(res, {code: -2, message:'失败', errMsg: err})
-            } else {
-                result = JSON.parse(JSON.stringify(result))
-                return $http.writeJson(res, {code: 1, data: result[0], message: '成功'})
-            }
-        })
+      let data = req.body
+      let sql = $sql.workStation.getAssignWorkDetail
+      let arrayParams = [data.apdID]
+      $http.connPool(sql, arrayParams, (err, result) => {
+        if (err) {
+          return $http.writeJson(res, {code: -2, message:'失败', errMsg: err})
+        } else {
+            result = JSON.parse(JSON.stringify(result))
+          return $http.writeJson(res, {code: 1, data: result[0], message: '成功'})
+        }
+      })
     },
     // 更新项目月工时申报状态
     updateAssignProjectFilled (req, res) {
@@ -970,7 +953,7 @@ const workStation = {
             return $http.writeJson(res, { code: -2, data: RCPDDatabaseErr, message: 'error' })
         })
     },
-    // 当月领导者是否已经评价完毕
+    // ***当月领导者是否已经评价完毕
     getManagerMultualRateFinish (req, res) {
         let sendData = req.body
         let sql = $sql.workStation.getManagerMultualRateFinish
@@ -1114,45 +1097,56 @@ const workStation = {
     },
     // 获取特定类型的项目列表
     getTypeProjectList (req, res) {
-        let promises = []
-        let promises2 = []
-        let count = 0
-        let count2 = 0
-        let sendData = req.body
-        fGetProjectTypeList(sendData.projectType, sendData.isFinish).then(getProjectTypeListRes => { // get 项目列表
-            for (let getProjectTypeListItem of getProjectTypeListRes) {
-                promises[count++] = getProjectStageByPID(getProjectTypeListItem) // get 项目阶段
-            }
-            Promise.all(promises).then(getProjectStageByPIDRes => {
-                for (let getProjectStageByPIDResItem of getProjectStageByPIDRes) {
-                    promises2[count2++] = getMonthProcessByProjectStageID(getProjectStageByPIDResItem, sendData.curApplyYear) // get 项目阶段计划、实际进展
-                }
-                Promise.all(promises2).then(getMonthProcessByProjectStageIDRes => {
-                    // for (let i = 0; i < getMonthProcessByProjectStageIDRes.length; i++) {
-                    //     for (let j = 0; j < getMonthProcessByProjectStageIDRes[i].length; j++) {
-                    //         let obj = {}
-                    //         if (getMonthProcessByProjectStageIDRes[i][j].length === 0) {
-                    //             obj.projectName = getProjectTypeListRes[i].projectName
-                    //             obj.projectStageName = getProjectStageByPIDRes[i][j].projectStageName
-                    //             obj.totalProjectStageProcess = getProjectTypeListRes[i].process
-                    //             obj.apdID = getProjectStageByPIDRes[i][j].id
-                    //             obj.aplID = getProjectTypeListRes[i].id
-                    //             obj.type = 'none'
-                    //             getMonthProcessByProjectStageIDRes[i][j].push(obj)
-                    //         }
-                    //     }
-                    // }
-                    let result = {
-                        projectList: getProjectTypeListRes,
-                        projectStage: getProjectStageByPIDRes,
-                        monthProcess: getMonthProcessByProjectStageIDRes
-                    }
-                    return $http.writeJson(res, {code: 1, data: result, message: 'success'})
-                })
-            })
-        }).catch(getProjectListErr => {
-            return $http.writeJson(res, {code: -2, err: getProjectListErr, message: 'false'})
+      let promises = []
+      let count = 0
+      let sendData = req.body
+      fGetProjectTypeList(sendData.projectType, sendData.isFinish).then(getProjectTypeListRes => { // get 项目列表
+        for (let getProjectTypeListItem of getProjectTypeListRes) {
+          promises[count++] = getProjectStageByPID(getProjectTypeListItem) // get 项目阶段
+        }
+        Promise.all(promises).then(getProjectStageByPIDRes => {
+          let result = {
+            projectList: getProjectTypeListRes,
+            projectStage: getProjectStageByPIDRes
+          }
+          return $http.writeJson(res, {code: 1, data: result, message: 'success'})
         })
+      }).catch(getProjectListErr => {
+        return $http.writeJson(res, {code: -2, err: getProjectListErr, message: 'false'})
+      })
+    },
+    // ***根据项目阶段获取项目进展***
+    getMonthProcess (req, res) {
+      let sendData = req.body
+      getMonthProcessByProjectStageID(sendData.projectStage, sendData.submitYear).then(RCPDDatabaseRes => {
+        return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
+      }).catch(RCPDDatabaseErr => {
+        return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+      }) // get 项目阶段计划、实际进展
+    },
+    // ***更新项目信息***
+    updateAssignProjectInfo (req, res) {
+      let sendData = req.body
+      let arrayParams = [sendData.userID, sendData.projectType, sendData.projectName, sendData.process, sendData.assignerID,
+        sendData.totalWorkTime, sendData.isFilled, sendData.projectLevel, sendData.reviewStatus, sendData.obsoleteStatus,
+        sendData.id]
+      let sql = $sql.workStation.updateAssignProjectInfo
+      RCPDDatabase(sql, arrayParams).then((RCPDDatabaseRes) => {
+        return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
+      }).catch(RCPDDatabaseErr => {
+        return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+      })
+    },
+    // ***获取项目总工时***
+    getAssignProjectTotalWorkTime (req, res) {
+      let sendData = req.body
+      let arrayParams = [sendData.aplID]
+      let sql = $sql.workStation.getAssignProjectTotalWorkTime
+      RCPDDatabase(sql, arrayParams).then((RCPDDatabaseRes) => {
+        return $http.writeJson(res, {code: 1, data: RCPDDatabaseRes, message: 'success'})
+      }).catch(RCPDDatabaseErr => {
+        return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+      })
     }
 }
 

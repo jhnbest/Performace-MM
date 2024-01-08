@@ -5,6 +5,11 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const app = express();
 
+// let CronJob = require('cron').CronJob
+// new CronJob('0 0 1 3 * ?', function() { // 秒 分 小时 月份中的日期 月份 星期中的日期 年份（可选）
+//   console.log(new Date())
+// }, null, true)
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 

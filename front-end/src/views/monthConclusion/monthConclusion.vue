@@ -33,10 +33,8 @@
           width="470"
           trigger="click">
           <span>1、根据当前的工时申报月份，点击编辑填写对应的月总结；</span><br>
-          <span>2、状态为“提交”时，管理者方可看到月总结内容并进行星级评价；</span><br>
-          <span>3、有完整填写“本月总结”和“下月计划”并提交默认评价为三颗星（获得10工时），如果取得较好成效，获得5星好评的奖励10工时，4星好评的奖励5工时，
-            如果成效较差，获得2颗星扣5工时，1颗星扣10工时；</span><br>
-          <span>4、若无特殊情况，提交截止时间为<span style="font-weight: bolder;color: red">每月1日24时。</span></span><br>
+          <span>2、状态为“已提交”时，管理者方可看到月总结内容并进行星级评价；</span><br>
+          <span>3、若无特殊情况，提交截止时间为<span style="font-weight: bolder;color: red">每月2日24时。</span></span><br>
           <span slot="reference" class="pointer-type"><i class="el-icon-warning-outline"></i>填报说明</span>
         </el-popover>
       </el-col>
@@ -150,6 +148,7 @@
   import monthConclusionTableCheck from './childViews/monthConclusionTableCheck'
   import monthConclusionTableCheckNew from './childViews/monthConclusionTableCheckNew.vue'
   import store from '@/store'
+import { getWorkTimeListByType, mianshenheWorkTimeSubmit } from '@/utils/performance'
   export default {
     data () {
       return {
@@ -319,6 +318,13 @@
             })
           }
         } else {
+          let userID = this.$store.state.userInfo.id
+          getWorkTimeListByType(userID, titleMonth, 549).then(res => {
+            // ***用户如果在截止日期前是先暂存后提交月总结，则也自动提交一条奖励工时
+            if (res.length === 0) {
+              mianshenheWorkTimeSubmit(userID, 549, titleMonth).then(() => {}).catch(err => { console.log(err) })
+            }
+          })
           let promises = []
           let count = 0
           for (let item of row.moreDetailData) {

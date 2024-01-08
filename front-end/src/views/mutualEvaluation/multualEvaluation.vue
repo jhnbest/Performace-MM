@@ -778,6 +778,9 @@
                 _this.isChanged = false
                 this.$common.toast('提交成功', 'success', false)
               }
+            }).catch(err => {
+              console.log('err')
+              console.log(err)
             })
           } else {
             this.$common.toast(this.title + '月已截止互评', 'error', true)

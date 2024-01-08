@@ -407,7 +407,7 @@ import { submitAMEvaData,
          updateAMEvaData,
          genAMEvaScoreData,
          genAMEvaScoreDataV2 } from '@/utils/achievementEva'
-import { getEvaCoef, sortObjectArrayByParams, getPerformanceIsPublish, sortByAscend, isUndefined, getIsSubmitAllow, convertYearMonth2Nor, getGlobalFlagByType, getGlobalFlagByTime } from '@/utils/common'
+import { getEvaCoef, sortObjectArrayByParams, getPerformanceIsPublish, sortByAscend, isUndefined, convertYearMonth2Nor, getGlobalFlagByType, getGlobalFlagByTime } from '@/utils/common'
 import store from '@/store'
 import Cookies from 'js-cookie'
 import moment from 'moment'
@@ -930,6 +930,12 @@ export default {
           }
           Promise.all(promises).then(allResponse => {
             let allWorkTimeList = allResponse[0]
+            let count = 0
+            for (let item of allWorkTimeList) {
+              if (item.id === 29) {
+                count++
+              }
+            }
             let QTEvaedData = allResponse[1]
             this.evaCoefObj = allResponse[2]
             if (this.PMPublishStatusData.length > 0) { // *******如果绩效数据库里面有绩效，则获取*******

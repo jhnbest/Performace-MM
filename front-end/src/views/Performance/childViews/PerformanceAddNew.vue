@@ -1,7 +1,6 @@
 <template>
     <div>
       <h3 v-if="applyType === 'fact'" class="v-line-icon">新增工时申报</h3>
-      <h3 v-if="applyType === 'plan'" class="v-line-icon">新增计划申报</h3>
       <el-form :label-position="labelPosition" label-width="110px" ref="formData" :model="formData" :rules="formRules" :inline="true">
       <el-form-item label="申报月份" prop="title">
           <el-date-picker
@@ -39,6 +38,7 @@
         <br>
         <el-form-item label="项目类型" prop="projectType">
           <el-cascader
+            :disabled="isDisableProjectType"
             v-if="showFlag.projectType"
             v-model="formData.projectType"
             :options="projectTypeOptions"
@@ -147,42 +147,21 @@
           </el-table-column>
           <el-table-column label="本月进展" align="center" width="100%" v-if="applyType === 'fact'">
             <template slot-scope="scope">
-              <el-form-item
-                :prop="'workTypeTimeDetail.' + scope.$index + '.applyProcess'"
-                :rules="formRules.applyProcess"
-                style="margin: auto">
-                <div>
-                  <el-input v-model.number="scope.row.applyProcess"
-                            type="number"
-                            size="mini"
-                            style="width: 70%"
-                            :max="100"
-                            @change="handleKValueCoffChange(scope.row, scope.$index)"></el-input>
-                  <span> %</span>
-                </div>
-              </el-form-item>
+              <el-select v-model="formData.workTypeTimeDetail[scope.$index].applyProcess"
+                         placeholder=""
+                         size="mini"
+                         filterable
+                         @visible-change="handleKValueCoffChange(scope.row, scope.$index)">
+                <el-option
+                  v-for="item in progress"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                  :disabled="item.disable">
+                </el-option>
+              </el-select>
             </template>
           </el-table-column>
-          <el-table-column label="计划进展" align="center" width="100%" v-if="applyType === 'plan'">
-            <template slot-scope="scope">
-              <el-form-item
-                :prop="'workTypeTimeDetail.' + scope.$index + '.applyProcess'"
-                :rules="formRules.applyProcess"
-                style="margin: auto">
-                <div>
-                  <el-input v-model.number="scope.row.applyProcess"
-                            type="number"
-                            size="mini"
-                            style="width: 70%"
-                            :max="100"
-                            @change="handleKValueCoffChange(scope.row, scope.$index)"></el-input>
-                  <span> %</span>
-                </div>
-              </el-form-item>
-            </template>
-          </el-table-column>
-          <el-table-column label="预计工时" align="center" width="100%" v-if="applyType === 'plan'"
-                           prop="avaiableWorkTime"></el-table-column>
           <el-table-column label="工时分配" align="center" width="100%">
             <template slot-scope="scope">
               <span class="link-type" @click="handleWorkTimeAssign(scope.row, scope.$index)">点击分配</span>
@@ -229,7 +208,6 @@
 <script>
   import {
     submitAssignWorkDetail,
-    submitMonthPlanProcess,
     urlGetIsSubmitAllow,
     ulrGetWorkTimeNew,
     submitPersonalProject,
@@ -281,6 +259,7 @@
           label: 'projectName',
           expandTrigger: 'hover'
         },
+        isDisableProjectType: false,
         projectTypeOptions: [],
         labelPosition: 'right',
         optionsWorkType: [],
@@ -365,16 +344,94 @@
           value: 4,
           text: '公司重点任务'
         }],
-        applyTypes: [{
-          value: 'plan',
-          text: '计划'
-        }, {
-          value: 'fact',
-          text: '实际'
-        }],
         selectProjectStageID: null,
         selectPersion: null,
-        usersList: null
+        usersList: null,
+        progress: [{
+          value: 100,
+          label: '100%',
+          disable: false
+        }, {
+          value: 95,
+          label: '95%',
+          disable: false
+        }, {
+          value: 90,
+          label: '90%',
+          disable: false
+        }, {
+          value: 85,
+          label: '85%',
+          disable: false
+        }, {
+          value: 80,
+          label: '80%',
+          disable: false
+        }, {
+          value: 75,
+          label: '75%',
+          disable: false
+        }, {
+          value: 70,
+          label: '70%',
+          disable: false
+        }, {
+          value: 65,
+          label: '65%',
+          disable: false
+        }, {
+          value: 60,
+          label: '60%',
+          disable: false
+        }, {
+          value: 55,
+          label: '55%',
+          disable: false
+        }, {
+          value: 50,
+          label: '50%',
+          disable: false
+        }, {
+          value: 45,
+          label: '45%',
+          disable: false
+        }, {
+          value: 40,
+          label: '40%',
+          disable: false
+        }, {
+          value: 35,
+          label: '35%',
+          disable: false
+        }, {
+          value: 30,
+          label: '30%',
+          disable: false
+        }, {
+          value: 25,
+          label: '25%',
+          disable: false
+        }, {
+          value: 20,
+          label: '20%',
+          disable: false
+        }, {
+          value: 15,
+          label: '15%',
+          disable: false
+        }, {
+          value: 10,
+          label: '10%',
+          disable: false
+        }, {
+          value: 5,
+          label: '5%',
+          disable: false
+        }, {
+          value: 0,
+          label: '0%',
+          disable: false
+        }]
       }
     },
     methods: {
@@ -492,57 +549,6 @@
           })
         })
       },
-      // 提交计划至计划进展表
-      onSubmitMonthPlanProcess () {
-        const url = submitMonthPlanProcess
-        let applyYear = this.$moment(this.formData.title).year()
-        let applyMonth = this.$moment(this.formData.title).month()
-        let applyMonthString = this.$common.MonthToString(String(applyMonth + 1))
-        let params = {
-          paramsData: []
-        }
-        for (let item of this.formData.workTypeTimeDetail) {
-          if (item.applyProcess !== 0) {
-            let obj = {
-              id: null,
-              kValue: item.defaultKValue,
-              coefficient: item.defaultCofficient,
-              applyProcess: item.applyProcess,
-              type: 'plan',
-              year: applyYear,
-              applyMonthString: applyMonthString,
-              aPDID: item.apdID,
-              January: null,
-              February: null,
-              March: null,
-              April: null,
-              May: null,
-              June: null,
-              July: null,
-              August: null,
-              September: null,
-              October: null,
-              November: null,
-              December: null
-            }
-            obj[applyMonthString] = item.applyProcess
-            params.paramsData.push(obj)
-          }
-        }
-        let it = this
-        return new Promise(function (resolve, reject) {
-          if (params.paramsData.length !== 0) {
-            it.$http(url, params)
-              .then(res => {
-                if (res.code === 1) {
-                  resolve(res.data)
-                }
-              })
-          } else {
-            resolve(0)
-          }
-        })
-      },
       // 提交工时申报
       onSubmitWorkTime (formData) {
         this.$refs[formData].validate(valid => {
@@ -562,58 +568,29 @@
                     if (this.reqFlag.submitOrTemporaryWorkTime) {
                       this.reqFlag.submitOrTemporaryWorkTime = false
                       this.onSubmitProjectList().then(() => { // 提交至项目明细表
-                        if (this.applyType === 'plan') { // 如果是计划项目，则更新计划进展表
-                          this.onSubmitMonthPlanProcess().then(() => {
-                            let tableDataCopy = []
-                            for (let item of this.formData.workTypeTimeDetail) { // 无进展的项目阶段不提交
-                              item.avaiableWorkTime = Number(item.avaiableWorkTime)
-                              if (item.avaiableWorkTime !== 0 && item.applyProcess !== 0) {
-                                item.lastProcess = 0
-                                tableDataCopy.push(item)
-                              }
-                            }
-                            if (tableDataCopy.length !== 0) {
-                              workTimeListInsert(null, 'insert', this.formData.title, this.applyType, tableDataCopy).then(workTimeListInsertRes => {
-                                this.$common.toast('提交成功', 'success', false)
-                                this.reqFlag.submitOrTemporaryWorkTime = true
-                                this.onCancel(formData)
-                              }).catch(err => {
-                                this.reqFlag.submitOrTemporaryWorkTime = true
-                                this.$common.toast('提交失败', 'error', false)
-                                console.log(err)
-                                this.onCancel(formData)
-                              })
-                            } else {
-                              this.reqFlag.submitOrTemporaryWorkTime = true
-                              this.$common.toast('提交成功', 'success', false)
-                              this.onCancel(formData)
-                            }
+                        let tableDataCopy = []
+                        for (let item of this.formData.workTypeTimeDetail) { // 无进展的项目阶段不提交
+                          item.avaiableWorkTime = Number(item.avaiableWorkTime)
+                          if (item.avaiableWorkTime !== 0 && item.applyProcess !== 0) {
+                            item.lastProcess = 0
+                            tableDataCopy.push(item)
+                          }
+                        }
+                        if (tableDataCopy.length !== 0) {
+                          workTimeListInsert(null, 'insert', this.formData.title, this.applyType, tableDataCopy).then(workTimeListInsertRes => {
+                            this.$common.toast('提交成功', 'success', false)
+                            this.reqFlag.submitOrTemporaryWorkTime = true
+                            this.onCancel(formData)
+                          }).catch(err => {
+                            this.reqFlag.submitOrTemporaryWorkTime = true
+                            this.$common.toast('提交失败', 'error', false)
+                            console.log(err)
+                            this.onCancel(formData)
                           })
                         } else {
-                          let tableDataCopy = []
-                          for (let item of this.formData.workTypeTimeDetail) { // 无进展的项目阶段不提交
-                            item.avaiableWorkTime = Number(item.avaiableWorkTime)
-                            if (item.avaiableWorkTime !== 0 && item.applyProcess !== 0) {
-                              item.lastProcess = 0
-                              tableDataCopy.push(item)
-                            }
-                          }
-                          if (tableDataCopy.length !== 0) {
-                            workTimeListInsert(null, 'insert', this.formData.title, this.applyType, tableDataCopy).then(workTimeListInsertRes => {
-                              this.$common.toast('提交成功', 'success', false)
-                              this.reqFlag.submitOrTemporaryWorkTime = true
-                              this.onCancel(formData)
-                            }).catch(err => {
-                              this.reqFlag.submitOrTemporaryWorkTime = true
-                              this.$common.toast('提交失败', 'error', false)
-                              console.log(err)
-                              this.onCancel(formData)
-                            })
-                          } else {
-                            this.reqFlag.submitOrTemporaryWorkTime = true
-                            this.$common.toast('提交成功', 'success', false)
-                            this.onCancel(formData)
-                          }
+                          this.reqFlag.submitOrTemporaryWorkTime = true
+                          this.$common.toast('提交成功', 'success', false)
+                          this.onCancel(formData)
                         }
                       })
                     }
@@ -675,6 +652,9 @@
                         this.$common.toast('暂存成功', 'success', false)
                         this.onCancel(formData)
                       }
+                    }).catch(err => {
+                      console.log(err)
+                      this.$common.toast('添加失败', 'error', false)
                     })
                   }
                 }
@@ -977,11 +957,13 @@
         obj.avaiableWorkTime = 0
         obj.baseWorkTime = 0
         obj.isConference = 0
+        obj.lastProcess = 0
         let selectLength = this.formData.projectType.length
         this.formData.workTypeTimeDetail.push(obj)
-        obj = JSON.parse(JSON.stringify(this.formData.projectType[selectLength - 1]))
-        this.formData.projectType.push(obj)
-        this.refreshSelectProjectType()
+        this.isDisableProjectType = true
+        // obj = JSON.parse(JSON.stringify(this.formData.projectType[selectLength - 1]))
+        // this.formData.projectType.push(obj)
+        // this.refreshSelectProjectType()
       },
       // 表格删除按钮
       handleDelete (row, index) {
@@ -989,6 +971,10 @@
         this.formData.projectType.splice(index, 1)
         this.showFlag.projectType = false
         this.refreshSelectProjectType()
+        // ***新增自定义项目>=1个时，再点击其他类型的项目有BUG，以下用于禁用选择其他类型项目，当新增自定义项目>=1个时
+        if (this.formData.workTypeTimeDetail.length === 1) {
+          this.isDisableProjectType = false
+        }
       },
       // 申报类型变化
       handleApplyTypeChange (applyType) {

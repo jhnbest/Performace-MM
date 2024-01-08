@@ -19,6 +19,11 @@
                  style="margin-left: 10px"
                  @click="handleNextMonth"
                  :disabled="!reqFlag.getPerformanceScore">下月</el-button>
+      <el-button v-if="false" size="mini"
+                 type="primary"
+                 style="margin-left: 10px"
+                 @click="test"
+                 :disabled="!reqFlag.getPerformanceScore">填充空白数据</el-button>
       <el-popover
         placement="bottom"
         width="500"
@@ -241,6 +246,8 @@ import monthConclusionTableCheckNewV2 from '@/views/monthConclusion/childViews/m
 import store from '@/store'
 import moment from 'moment'
 import Cookies from 'js-cookie'
+import { http } from '@/config/http'
+import { Notification } from 'element-ui'
 export default {
   data () {
     return {
@@ -502,17 +509,25 @@ export default {
     },
     // 下一月
     handleNextMonth () {
-      // const url = '/performance/test'
-      // let params = {}
-      // http(url, params).then(res => {
-      //   console.log(res)
-      // })
       this.title = this.$moment(this.title).add(1, 'months').format('YYYY-MM')
       if (typeof (Cookies.get('hMon')) !== 'undefined') {
         Cookies.remove('hMon')
       }
       Cookies.set('hMon', this.title)
       this.initData()
+    },
+    test () {
+      const url = '/performance/test'
+      let params = {}
+      http(url, params).then(res => {
+        console.log(res)
+        Notification.success({
+          title: '成功',
+          message: '插入成功'
+        })
+      }).catch(err => {
+        console.log(err)
+      })
     },
     // 日期变化调用
     handelDateChange () {

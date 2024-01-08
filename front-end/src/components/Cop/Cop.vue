@@ -62,8 +62,20 @@ export default {
         this.changeShowFlag()
         getWorkTimeAssign(row.id, 'applyer').then(res => {
           this.copInfoTable = res[0]
-          for (let item of this.copInfoTable) { // 插入审核状态
-            item.reviewStatus = res[1][0].reviewStatus
+          let checkFlag = false
+          let orgIndex = 0
+          for (let i = 0; i < this.copInfoTable.length; i++) { // 插入审核状态
+            this.copInfoTable[i].reviewStatus = res[1][0].reviewStatus
+            if (this.copInfoTable[i].workTime < 0) {
+              checkFlag = true
+            }
+            if (this.copInfoTable[i].assignRole === '组织者') {
+              orgIndex = i
+            }
+          }
+          if (checkFlag) {
+            this.copInfoTable[orgIndex].name = 'admin'
+            this.copInfoTable[orgIndex].groupName = 'admin'
           }
         }).catch(err => {
           console.log(err)

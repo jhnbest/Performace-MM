@@ -16,11 +16,11 @@
                 :lg="{span: 1, offset: 0}"
                 :xl="{span: 1, offset: 0}"
                 v-if="$store.state.userInfo.role !== '普通成员'
-                || $store.state.userInfo.id === 32 // 赵帅
-                || $store.state.userInfo.id === 7 // 白工
-                || $store.state.userInfo.id === 11 // 郭工
-                || $store.state.userInfo.id === 12 // 顾总
-                || $store.state.userInfo.id === 8 // 陈迪
+                || $store.state.userInfo.id === 13 // 雅婷
+                || $store.state.userInfo.id === 30 // 宇辰
+                || $store.state.userInfo.id === 33 // 邹涛
+                || $store.state.userInfo.id === 23 // 荣茂
+                || $store.state.userInfo.id === 18 // 俊炎
                 || $store.state.userInfo.id === 19">
           <el-button type="danger"
                      @click="handleProjectAssign"
@@ -62,7 +62,6 @@
             :name="String(projectTypeManager.projectTypeID)">
             <span slot="label">
               <span style="font-weight: bolder;color: black;font-size: 18px;vertical-align: center;">{{ projectTypeManager.name }}</span>
-              <el-badge v-if="projectTypeManager.count !== 0" :value="projectTypeManager.count" class="item"></el-badge>
             </span>
             <POverviewMan v-if="selectProjectType === String(projectTypeManager.projectTypeID)"
                        :fatherParams="{ projectTypeID: projectTypeManager.projectTypeID,

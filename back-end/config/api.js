@@ -50,6 +50,7 @@ module.exports = {
     getPMData: path + '/performance/getPMData', // 获取绩效数据
     test: path + '/performance/test', // 测试
     mianshenheWorkTimeSubmit: path + '/performance/mianshenheWorkTimeSubmit', // 提交免审核工时
+    getWorkTimeListByType: path + '/performance/getWorkTimeListByType', // ***根据项目类型获取工时列表***
 
 
     // workStation-个人工作台
@@ -62,7 +63,7 @@ module.exports = {
     updateAssignProjectList: path + '/workStation/updateAssignProjectList', // 更新已指派项目
     deleteAssignProject: path + '/workStation/deleteAssignProject', // 删除已指派项目
     updateAssignProjectFilled: path + '/workStation/updateAssignProjectFilled', // 更新指派项目是否填报字段
-    updateAssignWork: path + '/workStation/updateAssignWork', // 更新项目明细
+    updateAssignProjectStageInfo: path + '/performance/updateAssignProjectStageInfo', // ***更新项目阶段信息***
     getAssignWorkDetail: path + '/workStation/getAssignWorkDetail', // 获取项目明细
     submitPersonalProject: path + '/workStation/submitPersonalProject', // 提交个人申报项目
     submitMonthPlanProcess: path + '/workStation/submitMonthPlanProcess', // 提交计划至计划进展表
@@ -83,6 +84,9 @@ module.exports = {
     repairErrorData2: path + '/workStation/repairErrorData2', // 修复错误数据2
     setProjectFinish: path + '/workStation/setProjectFinish', // 将项目置为已完成状态
     getTypeProjectList: path + '/workStation/getTypeProjectList', // 获取特定类型的项目列表
+    getMonthProcess: path + '/performance/getMonthProcess', // ***根据项目阶段获取项目进展***
+    updateAssignProjectInfo: path + '/performance/updateAssignProjectInfo', // ***更新项目信息***
+    getAssignProjectTotalWorkTime: path + '/workStation/getAssignProjectTotalWorkTime', // ***获取项目总工时***
 
     // 互评模块
     getUserRates: path + '/mutualRates/getUserRates', // 获取互评信息

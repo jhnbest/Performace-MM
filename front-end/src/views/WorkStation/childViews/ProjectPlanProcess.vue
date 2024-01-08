@@ -108,7 +108,7 @@
                       size="mini"
                       :type="scope.row.process === 100.0 ? 'info' : (scope.row.type === 'fact' ? 'primary' : 'warning')"
                       @click="handleEdit(scope.row)"
-                      :disabled="scope.row.process === 100.0">
+                      :disabled="scope.row.process === 100.0 || scope.row.type === 'plan'">
             <div v-if="scope.row.process !== 100.0">
               <span v-if="scope.row.type === 'plan'">编辑计划进展</span>
               <span v-if="scope.row.type === 'fact'">编辑实际进展</span>
@@ -424,6 +424,10 @@
         }, {
           value: 5,
           label: '5%',
+          disable: false
+        }, {
+          value: 0,
+          label: '0%',
           disable: false
         }]
       }

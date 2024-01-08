@@ -4,9 +4,12 @@
                 :data="tableData"
                 size="medium"
                 style="margin: auto"
-                v-loading="!reqFlag.reqGetProjectList" >
+                v-loading="!reqFlag.reqGetProjectList"
+                :default-sort="{ prop: 'assignDate', order: 'ascending' }" >
         <el-table-column type="index" label="序号" width="60" align="center"></el-table-column>
-        <el-table-column label="项目名称" align="center" prop="projectName" show-overflow-tooltip width="200"></el-table-column>
+        <el-table-column label="项目名称" align="center" prop="projectName"></el-table-column>
+        <!-- <el-table-column label="指派人" align="center" prop="assigner" sortable></el-table-column> -->
+        <el-table-column label="指派时间" align="center" prop="assignDate" sortable></el-table-column>
         <el-table-column label="项目级别" align="center">
           <template slot-scope="scope">
             <el-tag :type="scope.row.projectLevel | projectLevelColorFilter">
@@ -14,11 +17,11 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="项目经理" align="center" prop="projectManager" width="100"></el-table-column>
+        <el-table-column label="项目经理" align="center" prop="projectManager" width="100" sortable></el-table-column>
 <!--        <el-table-column label="状态" align="center" prop="projectStatus">-->
 <!--        </el-table-column>-->
         <el-table-column label="当前阶段" align="center" prop="curProjectStage"></el-table-column>
-        <el-table-column label="计划阶段" align="center" prop="planProjectStage"></el-table-column>
+        <!-- <el-table-column label="计划阶段" align="center" prop="planProjectStage"></el-table-column> -->
         <el-table-column label="当前阶段进度" align="center">
           <template slot-scope="scope">
             <el-progress type="dashboard"
@@ -40,21 +43,18 @@
         </el-table-column>
       </el-table>
       <project-process-detail v-if="projectProcessDetail"
-                              :projectStage="this.tableDataCache.projectStage"
-                              :monthProcess="this.tableDataCache.monthProcess"
-                              :projectListIndex="projectListIndex"
+                              :projectStage="this.tableDataCache.projectStage[projectListIndex]"
                               :project-name="projectName"
                               :cur-year-num="this.curApplyYear"
-                              :project-type-i-d="this.fatherParams.projectTypeID"
-                              :is-finish="0"
                               @close="projectProcessDetail = false"></project-process-detail>
     </div>
 </template>
 
 <script>
-  import { getCurApplyAbleMonth, MonthToString } from '../../utils/common'
+  import { getCurApplyAbleMonth, isUndefined } from '../../utils/common'
   import { getTypeProjectList } from '../../utils/workStation'
   import projectProcessDetail from './projectProcessDetail'
+  import moment from 'moment'
   export default {
       data () {
         return {
@@ -86,11 +86,10 @@
             getCurApplyAbleMonth().then(getCurApplyAbleMonthRes => {
               this.curApplyYear = this.$moment(getCurApplyAbleMonthRes[0].setTime).year()
               this.curApplyMonth = this.$moment(getCurApplyAbleMonthRes[0].setTime).month()
-              getTypeProjectList(this.fatherParams.projectTypeID, 0, this.curApplyYear)
-                .then(getTypeProjectListRes => {
-                  this.genTableData(getTypeProjectListRes, this.curApplyMonth)
-                  this.reqFlag.reqGetProjectList = true
-                })
+              getTypeProjectList(this.fatherParams.projectTypeID, 0, this.curApplyYear).then(getTypeProjectListRes => {
+                this.genTableData(getTypeProjectListRes, this.curApplyMonth)
+                this.reqFlag.reqGetProjectList = true
+              })
             })
           }
         },
@@ -98,37 +97,33 @@
         genTableData (getTypeProjectListRes, curApplyMonth) {
           let projectList = getTypeProjectListRes.projectList
           let projectStage = getTypeProjectListRes.projectStage
-          let monthProcess = getTypeProjectListRes.monthProcess
           this.tableDataCache = getTypeProjectListRes
           this.tableData = []
           for (let i = 0; i < projectList.length; i++) {
-            let obj = {
-              projectName: projectList[i].projectName,
-              projectManager: projectList[i].projectManager,
-              totalProjectStageProcess: projectList[i].process,
-              projectLevel: projectList[i].projectLevel,
-              curProjectStage: null,
-              curProjectStageProcess: null,
-              projectListIndex: i
-            }
-            for (let projectStageItem of projectStage[i]) {
-              if (projectStageItem.process !== 0) {
-                obj.curProjectStage = projectStageItem.projectStageName
-                obj.curProjectStageProcess = projectStageItem.process
+            // *** 若项目总结已完成100%，则不显示 ***
+            let findResult = projectStage[i].find(item => {
+              return item.projectStageName === '项目总结'
+            })
+            if (isUndefined(findResult) || findResult.process !== 100) {
+              let obj = {
+                projectName: projectList[i].projectName,
+                projectManager: projectList[i].projectManager,
+                totalProjectStageProcess: projectList[i].process,
+                projectLevel: projectList[i].projectLevel,
+                assigner: projectList[i].assigner,
+                assignDate: moment(projectList[i].assignDate).format('YYYY-MM-DD'),
+                curProjectStage: null,
+                curProjectStageProcess: null,
+                projectListIndex: i
               }
-            }
-            for (let monthProcessItem of monthProcess[i]) {
-              if (monthProcessItem.length !== 0) {
-                for (let monthProcessItemItem of monthProcessItem) {
-                  if (monthProcessItemItem.type === 'plan') {
-                    if (monthProcessItemItem[MonthToString(String(curApplyMonth + 1))] !== null) {
-                      obj.planProjectStage = monthProcessItemItem.projectStageName
-                    }
-                  }
+              for (let projectStageItem of projectStage[i]) {
+                if (projectStageItem.process !== 0) {
+                  obj.curProjectStage = projectStageItem.projectStageName
+                  obj.curProjectStageProcess = projectStageItem.process
                 }
               }
+              this.tableData.push(obj)
             }
-            this.tableData.push(obj)
           }
         },
         // 查看详情

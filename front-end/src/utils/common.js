@@ -303,8 +303,6 @@ export function getGlobalFlagByTime (year, month, flagType) {
     month: month,
     flagType: flagType
   }
-  console.log('params')
-  console.log(params)
   return new Promise(function (resolve, reject) {
     http(url, params).then(res => {
       if (res.code === 1) {
@@ -410,7 +408,7 @@ export function smallNumToL (num) {
   }
 }
 
-// 月份转换成英文
+// 数字月份转换成英文
 export function MonthToString (month) {
   switch (month) {
     case '1':
@@ -430,6 +428,38 @@ export function MonthToString (month) {
     case '8':
       return 'August'
     case '9':
+      return 'September'
+    case '10':
+      return 'October'
+    case '11':
+      return 'November'
+    case '12':
+      return 'December'
+    default:
+      return 'error'
+  }
+}
+
+// 数字月份（两位）转换成英文
+export function MonthToStringV2 (month) {
+  switch (month) {
+    case '01':
+      return 'January'
+    case '02':
+      return 'February'
+    case '03':
+      return 'March'
+    case '04':
+      return 'April'
+    case '05':
+      return 'May'
+    case '06':
+      return 'June'
+    case '07':
+      return 'July'
+    case '08':
+      return 'August'
+    case '09':
       return 'September'
     case '10':
       return 'October'
@@ -600,4 +630,12 @@ export function isNull (value) {
 // 将单独的年份和月份转换成标准化字符串‘xxxx-xx-xx'
 export function convertYearMonth2Nor (year, month) {
   return month < 10 ? String(year) + '-' + '0' + String(month) : String(year) + '-' + String(month)
+}
+
+// 将日期标准化字符串(xxxx-xx)转换成单独数字年份和月份
+export function convertNorDate2YearMonth (date) {
+  let resArray = date.split('-')
+  let year = resArray[0]
+  let month = resArray[1]
+  return { year: year, month: month }
 }

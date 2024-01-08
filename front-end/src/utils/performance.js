@@ -13,7 +13,9 @@ import {
     urlGetProjectList,
     urlChangeSubmitStatus,
     urlGetSubmitWorkTimeCount,
-    urlMianshenheWorkTimeSubmit
+    urlMianshenheWorkTimeSubmit,
+    urlGetWorkTimeListByType,
+    urlGetProjectInfo
 } from '../config/interface'
 import { getUsersList } from '@/utils/users'
 import { getPerformanceIsPublish,
@@ -42,6 +44,26 @@ export function getAllWorkTimeList (applyDate) {
           resolve(recvData)
       } else {
           reject(new Error('getAllWorkTimeList recv error'))
+      }
+    }).catch((err) => {
+      reject(new Error(err + '请求失败'))
+    })
+  })
+}
+
+export function getProjectInfo (workTimeID, aplID) { // 获取工时申报详情
+  let url = urlGetProjectInfo
+  let params = {
+    id: workTimeID,
+    aplID: aplID
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(res => {
+      if (res.code === 1) {
+        let recvData = res
+        resolve(recvData)
+      } else {
+        reject(new Error('getAllWorkTimeList recv error'))
       }
     }).catch((err) => {
       reject(new Error(err + '请求失败'))
@@ -608,6 +630,27 @@ export function mianshenheWorkTimeSubmit (submitID, projectTypeID, applyMonth) {
     submitID: submitID,
     projectTypeID: projectTypeID,
     applyMonth: applyMonth
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(res => {
+      if (res.code === 1) {
+        resolve(res.data)
+      } else {
+        reject(res.err)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
+// ***根据项目类型获取工时列表***
+export function getWorkTimeListByType (userID, applyMonth, projectTypeID) {
+  const url = urlGetWorkTimeListByType
+  let params = {
+    userID: userID,
+    applyMonth: applyMonth,
+    projectTypeID: projectTypeID
   }
   return new Promise(function (resolve, reject) {
     http(url, params).then(res => {

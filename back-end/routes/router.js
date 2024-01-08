@@ -58,6 +58,7 @@ router.post(api.updatePMData, performance.updatePMData)
 router.post(api.getPMData, performance.getPMData)
 router.post(api.test, performance.test)
 router.post(api.mianshenheWorkTimeSubmit, performance.mianshenheWorkTimeSubmit)
+router.post(api.getWorkTimeListByType, performance.getWorkTimeListByType)
 
 // workStation-个人工作台
 router.post(api.getAssignProjectList, workStation.getAssignProjectList)
@@ -69,7 +70,7 @@ router.post(api.getAssignedProject, workStation.getAssignedProject)
 router.post(api.updateAssignProjectList, workStation.updateAssignProjectList)
 router.post(api.deleteAssignProject, workStation.deleteAssignProject)
 router.post(api.updateAssignProjectFilled, workStation.updateAssignProjectFilled)
-router.post(api.updateAssignWork, workStation.updateAssignWork)
+router.post(api.updateAssignProjectStageInfo, workStation.updateAssignProjectStageInfo)
 router.post(api.getAssignWorkDetail, workStation.getAssignWorkDetail)
 router.post(api.submitPersonalProject, workStation.submitPersonalProject)
 router.post(api.submitMonthPlanProcess, workStation.submitMonthPlanProcess)
@@ -90,6 +91,9 @@ router.post(api.repairErrorData, workStation.repairErrorData)
 router.post(api.repairErrorData2, workStation.repairErrorData2)
 router.post(api.setProjectFinish, workStation.setProjectFinish)
 router.post(api.getTypeProjectList, workStation.getTypeProjectList)
+router.post(api.getMonthProcess, workStation.getMonthProcess)
+router.post(api.updateAssignProjectInfo, workStation.updateAssignProjectInfo) // ***更新项目信息***
+router.post(api.getAssignProjectTotalWorkTime, workStation.getAssignProjectTotalWorkTime) // ***获取项目总工时***
 
 // 互评模块
 router.post(api.getUserRates, mutualRates.getUserRates)

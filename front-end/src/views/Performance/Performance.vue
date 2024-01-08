@@ -83,7 +83,7 @@
         </el-table-column>
         <el-table-column label="备注" align="center" width="100%">
           <template slot-scope="scope">
-            <div v-if="scope.row.submitComments !== ''">
+            <div v-if="scope.row.submitComments !== '' && scope.row.submitComments !== null">
               <el-popover
                 placement="top-start"
                 trigger="hover"
@@ -181,7 +181,7 @@
     import Cop from '@/components/Cop/Cop'
     import CountTo from 'vue-count-to'
     import { getProjectList, deleteWorkTimeSubmit, changeSubmitStatus } from '@/utils/performance'
-    import { getIsSubmitAllow, isUndefined } from '@/utils/common'
+    import { getIsSubmitAllow, isNull, isUndefined } from '@/utils/common'
     import store from '@/store'
     export default {
       data () {
@@ -369,7 +369,8 @@
           this.$router.push({
             path: '/home/PerformanceEdit',
             query: {
-              id: row.id
+              id: row.id,
+              aplID: row.aplID
             }
           })
         },

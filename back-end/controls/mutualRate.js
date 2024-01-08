@@ -72,27 +72,37 @@ const mutualRate = {
     submitRatesResult (req, res) {
         let sendData = req.body
         let promises = []
-        for (let item1 of sendData.data) {
-            for (let item2 of rateTypes) {
+        // ***首先查询提交人在该月是否已经提交过定性评价（正常是不会，排查重复提交BUG用）
+        let ratePersion = sendData.userID
+        let rateMonth = sendData.title
+        let sql = $sql.mutualRates.getRateDataByRatePersion
+        let arrayParams = [ratePersion, rateMonth]
+        RCPDDatabase(sql, arrayParams).then(res1 => {
+          // ***如果还未提交过定性评价，再写入数据库
+          if (res1.length === 0) {
+            for (let item1 of sendData.data) {
+              for (let item2 of rateTypes) {
                 let rate = starToRates(item1[item2.rateTypeName])
                 let rateType = item2.id
                 let ratedPersion = item1.ratedPersion
-                let ratePersion = sendData.userID
-                let rateMonth = sendData.title
-                let sql = $sql.mutualRates.submitRatesResult
+                sql = $sql.mutualRates.submitRatesResult
                 let rateTime = $time.formatTime()
-                let arrayParams = [ratePersion, ratedPersion, rateMonth, rate, rateType, rateTime, rateTime]
+                arrayParams = [ratePersion, ratedPersion, rateMonth, rate, rateType, rateTime, rateTime]
                 promises.push(RCPDDatabase(sql, arrayParams))
+              }
             }
-        }
-        Promise.all(promises).then(() => {
-            return $http.writeJson(res, {code: 1, data: 'yes', message: '成功'})
-        }).catch(err => {
-          return $http.writeJson(res, {code: -2, err: err, message: 'false'})
+            Promise.all(promises).then(() => {
+              return $http.writeJson(res, {code: 1, data: 'yes', message: '成功'})
+            }).catch(err => {
+              return $http.writeJson(res, {code: -2, err: err, message: 'false'})
+            })
+          } else { // ***如果数据库里面已有定性评价数据，报错
+            return $http.writeJson(res, {code: -1, data: '数据库当月已有定性评价数据', message: '数据库当月已有定性评价数据'})
+          }
         })
     },
     // 更新互评信息
-    async updateUserRate (req, res) {
+    updateUserRate (req, res) {
         let data = req.body
         let sql = $sql.mutualRates.updateUserRate
         let updateTime = $time.formatTime()
@@ -199,7 +209,7 @@ const mutualRate = {
             return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
         })
     },
-    // 一键填充定性评价
+    // ***一键填充定性评价
     handleFillMul (req, res) {
       let sendData = req.body
       let sql = $sql.mutualRates.handleFillMul
@@ -211,6 +221,7 @@ const mutualRate = {
       let count2 = 0
       let count3 = 0
 
+      // ***********查询各员工在查询月份的定性评价数量***********
       for (let usersItem of sendData.users) {
         arrayParams = [usersItem.id, sendData.rateMonth]
         promises[count++] = RCPDDatabase(sql, arrayParams)
@@ -220,10 +231,11 @@ const mutualRate = {
             result[i][0].userName = sendData.users[i].name
             result[i][0].userID = sendData.users[i].id
         }
+        // ***********如果查询数量为0，则查询上月份的成效评价数据***********
         for (let resultItem of result) {
           if (resultItem[0].totalCount === 0) {
             let preMonth = moment(sendData.rateMonth).subtract(1, 'months').format('YYYY-MM')
-            sql = $sql.mutualRates.handleFillMulCheck // 找上上月份的评价数据
+            sql = $sql.mutualRates.handleFillMulCheck
             arrayParams = [resultItem[0].userID, preMonth]
             promises2[count2++] = RCPDDatabase(sql, arrayParams)
           }

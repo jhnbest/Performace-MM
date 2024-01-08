@@ -23,7 +23,7 @@
               stripe
               size="mini"
               style="margin: auto;width: 100%;user-select:initial"
-              :header-cell-style="{background:'#00c0d1',color:'#000000',fontSize:'18px'}">
+              :header-cell-style="{background:'#00BFFF',color:'#000000',fontSize:'18px'}">
       <el-table-column label="打造精品工程"
                        align="center"
                        :render-header="renderHeaderBuildBoutiqueProject">
@@ -37,7 +37,7 @@
               border
               stripe
               size="medium"
-              :header-cell-style="{ background:'#00c0d1',color:'#000000',fontSize:'18px' }"
+              :header-cell-style="{ background:'#00BFFF',color:'#000000',fontSize:'18px' }"
               style="margin: auto;width: 99%;user-select:initial"
               highlight-current-row>
       <el-table-column label="创建专业团队"
@@ -53,7 +53,7 @@
               border
               stripe
               size="medium"
-              :header-cell-style="{ background:'#00c0d1',color:'#000000',fontSize:'18px' }"
+              :header-cell-style="{ background:'#00BFFF',color:'#000000',fontSize:'18px' }"
               style="margin: auto;width: 99%"
               highlight-current-row>
       <el-table-column label="下一个月的工作目标、工作计划/工作安排、工作内容"
@@ -69,7 +69,7 @@
               border
               stripe
               size="medium"
-              :header-cell-style="{ background:'#00c0d1',color:'#000000',fontSize:'18px' }"
+              :header-cell-style="{ background:'#00BFFF',color:'#000000',fontSize:'18px' }"
               style="margin: auto;width: 99%"
               highlight-current-row>
       <el-table-column label="对处室工作的意见/建议、不满/抱怨、工作/生活/学习中的烦恼和困难以及希望得到的帮助/支持/指导"
@@ -91,7 +91,7 @@
     updateMonthConclusionNew } from '@/utils/conclusion'
   import store from '@/store'
 import { convertYearMonth2Nor, getIsSubmitAllow } from '@/utils/common'
-import { mianshenheWorkTimeSubmit } from '@/utils/performance'
+import { getProjectList, getWorkTimeListByType, mianshenheWorkTimeSubmit } from '@/utils/performance'
   export default {
     data () {
       return {
@@ -157,7 +157,7 @@ import { mianshenheWorkTimeSubmit } from '@/utils/performance'
         let submitStatus = 1
         let promises = []
         let count = 0
-        if (this.moreDetailData.length === 0) { // 是否第一次提交
+        if (this.moreDetailData.length === 0) { // ***是否第一次提交
           // ***如果在截止日期前提交申报，则自动提交一条奖励工时
           getIsSubmitAllow(this.submitYear, this.submitMonth).then(res => {
             if (res.length === 0) {
@@ -183,6 +183,14 @@ import { mianshenheWorkTimeSubmit } from '@/utils/performance'
             this.$common.toast('提交失败', 'error', true)
           })
         } else { // 提交类型为更新
+          let userID = this.$store.state.userInfo.id
+          let applyMonth = convertYearMonth2Nor(this.$route.query.submitYear, this.$route.query.submitMonth)
+          getWorkTimeListByType(userID, applyMonth, 549).then(res => {
+            // ***用户如果在截止日期前是先暂存后提交月总结，则也自动提交一条奖励工时
+            if (res.length === 0) {
+              mianshenheWorkTimeSubmit(userID, 549, applyMonth).then(() => {}).catch(err => { console.log(err) })
+            }
+          })
           for (let item of this.moreDetailData) {
             promises[count++] = updateMonthConclusionNew(item.id, item.content, submitStatus)
           }

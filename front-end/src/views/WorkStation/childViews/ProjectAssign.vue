@@ -1,10 +1,10 @@
 <template>
   <div v-if="$store.state.userInfo.role !== '普通成员'
-  || $store.state.userInfo.id === 32
-  || $store.state.userInfo.id === 7
-  || $store.state.userInfo.id === 11
-  || $store.state.userInfo.id === 12
-  || $store.state.userInfo.id === 8
+  || $store.state.userInfo.id === 13 // 雅婷
+  || $store.state.userInfo.id === 30 // 宇辰
+  || $store.state.userInfo.id === 33 // 邹涛
+  || $store.state.userInfo.id === 23 // 荣茂
+  || $store.state.userInfo.id === 18 // 俊炎
   || $store.state.userInfo.id === 19">
     <div class="main-search">
       <el-row>

@@ -80,8 +80,8 @@ const sqlMap = {
         'and obsoleteStatus != 1 and reviewStatus = 0 and submitStatus = 1 and applyType = "fact"',
     getWorkAssign: 'SELECT u.name, u.groupName, u.id as userID, wa.id, wa.workTime, wa.reviewWorkTime, wa.projectID, wa.assignRole from worktimeassign ' +
         'wa INNER JOIN users u ON wa.userID = u.id WHERE wa.projectID = ? and wa.obsoleteStatus != 1',
-    getProjectInfo: 'select wl.*, apd.projectStageName from worktimelist wl left join assignprojectdetail apd on ' +
-        'wl.apdID = apd.id where wl.id = ? and wl.obsoleteStatus != 1',
+    getProjectInfo: 'select wl.*, apd.projectStageName, apl.projectName, apl.id as aplID from worktimelist wl left join assignprojectdetail apd on ' +
+        'wl.apdID = apd.id left join assignprojectlist apl on wl.aplID = apl.id where wl.id = ? and wl.obsoleteStatus != 1',
     getWorkAssignInfo: 'select * from worktimeassign where projectID = ? and obsoleteStatus != 1',
     getFullProjectType: 'select * from projecttypenew where projectTypeID = ?',
     changeSubmitStatus: 'update worktimelist set submitStatus = ?, updateTime = ?, reviewStatus = ? where id = ?',
@@ -118,14 +118,16 @@ const sqlMap = {
     getPMData: 'select pm.*, u.name, u.groupName as groupID from performancedata pm left join users u on pm.userID = u.id where pm.applyDate = ?',
     getWorkTimeAssign: 'select u.name, wa.* from worktimeassign wa left join users u on '
     + 'wa.userID = u.id where wa.projectID in (?) and wa.obsoleteStatus != 1',
-    test1: 'select apd.id from monthprocess m left join assignprojectdetail apd on m.aPDID = apd.id where m.year = 2022 and' +
-          ' apd.process != 0 and apd.process != 100 and m.obsoleteStatus != 1',
-    test2: 'select * from monthprocess m where m.year = 2023 and m.aPDID = ? and m.obsoleteStatus != 1',
+    test1: 'select apd.id from monthprocess m left join assignprojectdetail apd on m.aPDID = apd.id where m.year in (2022) and' +
+          ' m.type = "fact" and apd.process != 0 and apd.process != 100 and m.obsoleteStatus != 1 group by apd.id order by apd.id',
+    test2: 'select * from monthprocess m where m.year = 2023 and m.aPDID = ? and m.type = "fact" and m.obsoleteStatus != 1',
+    test3: 'insert into monthprocess (aPDID, year, type) values (?, ?, ?)',
     mianshenheWorkTimeSubmit: 'insert into worktimelist (apdID, aplID, monthID, submitID, projectTypeID, applyKValue, '
     + 'reviewKValue, applyCofficient, reviewCofficient, submitTime, updateTime, applyMonth, submitStatus, reviewStatus, reviewTime, '
     + 'workTimeAssignReviewStatus, reviewer, avaiableWorkTime, applyProcess, lastProcess, applyType, applyBaseWorkTime, '
     + 'obsoleteStatus) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-    insertmianshenheWorktimeassign: 'insert into worktimeassign (userID, projectID, workTime, reviewWorkTime, assignRole) values (?, ?, ?, ?, ?)'
+    insertmianshenheWorktimeassign: 'insert into worktimeassign (userID, projectID, workTime, reviewWorkTime, assignRole) values (?, ?, ?, ?, ?)',
+    getWorkTimeListByType: 'select * from worktimelist where submitID = ? and applyMonth = ? and projectTypeID = ?'
   },
   workStation: {
     getAssignProjectListUn: 'select apl.*, users.name as assigner from assignprojectlist apl left join users on apl.assignerID = users.id where ' +
@@ -174,11 +176,16 @@ const sqlMap = {
         'apd.process as apdProcess, apl.id as aplID, apl.userID, apl.assignDate, apl.projectType, apl.projectName, apl.process as aplProcess, ' +
         'apl.assignerID, apl.totalWorkTime, apl.gettedWorkTime, apl.isFilled from assignprojectdetail apd left join assignprojectlist apl on ' +
         'apd.aPLID = apl.id where apd.id = ? and apd.obsoleteStatus != 1',
+    getAssignProjectV2: 'select * from assignprojectlist where id = ?',
     getAssignedProject: 'select apl.id, apl.assignDate, apl.projectName, apl.projectType as projectTypeID, ' +
         'apl.userID as projectManagerID, apl.process, apl.projectLevel, pjn.projectName ' +
         'as projectType, users.name as projectManager from assignprojectlist apl left join projecttypenew pjn on ' +
-        'apl.projectType = pjn.projectTypeID left join users on apl.userID = users.id where apl.assignerID = ? and apl.obsoleteStatus != 1',
+        'apl.projectType = pjn.projectTypeID left join users on apl.userID = users.id where apl.assignerID = ? and' +
+        'apl.obsoleteStatus != 1',
     updateAssignProjectList: 'update assignprojectlist set userID = ?, projectName = ?, projectLevel = ? where id = ?',
+    updateAssignProjectInfo: 'update assignprojectlist set userID = ?, projectType = ?, projectName = ?,' +
+      'process = ?, assignerID = ?, totalWorkTime = ?, isFilled = ?, projectLevel = ?, reviewStatus = ?,' +
+      'obsoleteStatus = ? where id = ?',
     deleteAssignProjectList: 'update assignprojectlist set obsoleteStatus = 1 where id = ?',
     deleteAssignProjectDetail: 'update assignprojectdetail set obsoleteStatus = 1 where aPLID = ?',
     getAssignProjectDetailID: 'select id from assignprojectdetail where aPLID = ?',
@@ -186,7 +193,7 @@ const sqlMap = {
     updateAssignProjectFilled: 'update assignprojectlist set isFilled = 1 where id = ?',
     getAssignWorkDetail: 'select apd.id as apdID, apd.aPLID as aplID, apl.projectLevel from assignprojectdetail apd left join' +
         ' assignprojectlist apl on apd.aPLID = apl.id where apd.id = ?',
-    UpdateAssignWorkDetail: 'update assignprojectdetail set projectStageName = ?, kValue = ?, ' +
+    updateAssignProjectStageInfo: 'update assignprojectdetail set projectStageName = ?, kValue = ?, ' +
         'coefficient = ?, avaiableWorkTime = ?, baseWorkTime = ? where id = ?',
     UpdateAssignWorkList: 'update assignprojectlist set totalWorkTime = ? where id = ?',
     GetProjectTotalWorkTime: 'select sum(avaiableWorkTime)totalWorkTime from assignprojectdetail where aPLID = ?',
@@ -241,6 +248,10 @@ const sqlMap = {
         ' from assignprojectlist apl left join users on apl.assignerID = users.id ' +
         'left join users u on apl.userID = u.id where ' +
         "apl.projectType = ? and apl.process != 100.0 and apl.obsoleteStatus != 1",
+    getTypeProjectListUnV2: 'select apl.*, users.name as assigner, u.name as projectManager' +
+        ' from assignprojectlist apl left join users on apl.assignerID = users.id ' +
+        'left join users u on apl.userID = u.id where ' +
+        "apl.process != 100.0 and apl.obsoleteStatus != 1 and (apl.projectType = 213 or apl.projectType = 275)",
     getTypeProjectListed: 'select apl.*, users.name as assigner, u.name as projectManager' +
         ' from assignprojectlist apl left join users on apl.assignerID = users.id left join users u on apl.userID = u.id ' +
         'where apl.projectType = ? and apl.process == 100.0 and apl.obsoleteStatus != 1',
@@ -252,7 +263,8 @@ const sqlMap = {
     mianshenheProjectInsert: 'insert into assignprojectlist (userID, assignDate, projectType, projectName, process, assignerID, totalWorkTime,'
     + ' gettedWorkTime, isFilled, projectLevel, reviewStatus, obsoleteStatus) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
     mianshenheProjectDetailInsert: 'insert into assignprojectdetail (aPLID, projectStage, projectStageName, baseWorkTime, kValue, coefficient,'
-    + ' avaiableWorkTime, process, obsoleteStatus, isFinish) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+    + ' avaiableWorkTime, process, obsoleteStatus, isFinish) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    getAssignProjectTotalWorkTime: 'select sum(avaiableWorkTime)totalWorkTime from assignprojectdetail where aPLID = ?'
   },
   mutualRates: {
     getUserRates: 'select mr.*, u.name as ratedPersionName from mutualrate mr left join users u on ' +
@@ -264,6 +276,7 @@ const sqlMap = {
         'ml.ratedPersion = ? and ml.rateMonth = ?',
     getRateData: 'select ml.*, u.duty, u.groupName from mutualrate ml left join users u on ml.ratedPersion = u.id ' +
         'where ml.ratePersion = ? and ml.rateMonth = ?',
+    getRateDataByRatePersion: 'select * from mutualrate where ratePersion = ? and rateMonth = ?',
     getPerformanceIsCount: 'select * from globalflag where year(setTime) = ? and month(setTime) = ? and flagType = ?',
     getMonthEva: 'select mr.*, u.name as ratedPersionName from mutualrate mr left join users u on mr.ratedPersion = ' +
         'u.id where mr.rateMonth = ? and mr.ratePersion = ? and u.status != 0',

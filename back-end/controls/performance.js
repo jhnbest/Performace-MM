@@ -439,32 +439,32 @@ function updateProjectProcess(data, monthProcessExistParam) {
     return new Promise(function (resolve, reject) {
         let param = {}
         if (!monthProcessExist) {
-            param = {
-                id: data.monthID,
-                kValue: data.reviewKValue,
-                coefficient: data.reviewCofficient,
-                aPDID: data.apdID,
-                year: data.applyYear,
-                type: 'fact',
-                applyProcess: data.applyProcess,
-                January: null,
-                February: null,
-                March: null,
-                April: null,
-                May: null,
-                June: null,
-                July: null,
-                August: null,
-                September: null,
-                October: null,
-                November: null,
-                December: null,
-            }
+          param = {
+            id: data.monthID,
+            kValue: data.reviewKValue,
+            coefficient: data.reviewCofficient,
+            aPDID: data.apdID,
+            year: data.applyYear,
+            type: 'fact',
+            applyProcess: data.applyProcess,
+            January: null,
+            February: null,
+            March: null,
+            April: null,
+            May: null,
+            June: null,
+            July: null,
+            August: null,
+            September: null,
+            October: null,
+            November: null,
+            December: null,
+          }
         } else {
-            monthProcessExist.kValue = data.reviewKValue
-            monthProcessExist.coefficient = data.reviewCofficient
-            monthProcessExist.applyProcess = data.applyProcess
-            param = monthProcessExist
+          monthProcessExist.kValue = data.reviewKValue
+          monthProcessExist.coefficient = data.reviewCofficient
+          monthProcessExist.applyProcess = data.applyProcess
+          param = monthProcessExist
         }
         param[data.applyMonthString] = data.applyProcess
         $workStation.saveProcess(param).then(res0 => {
@@ -725,10 +725,12 @@ const performance = {
       let data = req.body
       $http.userVerify(req, res, () => {
         let checkID = data.id
+        let aplID = data.aplID
         let sqlGetProjectInfo = $sql.performance.getProjectInfo
         let sqlGetWorkAssignInfo = $sql.performance.getWorkAssignInfo
-        let sql = sqlGetProjectInfo + ';' + sqlGetWorkAssignInfo
-        let arrayParams = [checkID, checkID]
+        let sqlGetAssignProjectInfo = $sql.workStation.getAssignProjectV2
+        let sql = sqlGetProjectInfo + ';' + sqlGetWorkAssignInfo + ';' + sqlGetAssignProjectInfo
+        let arrayParams = [checkID, checkID, aplID]
         $http.connPool(sql, arrayParams, (err, result) => {
           if (err) {
             return $http.writeJson(res, {code: -2, message: '失败'})
@@ -736,6 +738,7 @@ const performance = {
             let resultData = {}
             resultData.workTimeList = formatData(result[0])
             resultData.workTimeAssign = formatData(result[1])
+            resultData.assignProject = formatData(result[2])
             resultData.projectTypeCheck = []
             getFullProjectType(res, resultData.workTimeList[0].projectTypeID, resultData)
           }
@@ -851,10 +854,18 @@ const performance = {
           if (data.reviewStatus === 0) {
             submitStatus = 1
           }
+          let count = 0
+          promises = []
           sql = $sql.performance.submitReviewRejectOrWithdraw
           arrayParams = [data.reviewKValue, data.reviewCofficient, data.reviewStatus, curTime, data.reviewComments, data.reviewer,
             submitStatus, data.id]
-          RCPDDatabase(sql, arrayParams).then(() => {
+          promises[count++] = RCPDDatabase(sql, arrayParams)
+          if (data.monthID != null) {
+            sql = 'update monthprocess set ' + data.monthEN + ' = ' + data.lastProcess + ' where id = ' + data.monthID
+            arrayParams = []
+            promises[count++] = RCPDDatabase(sql, arrayParams)
+          }
+          Promise.all(promises).then(()=> {
             return $http.writeJson(res, { code: 1, message: '成功' })
           }).catch(err => {
             return $http.writeJson(res, { code: -2, err: err, message: '操作失败' })
@@ -1066,19 +1077,32 @@ const performance = {
       let sendData = req.body
       let sql = $sql.performance.test1
       let arrayParams = []
-      RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
-        arrayParams = RCPDDatabaseRes
+      RCPDDatabase(sql, arrayParams).then(res1 => {
+        arrayParams = res1
         sql = $sql.performance.test2
         let promises = []
         let count = 0
-        for (let i = 0; i < RCPDDatabaseRes.length; i++) {
-          arrayParams = [RCPDDatabaseRes[i].id]
+        for (let i = 0; i < res1.length; i++) {
+          arrayParams = [res1[i].id]
           promises[count++] = RCPDDatabase(sql, arrayParams)
         }
-        Promise.all(promises).then(allRes => {
-          for (let i = 0; i < RCPDDatabaseRes.length; i++) {
+        Promise.all(promises).then(res2 => {
+          let result = {
+            result_2022: res1,
+            result_2023: res2
           }
-          return $http.writeJson(res, {code: 1, data: allRes, message: 'success'})
+          let promise2 = []
+          let count2 = 0
+          for (let i = 0; i < res1.length; i++) {
+            if (res2[i].length === 0) {
+              sql = $sql.performance.test3
+              arrayParams = [res1[i].id, 2023, 'fact']
+              promise2[count2++] = RCPDDatabase(sql, arrayParams)
+            }
+          }
+          Promise.all(promise2).then(res3 => {
+            return $http.writeJson(res, {code: 1, data: res3, message: 'success'})
+          })
         })
       }).catch(RCPDDatabaseErr => {
           return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
@@ -1159,6 +1183,17 @@ const performance = {
         return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
       })
     },
+    // ***根据项目类型获取工时列表***
+    getWorkTimeListByType (req, res) {
+      let sendData = req.body
+      let sql = $sql.performance.getWorkTimeListByType
+      let arrayParams = [sendData.userID, sendData.applyMonth, sendData.projectTypeID]
+      RCPDDatabase(sql, arrayParams).then(result => {
+        return $http.writeJson(res, {code: 1, data: result, message: 'success'})
+      }).catch(RCPDDatabaseErr => {
+          return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+      })
+    }
 }
 
 module.exports = performance

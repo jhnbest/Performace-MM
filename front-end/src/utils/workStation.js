@@ -5,10 +5,14 @@ import {
   urlProjectDetailIsApplyWorkTime,
   urlProjectDetailIsApplyWorkTimeV2,
   urlSubmitProcess,
-  urlSubmitProjectWorkTimeApply
+  urlSubmitProjectWorkTimeApply,
+  urlGetMonthProcess,
+  urlUpdateAssignProjectInfo,
+  urlUpdateAssignProjectStageInfo,
+  urlGetAssignProjectTotalWorkTime
 } from '@/config/interface'
 
-// 获取特定类型的项目列表
+// ***获取特定类型的项目列表
 export function getTypeProjectList (projectType, isFinish, curApplyYear) {
   const url = urlGetTypeProjectList
   let params = {
@@ -29,7 +33,7 @@ export function getTypeProjectList (projectType, isFinish, curApplyYear) {
   })
 }
 
- // 获取指派项目计划&进展明细
+ // ***获取指派项目计划&进展明细
  export function getAssignProjectDetailV2 (projectID, yearNum) {
    return new Promise(function (resolve, reject) {
     const url = urlgetAssignProjectDetailV2
@@ -49,7 +53,7 @@ export function getTypeProjectList (projectType, isFinish, curApplyYear) {
    })
 }
 
-// 查看项目阶段当月是否已填报工时
+// ***查看项目阶段当月是否已填报工时
 export function projectDetailIsApplyWorkTime (searchData, type, applyMonth) {
   const url = urlProjectDetailIsApplyWorkTime
   let params = {
@@ -68,7 +72,7 @@ export function projectDetailIsApplyWorkTime (searchData, type, applyMonth) {
     })
   })
 }
-// 查看项目阶段当月是否已填报工时
+// ***查看项目阶段当月是否已填报工时
 export function projectDetailIsApplyWorkTimeV2 (searchData, type, applyMonth) {
   const url = urlProjectDetailIsApplyWorkTimeV2
   let params = {
@@ -88,7 +92,7 @@ export function projectDetailIsApplyWorkTimeV2 (searchData, type, applyMonth) {
   })
 }
 
-// 提交项目阶段进展
+// ***提交项目阶段进展
 export function submitProcess (processData) {
   const url = urlSubmitProcess
   let params = processData
@@ -115,6 +119,93 @@ export function submitProjectWorkTimeApply (workTimeInfo, projectID) {
     http(url, params).then(res => {
       if (res.code === 1) {
         resolve()
+      } else {
+        reject(res.err)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
+// ***根据项目阶段获取项目进展
+export function getMonthProcess (projectStage, submitYear) {
+  let url = urlGetMonthProcess
+  let params = {
+    projectStage: projectStage,
+    submitYear: submitYear
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(res => {
+      if (res.code === 1) {
+        resolve(res.data)
+      } else {
+        reject(res.err)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
+// ***更新项目信息
+export function updateAssignProjectInfo (projectInfo) {
+  let url = urlUpdateAssignProjectInfo
+  let params = {
+    id: projectInfo.id,
+    userID: projectInfo.userID,
+    projectType: projectInfo.projectType,
+    projectName: projectInfo.projectName,
+    process: projectInfo.process,
+    assignerID: projectInfo.assignerID,
+    totalWorkTime: projectInfo.totalWorkTime,
+    isFilled: projectInfo.isFilled,
+    projectLevel: projectInfo.projectLevel,
+    reviewStatus: projectInfo.reviewStatus,
+    obsoleteStatus: projectInfo.obsoleteStatus
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(res => {
+      if (res.code === 1) {
+        resolve(res.data)
+      } else {
+        reject(res.err)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
+// ***更新项目阶段信息
+export function updateAssignProjectStageInfo (assignProjectDetail) {
+  const url = urlUpdateAssignProjectStageInfo
+  let params = {
+    assignProjectDetail: assignProjectDetail
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(res => {
+      if (res.code === 1) {
+        resolve(res.data)
+      } else {
+        reject(res.err)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
+// ***获取项目总工时
+export function getAssignProjectTotalWorkTime (aplID) {
+  const url = urlGetAssignProjectTotalWorkTime
+  let params = {
+    aplID: aplID
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(res => {
+      if (res.code === 1) {
+        resolve(res.data)
       } else {
         reject(res.err)
       }
