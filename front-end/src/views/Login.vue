@@ -1,31 +1,68 @@
 <template>
   <div class="login-container">
-    <el-form class="login-main sub-center-center" :model="formData" :rules="formRules" ref="formData" label-position="left" label-width="0px">
-      <h2 class="title">通信工程处绩效管理系统</h2>
-      <el-form-item prop="name">
-        <el-input type="text" v-model="formData.name" placeholder="工号" clearable></el-input>
-      </el-form-item>
-      <el-form-item prop="password">
-        <el-input type="password"
-                  v-model="formData.password"
-                  placeholder="密码"
-                  clearable></el-input>
-      </el-form-item>
-      <el-form-item class="btn-box">
-        <el-checkbox v-model="rememberUser"></el-checkbox>
-        <span style="margin-right: 20px;margin-left: 3px">记住密码</span>
-        <el-button type="primary" @click="submitLogin('formData')">登录</el-button>
-        <el-button @click="resetForm('formData')">重置</el-button>
-        <span style="margin-left: 40px;margin-right: 10px" class="link-type" @click="handleChangePassword">修改密码</span>
-      </el-form-item>
-    </el-form>
+    <div class="login-center-wrapper">
+      <el-form class="login-main" :model="formData" :rules="formRules" ref="formData" label-position="left" label-width="0px">
+        <h2 class="title">通信工程处绩效管理系统</h2>
+        <el-form-item prop="name">
+          <el-input type="text" v-model="formData.name" placeholder="工号" clearable></el-input>
+        </el-form-item>
+        <el-form-item prop="password">
+          <el-input type="password"
+                    v-model="formData.password"
+                    placeholder="密码"
+                    clearable></el-input>
+        </el-form-item>
+        <el-form-item class="btn-box">
+          <el-button type="primary" @click="submitLogin('formData')">登录</el-button>
+          <el-button @click="resetForm('formData')">重置</el-button>
+          <span style="margin-left: 40px;margin-right: 10px" class="link-type" @click="handleChangePassword">修改密码</span>
+        </el-form-item>
+      </el-form>
+    </div>
     <PasswordEdit v-if="showFlag.passwordEdit" ref="passwordEdit"/>
   </div>
 </template>
 
+<style scoped lang="scss">
+.login-container{
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background-image:url('../assets/images/login_bg.png');
+  background-size: cover;
+  overflow: hidden;
+
+  .login-center-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  .login-main{
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    background-clip: padding-box;
+    width: 350px;
+    padding: 35px 35px 15px;
+    background: #fff;
+    border: 1px solid #eaeaea;
+    box-shadow: 0 0 25px #cac6c6;
+
+    h3{text-align: center;}
+    h2{text-align: center;}
+    .btn-box{text-align: right;}
+  }
+}
+</style>
+
 <script>
 import { urlUserLogin } from '@/config/interface'
+import { isUndefined } from '@/utils/common'
 import PasswordEdit from '@/components/PasswordEdit/PasswordEdit'
+import Cookies from 'js-cookie'
 export default {
   data () {
     const validate = (rule, value, callback) => {
@@ -62,6 +99,12 @@ export default {
   },
   methods: {
     submitLogin (formName) {
+      if (!isUndefined(Cookies.get('userName'))) {
+        Cookies.remove('userName')
+      }
+      if (!isUndefined(Cookies.get('userPwd'))) {
+        Cookies.remove('userPwd')
+      }
       this.$refs[formName].validate((valid) => {
         if (valid) {
           const url = urlUserLogin
@@ -79,13 +122,13 @@ export default {
                 let pwdRegex4 = new RegExp('(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z]).{8,30}')
                 if (pwdRegex.test(this.formData.password) || pwdRegex2.test(this.formData.password) ||
                    pwdRegex3.test(this.formData.password) || pwdRegex4.test(this.formData.password)) {
-                  if (this.rememberUser) {
-                  // 传入账号名，密码，和保存天数3个参数
-                    this.setCookie(this.formData.name, this.formData.password, 7)
-                  } else {
-                    // 清空Cookie
-                    this.clearCookie()
-                  }
+                  // if (this.rememberUser) {
+                  // // 传入账号名，密码，和保存天数3个参数
+                  //   this.setCookie(this.formData.name, this.formData.password, 7)
+                  // } else {
+                  //   // 清空Cookie
+                  //   this.clearCookie()
+                  // }
                   let data = res.data
                   localStorage.setItem('userInfo', JSON.stringify(data))
                   this.$store.dispatch('saveUserInfo', data)
@@ -167,13 +210,3 @@ export default {
   }
 }
 </script>
-
-<style scoped lang="scss">
-.login-container{position: relative; width: 100vw; height: 100vh;background-image:url('../assets/images/login_bg.png'); background-size: cover; overflow: hidden;
-  .login-main{ -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; background-clip: padding-box; width: 350px; padding: 35px 35px 15px; background: #fff; border: 1px solid #eaeaea; box-shadow: 0 0 25px #cac6c6;
-    h3{text-align: center;}
-    h2{text-align: center;}
-    .btn-box{text-align: right;}
-  }
-}
-</style>

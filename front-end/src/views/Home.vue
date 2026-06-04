@@ -28,7 +28,7 @@
           active-text-color="#19d1e3"
           router
           :collapse="iscollapse">
-          <el-menu-item v-for="item in menuList" :key="item.url" :index="item.url"
+          <el-menu-item v-for="item in filteredMenuList" :key="item.url" :index="item.url"
             @click="handleSelect(item.url)">
             <template slot="title">
               <i :class="item.icon" style="font-size: 20px"></i>
@@ -40,7 +40,7 @@
               <i class="el-icon-pie-chart" style="font-size: 20px"></i>
               <span style="font-size: 16px">绩效管理</span>
             </template>
-            <el-menu-item v-for="item in workTimeManagerList" :key="item.url" :index="item.url"
+            <el-menu-item v-for="item in filteredWorkTimeManagerList" :key="item.url" :index="item.url"
                           @click="handleSelect(item.url)">
               <span slot="title">{{item.name}}</span>
             </el-menu-item>
@@ -59,6 +59,8 @@
 
 <script>
 import { urlUserLogout } from '@/config/interface'
+import { isUndefined } from '@/utils/common'
+import Cookies from 'js-cookie'
 export default {
   data () {
     return {
@@ -79,7 +81,26 @@ export default {
     userInfo: function () {
       let userInfo = this.$store.state.userInfo
       return userInfo
-    }
+    },
+    filteredMenuList: function () {
+      const list = this.$store.state.menuList
+      const userDuty = this.userInfo.duty
+      const userId = this.userInfo.id
+      // duty为1的管理者，隐藏工时查询和月总结菜单
+      if (userDuty === 1) {
+        return list.filter(item => !item.dutyHide && (!item.onlyShowID || item.onlyShowID === userId))
+      }
+      // 非管理者，隐藏onlyShowID指定的菜单
+      return list.filter(item => !item.onlyShowID || item.onlyShowID === userId)
+    },
+    filteredWorkTimeManagerList: function () {
+       const list = this.$store.state.workTimeManagerList
+       // 工号为15的用户才能看到定时任务管理、成效评价失败监控和工时统计菜单
+       if (this.userInfo.id !== '15' && this.userInfo.id !== 15) {
+         return list.filter(item => item.url !== '/home/cronJob' && item.url !== '/home/FailedAMEvaMonitor' && item.url !== '/home/workHourStatistics')
+       }
+       return list
+     }
   },
   watch: {
     '$route': function (to, from) {
@@ -88,6 +109,12 @@ export default {
   },
   created () {
     this.activePath = this.$route.meta.pagePath
+    if (!isUndefined(Cookies.get('userName'))) {
+      Cookies.remove('userName')
+    }
+    if (!isUndefined(Cookies.get('userPwd'))) {
+      Cookies.remove('userPwd')
+    }
   },
   methods: {
     handleCommand (command) {

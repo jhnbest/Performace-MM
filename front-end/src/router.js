@@ -9,7 +9,7 @@ Router.prototype.push = function push (location) {
   return originalPush.call(this, location).catch(err => err)
 }
 
-export default new Router({
+const router = new Router({
   mode: 'hash',
   base: process.env.BASE_URL,
   scrollBehavior (to, from, savedPosition) {
@@ -96,12 +96,6 @@ export default new Router({
           meta: { pagePath: '/home/mutualEvaluation' }
         },
         {
-          path: 'mulEvaCheck',
-          name: 'mulEvaCheck',
-          component: () => import('./views/mutualEvaluation/muLEvaCheck'),
-          meta: { pagePath: '/home/mulEvaCheck' }
-        },
-        {
           path: 'workTimeReview',
           name: 'workTimeReview',
           component: () => import('./views/workTimeReview/WorkTimeReview.vue'),
@@ -123,11 +117,6 @@ export default new Router({
           component: () => import('./views/monthConclusion/childViews/monthConclusionTable.vue'),
           meta: { pagePath: '/home/monthConclusion' }
         },{
-          path: 'PMDataFillUp',
-          name: 'PMDataFillUp',
-          component: () => import('./views/tmp/PMDataFillUp.vue'),
-          meta: { pagePath: '/home/PMDataFillUp' }
-        },{
           path: 'monthConclusionTableNew',
           name: 'monthConclusionTableNew',
           component: () => import('./views/monthConclusion/childViews/monthConclusionTableNew.vue'),
@@ -137,6 +126,31 @@ export default new Router({
           name: 'AMEvaluation',
           component: () => import('./views/performanceEva/AMEva.vue'),
           meta: { pagePath: '/home/AMEvaluation' }
+        },{
+          path: 'FailedAMEvaMonitor',
+          name: 'FailedAMEvaMonitor',
+          component: () => import('./views/performanceEva/FailedAMEvaMonitor.vue'),
+          meta: { pagePath: '/home/FailedAMEvaMonitor', allowedUserIds: [15] }
+        },{
+          path: 'PerformanceBonusIndex',
+          name: 'PerformanceBonusIndex',
+          component: () => import('./views/PerformanceBonus/PerformanceBonusIndex.vue'),
+          meta: { pagePath: '/home/PerformanceBonusIndex' }
+        },{
+          path: 'PerformanceBonusReview',
+          name: 'PerformanceBonusReview',
+          component: () => import('./views/PerformanceBonusReview/PerformanceBonusReview.vue'),
+          meta: { pagePath: '/home/PerformanceBonusReview' }
+        },{
+          path: 'cronJob',
+          name: 'cronJob',
+          component: () => import('./views/CronJob/index.vue'),
+          meta: { pagePath: '/home/cronJob', requireCronJobPermission: true }
+        },{
+          path: 'workHourStatistics',
+          name: 'workHourStatistics',
+          component: () => import('./views/workHourStatistics/WorkHourStatistics.vue'),
+          meta: { pagePath: '/home/workHourStatistics', allowedUserIds: [15] }
         }
       ]
     },
@@ -148,3 +162,23 @@ export default new Router({
     }
   ]
 })
+
+router.beforeEach((to, from, next) => {
+   if (to.meta.requireCronJobPermission) {
+     const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}')
+     if (userInfo.id !== '15' && userInfo.id !== 15) {
+       next({ path: '/home/dashboard' })
+       return
+     }
+   }
+   if (to.meta.allowedUserIds && to.meta.allowedUserIds.length > 0) {
+     const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}')
+     if (!to.meta.allowedUserIds.includes(userInfo.id)) {
+       next({ path: '/home/dashboard' })
+       return
+     }
+   }
+   next()
+})
+
+export default router

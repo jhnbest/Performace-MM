@@ -49,7 +49,7 @@
               </template>
             </el-table-column>
           </el-table>
-          <el-table v-if="checkUserID === $store.state.userInfo.id || this.$store.state.userInfo.id === 26"
+          <el-table v-if="checkUserID === $store.state.userInfo.id || this.$store.state.userInfo.id === 35"
                     :data="tableData4"
                     border
                     stripe
@@ -102,7 +102,7 @@
               </template>
             </el-table-column>
           </el-table>
-          <el-table v-if="checkUserID.id === $store.state.userInfo.id || this.$store.state.userInfo.id === 26"
+          <el-table v-if="checkUserID.id === $store.state.userInfo.id || this.$store.state.userInfo.id === 35"
                     :data="tableData3"
                     border
                     stripe
@@ -116,7 +116,7 @@
               </template>
             </el-table-column>
           </el-table>
-          <el-table v-if="checkUserID.id === $store.state.userInfo.id || $store.state.userInfo.id === 26"
+          <el-table v-if="checkUserID.id === $store.state.userInfo.id || $store.state.userInfo.id === 35"
                     :data="tableData5"
                     border
                     stripe

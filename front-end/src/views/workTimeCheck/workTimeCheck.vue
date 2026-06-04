@@ -20,15 +20,18 @@
     <!-- 分割线 end -->
     <div class="main-content">
       <el-radio-group v-model="formData.selectType" @change="handleSelectTypeChange" :disabled="!reqFlag.reqGetProjectList">
-        <el-radio-button label="技术标准组"
-                         v-if="$store.state.userInfo.groupName === '技术标准组'
-                          || $store.state.userInfo.groupName === '处经理'"></el-radio-button>
-        <el-radio-button label="工程组"
-                         v-if="$store.state.userInfo.groupName === '工程组'
-                          || $store.state.userInfo.groupName === '处经理'"></el-radio-button>
+        <el-radio-button label="多媒体应用组"
+                         v-if="$store.state.userInfo.groupID === 2
+                          || $store.state.userInfo.groupID === 1"></el-radio-button>
+        <el-radio-button label="数字物联组"
+                         v-if="$store.state.userInfo.groupID === 3
+                          || $store.state.userInfo.groupID === 1"></el-radio-button>
+        <el-radio-button label="综合业务组"
+                         v-if="$store.state.userInfo.groupID === 4
+                          || $store.state.userInfo.groupID === 1"></el-radio-button>
         <el-radio-button label="通信组"
-                         v-if="$store.state.userInfo.groupName === '通信组'
-                          || $store.state.userInfo.groupName === '处经理'"></el-radio-button>
+                         v-if="$store.state.userInfo.groupID === 5
+                          || $store.state.userInfo.groupID === 1"></el-radio-button>
       </el-radio-group>
     </div>
     <div style="margin-top: -20px">
@@ -40,7 +43,6 @@
         <el-table-column label="姓名" align="center" prop="name"></el-table-column>
         <el-table-column label="获得工时" align="center" prop="totalWorkTime"></el-table-column>
         <el-table-column label="小组排名" align="center" prop="rank"></el-table-column>
-        <el-table-column label="定量指标得分" align="center" prop="quantitativeScore"></el-table-column>
       </el-table>
     </div>
     <br>
@@ -50,12 +52,13 @@
 
 <script>
   import { getGroupWorkTimeList } from '@/config/interface'
+import store from '@/store'
   export default {
     data () {
       return {
         formData: {
           title: this.$moment().format('YYYY-MM'),
-          selectType: this.$store.state.userInfo.groupName
+          selectType: '多媒体应用组'
         },
         tableData: [],
         reqFlag: {
@@ -86,23 +89,6 @@
             let obj = {}
             throw (obj)
           }
-        }
-      },
-      // 定性、定量指标得分计算
-      calGetScore (length, rank) {
-        if (rank === 1) {
-          return 92.5
-        }
-        if (rank < Number((length * 0.1).toFixed(0)) || rank === Number((length * 0.1).toFixed(0))) {
-          return 92.5
-        } else if (rank < Number((length * 0.3).toFixed(0)) || rank === Number((length * 0.3).toFixed(0))) {
-          return 90
-        } else if (rank < Number((length * 0.7).toFixed(0)) || rank === Number((length * 0.7).toFixed(0))) {
-          return 87.5
-        } else if (rank < Number((length * 0.9).toFixed(0)) || rank === Number((length * 0.9).toFixed(0))) {
-          return 85
-        } else if (rank < Number((length * 1).toFixed(0)) || rank === Number((length * 1).toFixed(0))) {
-          return 82.5
         }
       },
       // 获取已审项目列表
@@ -153,10 +139,6 @@
                   count++
                   preWorkTime = item.totalWorkTime
                 }
-                let length = totalWorkTimeCal.length
-                for (let item of totalWorkTimeCal) { // 计算定量指标得分
-                  item.quantitativeScore = this.calGetScore(length, item.rank)
-                }
                 this.tableData = totalWorkTimeCal
               }
               this.reqFlag.reqGetProjectList = true
@@ -166,20 +148,40 @@
       // 组名转ID
       groupName2ID (groupName) {
         switch (groupName) {
-          case '技术标准组':
-            return 1
-          case '工程组':
+          case '多媒体应用组':
             return 2
-          case '通信组':
+          case '数字物联组':
             return 3
-          case '处经理':
+          case '综合业务组':
             return 4
+          case '通信组':
+            return 5
           default:
             return 1
         }
       },
       // 申报月份变化
       handelDateChange () {
+        switch (store.state.userInfo.groupID) {
+          case 1 :
+            this.formData.selectType = '多媒体应用组'
+            break
+          case 2 :
+            this.formData.selectType = '多媒体应用组'
+          break
+          case 3 :
+            this.formData.selectType = '数字物联组'
+          break
+          case 4 :
+            this.formData.selectType = '综合业务组'
+          break
+          case 5 :
+            this.formData.selectType = '通信组'
+          break
+          default :
+            this.formData.selectType = '多媒体应用组'
+          break
+        }
         let groupID = this.groupName2ID(this.formData.selectType)
         this.getGroupWorkTimeList(groupID)
         this.setCookie(this.formData.title, 7)

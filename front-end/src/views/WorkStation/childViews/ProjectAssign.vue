@@ -95,21 +95,21 @@
             </el-option-group>
           </el-select>
         </el-form-item>
-        <el-form-item style="margin-left: -100px">
+        <el-form-item label="整体K值设置" style="margin-left: -90px">
+          <el-input-number v-model="resetKValue"
+                           size="medium"
+                           :step="0.1"
+                           :min="0.1"
+                           @change="handleResetKValue" style="width: 150px"></el-input-number>
+        </el-form-item>
+        <br>
+        <el-form-item style="margin-left: 50px;margin-right: 10px">
           <span style="font-size: 15px">总工时：</span>
           <span style="font-size: 20px;color: red;font-weight: bolder">{{totalWorkTime}}</span>
         </el-form-item>
         <el-form-item style="margin-left: 30px">
           <el-button type="success" size="medium" @click="handleAssign('formData')">指派</el-button>
           <el-button type="danger" size="medium" @click="resetForm('formData')">重置</el-button>
-        </el-form-item>
-        <br>
-        <el-form-item label="整体K值设置" style="margin-left: 40px">
-          <el-input-number v-model="resetKValue"
-                           size="medium"
-                           :step="0.1"
-                           :min="0.1"
-                           @change="handleResetKValue" style="width: 150px"></el-input-number>
         </el-form-item>
         <br>
         <el-table :data="tableData" ref="dragTable" style="width: 95%;margin: auto" row-key="id" border>
@@ -130,7 +130,7 @@
               <div v-if="scope.row.projectTypeID === 72">
                 <el-input-number v-model="scope.row.workTime"
                                  size="mini"
-                                 :min="0.5"
+                                 :min="0.1"
                                  :step="0.5"></el-input-number>
               </div>
               <div v-else>
@@ -138,7 +138,7 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="调整基本工时" align="center" prop="avaiableWorkTime" width="140%">
+          <!-- <el-table-column label="调整基本工时" align="center" prop="avaiableWorkTime" width="140%">
             <template slot-scope="scope">
               <el-input-number v-model="scope.row.avaiableWorkTime"
                                size="mini"
@@ -146,13 +146,14 @@
                                :step="0.5"
                                style="width: 100%"></el-input-number>
             </template>
-          </el-table-column>
+          </el-table-column> -->
           <el-table-column label="K值" align="center" prop="kValue" width="150%">
             <template slot-scope="scope">
               <el-input-number v-model="scope.row.kValue"
                                size="mini"
                                :min="0.1"
                                :step="0.1"
+                               :precision="1"
                                style="width: 100%"
                                :disabled="scope.row.dynamicKValue === 0"></el-input-number>
             </template>
@@ -395,507 +396,516 @@
   import { getProjectType } from '@/utils/performance'
   import { getUsersList } from '@/utils/users'
   import Sortable from 'sortablejs'
-    export default {
-      data () {
-        return {
-          formData: {
-            title: this.$moment().format('YYYY-MM'),
-            projectType: '',
-            projectManager: '',
-            projectName: '',
-            projectLevel: 1,
-            yearNum: this.$moment().format('YYYY')
-          },
-          users: [{
-            label: '技术标准组',
-            options: []
-          }, {
-            label: '工程组',
-            options: []
-          }, {
-            label: '通信组',
-            options: []
-          }],
-          tableData: [],
-          projectTypeOptions: [],
-          formRules: {
-            projectName: [
-              { required: true, message: '请输入项目名称', trigger: 'blur' }
-            ],
-            projectType: [
-              { required: true, message: '请选择项目类型', trigger: 'change' }
-            ],
-            projectManager: [
-              { required: true, message: '请选择项目经理', trigger: 'change' }
-            ],
-            projectLevel: [
-              { required: true, message: '请选择项目级别', trigger: 'change' }
-            ]
-          },
-          reqFlag: {
-            getUserName: true,
-            handleAssign: true,
-            deleteAssignProject: true,
-            getAssignProjectDetail: true
-          },
-          props: {
-            multiple: true,
-            value: 'projectTypeID',
-            label: 'projectName',
-            expandTrigger: 'hover'
-          },
-          showFlag: {
-            projectAssign: true,
-            assigned: false,
-            projectDetail: false
-          },
-          selectType: '项目指派',
-          assignedTable: [],
-          pickerOptions: {
-            disabledDate (time) {
-              return time.getTime() > Date.now()
+  export default {
+    data () {
+      return {
+        formData: {
+          title: this.$moment().format('YYYY-MM'),
+          projectType: '',
+          projectManager: '',
+          projectName: '',
+          projectLevel: 1,
+          yearNum: this.$moment().format('YYYY')
+        },
+        users: [{
+          label: '多媒体应用组',
+          options: []
+        }, {
+          label: '数字物联组',
+          options: []
+        }, {
+          label: '综合业务组',
+          options: []
+        }, {
+          label: '通信组',
+          options: []
+        }],
+        tableData: [],
+        projectTypeOptions: [],
+        formRules: {
+          projectName: [
+            { required: true, message: '请输入项目名称', trigger: 'blur' }
+          ],
+          projectType: [
+            { required: true, message: '请选择项目类型', trigger: 'change' }
+          ],
+          projectManager: [
+            { required: true, message: '请选择项目经理', trigger: 'change' }
+          ],
+          projectLevel: [
+            { required: true, message: '请选择项目级别', trigger: 'change' }
+          ]
+        },
+        reqFlag: {
+          getUserName: true,
+          handleAssign: true,
+          deleteAssignProject: true,
+          getAssignProjectDetail: true
+        },
+        props: {
+          multiple: true,
+          value: 'projectTypeID',
+          label: 'projectName',
+          expandTrigger: 'hover'
+        },
+        showFlag: {
+          projectAssign: true,
+          assigned: false,
+          projectDetail: false
+        },
+        selectType: '项目指派',
+        assignedTable: [],
+        pickerOptions: {
+          disabledDate (time) {
+            return time.getTime() > Date.now()
+          }
+        },
+        projectLevels: [{
+          value: 1,
+          text: '普通任务'
+        }, {
+          value: 2,
+          text: '处室重点任务'
+        }, {
+          value: 3,
+          text: '部门重点任务'
+        }, {
+          value: 4,
+          text: '公司重点任务'
+        }],
+        progress: [{
+          value: 1,
+          text: '未完成'
+        }, {
+          value: 100,
+          text: '已完成'
+        }],
+        projectTypes: [{
+          value: 173,
+          text: '基建类项目'
+        }, {
+          value: 213,
+          text: '基础平台类项目(工程组)'
+        }, {
+          value: 249,
+          text: '修缮类项目'
+        }, {
+          value: 172,
+          text: '选型项目'
+        }, {
+          value: 4,
+          text: '其他标准项目'
+        }, {
+          value: 5,
+          text: '其他非标项目'
+        }, {
+          value: 275,
+          text: '基础平台类项目(通信组)'
+        }],
+        usersFilter: [],
+        checkAssignProjectID: null,
+        assignProjectName: '',
+        id: 0,
+        resetKValue: 1
+      }
+    },
+    methods: {
+      // 初始化
+      init () {
+        let checkGroupID = 0
+        getUsersList(checkGroupID).then(users => {
+          for (let user of users) {
+            if (user.groupID === 2) {
+              this.users[0].options.push(user)
+            } else if (user.groupID === 3) {
+              this.users[1].options.push(user)
+            } else if (user.groupID === 4) {
+              this.users[2].options.push(user)
+            } else if (user.groupID === 5) {
+              this.users[3].options.push(user)
             }
+            let obj = {
+              value: user.id,
+              text: user.name
+            }
+            this.usersFilter.push(obj)
+          }
+        })
+        getProjectType(this.$store.state.userInfo.groupName).then(getProjectTypeRes => {
+          this.projectTypeOptions = getProjectTypeRes
+        })
+      },
+      // 表格拖拽初始化
+      setSort () {
+        const el = this.$refs.dragTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
+        this.sortable = Sortable.create(el, {
+          ghostClass: 'sortable-ghost', // Class name for the drop placeholder,
+          setData: function (dataTransfer) {
+            // to avoid Firefox bug
+            // Detail see : https://github.com/RubaXa/Sortable/issues/1012
+            dataTransfer.setData('Text', '')
           },
-          projectLevels: [{
-            value: 1,
-            text: '普通任务'
-          }, {
-            value: 2,
-            text: '处室重点任务'
-          }, {
-            value: 3,
-            text: '部门重点任务'
-          }, {
-            value: 4,
-            text: '公司重点任务'
-          }],
-          progress: [{
-            value: 1,
-            text: '未完成'
-          }, {
-            value: 100,
-            text: '已完成'
-          }],
-          projectTypes: [{
-            value: 173,
-            text: '基建类项目'
-          }, {
-            value: 213,
-            text: '基础平台类项目(工程组)'
-          }, {
-            value: 249,
-            text: '修缮类项目'
-          }, {
-            value: 172,
-            text: '选型项目'
-          }, {
-            value: 4,
-            text: '其他标准项目'
-          }, {
-            value: 5,
-            text: '其他非标项目'
-          }, {
-            value: 275,
-            text: '基础平台类项目(通信组)'
-          }],
-          usersFilter: [],
-          checkAssignProjectID: null,
-          assignProjectName: '',
-          id: 0,
-          resetKValue: 1
+          onEnd: evt => {
+            const targetRow = this.tableData.splice(evt.oldIndex, 1)[0]
+            this.tableData.splice(evt.newIndex, 0, targetRow)
+          }
+        })
+      },
+      // 指派按钮
+      handleAssign (formData) {
+        this.$refs[formData].validate((valid) => {
+          if (valid) {
+            let selectLen = this.formData.projectType.length
+            let selectItems = []
+            let params = {}
+            let url = ulrGetWorkTimeNew
+            for (let i = 0; i < selectLen; i++) {
+              selectItems.push(this.formData.projectType[i][this.formData.projectType[i].length - 1]) // 数组最后一位即为项目最底级ID
+            }
+            params.checkID = selectItems
+            params.parentID = this.formData.projectType[0][0]
+            if (this.reqFlag.handleAssign) {
+              this.reqFlag.handleAssign = false
+              let it = this
+              this.$http(url, params)
+                .then(res => {
+                  if (res.code === 1) {
+                    this.reqFlag.handleAssign = true
+                    let data = res.data
+                    let parentType = data.pop()
+                    let assignTo = null
+                    this.users.find(items => {
+                      for (let item of items.options) {
+                        if (item.id === this.formData.projectManager) {
+                          return (assignTo = item.name)
+                        }
+                      }
+                    })
+                    it.id = 0
+                    for (let item of data) {
+                      item.projectType = parentType
+                      item.projectManager = assignTo
+                      item.projectManagerID = this.formData.projectManager
+                      item.avaiableWorkTime = item.workTime * this.resetKValue
+                      item.kValue = this.resetKValue
+                      // if (item.dynamicKValue !== 0) {
+                      //   item.kValue = this.resetKValue
+                      // }
+                      item.workType = item.projectName
+                      item.id = ++it.id
+                    }
+                    it.tableData = data
+                  }
+                })
+            }
+          }
+        })
+      },
+      // 重置表单
+      resetForm (formData) {
+        this.$refs[formData].resetFields()
+        this.tableData = []
+      },
+      // 删除按钮
+      handleDelete (row, index) {
+        this.tableData.splice(index, 1)
+      },
+      // 保存按钮
+      submit () {
+        if (this.tableData.length !== 0) {
+          const url = submitAssignWorkDetail
+          let params = {
+            tableData: this.tableData,
+            parentID: this.formData.projectType[0][0],
+            projectLevel: this.formData.projectLevel,
+            projectName: this.formData.projectName
+          }
+          this.$http(url, params)
+            .then(res => {
+              if (res.code === 1) {
+                this.$common.toast('保存成功', 'success', 'false')
+                this.selectType = '已指派'
+                this.showFlag.projectAssign = false
+                this.showFlag.assigned = false
+                this.getAssignedProject()
+                this.$nextTick(() => {
+                  this.showFlag.assigned = true
+                })
+              }
+            })
+        } else {
+          this.$common.toast('请指派任务', 'error', 'false')
         }
       },
-      methods: {
-        // 初始化
-        init () {
-          let checkGroupID = 0
-          getUsersList(checkGroupID).then(users => {
-            for (let user of users) {
-              if (user.groupName === '技术标准组') {
-                this.users[0].options.push(user)
-              } else if (user.groupName === '工程组') {
-                this.users[1].options.push(user)
-              } else if (user.groupName === '通信组') {
-                this.users[2].options.push(user)
+      // 返回按钮
+      goBack () {
+        this.$router.push({ path: '/home/workStation' })
+      },
+      // 获取已指派项目列表
+      getAssignedProject () {
+        const url = getAssignedProject
+        let params = {
+          assignerID: this.$store.state.userInfo.id,
+          title: this.formData.title
+        }
+        this.$http(url, params)
+          .then(res => {
+            if (res.code === 1) {
+              for (let item of res.data) {
+                item.editable = false
               }
-              let obj = {
-                value: user.id,
-                text: user.name
-              }
-              this.usersFilter.push(obj)
+              this.assignedTable = res.data
+            } else {
+              console.log(res)
+            }
+          }).catch(err => {
+            console.log(err)
+          })
+      },
+      // 手动重置表单数据
+      resetFormData () {
+        this.formData.title = this.$moment().format('YYYY-MM')
+        this.formData.projectType = ''
+        this.formData.projectManager = ''
+        this.formData.projectName = ''
+        this.formData.projectLevel = 1
+        this.formData.yearNum = this.$moment().format('YYYY')
+      },
+      // 标签切换
+      handleSelectTypeChange (selectType) {
+        if (selectType === '项目指派') {
+          this.showFlag.projectAssign = false
+          this.showFlag.assigned = false
+          this.$nextTick(() => {
+            this.showFlag.projectAssign = true
+          })
+        } else if (selectType === '已指派') {
+          this.resetFormData()
+          this.showFlag.projectAssign = false
+          this.showFlag.assigned = false
+          this.getAssignedProject()
+          this.$nextTick(() => {
+            this.showFlag.assigned = true
+          })
+        }
+      },
+      // 转办
+      handleTurnTo (row) {
+        row.editable = !row.editable
+      },
+      // 保存
+      handleSave (row) {
+        row.editable = !row.editable
+        const url = updateAssignProjectList
+        let params = {
+          data: row
+        }
+        this.$http(url, params)
+          .then(res => {
+            if (res.code === 1) {
+              this.getAssignedProject()
+              this.$common.toast('保存成功', 'success', 'false')
             }
           })
-          getProjectType().then(getProjectTypeRes => {
-            this.projectTypeOptions = getProjectTypeRes
-          })
-        },
-        // 表格拖拽初始化
-        setSort () {
-          const el = this.$refs.dragTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
-          this.sortable = Sortable.create(el, {
-            ghostClass: 'sortable-ghost', // Class name for the drop placeholder,
-            setData: function (dataTransfer) {
-              // to avoid Firefox bug
-              // Detail see : https://github.com/RubaXa/Sortable/issues/1012
-              dataTransfer.setData('Text', '')
-            },
-            onEnd: evt => {
-              const targetRow = this.tableData.splice(evt.oldIndex, 1)[0]
-              this.tableData.splice(evt.newIndex, 0, targetRow)
-            }
-          })
-        },
-        // 指派按钮
-        handleAssign (formData) {
-          this.$refs[formData].validate((valid) => {
-            if (valid) {
-              let selectLen = this.formData.projectType.length
-              let selectItems = []
-              let params = {}
-              let url = ulrGetWorkTimeNew
-              for (let i = 0; i < selectLen; i++) {
-                selectItems.push(this.formData.projectType[i][this.formData.projectType[i].length - 1]) // 数组最后一位即为项目最底级ID
-              }
-              params.checkID = selectItems
-              params.parentID = this.formData.projectType[0][0]
-              if (this.reqFlag.handleAssign) {
-                this.reqFlag.handleAssign = false
-                let it = this
-                this.$http(url, params)
-                  .then(res => {
-                    if (res.code === 1) {
-                      this.reqFlag.handleAssign = true
-                      let data = res.data
-                      let parentType = data.pop()
-                      let assignTo = null
-                      this.users.find(items => {
-                        for (let item of items.options) {
-                          if (item.id === this.formData.projectManager) {
-                            return (assignTo = item.name)
-                          }
-                        }
-                      })
-                      it.id = 0
-                      for (let item of data) {
-                        item.projectType = parentType
-                        item.projectManager = assignTo
-                        item.projectManagerID = this.formData.projectManager
-                        item.avaiableWorkTime = item.workTime
-                        item.kValue = 1.0
-                        item.workType = item.projectName
-                        item.id = ++it.id
-                      }
-                      it.tableData = data
-                    }
-                  })
-              }
-            }
-          })
-        },
-        // 重置表单
-        resetForm (formData) {
-          this.$refs[formData].resetFields()
-          this.tableData = []
-        },
-        // 删除按钮
-        handleDelete (row, index) {
-          this.tableData.splice(index, 1)
-        },
-        // 保存按钮
-        submit () {
-          if (this.tableData.length !== 0) {
-            const url = submitAssignWorkDetail
-            for (let item of this.tableData) { // 可用工时替换基本工时（针对目前已经进行到一半的项目）
-              item.workTime = item.avaiableWorkTime
-            }
+      },
+      // 取消
+      handleCancel (row) {
+        row.editable = !row.editable
+      },
+      // 项目级别过滤方法
+      projectLevelsFilter (value, row) {
+        return row.projectLevel === value
+      },
+      // 项目类型过滤方法
+      projectTypesFilter (value, row) {
+        return row.projectTypeID === value
+      },
+      // 项目进展过滤方法
+      projectProgressFilter (value, row) {
+        if (value === 1) {
+          return row.process < 100
+        } else {
+          return row.process === 100
+        }
+      },
+      // 项目经理过滤方法
+      usersFilterMethod (value, row) {
+        return row.projectManagerID === value
+      },
+      // 删除操作
+      handleAssignDelete (row, index) {
+        this.$common.msgBox('confirm', '操作提示', '确定删除？', () => {
+          if (this.reqFlag.deleteAssignProject) {
+            this.reqFlag.deleteAssignProject = false
+            const url = deleteAssignProject
+            this.assignedTable.splice(index, 1)
             let params = {
-              tableData: this.tableData,
-              parentID: this.formData.projectType[0][0],
-              projectLevel: this.formData.projectLevel,
-              projectName: this.formData.projectName
+              id: row.id
             }
             this.$http(url, params)
               .then(res => {
                 if (res.code === 1) {
-                  this.$common.toast('保存成功', 'success', 'false')
-                  this.selectType = '已指派'
-                  this.showFlag.projectAssign = false
-                  this.showFlag.assigned = false
-                  this.getAssignedProject()
-                  this.$nextTick(() => {
-                    this.showFlag.assigned = true
-                  })
+                  this.$common.toast('操作成功', 'success', false)
+                } else {
+                  this.$common.toast('操作失败', 'warning', false)
                 }
+                this.reqFlag.deleteAssignProject = true
               })
-          } else {
-            this.$common.toast('请指派任务', 'error', 'false')
           }
-        },
-        // 返回按钮
-        goBack () {
-          this.$router.push({ path: '/home/workStation' })
-        },
-        // 获取已指派项目列表
-        getAssignedProject () {
-          const url = getAssignedProject
-          let params = {
-            assignerID: this.$store.state.userInfo.id,
-            title: this.formData.title
-          }
-          this.$http(url, params)
-            .then(res => {
+        })
+      },
+      // 获取指派项目计划&进展明细
+      getAssignProjectDetail (id) {
+        let _this = this
+        return new Promise(function (resolve, reject) {
+          if (_this.reqFlag.getAssignProjectDetail) {
+            _this.reqFlag.getAssignProjectDetail = false
+            const url = getAssignProjectDetail
+            let params = {
+              id: id,
+              year: _this.formData.yearNum
+            }
+            _this.$http(url, params).then(res => {
               if (res.code === 1) {
                 for (let item of res.data) {
                   item.editable = false
                 }
-                this.assignedTable = res.data
+                _this.formData.tableData = res.data
+                _this.reqFlag.getAssignProjectDetail = true
               }
             })
-        },
-        // 手动重置表单数据
-        resetFormData () {
-          this.formData.title = this.$moment().format('YYYY-MM')
-          this.formData.projectType = ''
-          this.formData.projectManager = ''
-          this.formData.projectName = ''
-          this.formData.projectLevel = 1
-          this.formData.yearNum = this.$moment().format('YYYY')
-        },
-        // 标签切换
-        handleSelectTypeChange (selectType) {
-          if (selectType === '项目指派') {
-            this.showFlag.projectAssign = false
-            this.showFlag.assigned = false
-            this.$nextTick(() => {
-              this.showFlag.projectAssign = true
-            })
-          } else if (selectType === '已指派') {
-            this.resetFormData()
-            this.showFlag.projectAssign = false
-            this.showFlag.assigned = false
-            this.getAssignedProject()
-            this.$nextTick(() => {
-              this.showFlag.assigned = true
-            })
           }
-        },
-        // 转办
-        handleTurnTo (row) {
-          row.editable = !row.editable
-        },
-        // 保存
-        handleSave (row) {
-          row.editable = !row.editable
-          const url = updateAssignProjectList
-          let params = {
-            data: row
-          }
-          this.$http(url, params)
-            .then(res => {
-              if (res.code === 1) {
-                this.getAssignedProject()
-                this.$common.toast('保存成功', 'success', 'false')
-              }
-            })
-        },
-        // 取消
-        handleCancel (row) {
-          row.editable = !row.editable
-        },
-        // 项目级别过滤方法
-        projectLevelsFilter (value, row) {
-          return row.projectLevel === value
-        },
-        // 项目类型过滤方法
-        projectTypesFilter (value, row) {
-          return row.projectTypeID === value
-        },
-        // 项目进展过滤方法
-        projectProgressFilter (value, row) {
-          if (value === 1) {
-            return row.process < 100
+        })
+      },
+      // 查看项目详情
+      handleProjectDetailClick (row) {
+        this.showFlag.projectDetail = true
+        this.getAssignProjectDetail(row.id)
+        this.checkAssignProjectID = row.id
+        this.assignProjectName = row.projectName
+      },
+      // 表格列合并方法
+      objectSpanMethod ({ row, column, rowIndex, columnIndex }) {
+        if (columnIndex === 0 || columnIndex === 1 || columnIndex === 2) {
+          if (rowIndex % 2 === 0) {
+            return {
+              rowspan: 2,
+              colspan: 1
+            }
           } else {
-            return row.process === 100
-          }
-        },
-        // 项目经理过滤方法
-        usersFilterMethod (value, row) {
-          return row.projectManagerID === value
-        },
-        // 删除操作
-        handleAssignDelete (row, index) {
-          this.$common.msgBox('confirm', '操作提示', '确定删除？', () => {
-            if (this.reqFlag.deleteAssignProject) {
-              this.reqFlag.deleteAssignProject = false
-              const url = deleteAssignProject
-              this.assignedTable.splice(index, 1)
-              let params = {
-                id: row.id
-              }
-              this.$http(url, params)
-                .then(res => {
-                  if (res.code === 1) {
-                    this.$common.toast('操作成功', 'success', false)
-                  } else {
-                    this.$common.toast('操作失败', 'warning', false)
-                  }
-                  this.reqFlag.deleteAssignProject = true
-                })
-            }
-          })
-        },
-        // 获取指派项目计划&进展明细
-        getAssignProjectDetail (id) {
-          let _this = this
-          return new Promise(function (resolve, reject) {
-            if (_this.reqFlag.getAssignProjectDetail) {
-              _this.reqFlag.getAssignProjectDetail = false
-              const url = getAssignProjectDetail
-              let params = {
-                id: id,
-                year: _this.formData.yearNum
-              }
-              _this.$http(url, params).then(res => {
-                if (res.code === 1) {
-                  for (let item of res.data) {
-                    item.editable = false
-                  }
-                  _this.formData.tableData = res.data
-                  _this.reqFlag.getAssignProjectDetail = true
-                }
-              })
-            }
-          })
-        },
-        // 查看项目详情
-        handleProjectDetailClick (row) {
-          this.showFlag.projectDetail = true
-          this.getAssignProjectDetail(row.id)
-          this.checkAssignProjectID = row.id
-          this.assignProjectName = row.projectName
-        },
-        // 表格列合并方法
-        objectSpanMethod ({ row, column, rowIndex, columnIndex }) {
-          if (columnIndex === 0 || columnIndex === 1 || columnIndex === 2) {
-            if (rowIndex % 2 === 0) {
-              return {
-                rowspan: 2,
-                colspan: 1
-              }
-            } else {
-              return {
-                rowspan: 0,
-                colspan: 0
-              }
-            }
-          }
-        },
-        // 上一年度进展
-        handleDecYear () {
-          if (this.reqFlag.getAssignProjectDetail) {
-            this.formData.yearNum -= 1
-            this.getAssignProjectDetail(this.checkAssignProjectID)
-          }
-        },
-        // 下一年度进展
-        handleAddYear () {
-          if (this.reqFlag.getAssignProjectDetail) {
-            this.formData.yearNum += 1
-            this.getAssignProjectDetail(this.checkAssignProjectID)
-          }
-        },
-        // 新增项目阶段
-        addNewLine () {
-          if (this.tableData.length > 0) {
-            let obj = {
-              avaiableWorkTime: 0,
-              defaultAssginWorkTime: 0,
-              dynamicKValue: 1,
-              isConference: 0,
-              kValue: 1,
-              projectManager: this.tableData[0].projectManager,
-              projectManagerID: this.tableData[0].projectManagerID,
-              projectName: '',
-              projectType: this.tableData[0].projectType,
-              projectTypeID: 72,
-              workTime: 0,
-              workType: '',
-              id: ++this.id
-            }
-            this.tableData.push(obj)
-          } else {
-            this.$common.toast('请选择指派任务类型', 'warning', 'false')
-          }
-        },
-        // 一键设置K值
-        handleResetKValue () {
-          for (let item of this.tableData) {
-            if (item.dynamicKValue !== 0) {
-              item.kValue = this.resetKValue
+            return {
+              rowspan: 0,
+              colspan: 0
             }
           }
         }
       },
-      computed: {
-        tableMaxHeight () {
-          return window.innerHeight - 170 + 'px'
-        },
-        totalWorkTime () {
-          let total = 0
-          for (let item of this.tableData) {
-            total += item.avaiableWorkTime * item.kValue
-          }
-          return total
+      // 上一年度进展
+      handleDecYear () {
+        if (this.reqFlag.getAssignProjectDetail) {
+          this.formData.yearNum -= 1
+          this.getAssignProjectDetail(this.checkAssignProjectID)
         }
       },
-      filters: {
-        projectLevelColorFilter (projectLevel) {
-          switch (projectLevel) {
-            case 1:
-              return 'info'
-            case 2:
-              return 'success'
-            case 3:
-              return 'warning'
-            case 4:
-              return 'danger'
-            default:
-              return 'primary'
-          }
-        },
-        projectLevelStringFilter (projectLevel) {
-          switch (projectLevel) {
-            case 1:
-              return '普通任务'
-            case 2:
-              return '处室重点任务'
-            case 3:
-              return '部门重点任务'
-            case 4:
-              return '公司重点任务'
-            default:
-              return '错误'
-          }
-        },
-        processTypeFilter (type) {
-          switch (type) {
-            case 'plan':
-              return '计划'
-            case 'fact':
-              return '实际'
-            default:
-              return '错误'
-          }
+      // 下一年度进展
+      handleAddYear () {
+        if (this.reqFlag.getAssignProjectDetail) {
+          this.formData.yearNum += 1
+          this.getAssignProjectDetail(this.checkAssignProjectID)
         }
       },
-      created () {
-        this.init()
+      // 新增项目阶段
+      addNewLine () {
+        if (this.tableData.length > 0) {
+          let obj = {
+            avaiableWorkTime: 0,
+            defaultAssginWorkTime: 0,
+            dynamicKValue: 1,
+            isConference: 0,
+            kValue: 1,
+            projectManager: this.tableData[0].projectManager,
+            projectManagerID: this.tableData[0].projectManagerID,
+            projectName: '',
+            projectType: this.tableData[0].projectType,
+            projectTypeID: 72,
+            workTime: 0,
+            workType: '',
+            id: ++this.id
+          }
+          this.tableData.push(obj)
+        } else {
+          this.$common.toast('请选择指派任务类型', 'warning', 'false')
+        }
       },
-      mounted () {
-        this.setSort()
+      // 一键设置K值
+      handleResetKValue () {
+        for (let item of this.tableData) {
+          if (item.dynamicKValue !== 0) {
+            item.kValue = this.resetKValue
+          }
+        }
+      }
+    },
+    computed: {
+      tableMaxHeight () {
+        return window.innerHeight - 170 + 'px'
       },
-      name: 'ProjectAssign'
-    }
+      totalWorkTime () {
+        let total = 0
+        for (let item of this.tableData) {
+          total += item.workTime * item.kValue
+        }
+        return total
+      }
+    },
+    filters: {
+      projectLevelColorFilter (projectLevel) {
+        switch (projectLevel) {
+          case 1:
+            return 'info'
+          case 2:
+            return 'success'
+          case 3:
+            return 'warning'
+          case 4:
+            return 'danger'
+          default:
+            return 'primary'
+        }
+      },
+      projectLevelStringFilter (projectLevel) {
+        switch (projectLevel) {
+          case 1:
+            return '普通任务'
+          case 2:
+            return '处室重点任务'
+          case 3:
+            return '部门重点任务'
+          case 4:
+            return '公司重点任务'
+          default:
+            return '错误'
+        }
+      },
+      processTypeFilter (type) {
+        switch (type) {
+          case 'plan':
+            return '计划'
+          case 'fact':
+            return '实际'
+          default:
+            return '错误'
+        }
+      }
+    },
+    created () {
+      this.init()
+    },
+    mounted () {
+      this.setSort()
+    },
+    name: 'ProjectAssign'
+  }
 </script>
 
 <style scoped>

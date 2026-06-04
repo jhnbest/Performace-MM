@@ -85,7 +85,7 @@
           this.groupUserList = res
           getSubmitWorkTimeCount(this.groupUserList, this.formData.title).then(result => {
             this.groupUsers = result
-            for (let item of this.groupUsers) {
+            for (let item of this.groupUsers) { // ***默认显示第一个未审核人员的页面
               if (item.unReviewProjectCount !== 0) {
                 this.formData.reviewPerson = String(item.id)
                 break
@@ -120,7 +120,7 @@
           }
         }
       },
-      // 子组件回调
+      // ***子组件回调
       handleReviewPass () {
         getSubmitWorkTimeCount(this.groupUserList, this.formData.title).then(res => {
           this.groupUsers = res

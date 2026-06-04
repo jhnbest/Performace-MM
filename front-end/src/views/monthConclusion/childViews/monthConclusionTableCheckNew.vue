@@ -10,55 +10,110 @@
         <el-tab-pane v-for="(month) in months" :key="month" :label= 'month' :name="month"></el-tab-pane>
       </el-tabs>
       <div class="dialogDiv">
-        <el-table :data="tableData1"
-                  border
-                  stripe
-                  size="medium"
-                  style="margin: auto"
-                  :header-cell-style="{background:'#ced1d4',color:'#000000',fontSize:'16px'}">
-          <el-table-column label="打造精品工程">
-            <template>
-              <div v-html="buildBoutiqueProject"></div>
-            </template>
-          </el-table-column>
-        </el-table>
-        <el-table :data="tableData2"
+        <template v-if="isMergedConclusion">
+          <el-table :data="tableMerged"
+                    border
+                    stripe
+                    size="medium"
+                    style="margin: auto"
+                    :header-cell-style="{background:'#ced1d4',color:'#000000',fontSize:'16px'}">
+            <el-table-column label="月度总结">
+              <template>
+                <div v-html="buildBoutiqueProject"></div>
+              </template>
+            </el-table-column>
+          </el-table>
+          <el-table :data="tableData3"
+                    border
+                    stripe
+                    size="medium"
+                    :header-cell-style="{ background:'#ced1d4',color:'#000000',fontSize:'16px' }"
+                    style="margin: auto"
+                    highlight-current-row>
+            <el-table-column label="下月计划">
+              <template>
+                <div v-html="nextPlan"></div>
+              </template>
+            </el-table-column>
+          </el-table>
+          <el-table :data="tableData4"
+                    border
+                    stripe
+                    size="medium"
+                    :header-cell-style="{ background:'#ced1d4',color:'#000000',fontSize:'16px' }"
+                    style="margin: auto"
+                    highlight-current-row>
+            <el-table-column label="意见建议与困难反馈">
+              <template>
+                <div v-html="curAdvice"></div>
+              </template>
+            </el-table-column>
+          </el-table>
+        </template>
+        <template v-else>
+          <el-table :data="tableData1"
+                    border
+                    stripe
+                    size="medium"
+                    style="margin: auto"
+                    :header-cell-style="{background:'#ced1d4',color:'#000000',fontSize:'16px'}">
+            <el-table-column label="打造精品工程">
+              <template>
+                <div v-html="buildBoutiqueProject"></div>
+              </template>
+            </el-table-column>
+          </el-table>
+          <el-table :data="tableData2"
+                    border
+                    stripe
+                    size="medium"
+                    :header-cell-style="{ background:'#ced1d4',color:'#000000',fontSize:'16px' }"
+                    style="margin: auto"
+                    highlight-current-row>
+            <el-table-column label="创建专业团队">
+              <template>
+                <div v-html="buildProTeam"></div>
+              </template>
+            </el-table-column>
+          </el-table>
+          <el-table :data="tableData3"
+                    border
+                    stripe
+                    size="medium"
+                    :header-cell-style="{ background:'#ced1d4',color:'#000000',fontSize:'16px' }"
+                    style="margin: auto"
+                    highlight-current-row>
+            <el-table-column label="下月计划">
+              <template>
+                <div v-html="nextPlan"></div>
+              </template>
+            </el-table-column>
+          </el-table>
+          <el-table :data="tableData4"
+                    border
+                    stripe
+                    size="medium"
+                    :header-cell-style="{ background:'#ced1d4',color:'#000000',fontSize:'16px' }"
+                    style="margin: auto"
+                    highlight-current-row>
+            <el-table-column label="意见建议与困难反馈">
+              <template>
+                <div v-html="curAdvice"></div>
+              </template>
+            </el-table-column>
+          </el-table>
+        </template>
+        <el-table v-if="(checkUserId === $store.state.userInfo.id || this.$store.state.userInfo.id === 35) && (checkUserDuty === 2)"
+                  :data="tableData5"
                   border
                   stripe
                   size="medium"
                   :header-cell-style="{ background:'#ced1d4',color:'#000000',fontSize:'16px' }"
                   style="margin: auto"
                   highlight-current-row>
-          <el-table-column label="创建专业团队">
+          <el-table-column label="小组工作">
             <template>
-              <div v-html="buildProTeam"></div>
-            </template>
-          </el-table-column>
-        </el-table>
-        <el-table :data="tableData3"
-                  border
-                  stripe
-                  size="medium"
-                  :header-cell-style="{ background:'#ced1d4',color:'#000000',fontSize:'16px' }"
-                  style="margin: auto"
-                  highlight-current-row>
-          <el-table-column label="下一个月的工作目标、工作计划/工作安排、工作内容">
-            <template>
-              <div v-html="nextPlan"></div>
-            </template>
-          </el-table-column>
-        </el-table>
-        <el-table v-if="checkUserId === $store.state.userInfo.id || this.$store.state.userInfo.id === 26"
-                  :data="tableData4"
-                  border
-                  stripe
-                  size="medium"
-                  :header-cell-style="{ background:'#ced1d4',color:'#000000',fontSize:'16px' }"
-                  style="margin: auto"
-                  highlight-current-row>
-          <el-table-column label="对处室工作的意见/建议、不满/抱怨、工作/生活/学习中的烦恼和困难以及希望得到的帮助/支持/指导">
-            <template>
-              <div v-html="curAdvice"></div>
+              <div v-html="groupWork"></div>
             </template>
           </el-table-column>
         </el-table>
@@ -76,13 +131,14 @@
           tableData3: [{}],
           tableData4: [{}],
           tableData5: [{}],
-          tableData6: [{}],
+          tableMerged: [{ }],
           conclusionDialog: false,
           buildBoutiqueProject: null,
           buildProTeam: null,
           nextPlan: null,
           curAdvice: null,
-          activeMonth: null
+          activeMonth: null,
+          groupWork: null
         }
       },
       props: {
@@ -98,6 +154,10 @@
           type: Number,
           default: null
         },
+        checkUserDuty: {
+          type: Number,
+          default: null
+        },
         months: {
           type: Array,
           default: null
@@ -110,18 +170,17 @@
             this.activeMonth = this.months[0]
             this.conclusionDialog = !this.conclusionDialog
             if (this.moreDetailData.length !== 0) {
-              this.buildBoutiqueProject = this.moreDetailData.find(item => {
-                return item.dimension === 1
-              }).content
-              this.buildProTeam = this.moreDetailData.find(item => {
-                return item.dimension === 2
-              }).content
-              this.nextPlan = this.moreDetailData.find(item => {
-                return item.dimension === 3
-              }).content
-              this.curAdvice = this.moreDetailData.find(item => {
-                return item.dimension === 4
-              }).content
+              this.buildBoutiqueProject = (this.moreDetailData.find(item => item.dimension === 1) || {}).content || ''
+              this.buildProTeam = (this.moreDetailData.find(item => item.dimension === 2) || {}).content || ''
+              this.nextPlan = (this.moreDetailData.find(item => item.dimension === 3) || {}).content || ''
+              this.curAdvice = (this.moreDetailData.find(item => item.dimension === 4) || {}).content || ''
+              this.groupWork = (this.moreDetailData.find(item => item.dimension === 5) || {}).content || ''
+            } else {
+              this.buildBoutiqueProject = ''
+              this.buildProTeam = ''
+              this.nextPlan = ''
+              this.curAdvice = ''
+              this.groupWork = ''
             }
           })
         },
@@ -139,6 +198,15 @@
         this.init()
       },
       computed: {
+        // 判断当前月份是否使用合并后的月度总结模板（>=2026年5月）
+        isMergedConclusion () {
+          if (!this.moreDetailData || this.moreDetailData.length === 0) return false
+          const firstItem = this.moreDetailData[0]
+          if (!firstItem.conclusionYear || !firstItem.conclusionMonth) return false
+          const targetYM = Number(firstItem.conclusionYear) * 100 + Number(firstItem.conclusionMonth)
+          const mergeYM = 2026 * 100 + 5
+          return targetYM >= mergeYM
+        }
       },
       components: {
         // editorVue

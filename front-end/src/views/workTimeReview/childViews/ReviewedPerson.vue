@@ -33,7 +33,7 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="项目名称" align="center">
+        <el-table-column label="项目名称" align="center" show-overflow-tooltip>
           <template slot-scope="scope">
             <el-popover
               placement="bottom"
@@ -565,6 +565,10 @@ import { convertNorDate2YearMonth, MonthToStringV2 } from '@/utils/common'
             return 'info'
           case 275: // 基础平台（通信）
             return 'info'
+          case 560: // 基础平台
+            return 'info'
+          case 550: // 基础平台
+            return 'warning'
           case 249: // 修缮
             return 'warning'
           default:
@@ -585,6 +589,10 @@ import { convertNorDate2YearMonth, MonthToStringV2 } from '@/utils/common'
             return '基础平台类（工程）'
           case 275: // 基础平台（通信）
             return '基础平台类（通信）'
+          case 560: // 基础平台（通信）
+            return '基础平台类'
+          case 550: // 基础平台（通信）
+            return '其他标准工时'
           case 249: // 修缮
             return '修缮类'
           default:

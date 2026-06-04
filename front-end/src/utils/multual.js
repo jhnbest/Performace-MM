@@ -25,7 +25,7 @@ export function getAllUserRates (users, rateMonth) {
     })
   })
 }
-// 获取全处员工定性评价数据(被评价人为对象)
+// ***获取全处员工定性评价数据(被评价人为对象)
 export function getAllQTEvaedData (usersList, applyDate) {
   const url = urlGetAllQTEvaedData
   let params = {
@@ -70,14 +70,16 @@ function calQTRateMid (rate, rateType) {
   }
 }
 
-// 生成定性评价数据
+// ***生成定性评价数据
+// ***  QTEvaedData:定性互评数据； QYEvaScoreData：定量评价数据
 export function genQualiEvaData (QTEvaedData, QYEvaScoreData) {
   let QTEvaScoreData = []
-  let SEGroupQTEvaData = [] // 技术标准和工程组互评数据
-  let CMGroupQTEvaData = [] // 通信组互评数据
+  let intelligentGroupQTEvaData = [] // ***智能化相关组互评数据
+  let CMGroupQTEvaData = [] // ***通信组互评数据
   for (let QTEvaedDataItem of QTEvaedData) {
     let isMGEva = false
     let QTEvaedDataLength = QTEvaedDataItem.QTEvaedData.length
+    // ***构造定性评价数据基本单元
     let obj = {
       id: QTEvaedDataItem.ratedPersion,
       name: QTEvaedDataItem.ratedPersionName,
@@ -94,43 +96,47 @@ export function genQualiEvaData (QTEvaedData, QYEvaScoreData) {
       totalWorkTime: typeof (QYEvaScoreData.find(item => { return item.id === QTEvaedDataItem.ratedPersion })) !== 'undefined'
         ? QYEvaScoreData.find(item => { return item.id === QTEvaedDataItem.ratedPersion }).totalWorkTime : 0
     }
-    // 根据评价的类型计算加权分值
+    // ***根据评价的类型计算加权分值
     for (let i = 0; i < QTEvaedDataLength; i++) {
-      if (QTEvaedDataItem.QTEvaedData[i].ratePersionDuty === 1) { // 如果评价的人是处经理
+      if (QTEvaedDataItem.QTEvaedData[i].ratePersionDuty === 1) { // ***如果评价的人是处经理，则赋值处经理评价得分字段
         obj.MGQualiEvaScoreUnN += calQTRateMid(QTEvaedDataItem.QTEvaedData[i].rate, QTEvaedDataItem.QTEvaedData[i].rateType)
         isMGEva = true
-      } else { // 评价的人不是处经理
+      } else { // ***如果评价的人不是处经理，则对员工评价数据进行加权累加
         obj.CSMutualScoreTotal += calQTRateMid(QTEvaedDataItem.QTEvaedData[i].rate, QTEvaedDataItem.QTEvaedData[i].rateType)
       }
     }
+    // ***计算员工互评的平均分
     if (QTEvaedDataLength !== 0) {
       obj.CSMutualScoreAve = isMGEva ? obj.CSMutualScoreTotal / ((QTEvaedDataLength / 6) - 1) : obj.CSMutualScoreTotal / (QTEvaedDataLength / 6)
     }
-    if (obj.groupID === 1 || obj.groupID === 2) {
-      SEGroupQTEvaData.push(obj)
-    } else if (obj.groupID === 3) {
+    // ***根据被评价人组别填充相应的定性评价元素入数组
+    if (obj.groupID === 2 || obj.groupID === 3 || obj.groupID === 4) { // **智能化相关组
+      intelligentGroupQTEvaData.push(obj)
+    } else if (obj.groupID === 5) { // ***通信组
       CMGroupQTEvaData.push(obj)
     }
   }
-  // 根据定性评分值和总工时排序
-  SEGroupQTEvaData = sortObjectArrayByParams(JSON.parse(JSON.stringify(SEGroupQTEvaData)), 'CSMutualScoreAve', 'totalWorkTime')
+  // ***根据定性评分值和总工时排序，如果定性评价得分一样，则按照工时排序
+  intelligentGroupQTEvaData = sortObjectArrayByParams(JSON.parse(JSON.stringify(intelligentGroupQTEvaData)), 'CSMutualScoreAve', 'totalWorkTime')
   CMGroupQTEvaData = sortObjectArrayByParams(JSON.parse(JSON.stringify(CMGroupQTEvaData)), 'CSMutualScoreAve', 'totalWorkTime')
-  for (let i = 0; i < SEGroupQTEvaData.length; i++) {
-    SEGroupQTEvaData[i].CSMutualScoreAveRank = i + 1
-    SEGroupQTEvaData[i].CSMutualScoreNor = NorCal(SEGroupQTEvaData.length, i + 1)
+  // ***根据被评价人的员工互评得分排名计算员工定性互评标准化得分
+  for (let i = 0; i < intelligentGroupQTEvaData.length; i++) {
+    intelligentGroupQTEvaData[i].CSMutualScoreAveRank = i + 1
+    intelligentGroupQTEvaData[i].CSMutualScoreNor = NorCal(intelligentGroupQTEvaData.length, i + 1)
   }
   for (let i = 0; i < CMGroupQTEvaData.length; i++) {
     CMGroupQTEvaData[i].CSMutualScoreAveRank = i + 1
     CMGroupQTEvaData[i].CSMutualScoreNor = NorCal(CMGroupQTEvaData.length, i + 1)
   }
-  // 拼接3个组的定性评价计算成果
-  QTEvaScoreData = SEGroupQTEvaData.concat(CMGroupQTEvaData)
+  // ***拼接所有组的定性评价计算成果
+  QTEvaScoreData = intelligentGroupQTEvaData.concat(CMGroupQTEvaData)
+  // ***根据管理者评价得分进行排序
   QTEvaScoreData = sortObjectArrayByParams(JSON.parse(JSON.stringify(QTEvaScoreData)), 'MGQualiEvaScoreUnN', 'totalWorkTime')
+  // ***根据被评价人的管理者评价得分排名计算员工管理者评价计算标准化得分
   for (let i = 0; i < QTEvaScoreData.length; i++) {
     QTEvaScoreData[i].MGQualiEvaScoreRank = i + 1
     QTEvaScoreData[i].MGQualiEvaScoreNor = NorCal(QTEvaScoreData.length + 1, i + 1)
   }
-
   return QTEvaScoreData
 }
 

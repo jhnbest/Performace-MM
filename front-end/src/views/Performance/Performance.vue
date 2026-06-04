@@ -181,7 +181,7 @@
     import Cop from '@/components/Cop/Cop'
     import CountTo from 'vue-count-to'
     import { getProjectList, deleteWorkTimeSubmit, changeSubmitStatus } from '@/utils/performance'
-    import { getIsSubmitAllow, isNull, isUndefined } from '@/utils/common'
+    import { getIsSubmitAllow, isUndefined } from '@/utils/common'
     import store from '@/store'
     export default {
       data () {
@@ -379,7 +379,7 @@
           let applyYear = this.$moment(this.title).year()
           let applyMonth = this.$moment(this.title).month() + 1
           getIsSubmitAllow(applyYear, applyMonth).then(getIsSubmitAllowRes => {
-            if (getIsSubmitAllowRes.length === 0 || row.reviewStatus === 2 || this.$store.state.userInfo.id === 26) {
+            if (getIsSubmitAllowRes.length === 0 || row.reviewStatus === 2 || this.$store.state.userInfo.id === 35) {
               if (this.reqFlag.changeSubmitStatus) {
                 this.reqFlag.changeSubmitStatus = false
                 row.submitStatus = row.submitStatus === 1 ? 0 : 1
@@ -475,18 +475,6 @@
         CountTo
       },
       filters: {
-        groupNameFilter (groupName) {
-          switch (groupName) {
-            case '技术标准组':
-              return 'success'
-            case '工程组':
-              return 'warning'
-            case '通信组':
-              return 'primary'
-            default:
-              return 'danger'
-          }
-        },
         submitStatusFilter (status) {
           if (status === 1) {
             return 'success'

@@ -4,11 +4,18 @@ import {
   urlSubmitAMEvaData,
   urlUpdateAMEvaData,
   urlGetAchievementEvaOfConclusionDimension,
-  urlGetUserConclusionEvaedData
+  urlGetUserConclusionEvaedData,
+  urlAddFailedAMEvaData,
+  urlGetFailedAMEvaData,
+  urlGetAllFailedAMEvaData,
+  urlUpdateFailedAMEvaRetrySuccess,
+  urlDeleteFailedAMEvaData,
+  urlClearFailedAMEvaData
 } from '../config/interface'
 import { sortObjectArrayByParams,
          NorCal,
-         starToRatesNew } from '@/utils/common'
+         starToRatesNew,
+         NorCalV2 } from '@/utils/common'
 import store from '@/store'
 
 // 获取用户的成效评价
@@ -52,6 +59,11 @@ export function getAchievementEvaOfConclusionDimension (conclusionID) {
 
 // ************提交成效评价************
 export function submitAMEvaData (evaUserID, dimensionID, evaStar) {
+
+  // if (dimensionID === 4447) {
+  //   return Promise.reject({ code: -4, message: '评价维度不存在或已失效' })
+  // }
+
   const url = urlSubmitAMEvaData
   let params = {
     evaUserID: evaUserID,
@@ -62,8 +74,12 @@ export function submitAMEvaData (evaUserID, dimensionID, evaStar) {
     http(url, params).then(response => {
       if (response.code === 1) {
         resolve(response.data)
+      } else if (response.code === -3) {
+        reject({ code: -3, message: response.message || '该评价已存在，请勿重复提交' })
+      } else if (response.code === -4) {
+        reject({ code: -4, message: response.message || '评价维度不存在或已失效' })
       } else {
-        reject(response.err)
+        reject({ code: response.code, message: response.message || '评价数据保存失败' })
       }
     }).catch(err => {
       reject(err)
@@ -104,9 +120,9 @@ function calAMRateMid (evaStar, dimension, AMBuildBoutiqueProjectCoef, AMBuildPr
 // ***************根据月总结类型的评价得分计算加权分V2，2023年6月实施***************
 function calAMRateMidV2 (evaStar, dimension, AMDimension1CoefV2, AMDimension2CoefV2) {
   switch (dimension) {
-    case 1:
+    case 1: // ***打造精品工程、创建专业团队评价项
       return starToRatesNew(evaStar) * AMDimension1CoefV2
-    case 3:
+    case 3: // ***上月计划执行程度评价项
       return starToRatesNew(evaStar) * AMDimension2CoefV2
     default:
       return 0
@@ -239,31 +255,29 @@ export function genAMEvaScoreDataV2 (tableData,
     let allAMEvaedDataLength = tableDataItem.allAMEvaedData.length
     let AMCSEvaNum = 0
     let AMGPEvaNum = 0
-    tableDataItem.AMMGEvaScore = 0
-    tableDataItem.AMGPEvaScore = 0
-    tableDataItem.AMCSEvaTotalScore = 0
-    tableDataItem.AMD1CSEvaTotalStar = 0
-    tableDataItem.AMD2CSEvaTotalStar = 0
-    tableDataItem.AMD1GPEvaStar = 0
-    tableDataItem.AMD2GPEvaStar = 0
+    tableDataItem.AMMGEvaScore = 0 // **处经理的评价得分
+    tableDataItem.AMGPEvaScore = 0 // **组长的评价得分
+    tableDataItem.AMCSEvaTotalScore = 0 // **普通成员成效评价总分
+    tableDataItem.AMD1CSEvaTotalStar = 0 // **普通成员对评价维度1的平均评价星级
+    tableDataItem.AMD2CSEvaTotalStar = 0 // **普通成员对评价维度2的平均评价星级
+    tableDataItem.AMD1GPEvaStar = 0 // **评价维度1的组长的评价星级
+    tableDataItem.AMD2GPEvaStar = 0 // **评价维度2的组长的评价星级
     for (let i = 0; i < allAMEvaedDataLength; i++) {
       let evaStar = tableDataItem.allAMEvaedData[i].evaStar
       let dimension = tableDataItem.allAMEvaedData[i].dimension
       let evaUserDuty = tableDataItem.allAMEvaedData[i].evaUserDuty
       let evaUserGroupID = tableDataItem.allAMEvaedData[i].evaUserGroupID
-      if (evaUserDuty === 1) { // ***************如果评价的人是处经理***************
-        // ***************计算处经理的成效评价总分***************
+      // ***根据成效评价人的角色计算相应的成效评价得分
+      if (evaUserDuty === 1) { // ***如果评价的人是处经理，计算处经理成效评价得分
         tableDataItem.AMMGEvaScore += calAMRateMidV2(evaStar, dimension, AMDimension1CoefV2, AMDimension2CoefV2)
-      } else if (evaUserDuty === 2 && evaUserGroupID === tableDataItem.groupID) { // 如果评价的人是本组组长
-        // ***************计算组长的成效评价总分***************
+      } else if (evaUserDuty === 2 && evaUserGroupID === tableDataItem.groupID) { // ***如果评价的人是本组组长，计算组长成效评价得分
         tableDataItem.AMGPEvaScore += calAMRateMidV2(evaStar, dimension, AMDimension1CoefV2, AMDimension2CoefV2)
         // ***************记录组长的评价星级***************
         tableDataItem.AMD1GPEvaStar = dimension === 1 ? evaStar : tableDataItem.AMD1GPEvaStar
         tableDataItem.AMD2GPEvaStar = dimension === 3 ? evaStar : tableDataItem.AMD2GPEvaStar
         // ***************计算组长的总评价人数（2倍）（临时措施，防止出现异常新增的组长评价数据）
         AMGPEvaNum++
-      } else { // ***************如果评价的人是普通成员或其他组组长
-        // ***************计算普通成员的成效评价总分
+      } else { // ***************如果评价的人是普通成员或其他组组长，按照普通成员计入员工成效评价得分
         tableDataItem.AMCSEvaTotalScore += calAMRateMidV2(evaStar, dimension, AMDimension1CoefV2, AMDimension2CoefV2)
         // ***************计算普通员工的总评价星级
         tableDataItem.AMD1CSEvaTotalStar = dimension === 1 ? tableDataItem.AMD1CSEvaTotalStar + evaStar : tableDataItem.AMD1CSEvaTotalStar
@@ -272,32 +286,32 @@ export function genAMEvaScoreDataV2 (tableData,
         AMCSEvaNum++
       }
     }
-    tableDataItem.AMCSEvaAveScore = AMCSEvaNum === 0 ? 0 : tableDataItem.AMCSEvaTotalScore / (AMCSEvaNum / 2) // ***************组员评价评价得分
-    tableDataItem.AMD1CSEvaAveStar = AMCSEvaNum === 0 ? 0 : tableDataItem.AMD1CSEvaTotalStar / (AMCSEvaNum / 2) // ***************组员对维度1的平均评价星级
-    tableDataItem.AMD2CSEvaAveStar = AMCSEvaNum === 0 ? 0 : tableDataItem.AMD2CSEvaTotalStar / (AMCSEvaNum / 2) // ***************组员对维度2的平均评价星级
+    tableDataItem.AMCSEvaAveScore = AMCSEvaNum === 0 ? 0 : tableDataItem.AMCSEvaTotalScore / (AMCSEvaNum / 2) // ***组员成效评价平均得分
+    tableDataItem.AMD1CSEvaAveStar = AMCSEvaNum === 0 ? 0 : tableDataItem.AMD1CSEvaTotalStar / (AMCSEvaNum / 2) // ***组员对维度1的平均评价星级
+    tableDataItem.AMD2CSEvaAveStar = AMCSEvaNum === 0 ? 0 : tableDataItem.AMD2CSEvaTotalStar / (AMCSEvaNum / 2) // ***组员对维度2的平均评价星级
     // ***************计算组长的评价星级（临时措施，防止出现异常新增的组长评价数据）
     tableDataItem.AMGPEvaScore = AMGPEvaNum === 0 ? 0 : tableDataItem.AMGPEvaScore / (AMGPEvaNum / 2)
     // ***************查找总工时
     tableDataItem.totalWorkTime = QYEvaScoreData.find(item => { return item.id === tableDataItem.id }).totalWorkTime
 
-    // ***************如果处经理还未对该用户评价，则将处经理评价星级设置成员工和组长的平均评价星级
+    // ***************如果处经理还未对该成员评价，则将处经理评价星级设置成员工和组长的平均评价星级（用于计算各员工的初始成效评价得分）
     if (tableDataItem.AMMGEvaScore === 0) {
       let AMD1AveStar = 0
       let AMD2AveStar = 0
-      if (tableDataItem.AMCSEvaTotalScore !== 0 && tableDataItem.AMGPEvaScore !== 0) { // ***************如果普通成员和组长都评价了，则设置成他们的平均星级取整
+      if (tableDataItem.AMCSEvaTotalScore !== 0 && tableDataItem.AMGPEvaScore !== 0) { // **如果普通成员和组长都评价了，则设置成他们的平均星级取整
         AMD1AveStar = Number(((tableDataItem.AMD1CSEvaTotalStar + tableDataItem.AMD1GPEvaStar) / (AMCSEvaNum / 2 + 1)).toFixed(0))
         AMD2AveStar = Number(((tableDataItem.AMD2CSEvaTotalStar + tableDataItem.AMD2GPEvaStar) / (AMCSEvaNum / 2 + 1)).toFixed(0))
-      } else if (tableDataItem.AMCSEvaTotalScore === 0 && tableDataItem.AMGPEvaScore !== 0) { // ***************如果普通成员还未有人评价，组长评价了，则设置成组长的评价星级
+      } else if (tableDataItem.AMCSEvaTotalScore === 0 && tableDataItem.AMGPEvaScore !== 0) { // **如果普通成员还未有人评价，组长评价了，则设置成组长的评价星级
         AMD1AveStar = tableDataItem.AMD1GPEvaStar
         AMD2AveStar = tableDataItem.AMD2GPEvaStar
-      } else if (tableDataItem.AMCSEvaTotalScore !== 0 && tableDataItem.AMGPEvaScore === 0) { // ***************如果普通成员有人评价了，组长还没评价，则设置成普通成员的评价评价星级取整
+      } else if (tableDataItem.AMCSEvaTotalScore !== 0 && tableDataItem.AMGPEvaScore === 0) { // **如果普通成员有人评价了，组长还没评价，则设置成普通成员的评价评价星级取整
         AMD1AveStar = Number(((tableDataItem.AMD1CSEvaTotalStar) / (AMCSEvaNum / 2)).toFixed(0))
         AMD2AveStar = Number(((tableDataItem.AMD2CSEvaTotalStar) / (AMCSEvaNum / 2)).toFixed(0))
-      } else { // ***************如果都还没有人评价，则设置成默认评价星级
+      } else { // **如果都还没有人评价，则设置成默认评价星级
         AMD1AveStar = store.state.defaultStar
         AMD2AveStar = store.state.defaultStar
       }
-      // ***************构建评价维度1的处经理虚拟评价
+      // ***构建评价维度1的处经理虚拟评价
       let obj = {
         evaUserID: store.state.userInfo.id,
         evaStar: AMD1AveStar,
@@ -305,12 +319,12 @@ export function genAMEvaScoreDataV2 (tableData,
         dimension: 1,
         evaUserGroupID: store.state.userInfo.groupID
       }
-      // ***************把构建的处经理虚拟评价插入表格数据中
+      // ***把构建的处经理虚拟评价插入表格数据中
       tableDataItem.allAMEvaedData.push(JSON.parse(JSON.stringify(obj)))
-      // ***************构建评价维度2的处经理虚拟评价
+      // ***构建评价维度2的处经理虚拟评价
       obj.evaStar = AMD2AveStar
       obj.dimension = 3
-      // ***************把构建的处经理虚拟评价插入表格数据中
+      // ***把构建的处经理虚拟评价插入表格数据中
       tableDataItem.allAMEvaedData.push(JSON.parse(JSON.stringify(obj)))
 
       tableDataItem.AMD1MGEvaStarV = AMD1AveStar
@@ -319,27 +333,26 @@ export function genAMEvaScoreDataV2 (tableData,
                                     calAMRateMidV2(AMD2AveStar, 3, AMDimension1CoefV2, AMDimension2CoefV2)
     }
   }
-  // ===================================================计算成效评价的标准化得分=========================================================
+  // ***计算成效评价的标准化得分
   for (let tableDataItem of tableData) {
     let evaedUserDuty = tableDataItem.duty
-    // 如果用户属于普通员工，则按照普通员工评价占比30%、组长评价占比30%、处经理评价占比40%进行加权得分
+    // ***如果用户属于普通员工，则成效评价得分按照普通员工评价占比30%、组长评价占比30%、处经理评价占比40%进行加权得分
     if (evaedUserDuty === 3) {
       tableDataItem.AMEvaScoreUnN = tableDataItem.AMCSEvaAveScore * CScommonStaffAMEvaCoef +
                                     tableDataItem.AMGPEvaScore * CSGroupLeaderAMEvaCoef +
                                     tableDataItem.AMMGEvaScore * CSManagerAMEvaCoef
-    // 如果用户属于小组组长，则按照普通员工评价占比50%、处经理评价占比50%进行加权得分
+    // ***如果用户属于小组组长，则按照普通员工评价占比50%、处经理评价占比50%进行加权得分
     } else if (evaedUserDuty === 2) {
       tableDataItem.AMEvaScoreUnN = tableDataItem.AMCSEvaAveScore * GPCommonStaffAMEvaCoef +
                                     tableDataItem.AMMGEvaScore * GPManagerAMEvaCoef
     }
+    tableDataItem.AMEvaScoreUnN = Number(tableDataItem.AMEvaScoreUnN.toFixed(2))
   }
+  // ***根据加权出来的成效评价得分进行排序，并计算标准化得分
   tableData = sortObjectArrayByParams(JSON.parse(JSON.stringify(tableData)), 'AMEvaScoreUnN', 'totalWorkTime')
   for (let i = 0; i < tableData.length; i++) {
     tableData[i].AMEvaRank = i + 1
-    tableData[i].AMEvaScoreNor = NorCal(tableData.length + 1, i + 1)
-    // console.log(tableData[i].name + ' ' + '未标准化成效评价：' + tableData[i].AMEvaScoreUnN.toFixed(2) + ';' +
-    //  '标准化成效评价：' + tableData[i].AMEvaScoreNor.toFixed(2) + ';' +
-    //  '成效评价排名' + i)
+    tableData[i].AMEvaScoreNor = NorCalV2(tableData.length + 1, i + 1)
   }
 
   return tableData
@@ -352,6 +365,133 @@ export function getUserConclusionEvaedData (conclusionYear, conclusionMonth, eva
     conclusionYear: conclusionYear,
     conclusionMonth: conclusionMonth,
     evaedUserID: evaedUserID
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(response => {
+      if (response.code === 1) {
+        resolve(response.data)
+      } else {
+        reject(response.err)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
+// 添加失败成效评价数据到后端
+export function addFailedAMEvaData (failedData) {
+  const url = urlAddFailedAMEvaData
+  let params = {
+    evaUserID: failedData.evaUserID,
+    evaUserName: failedData.evaUserName,
+    evaedUserID: failedData.evaedUserID,
+    evaedUserName: failedData.evaedUserName,
+    dimensionID: failedData.dimensionID,
+    dimension: failedData.dimension,
+    dimensionName: failedData.dimensionName,
+    evaStar: failedData.evaStar,
+    conclusionYear: failedData.conclusionYear,
+    conclusionMonth: failedData.conclusionMonth,
+    errorCode: failedData.errorCode,
+    errorMessage: failedData.errorMessage
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(response => {
+      if (response.code === 1) {
+        resolve(response.data)
+      } else {
+        reject(response.err)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
+// 从后端获取失败成效评价数据
+export function getFailedAMEvaData (evaUserID, conclusionYear, conclusionMonth) {
+  const url = urlGetFailedAMEvaData
+  let params = {
+    evaUserID: evaUserID,
+    conclusionYear: conclusionYear,
+    conclusionMonth: conclusionMonth
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(response => {
+      if (response.code === 1) {
+        resolve(response.data)
+      } else {
+        reject(response.err)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
+// 从后端获取所有失败成效评价数据（监控用）
+export function getAllFailedAMEvaData () {
+  const url = urlGetAllFailedAMEvaData
+  return new Promise(function (resolve, reject) {
+    http(url, {}).then(response => {
+      if (response.code === 1) {
+        resolve(response.data)
+      } else {
+        reject(response.err)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
+// 更新失败成效评价为重试成功
+export function updateFailedAMEvaRetrySuccess (evaUserID, dimensionID) {
+  const url = urlUpdateFailedAMEvaRetrySuccess
+  let params = {
+    evaUserID: evaUserID,
+    dimensionID: dimensionID
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(response => {
+      if (response.code === 1) {
+        resolve(response.data)
+      } else {
+        reject(response.err)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
+// 从后端删除单条失败成效评价数据
+export function deleteFailedAMEvaData (id) {
+  const url = urlDeleteFailedAMEvaData
+  let params = {
+    id: id
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(response => {
+      if (response.code === 1) {
+        resolve(response.data)
+      } else {
+        reject(response.err)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
+// 从后端清除所有失败成效评价数据
+export function clearFailedAMEvaData (evaUserID, conclusionYear, conclusionMonth) {
+  const url = urlClearFailedAMEvaData
+  let params = {
+    evaUserID: evaUserID,
+    conclusionYear: conclusionYear,
+    conclusionMonth: conclusionMonth
   }
   return new Promise(function (resolve, reject) {
     http(url, params).then(response => {

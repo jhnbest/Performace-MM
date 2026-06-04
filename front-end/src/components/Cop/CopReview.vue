@@ -19,7 +19,7 @@
           <el-table-column label="姓名" prop="name" align="center"></el-table-column>
           <el-table-column label="小组" prop="groupName" align="center">
             <template slot-scope="scope">
-              <el-tag :type="scope.row.groupName | groupNameFilter">
+              <el-tag :type="scope.row.groupID | groupIDFilter">
                 {{scope.row.groupName}}
               </el-tag>
             </template>
@@ -49,7 +49,7 @@
 
 <script>
 import { updateWorkTimeAssignReview } from '../../config/interface'
-import { getWorkTimeAssign } from '@/utils/performance'
+import { getWorkAssign } from '@/utils/performance'
 export default {
   data () {
     return {
@@ -83,7 +83,7 @@ export default {
     init (row, index, reviewType) {
       this.$nextTick(() => {
         this.changeShowFlag()
-        getWorkTimeAssign(row.id, null).then((res) => {
+        getWorkAssign(row.id, null).then((res) => {
           this.formData.totalReviewWorkTime = 0
           for (let item of res) {
             if (row.reviewStatus !== 1 && item.reviewWorkTime === null) {
@@ -155,16 +155,20 @@ export default {
     }
   },
   filters: {
-    groupNameFilter (groupName) {
-      switch (groupName) {
-        case '技术标准组':
+    groupIDFilter (groupID) {
+      switch (groupID) {
+        case 0:
           return 'success'
-        case '工程组':
+        case 2:
+          return 'success'
+        case 3:
           return 'warning'
-        case '通信组':
+        case 4:
+          return 'danger'
+        case 5:
           return 'primary'
         default:
-          return 'danger'
+          return 'info'
       }
     }
   }

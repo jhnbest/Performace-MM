@@ -9,7 +9,8 @@ import {
   urlGetMonthProcess,
   urlUpdateAssignProjectInfo,
   urlUpdateAssignProjectStageInfo,
-  urlGetAssignProjectTotalWorkTime
+  urlGetAssignProjectTotalWorkTime,
+  urlGetLatestProcessBeforeMonth
 } from '@/config/interface'
 
 // ***获取特定类型的项目列表
@@ -96,6 +97,27 @@ export function projectDetailIsApplyWorkTimeV2 (searchData, type, applyMonth) {
 export function submitProcess (processData) {
   const url = urlSubmitProcess
   let params = processData
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(res => {
+      if (res.code === 1) {
+        resolve(res.data)
+      } else {
+        reject(res.err)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
+// ***获取项目在某年某月之前的最近申报进展（用于处理中间月份未申报的情况）
+export function getLatestProcessBeforeMonth (apdID, targetYear, targetMonth) {
+  const url = urlGetLatestProcessBeforeMonth
+  let params = {
+    apdID: apdID,
+    targetYear: targetYear,
+    targetMonth: targetMonth
+  }
   return new Promise(function (resolve, reject) {
     http(url, params).then(res => {
       if (res.code === 1) {

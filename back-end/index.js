@@ -4,11 +4,7 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const express = require('express');
 const app = express();
-
-// let CronJob = require('cron').CronJob
-// new CronJob('0 0 1 3 * ?', function() { // 秒 分 小时 月份中的日期 月份 星期中的日期 年份（可选）
-//   console.log(new Date())
-// }, null, true)
+const cronJobManager = require('./controls/cronJobManager');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
@@ -17,5 +13,9 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(router);
 
 // 监听端口
-app.listen(3002);
-console.log('success listen at port:3002......');
+app.listen(3002, async () => {
+  console.log('success listen at port:3002......');
+  // 启动所有定时任务
+  await cronJobManager.startAllCronJobs();
+  console.log('所有定时任务已启动');
+});

@@ -139,6 +139,7 @@
                 <el-input-number size="mini"
                                  v-model="scope.row.defaultCofficient"
                                  :min="1.0"
+                                 :precision="0"
                                  @change="handleKValueCoffChange(scope.row, scope.$index)"
                                  style="width: 70%">
                 </el-input-number>
@@ -188,7 +189,7 @@
           <el-table-column label="操作" align="center" width="100%">
             <template slot-scope="scope">
               <div>
-                <el-button size="mini" type="danger" @click="handleDelete(scope.row, scope.$index)">删除</el-button>
+                <el-button size="mini" type="danger" @click="handleDelete(scope.$index)">删除</el-button>
               </div>
             </template>
           </el-table-column>
@@ -210,7 +211,6 @@
     submitAssignWorkDetail,
     urlGetIsSubmitAllow,
     ulrGetWorkTimeNew,
-    submitPersonalProject,
     getAssignProjectList } from '@/config/interface'
   import Assign from '@/components/Cop/workTimeAssign'
   import { getProjectType, workTimeListInsert, temporaryWorkTimeList } from '@/utils/performance'
@@ -487,30 +487,6 @@
           this.isInputCommentsWordExceed = false
         }
       },
-      // 提交项目进展
-      onSubmitProjectProcess (param) {
-        const url = submitPersonalProject
-        let year = this.$moment(this.formData.title).year()
-        let month = this.$moment(this.formData.title).month() + 1
-        let params = {
-          id: null,
-          type: 'fact',
-          year: year,
-          month: month,
-          monthString: this.$common.MonthToString(String(month)),
-          tableData: this.formData.workTypeTimeDetail,
-          aplID: param.aplID
-        }
-        let it = this
-        return new Promise(function (resolve, reject) {
-          it.$http(url, params)
-            .then(res => {
-              if (res.code === 1) {
-                resolve(res.data)
-              }
-            })
-        })
-      },
       // 提交至项目明细列表
       onSubmitProjectList () {
         const url = submitAssignWorkDetail
@@ -554,7 +530,7 @@
         this.$refs[formData].validate(valid => {
           if (valid) {
             this.getIsSubmitAllow().then(getIsSubmitAllowRes => {
-              if (getIsSubmitAllowRes.length === 0 || this.$store.state.userInfo.id === 26) {
+              if (getIsSubmitAllowRes.length === 0 || this.$store.state.userInfo.id === 35) {
                 if (!this.isProjectNameWordExceed && !this.isInputCommentsWordExceed) {
                   let projectParentArray = []
                   for (let item of this.formData.projectType) {
@@ -616,7 +592,7 @@
         this.$refs[formData].validate(valid => {
           if (valid) {
             this.getIsSubmitAllow().then(getIsSubmitAllowRes => {
-              if (getIsSubmitAllowRes.length === 0 || this.$store.state.userInfo.id === 26) {
+              if (getIsSubmitAllowRes.length === 0 || this.$store.state.userInfo.id === 35) {
                 if (this.reqFlag.submitOrTemporaryWorkTime) {
                   this.reqFlag.submitOrTemporaryWorkTime = false
                   let projectParentArray = []
@@ -730,6 +706,7 @@
                     let defaultCurrentUserWorkTime = {
                       id: this.$store.state.userInfo.id,
                       groupName: this.$store.state.userInfo.groupName,
+                      groupID: this.$store.state.userInfo.groupID,
                       name: this.$store.state.userInfo.name,
                       applyRole: '组织者',
                       assignWorkTime: obj.avaiableWorkTime,
@@ -752,151 +729,6 @@
               }
             }
             this.formData.workTypeTimeDetail.splice(deleteIndex, 1)
-          }
-        }
-      },
-      // 删除工时明细记录
-      handleDeleteWorkDetail (row, index) {
-        let deleteIndex = null
-        this.formData.workTypeTimeDetail.splice(index, 1)
-        for (let i = 0; i < this.formData.projectType.length; i++) {
-          let arrayLen = this.formData.projectType[i].length
-          if (this.formData.projectType[i][arrayLen - 1] === row.projectTypeID) {
-            deleteIndex = i
-            break
-          }
-        }
-        this.$nextTick(() => {
-          this.formData.projectType.splice(deleteIndex, 1)
-        })
-      },
-      // 参与人员变化处理
-      handlePartChange () {
-        let selectUsers = []
-        let tableUsers = []
-        let selectUsersLen = 0
-        let tmp = []
-        // 取出现有表格中的数据
-        for (let item of this.formData.partTableData) {
-          if (item.account !== this.$store.state.userInfo.account) {
-            tableUsers.push(item.account)
-          }
-        }
-        // 是否选了全处室
-        if (this.formData.participant.indexOf('0') !== -1) {
-          for (let user of this.formData.usersList[1].options) {
-            selectUsers.push(user.id)
-          }
-        } else if (this.formData.participant.indexOf('1') !== -1) { // 是否选了技术标准组
-          for (let user of this.formData.usersList[1].options) {
-            if (user.groupName === '技术标准组') {
-              selectUsers.push(user.id)
-            }
-          }
-          if (this.formData.participant.indexOf('2') !== -1) { // 是否同时选了工程组
-            for (let user of this.formData.usersList[1].options) {
-              if (user.groupName === '工程组') {
-                selectUsers.push(user.id)
-              }
-            }
-          }
-          if (this.formData.participant.indexOf('3') !== -1) { // 是否同时选了通信组
-            for (let user of this.formData.usersList[1].options) {
-              if (user.groupName === '通信组') {
-                selectUsers.push(user.id)
-              }
-            }
-          }
-          if (this.formData.participant.length > 1) {
-            for (let item of this.formData.participant) {
-              if (selectUsers.indexOf(item) === -1 && item !== '1' && item !== '2' && item !== '3' && item !== '0') {
-                selectUsers.push(item)
-              }
-            }
-          }
-        } else if (this.formData.participant.indexOf('2') !== -1) { // 是否选了工程组
-          for (let user of this.formData.usersList[1].options) {
-            if (user.groupName === '工程组') {
-              selectUsers.push(user.id)
-            }
-          }
-          if (this.formData.participant.indexOf('1') !== -1) { // 是否同时选了技术标准组
-            for (let user of this.formData.usersList[1].options) {
-              if (user.groupName === '技术标准组') {
-                selectUsers.push(user.id)
-              }
-            }
-          }
-          if (this.formData.participant.indexOf('3') !== -1) { // 是否同时选了通信组
-            for (let user of this.formData.usersList[1].options) {
-              if (user.groupName === '通信组') {
-                selectUsers.push(user.id)
-              }
-            }
-          }
-          if (this.formData.participant.length > 1) {
-            for (let item of this.formData.participant) {
-              if (selectUsers.indexOf(item) === -1 && item !== '2') {
-                selectUsers.push(item)
-              }
-            }
-          }
-        } else if (this.formData.participant.indexOf('3') !== -1) { // 是否选了通信组
-          for (let user of this.formData.usersList[1].options) {
-            if (user.groupName === '通信组') {
-              selectUsers.push(user.id)
-            }
-          }
-          if (this.formData.participant.indexOf('1') !== -1) { // 是否同时选了技术标准组
-            for (let user of this.formData.usersList[1].options) {
-              if (user.groupName === '技术标准组') {
-                selectUsers.push(user.id)
-              }
-            }
-          }
-          if (this.formData.participant.indexOf('2') !== -1) { // 是否同时选了工程组
-            for (let user of this.formData.usersList[1].options) {
-              if (user.groupName === '工程组') {
-                selectUsers.push(user.id)
-              }
-            }
-          }
-          if (this.formData.participant.length > 1) {
-            for (let item of this.formData.participant) {
-              if (selectUsers.indexOf(item) === -1 && item !== '3') {
-                selectUsers.push(item)
-              }
-            }
-          }
-        } else {
-          selectUsers = this.formData.participant
-        }
-        selectUsersLen = selectUsers.length
-        let tableUsersLen = tableUsers.length
-        let difference = selectUsers.filter(x => tableUsers.indexOf(x) === -1)
-          .concat(tableUsers.filter(x => selectUsers.indexOf(x) === -1))
-        if (selectUsersLen > tableUsersLen) {
-          for (let index of difference) {
-            tmp = this.formData.usersList[1].options.find((item) => {
-              if (item.id === index) {
-                let obj = {
-                  account: item.id,
-                  dept: item.dept,
-                  groupName: item.groupName,
-                  name: item.name,
-                  workTime: this.formData.partWorkTime,
-                  deleteAble: false
-                }
-                this.formData.partTableData.push(obj)
-                return this.formData.partTableData
-              }
-            })
-          }
-        } else {
-          for (let diff of difference) {
-            let index = tableUsers.indexOf(diff)
-            let newArr = this.formData.partTableData.splice(index + 1, 1)
-            tableUsers.splice(index, 1)
           }
         }
       },
@@ -943,11 +775,11 @@
           it.showFlag.projectType = true
         }, it.$store.state.refreshInterval)
       },
-      // 新增一行
+      // **新增一行
       addNewLine () {
         let tableLength = this.formData.workTypeTimeDetail.length
+        // **复制前一条工时申报数据
         let obj = JSON.parse(JSON.stringify(this.formData.workTypeTimeDetail[tableLength - 1]))
-        // 清空前一条工时申报数据
         let tmp = obj.workTimeAssign[0]
         tmp.assignWorkTime = 0
         obj.workTimeAssign = []
@@ -961,27 +793,19 @@
         let selectLength = this.formData.projectType.length
         this.formData.workTypeTimeDetail.push(obj)
         this.isDisableProjectType = true
-        // obj = JSON.parse(JSON.stringify(this.formData.projectType[selectLength - 1]))
-        // this.formData.projectType.push(obj)
-        // this.refreshSelectProjectType()
       },
-      // 表格删除按钮
-      handleDelete (row, index) {
+      // **表格删除按钮
+      handleDelete (index) {
         this.formData.workTypeTimeDetail.splice(index, 1)
-        this.formData.projectType.splice(index, 1)
-        this.showFlag.projectType = false
+        // ***自定义项目不会新加项目类型
+        if (this.formData.projectType.length !== 1) {
+          this.formData.projectType.splice(index, 1)
+        }
         this.refreshSelectProjectType()
         // ***新增自定义项目>=1个时，再点击其他类型的项目有BUG，以下用于禁用选择其他类型项目，当新增自定义项目>=1个时
         if (this.formData.workTypeTimeDetail.length === 1) {
           this.isDisableProjectType = false
         }
-      },
-      // 申报类型变化
-      handleApplyTypeChange (applyType) {
-        this.showFlag.freshTable = false
-        setTimeout(() => {
-          this.showFlag.freshTable = true
-        }, this.$store.state.refreshInterval)
       },
       // 设置cookie
       setCookie (month, exdays) {
@@ -1006,14 +830,6 @@
       // 申报月份变化
       handleDateChange () {
         Cookies.set('pmadd', this.formData.title)
-      },
-      // 人员选择变化处理
-      handlePersionChange () {
-        this.getAssignProjectList().then(getAssignProjectListRes => { // 获取项目列表
-          this.formData.tableData = getAssignProjectListRes
-        }).catch(getAssignProjectListErr => {
-          this.$common.toast('初始化失败' + getAssignProjectListErr, 'error', true)
-        })
       },
       // 获取指派的项目列表
       getAssignProjectList () {

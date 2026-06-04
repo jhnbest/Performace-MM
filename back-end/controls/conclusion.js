@@ -77,6 +77,7 @@ function getCurMonthConclusionOverviewDataNew (conclusionYear, conclusionMonth, 
 const conclusion = {
   // 提交月总结
   submitMonthConclusionData (req, res) {
+    $http.userVerify(req, res, () => {
       let sendData = req.body
       let sql = $sql.conclusion.submitMonthConclusionData
       let submitTime = $time.formatTime()
@@ -89,9 +90,11 @@ const conclusion = {
       }).catch(RCPDDatabaseErr => {
           return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
       })
+    })
   },
   // 更新月总结
   updateMonthConclusionData (req, res) {
+    $http.userVerify(req, res, () => {
       let sendData = req.body
       let sql = $sql.conclusion.updateMonthConclusionData
       let updateTime = $time.formatTime()
@@ -104,9 +107,11 @@ const conclusion = {
       }).catch(RCPDDatabaseErr => {
           return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
       })
+    })
   },
   // 更新月总结状态
   updateMonthConclusionStatus (req, res) {
+    $http.userVerify(req, res, () => {
       let sendData = req.body
       let sql = $sql.conclusion.updateMonthConclusionStatus
       let updateTime = $time.formatTime()
@@ -117,9 +122,11 @@ const conclusion = {
       }).catch(RCPDDatabaseErr => {
           return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
       })
+    })
   },
   // 提交评价数据
   submitEvaData (req, res) {
+    $http.userVerify(req, res, () => {
       let sendData = req.body
       let sql = $sql.conclusion.submitEvaData
       let evaTime = $time.formatTime()
@@ -131,9 +138,11 @@ const conclusion = {
       }).catch(RCPDDatabaseErr => {
           return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
       })
+    })
   },
   // 更新总结对应的工时ID
   updateWorkTimeListIdOfConclusion (req, res) {
+    $http.userVerify(req, res, () => {
       let sendData = req.body
       let sql = $sql.conclusion.updateWorkTimeListIdOfConclusion
       let arrayParams = [sendData.workTimeListId, sendData.conclusionId]
@@ -143,9 +152,11 @@ const conclusion = {
       }).catch(RCPDDatabaseErr => {
           return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
       })
+    })
   },
   // 提交月总结（新）
   submitMonthConclusionNew (req, res) {
+    $http.userVerify(req, res, () => {
       let sendData = req.body
       let sql = $sql.conclusion.submitMonthConclusionNew
       let submitTime = $time.formatTime()
@@ -157,9 +168,11 @@ const conclusion = {
       }).catch(RCPDDatabaseErr => {
           return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
       })
+    })
   },
   // 更新月总结（新）
   updateMonthConclusionNew (req, res) {
+    $http.userVerify(req, res, () => {
       let sendData = req.body
       let sql = $sql.conclusion.updateMonthConclusionNew
       let updateTime = $time.formatTime()
@@ -169,118 +182,165 @@ const conclusion = {
       }).catch(RCPDDatabaseErr => {
           return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
       })
+    })
   },
   // 获取月总结概览数据
   getCurMonthConclusionOverviewData (req, res) {
-    let sendData = req.body
-    let sql = $sql.conclusion.getCurMonthConclusionOverviewData
-    let arrayParams = [sendData.submitYear, sendData.submitMonth, sendData.submitter]
-    RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
-        return $http.writeJson(res, {code: 1, data: formatData(RCPDDatabaseRes)[0], message: 'success'})
-    }).catch(RCPDDatabaseErr => {
-        return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+    $http.userVerify(req, res, () => {
+      let sendData = req.body
+      let sql = $sql.conclusion.getCurMonthConclusionOverviewData
+      let arrayParams = [sendData.submitYear, sendData.submitMonth, sendData.submitter]
+      RCPDDatabase(sql, arrayParams).then(RCPDDatabaseRes => {
+          return $http.writeJson(res, {code: 1, data: formatData(RCPDDatabaseRes)[0], message: 'success'})
+      }).catch(RCPDDatabaseErr => {
+          return $http.writeJson(res, {code: -2, err: RCPDDatabaseErr, message: 'false'})
+      })
     })
   },
   // 获取月总结概览信息及相应的评价信息（新）
   getCurMonthConclusionOverviewDataNew (req, res) {
-    let sendData = req.body
-    let sql = $sql.conclusion.getCurMonthConclusionOverviewDataNew
-    let arrayParams = []
-    let finalResult = {
-        conclusionData: [],
-        AMEvaedData: []
-    }
-    arrayParams = [sendData.conclusionYear, sendData.conclusionMonth, sendData.checkUserID]
-    RCPDDatabase(sql, arrayParams).then(conclusionData => {
-      let checkConclusionID = []
-      for (let i = 0; i < conclusionData.length; i++) {
-        if (conclusionData[i].submitStatus === 1 &&
-           (conclusionData[i].dimension === 1 || conclusionData[i].dimension === 2)) { // 提交状态为已提交且类型为1或2的月总结
-            checkConclusionID.push(conclusionData[i].id)
+    $http.userVerify(req, res, () => {
+      let sendData = req.body
+      let sql = $sql.conclusion.getCurMonthConclusionOverviewDataNew
+      let arrayParams = []
+      let finalResult = {
+          conclusionData: [],
+          AMEvaedData: []
+      }
+      arrayParams = [sendData.conclusionYear, sendData.conclusionMonth, sendData.checkUserID]
+      RCPDDatabase(sql, arrayParams).then(conclusionData => {
+        let checkConclusionID = []
+        for (let i = 0; i < conclusionData.length; i++) {
+          if (conclusionData[i].submitStatus === 1 &&
+            (conclusionData[i].dimension === 1 || conclusionData[i].dimension === 2)) { // 提交状态为已提交且类型为1或2的月总结
+              checkConclusionID.push(conclusionData[i].id)
+          }
         }
-      }
-      if (checkConclusionID.length === 0) {
-        checkConclusionID = [-1]
-      }
-      if (sendData.evaUserDuty !== 1) { // 如果是普通成员，只获取本人对该用户的评价
-        sql = $sql.achievementsEva.getUserofAchievementToAnotherUser
-        arrayParams = [checkConclusionID, sendData.evaUserID]
-      } else { // 如果是处经理，获取所有人对该用户的评价
-        sql = $sql.achievementsEva.getOtherUserConclusionEvaedData
-        arrayParams = [checkConclusionID]
-      }
-      RCPDDatabase(sql, arrayParams).then(AMEvaedData => {
-        finalResult.conclusionData = conclusionData
-        finalResult.AMEvaedData = AMEvaedData
-        return $http.writeJson(res, {code: 1, data: finalResult, message: 'success'})
+        if (checkConclusionID.length === 0) {
+          checkConclusionID = [-1]
+        }
+        if (sendData.evaUserDuty !== 1) { // 如果是普通成员，只获取本人对该用户的评价
+          sql = $sql.achievementsEva.getUserofAchievementToAnotherUser
+          arrayParams = [checkConclusionID, sendData.evaUserID]
+        } else { // 如果是处经理，获取所有人对该用户的评价
+          sql = $sql.achievementsEva.getOtherUserConclusionEvaedData
+          arrayParams = [checkConclusionID]
+        }
+        RCPDDatabase(sql, arrayParams).then(AMEvaedData => {
+          finalResult.conclusionData = conclusionData
+          finalResult.AMEvaedData = AMEvaedData
+          return $http.writeJson(res, {code: 1, data: finalResult, message: 'success'})
+        }).catch(err => {
+          return $http.writeJson(res, {code: -2, err: err, message: 'err'})
+        })
       }).catch(err => {
         return $http.writeJson(res, {code: -2, err: err, message: 'err'})
       })
-    }).catch(err => {
-      return $http.writeJson(res, {code: -2, err: err, message: 'err'})
     })
   },
-  // 获取月总结概览信息及相应的评价信息V2
+  // ***获取月总结概览信息及相应的评价信息V2
   getCurMonthConclusionOverviewDataNewV2 (req, res) {
-    let sendData = req.body
-    let sql1 = $sql.conclusion.getCurMonthConclusionOverviewDataNewV2
-    let arrayParams1 = [sendData.conclusionYear, sendData.conclusionMonth, sendData.checkUserID]
-    let sql2 = $sql.conclusion.getPreMonthConclusionOverviewDataNewV2
-    let arrayParams2 = [sendData.conclusionYear, sendData.conclusionMonth - 1, sendData.checkUserID]
-    let finalResult = {
-        conclusionData: [],
-        AMEvaedData: []
-    }
-    let count = 0
-    let promises = []
-    promises[count++] = RCPDDatabase(sql1, arrayParams1)
-    promises[count++] = RCPDDatabase(sql2, arrayParams2)
-    Promise.all(promises).then(allRes => {
-      let conclusionData = allRes[0].concat(allRes[1])
-      let checkConclusionID = []
-      for (let i = 0; i < conclusionData.length; i++) {
-        if (conclusionData[i].submitStatus === 1 &&
-            (conclusionData[i].dimension === 1 || conclusionData[i].dimension === 3)) { // 提交状态为已提交且类型为1或2的月总结
-            checkConclusionID.push(conclusionData[i].id)
+    $http.userVerify(req, res, () => {
+      let sendData = req.body
+      let checkYear = sendData.conclusionYear
+      let checkMonth = sendData.conclusionMonth
+      let sql1 = $sql.conclusion.getCurMonthConclusionOverviewDataNewV2 // ***查询当月月总结，去除下月计划部分
+      let arrayParams1 = [checkYear, checkMonth, sendData.checkUserID]
+      let sql2 = $sql.conclusion.getPreMonthConclusionOverviewDataNewV2 // ***查询上月月总结中的下月计划部分（上月填的下月计划=本月计划）
+      if (sendData.conclusionMonth === 1) { // **如果查询当月为1月份，则上月为去年12月
+        checkYear = sendData.conclusionYear - 1
+        checkMonth = 12
+      } else {
+        checkYear = sendData.conclusionYear
+        checkMonth = sendData.conclusionMonth - 1
+      }
+      let arrayParams2 = [checkYear, checkMonth, sendData.checkUserID]
+      // **2026年5月起：下月计划评分改为对当月dimension=3，需额外查询当月dimension=3的评价数据
+      const conclusionYM = sendData.conclusionYear * 100 + sendData.conclusionMonth
+      const isMergedMode = conclusionYM >= 202605
+      let count = 0
+      let promises = []
+      promises[count++] = RCPDDatabase(sql1, arrayParams1)
+      promises[count++] = RCPDDatabase(sql2, arrayParams2)
+      if (isMergedMode) {
+        let sql3 = $sql.conclusion.getCurMonthConclusionOverviewDataNewV3
+        let arrayParams3 = [sendData.conclusionYear, sendData.conclusionMonth, sendData.checkUserID]
+        promises[count++] = RCPDDatabase(sql3, arrayParams3)
+      }
+      Promise.all(promises).then(allRes => {
+        let conclusionData = allRes[0].concat(allRes[1])
+        if (isMergedMode) {
+          conclusionData = conclusionData.concat(allRes[2])
         }
-      }
-      if (checkConclusionID.length === 0) {
-        checkConclusionID = [-1]
-      }
-      if (sendData.evaUserDuty !== 1) { // 如果是普通成员，只获取本人对该用户的评价
-        sql = $sql.achievementsEva.getUserofAchievementToAnotherUser
-        arrayParams = [checkConclusionID, sendData.evaUserID]
-      } else { // 如果是处经理，获取所有人对该用户的评价
-        sql = $sql.achievementsEva.getOtherUserConclusionEvaedData
-        arrayParams = [checkConclusionID]
-      }
-      RCPDDatabase(sql, arrayParams).then(AMEvaedData => {
-        finalResult.conclusionData = conclusionData
-        finalResult.AMEvaedData = AMEvaedData
-        return $http.writeJson(res, {code: 1, data: finalResult, message: 'success'})
+        let finalResult = {
+            conclusionData: [],
+            AMEvaedData: []
+        }
+        let checkConclusionID = []
+        for (let i = 0; i < conclusionData.length; i++) {
+          // ***构造月总结类型为1或3的数组，查询对应的成效评价
+          if (conclusionData[i].submitStatus === 1 &&
+              (conclusionData[i].dimension === 1 ||
+              conclusionData[i].dimension === 3 ||
+              conclusionData[i].dimension === 5)) {
+              checkConclusionID.push(conclusionData[i].id)
+          }
+        }
+        if (checkConclusionID.length === 0) {
+          checkConclusionID = [-1]
+        }
+        if (sendData.evaUserDuty !== 1) { // ***如果是普通成员，只获取本人对该用户的评价
+          sql = $sql.achievementsEva.getUserofAchievementToAnotherUser
+          arrayParams = [checkConclusionID, sendData.evaUserID]
+        } else { // ***如果是处经理，获取所有人对该用户的评价
+          sql = $sql.achievementsEva.getOtherUserConclusionEvaedData
+          arrayParams = [checkConclusionID]
+        }
+        RCPDDatabase(sql, arrayParams).then(AMEvaedData => {
+          finalResult.conclusionData = conclusionData
+          finalResult.AMEvaedData = AMEvaedData
+          return $http.writeJson(res, {code: 1, data: finalResult, message: 'success'})
+        }).catch(err => {
+          return $http.writeJson(res, {code: -2, err: err, message: 'err'})
+        })
       }).catch(err => {
         return $http.writeJson(res, {code: -2, err: err, message: 'err'})
       })
-    }).catch(err => {
-      return $http.writeJson(res, {code: -2, err: err, message: 'err'})
+    })
+  },
+  // ***获取当月月总结中的下月计划（dimension=3）
+  getCurMonthConclusionOverviewDataNewV3 (req, res) {
+    $http.userVerify(req, res, () => {
+      let sendData = req.body
+      let checkYear = sendData.conclusionYear
+      let checkMonth = sendData.conclusionMonth
+      let sql = $sql.conclusion.getCurMonthConclusionOverviewDataNewV3
+      let arrayParams = [checkYear, checkMonth, sendData.checkUserID]
+      RCPDDatabase(sql, arrayParams).then(result => {
+        return $http.writeJson(res, {code: 1, data: result, message: 'success'})
+      }).catch(err => {
+        return $http.writeJson(res, {code: -2, err: err, message: 'err'})
+      })
     })
   },
   // 获取本年份总结概览数据
   getCurYearConclusionOverviewData (req, res) {
-    let sendData = req.body
-    let promises = []
-    for (let i = 0; i < 12; i++) {
-      let titleMonth = String(sendData.submitYear) + '-' + String((i + 1) < 10 ? '0' + String(i + 1) : String(i + 1))
-      if (moment(titleMonth).isBefore(sendData.newRulesDate)) { // 请求的月份在新规则实施月份之前
-        promises[i] = getCurMonthConclusionOverviewData(sendData.submitYear, i + 1, sendData.submitter)
-      } else {
-        promises[i] = getCurMonthConclusionOverviewDataNew(sendData.submitYear, i + 1, [sendData.submitter], null, null, null)
+    $http.userVerify(req, res, () => {
+      let sendData = req.body
+      let promises = []
+      for (let i = 0; i < 12; i++) {
+        let titleMonth = String(sendData.submitYear) + '-' + String((i + 1) < 10 ? '0' + String(i + 1) : String(i + 1))
+        if (moment(titleMonth).isBefore(sendData.newRulesDate)) { // 请求的月份在新规则实施月份之前
+          promises[i] = getCurMonthConclusionOverviewData(sendData.submitYear, i + 1, sendData.submitter)
+        } else {
+          promises[i] = getCurMonthConclusionOverviewDataNew(sendData.submitYear, i + 1, [sendData.submitter], null, null, null)
+        }
       }
-    }
-    Promise.all(promises).then(allResponse => {
-      return $http.writeJson(res, {code: 1, data: allResponse, message: 'success'})
-    }).catch(err => {
-      return $http.writeJson(res, {code: -2, err: err, message: 'err'})
+      Promise.all(promises).then(allResponse => {
+        return $http.writeJson(res, {code: 1, data: allResponse, message: 'success'})
+      }).catch(err => {
+        return $http.writeJson(res, {code: -2, err: err, message: 'err'})
+      })
     })
   }
 }

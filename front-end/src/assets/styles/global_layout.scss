@@ -63,7 +63,7 @@ input[type="number"]{
 }
 
 .container-wrap{margin-top: 60px; overflow:auto;
-  .aside-wrap{position:fixed;width: 170px; height: 100%;z-index: 100;overflow: auto;
+  .aside-wrap{position:fixed;width: 170px; height: calc(100vh - 60px); top: 60px; left: 0; z-index: 100; overflow-y: auto;
     .el-menu{height: 100%;}
   }
   .main-wrap{margin-left: 170px;padding: 0;}
@@ -73,6 +73,10 @@ input[type="number"]{
 .table-header th{background: $color-bg;}
 .main-search{
   padding: 20px 20px 0px;
+  .el-input,.el-select{width:200px;}
+}
+.main-search-v2{
+  padding: 20px;
   .el-input,.el-select{width:200px;}
 }
 
@@ -95,7 +99,7 @@ input[type="number"]{
   width: 50%;
 }
 .hr-10{width: 99%; height: 1px; background: $color-bg; margin: auto}
-
+.hr-10-v2{width: 95%; height: 1px; background: $color-bg; margin: 20px 0px}
 /* Pagination 分页 */
 .el-pagination{text-align: right; margin-top: 10px;}
 

@@ -66,7 +66,7 @@
       <span v-else style="font-weight: bolder;color: red;font-size: 23px">未评价</span>
     </span>
     <el-button size="medium" type="success" style="margin-left: 20px" @click="getPreMonthEva">提取上月评价</el-button>
-    <el-button size="medium" type="warning" @click="handleFillMul" v-if="$store.state.userInfo.id === 15">一键填充{{title}}定性评价</el-button>
+    <el-button :disabled="false" size="medium" type="warning" @click="handleFillMul" v-if="$store.state.userInfo.id === 15">一键填充{{title}}定性评价</el-button>
   </div>
   <br v-if="showFlag.descTableShow">
   <div v-if="showFlag.descTableShow">
@@ -101,15 +101,15 @@
               ref="rateTable"
               highlight-current-row>
       <el-table-column label="序号" align="center" type="index"></el-table-column>
-      <el-table-column label="姓名" align="center" min-width="50">
+      <el-table-column label="姓名" align="center">
         <template slot-scope="scope">
-          <span class="link-type" @click="handleClickRateName(scope.row)">{{scope.row.ratedName}}</span>
+          <span>{{scope.row.ratedName}}</span>
         </template>
       </el-table-column>
-      <el-table-column v-if="$store.state.userInfo.id === 26" label="领导评价" align="center">
-        <el-table-column v-if="$store.state.userInfo.id === 26" label="领导评价得分(标准化)" align="center" prop="managerScoreTmp" width="77"></el-table-column>
-        <el-table-column v-if="$store.state.userInfo.id === 26" label="领导评价得分(未标准化)" align="center" prop="totalScore" width="77"></el-table-column>
-        <el-table-column v-if="$store.state.userInfo.id === 26" label="领导评价排名" align="center" prop="managerRateRank" width="57"></el-table-column>
+      <el-table-column v-if="$store.state.userInfo.id === 35" label="领导评价" align="center">
+        <!-- <el-table-column v-if="$store.state.userInfo.id === 35" label="领导评价得分(标准化)" align="center" prop="managerScoreTmp" width="77"></el-table-column> -->
+        <el-table-column v-if="$store.state.userInfo.id === 35" label="领导评价得分" align="center" prop="totalScore"></el-table-column>
+        <el-table-column v-if="$store.state.userInfo.id === 35" label="领导评价排名" align="center" prop="managerRateRank"></el-table-column>
       </el-table-column>
       <el-table-column label="工作态度" align="center">
           <el-table-column label="责任意识(15%)" align="center" min-width="110">
@@ -151,7 +151,7 @@
             </template>
           </el-table-column>
         </el-table-column>
-      <el-table-column v-if="$store.state.userInfo.id !== 26" label="总分" align="center" prop="totalScore" min-width="50"></el-table-column>
+      <el-table-column v-if="$store.state.userInfo.id !== 35" label="总分" align="center" prop="totalScore" min-width="50"></el-table-column>
     </el-table>
     <br>
     <br>
@@ -175,15 +175,15 @@
     submitRatesResult,
     handleFillMul } from '@/config/interface'
   import monthConclusionTableCheck from '@/views/monthConclusion/childViews/monthConclusionTableCheck'
-  import { PMScoreNorCal, calGetScore, sortObjectArrayByParams, getCurApplyAbleMonth, isUndefined, getIsSubmitAllow } from '@/utils/common'
+  import { PMScoreNorCal, calGetScore, sortObjectArrayByParams, getCurApplyAbleMonth, isUndefined, getIsSubmitAllow, isNull, starToRatesNew, ratesToStar, ratesToStarOld, starToRates } from '@/utils/common'
   import { getUsersList } from '@/utils/users'
-  import { getMonthEva, rateTypeToText } from '@/utils/multual'
+  import { getAllQTEvaedData, getMonthEva, rateTypeToText } from '@/utils/multual'
   import store from '@/store'
   import moment from 'moment'
   export default {
     data () {
       return {
-        title: this.$moment().format('YYYY-MM'),
+        title: null,
         showFlag: {
           descTableShow: false
         },
@@ -384,15 +384,14 @@
         descriptionContent: '1、首先查看评价标准，了解',
         rateTableData: [],
         users: [],
+        usersTmp: [],
         defaultStar: 3,
-        scoreText: ['82.5', '85', '87.5', '90', '92.5'],
         isRated: false,
         isChanged: false,
         ratesTableTmp: [],
         reqFlag: {
           getUserRates: true,
-          updateRateToUpdate: true,
-          getAllUserRates: true
+          updateRateToUpdate: true
         },
         ratesTmp: [],
         ratesToUpdate: [],
@@ -429,55 +428,26 @@
       init () {
         getCurApplyAbleMonth().then(getCurApplyAbleMonthRes => {
           this.title = this.$moment(getCurApplyAbleMonthRes[0].setTime).format('YYYY-MM')
-        })
-        let checkGroupID = 0
-        getUsersList(checkGroupID).then(userList => {
-          this.users = userList
-          this.initData(userList)
+          let checkGroupID = 0
+          getUsersList(checkGroupID).then(userList => {
+            this.users = userList
+            this.usersTmp = JSON.parse(JSON.stringify(userList))
+            let userList2 = JSON.parse(JSON.stringify(userList))
+            this.initData(userList2)
+          })
         })
       },
-      // 初始化互评及绩效数据（若需要）
+      // ***初始化互评及绩效数据（若需要）
       initData (userList) {
         this.getUserRates().then(userRates => {
           this.isRated = userRates.length !== 0
+          // ***剔除自己
+          let findIndex = userList.findIndex(item => { return item.id === store.state.userInfo.id })
+          if (findIndex !== -1) { userList.splice(findIndex, 1) }
           this.rateTableData = JSON.parse(JSON.stringify(this.genRateTableData(userList, userRates)))
         })
       },
-      // 评分转星级
-      ratesToStar (rates) {
-        switch (rates) {
-          case 92.5:
-            return 5
-          case 90:
-            return 4
-          case 87.5:
-            return 3
-          case 85:
-            return 2
-          case 82.5:
-            return 1
-          default:
-            return 4
-        }
-      },
-      // 评分转星级
-      starToRate (star) {
-        switch (star) {
-          case 5:
-            return 92.5
-          case 4:
-            return 90
-          case 3:
-            return 87.5
-          case 2:
-            return 85
-          case 1:
-            return 82.5
-          default:
-            return 87.5
-        }
-      },
-      // 获取互评信息
+      // *** 获取互评信息
       getUserRates () {
         const url = getUserRates
         let params = {
@@ -493,69 +463,46 @@
                 resolve(res.data)
               }
               _this.reqFlag.getUserRates = true
+            }).catch(err => {
+              console.log(err)
             })
           })
         }
       },
-      // 计算互评总分
-      calMultualScore (t1Star, t2Star, t3Star, t4Star, t5Star, t6Star) {
-        let t1Score = this.starToRate(t1Star)
-        let t2Score = this.starToRate(t2Star)
-        let t3Score = this.starToRate(t3Star)
-        let t4Score = this.starToRate(t4Star)
-        let t5Score = this.starToRate(t5Star)
-        let t6Score = this.starToRate(t6Star)
+      // ***计算互评总分
+      calMultualScoreV1 (t1Star, t2Star, t3Star, t4Star, t5Star, t6Star) {
+        let t1Score = starToRates(t1Star)
+        let t2Score = starToRates(t2Star)
+        let t3Score = starToRates(t3Star)
+        let t4Score = starToRates(t4Star)
+        let t5Score = starToRates(t5Star)
+        let t6Score = starToRates(t6Star)
         let totalScore = t1Score * 0.15 + t2Score * 0.2 + t3Score * 0.1 +
           t4Score * 0.1 + t5Score * 0.3 + t6Score * 0.15
         return totalScore
       },
-      // 生成用户互评数据
+      // ***计算互评总分
+      calMultualScoreV2 (t1Star, t2Star, t3Star, t4Star, t5Star, t6Star) {
+        let t1Score = starToRatesNew(t1Star)
+        let t2Score = starToRatesNew(t2Star)
+        let t3Score = starToRatesNew(t3Star)
+        let t4Score = starToRatesNew(t4Star)
+        let t5Score = starToRatesNew(t5Star)
+        let t6Score = starToRatesNew(t6Star)
+        let totalScore = t1Score * 0.15 + t2Score * 0.2 + t3Score * 0.1 +
+          t4Score * 0.1 + t5Score * 0.3 + t6Score * 0.15
+        return totalScore
+      },
+      // ***生成用户互评数据
       genRateTableData (users, rates) {
         this.isChanged = false
-        this.rateTableData = []
-        let curGroupName = this.$store.state.userInfo.groupName
-        let curID = this.$store.state.userInfo.id
+        // this.rateTableData = []
+        let curGroupID = this.$store.state.userInfo.groupID
         let ratesTableTmp = []
-        if (rates.length === 0) { // 该月还未进行互评
+        if (rates.length === 0) { // ***该月还未进行互评,则生成默认评价数据
           for (let user of users) {
-            if (curGroupName === '技术标准组' || curGroupName === '工程组') {
-              if (user.groupName === '技术标准组' || user.groupName === '工程组') {
-                if (curID !== user.id) {
-                  let obj = {
-                    ratedPersion: user.id,
-                    ratedName: user.name,
-                    t1Star: this.defaultStar,
-                    t2Star: this.defaultStar,
-                    t3Star: this.defaultStar,
-                    t4Star: this.defaultStar,
-                    t5Star: this.defaultStar,
-                    t6Star: this.defaultStar
-                  }
-                  obj.totalScore = this.calMultualScore(obj.t1Star, obj.t2Star, obj.t3Star,
-                    obj.t4Star, obj.t5Star, obj.t6Star)
-                  ratesTableTmp.push(obj)
-                }
-              }
-            } else if (curGroupName === '通信组') {
-              if (user.groupName === '通信组') {
-                if (curID !== user.id) {
-                  let obj = {
-                    ratedPersion: user.id,
-                    ratedName: user.name,
-                    t1Star: this.defaultStar,
-                    t2Star: this.defaultStar,
-                    t3Star: this.defaultStar,
-                    t4Star: this.defaultStar,
-                    t5Star: this.defaultStar,
-                    t6Star: this.defaultStar
-                  }
-                  obj.totalScore = this.calMultualScore(obj.t1Star, obj.t2Star, obj.t3Star,
-                    obj.t4Star, obj.t5Star, obj.t6Star)
-                  ratesTableTmp.push(obj)
-                }
-              }
-            } else if (curGroupName === '处经理') {
-              if (curID !== user.id) {
+            if (curGroupID === 2 || curGroupID === 3 || curGroupID === 4) {
+              if (user.groupID === 2 || user.groupID === 3 || user.groupID === 4) {
                 let obj = {
                   ratedPersion: user.id,
                   ratedName: user.name,
@@ -564,18 +511,64 @@
                   t3Star: this.defaultStar,
                   t4Star: this.defaultStar,
                   t5Star: this.defaultStar,
-                  t6Star: this.defaultStar,
-                  managerRateRank: null
+                  t6Star: this.defaultStar
                 }
-                obj.totalScore = this.calMultualScore(obj.t1Star, obj.t2Star, obj.t3Star,
-                  obj.t4Star, obj.t5Star, obj.t6Star)
+                if (moment(this.title).isAfter(store.state.newRulesTeamWork)) {
+                  obj.totalScore = this.calMultualScoreV2(obj.t1Star, obj.t2Star, obj.t3Star,
+                                                        obj.t4Star, obj.t5Star, obj.t6Star)
+                } else {
+                  obj.totalScore = this.calMultualScoreV1(obj.t1Star, obj.t2Star, obj.t3Star,
+                                                        obj.t4Star, obj.t5Star, obj.t6Star)
+                }
                 ratesTableTmp.push(obj)
               }
+            } else if (curGroupID === 5) {
+              if (user.groupID === 5) {
+                let obj = {
+                  ratedPersion: user.id,
+                  ratedName: user.name,
+                  t1Star: this.defaultStar,
+                  t2Star: this.defaultStar,
+                  t3Star: this.defaultStar,
+                  t4Star: this.defaultStar,
+                  t5Star: this.defaultStar,
+                  t6Star: this.defaultStar
+                }
+                if (moment(this.title).isAfter(store.state.newRulesTeamWork)) {
+                  obj.totalScore = this.calMultualScoreV2(obj.t1Star, obj.t2Star, obj.t3Star,
+                                                        obj.t4Star, obj.t5Star, obj.t6Star)
+                } else {
+                  obj.totalScore = this.calMultualScoreV1(obj.t1Star, obj.t2Star, obj.t3Star,
+                                                        obj.t4Star, obj.t5Star, obj.t6Star)
+                }
+                ratesTableTmp.push(obj)
+              }
+            } else if (curGroupID === 1) {
+              let obj = {
+                ratedPersion: user.id,
+                ratedName: user.name,
+                t1Star: this.defaultStar,
+                t2Star: this.defaultStar,
+                t3Star: this.defaultStar,
+                t4Star: this.defaultStar,
+                t5Star: this.defaultStar,
+                t6Star: this.defaultStar,
+                managerRateRank: null
+              }
+              if (moment(this.title).isAfter(store.state.newRulesTeamWork)) {
+                obj.totalScore = this.calMultualScoreV2(obj.t1Star, obj.t2Star, obj.t3Star,
+                                                      obj.t4Star, obj.t5Star, obj.t6Star)
+              } else {
+                obj.totalScore = this.calMultualScoreV1(obj.t1Star, obj.t2Star, obj.t3Star,
+                                                      obj.t4Star, obj.t5Star, obj.t6Star)
+              }
+              ratesTableTmp.push(obj)
             }
           }
           return ratesTableTmp
-        } else {
-          this.ratesTmp = JSON.parse(JSON.stringify(rates))
+        } else { // ***该月已进行互评，则显示已互评的结果
+          this.ratesGlobal = JSON.parse(JSON.stringify(rates)) // ***保存原始互评数据
+          // ***以被评价人为主体，重新构建互评数据
           for (let item1 of rates) {
             let index = ratesTableTmp.findIndex(ratesTableTmpItem => {
               return ratesTableTmpItem.ratedPersion === item1.ratedPersion
@@ -586,22 +579,35 @@
                 ratedName: item1.ratedPersionName,
                 managerRateRank: null
               }
-              obj[rateTypeToText(item1.rateType)] = this.ratesToStar(item1.rate)
+              if (moment(this.title).isAfter(store.state.newRulesTeamWork)) {
+                obj[rateTypeToText(item1.rateType)] = ratesToStar(item1.rate)
+              } else {
+                obj[rateTypeToText(item1.rateType)] = ratesToStarOld(item1.rate)
+              }
               ratesTableTmp.push(obj)
             } else {
-              ratesTableTmp[index][rateTypeToText(item1.rateType)] = this.ratesToStar(item1.rate)
+              if (moment(this.title).isAfter(store.state.newRulesTeamWork)) {
+                ratesTableTmp[index][rateTypeToText(item1.rateType)] = ratesToStar(item1.rate)
+              } else {
+                ratesTableTmp[index][rateTypeToText(item1.rateType)] = ratesToStarOld(item1.rate)
+              }
             }
           }
-          for (let item of ratesTableTmp) { // 计算各被评价人总分
-            item.totalScore = this.calMultualScore(item.t1Star, item.t2Star, item.t3Star, item.t4Star,
-              item.t5Star, item.t6Star)
+          for (let item of ratesTableTmp) { // ***计算各被评价人总分
+            if (moment(this.title).isAfter(store.state.newRulesTeamWork)) {
+              item.totalScore = this.calMultualScoreV2(item.t1Star, item.t2Star, item.t3Star,
+                                                      item.t4Star, item.t5Star, item.t6Star)
+            } else {
+              item.totalScore = this.calMultualScoreV1(item.t1Star, item.t2Star, item.t3Star,
+                                                      item.t4Star, item.t5Star, item.t6Star)
+            }
           }
-          ratesTableTmp = sortObjectArrayByParams(ratesTableTmp, 'totalScore', 't1Star') // 根据评价得分排序
-          // 如果是处经理，则计算领导评价得分
-          if (curGroupName === '处经理') {
+          ratesTableTmp = sortObjectArrayByParams(ratesTableTmp, 'totalScore', 't1Star') // ***根据评价得分排序
+          // ***如果是处经理，则计算领导评价得分
+          if (curGroupID === 1) {
             for (let i = 0; i < ratesTableTmp.length; i++) {
               ratesTableTmp[i].managerRateRank = i + 1
-              if (moment(this.title).isBefore(store.state.newRulesDate)) { // 请求的月份在新规则实施月份之前
+              if (moment(this.title).isBefore(store.state.newRulesDate)) { // ***请求的月份在新规则实施月份之前
                 ratesTableTmp[i].managerScoreTmp = calGetScore(ratesTableTmp.length, i + 1)
               } else {
                 ratesTableTmp[i].managerScoreTmp = PMScoreNorCal(ratesTableTmp.length, i + 1)
@@ -611,17 +617,17 @@
           return ratesTableTmp
         }
       },
-      // 上一月
+      // ***上一月按钮点击事件
       handlePreMonth () {
         this.title = this.$moment(this.title).subtract(1, 'months').format('YYYY-MM')
         this.initData(this.users)
       },
-      // 下一月
+      // ***下一月按钮点击事件
       handleNextMonth () {
         this.title = this.$moment(this.title).add(1, 'months').format('YYYY-MM')
         this.initData(this.users)
       },
-      // 表格合并方法
+      // ***表格合并方法
       objectSpanMethod ({ row, column, rowIndex, columnIndex }) {
         if (columnIndex === 0) {
           if (rowIndex === 0) {
@@ -710,14 +716,14 @@
           }
         }
       },
-      // 标准表格显示开关
+      // ***标准表格显示开关
       handleSwitchChange () {
         this.refreshTableSize()
       },
-      // 更新带id的评分数据
+      // ***更新带id的评分数据
       updateRateRawRateData (rateType, ratedPersion, rate) {
         this.isChanged = true
-        let findResult = this.ratesTmp.find(ratesTmpItem => {
+        let findResult = this.ratesGlobal.find(ratesTmpItem => {
           return (ratesTmpItem.rateType === rateType) && (ratesTmpItem.ratedPersion === ratedPersion)
         })
         if (!isUndefined(findResult)) {
@@ -732,39 +738,50 @@
           }
         }
       },
-      // 评分项星级变化事件
+      // ***评分项星级变化事件
       handleStarChange (row, rateType) {
-        let curGroupName = this.$store.state.userInfo.groupName
-        row.totalScore = this.calMultualScore(row.t1Star, row.t2Star, row.t3Star, row.t4Star, row.t5Star, row.t6Star)
-        this.updateRateRawRateData(rateType, row.ratedPersion, this.starToRate(row[rateTypeToText(rateType)])) // 记录有发生变化的评价数据
-        if (curGroupName === '处经理') { // 如果是管理者，则更新管理者评价得分，并更新排名
+        let curGroupID = this.$store.state.userInfo.groupID
+        if (moment(this.title).isAfter(store.state.newRulesTeamWork)) {
+          row.totalScore = this.calMultualScoreV2(row.t1Star, row.t2Star, row.t3Star,
+                                                  row.t4Star, row.t5Star, row.t6Star)
+        } else {
+          row.totalScore = this.calMultualScoreV1(row.t1Star, row.t2Star, row.t3Star,
+                                                  row.t4Star, row.t5Star, row.t6Star)
+        }
+        // ***记录有发生变化的评价数据，更新的时候只更新这部分数据
+        if (moment(this.title).isAfter(store.state.newRulesTeamWork)) {
+          this.updateRateRawRateData(rateType, row.ratedPersion, starToRatesNew(row[rateTypeToText(rateType)]))
+        } else {
+          this.updateRateRawRateData(rateType, row.ratedPersion, starToRates(row[rateTypeToText(rateType)]))
+        }
+        if (curGroupID === 1) { // ***如果是管理者，则更新管理者评价得分，并更新排名
           let rateTableTmp = JSON.parse(JSON.stringify(this.rateTableData))
-          rateTableTmp = sortObjectArrayByParams(rateTableTmp, 'totalScore', 't1Star') // 根据评价得分排序
-          // 计算管理者评价排名，并计算管理者评价标准化得分
+          rateTableTmp = sortObjectArrayByParams(rateTableTmp, 'totalScore', 't1Star') // **根据评价得分排序
+          // **计算管理者评价排名
           for (let i = 0; i < rateTableTmp.length; i++) {
             rateTableTmp[i].managerRateRank = i + 1
-            if (moment(this.title).isBefore(store.state.newRulesDate)) { // 请求的月份在新规则实施月份之前
-              rateTableTmp[i].managerScoreTmp = calGetScore(rateTableTmp.length, i + 1)
-            } else {
-              rateTableTmp[i].managerScoreTmp = PMScoreNorCal(rateTableTmp.length, i + 1)
-            }
+            // if (moment(this.title).isBefore(store.state.newRulesDate)) { // 请求的月份在新规则实施月份之前
+            //   rateTableTmp[i].managerScoreTmp = calGetScore(rateTableTmp.length, i + 1)
+            // } else {
+            //   rateTableTmp[i].managerScoreTmp = PMScoreNorCal(rateTableTmp.length, i + 1)
+            // }
           }
-          // 把计算的最终结果赋值到实际的表格数据中，防止更新一个评分当前评价项就乱跳
+          // ***把计算的最终结果赋值到实际的表格数据中，防止更新一个评分当前评价项就乱跳
           for (let i = 0; i < rateTableTmp.length; i++) {
             let findResult = this.rateTableData.find(item => {
               return item.ratedPersion == rateTableTmp[i].ratedPersion
             })
             findResult.managerRateRank = rateTableTmp[i].managerRateRank
-            findResult.managerScoreTmp = rateTableTmp[i].managerScoreTmp
+            // findResult.managerScoreTmp = rateTableTmp[i].managerScoreTmp
           }
         }
       },
-      // 提交
+      // ***提交按钮点击事件
       submitRatesResult () {
         let applyYear = this.$moment(this.title).year()
         let applyMonth = this.$moment(this.title).month() + 1
         getIsSubmitAllow(applyYear, applyMonth).then(res => {
-          if (res.length === 0 || this.$store.state.userInfo.id === 26) {
+          if (res.length === 0 || this.$store.state.userInfo.id === 35) {
             const url = submitRatesResult
             let params = {
               data: this.rateTableData,
@@ -789,10 +806,10 @@
           this.$common.toast(err, 'error', true)
         })
       },
-      // 更新按钮
+      // ***更新按钮点击事件
       updateRateTableData () {
         getIsSubmitAllow().then(res => {
-          if (res.length === 0 || this.$store.state.userInfo.id === 26) {
+          if (res.length === 0 || this.$store.state.userInfo.id === 35) {
             const url = updateUserRate
             let params = {
               ratesToUpdate: this.ratesToUpdate
@@ -815,7 +832,7 @@
           this.$common.toast(err, 'error', true)
         })
       },
-      // 刷新表格尺寸
+      // ***刷新表格尺寸
       refreshTableSize () {
         this.$nextTick(() => {
           this.tableHeight = window.innerHeight - this.$refs.rateTable.$el.offsetTop - 5
@@ -831,22 +848,48 @@
           }
         })
       },
-      // 提取上月互评结果
+      // ***提取上月互评结果
       getPreMonthEva () {
         let rateUserID = this.$store.state.userInfo.id
         let rateMonth = this.$moment(this.title).subtract(1, 'months').format('YYYY-MM')
-        // 提取定性评价数据
+        // ***提取定性评价数据
         getMonthEva(rateUserID, rateMonth).then(res => {
-          // 生成表格数据
-          this.rateTableData = JSON.parse(JSON.stringify(this.genRateTableData(this.users, res)))
+          let preRateData = JSON.parse(JSON.stringify(this.genRateTableData(this.users, res))) // **根据上月评价结果生成的表格数据
+          // ***基于初始未进行评价生成的表格数据，以被评价人为主体，根据上月评价结果替换相应的被评价人评价数据
+          for (let rateTableDataItem of this.rateTableData) {
+            let findResult = preRateData.find(preRateDataItem => { return preRateDataItem.ratedPersion === rateTableDataItem.ratedPersion })
+            if (!isUndefined(findResult)) {
+              rateTableDataItem.t1Star = findResult.t1Star
+              rateTableDataItem.t2Star = findResult.t2Star
+              rateTableDataItem.t3Star = findResult.t3Star
+              rateTableDataItem.t4Star = findResult.t4Star
+              rateTableDataItem.t5Star = findResult.t5Star
+              rateTableDataItem.t6Star = findResult.t6Star
+              if (moment(this.title).isAfter(store.state.newRulesTeamWork)) {
+                rateTableDataItem.totalScore = this.calMultualScoreV2(rateTableDataItem.t1Star,
+                                                                      rateTableDataItem.t2Star,
+                                                                      rateTableDataItem.t3Star,
+                                                                      rateTableDataItem.t4Star,
+                                                                      rateTableDataItem.t5Star,
+                                                                      rateTableDataItem.t6Star)
+              } else {
+                rateTableDataItem.totalScore = this.calMultualScoreV1(rateTableDataItem.t1Star,
+                                                                      rateTableDataItem.t2Star,
+                                                                      rateTableDataItem.t3Star,
+                                                                      rateTableDataItem.t4Star,
+                                                                      rateTableDataItem.t5Star,
+                                                                      rateTableDataItem.t6Star)
+              }
+            }
+          }
         })
       },
-      // 一键填充定性评价
+      // ***一键填充定性评价
       handleFillMul () {
         const url = handleFillMul
         let params = {
           rateMonth: this.title,
-          users: this.users
+          users: this.usersTmp
         }
         this.$http(url, params).then(res => {
           if (res.code === 1) {

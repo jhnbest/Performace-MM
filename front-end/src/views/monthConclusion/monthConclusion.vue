@@ -90,7 +90,8 @@
 <!-- (scope.row.managerRateStar !== null) || (curApplyYear !== Number(title)) ||
                     ((curApplyMonth !== scope.row.submitMonth) && (curApplyYear === Number(title))) -->
           <el-button :disabled="(scope.row.managerRateStar !== null) || (curApplyYear !== Number(title)) ||
-                    ((curApplyMonth !== scope.row.submitMonth) && (curApplyYear === Number(title)))"
+                    ((curApplyMonth !== scope.row.submitMonth) && (curApplyYear === Number(title)) &&
+                     !(scope.row.submitMonth === tempAllowMonth.month && Number(title) === tempAllowMonth.year))"
                      size="mini"
                      type="warning"
                      @click="handleEdit(scope.row)"
@@ -98,7 +99,8 @@
 <!--          暂存-->
           <el-button v-if="scope.row.submitStatus === 1"
                      :disabled=" (scope.row.managerRateStar !== null) || (curApplyYear > Number(title)) ||
-                    ((curApplyMonth > scope.row.submitMonth) && (curApplyYear === Number(title))) ||
+                    ((curApplyMonth > scope.row.submitMonth) && (curApplyYear === Number(title)) &&
+                     !(scope.row.submitMonth === tempAllowMonth.month && Number(title) === tempAllowMonth.year)) ||
                      !reqFlag.updateMonthConclusionStatus"
                      size="mini"
                      type="info"
@@ -108,7 +110,8 @@
                      :disabled="scope.row.moreDetailData.length === 0 || !reqFlag.updateMonthConclusionStatus
                       || (scope.row.managerRateStar !== null)
                       || (curApplyYear > Number(title)) ||
-                    ((curApplyMonth > scope.row.submitMonth) && (curApplyYear === Number(title)))"
+                    ((curApplyMonth > scope.row.submitMonth) && (curApplyYear === Number(title)) &&
+                     !(scope.row.submitMonth === tempAllowMonth.month && Number(title) === tempAllowMonth.year))"
                      size="mini"
                      type="success"
                      @click="handleSubmit(scope.row, 1)">提交</el-button>
@@ -132,6 +135,7 @@
                                 :moreDetailData = moreDetailData
                                 :conclusionTitle="conclusionTitle"
                                 :checkUserId="$store.state.userInfo.id"
+                                :checkUserDuty="$store.state.userInfo.duty"
                                 :months="selectMonth"
                                 @close="conclusionDialogNew = false"></month-conclusion-table-check-new>
 </div>
@@ -163,6 +167,7 @@ import { getWorkTimeListByType, mianshenheWorkTimeSubmit } from '@/utils/perform
         },
         curApplyYear: 1970,
         curApplyMonth: 1,
+        tempAllowMonth: { year: 2026, month: 4 },
         conclusionDialog: false,
         conclusionDialogNew: false,
         conclusionTitle: null,
@@ -258,7 +263,7 @@ import { getWorkTimeListByType, mianshenheWorkTimeSubmit } from '@/utils/perform
         this.selectMonth = []
         this.selectMonth.push(row.month)
         let titleMonth = this.$moment(String(this.title) + '-' + String(row.submitMonth)).format('YYYY-MM')
-        if (this.$moment(titleMonth).isBefore(store.state.newRulesDate)) { // 请求的月份再新规则实施月份之前
+        if (this.$moment(titleMonth).isBefore(store.state.newRulesDate)) { // 请求的月份在新规则实施月份之前
           this.conclusionDialog = true
           this.curConclusion = row.curConclusion
           this.nextPlan = row.nextPlan
@@ -319,12 +324,12 @@ import { getWorkTimeListByType, mianshenheWorkTimeSubmit } from '@/utils/perform
           }
         } else {
           let userID = this.$store.state.userInfo.id
-          getWorkTimeListByType(userID, titleMonth, 549).then(res => {
-            // ***用户如果在截止日期前是先暂存后提交月总结，则也自动提交一条奖励工时
-            if (res.length === 0) {
-              mianshenheWorkTimeSubmit(userID, 549, titleMonth).then(() => {}).catch(err => { console.log(err) })
-            }
-          })
+          // getWorkTimeListByType(userID, titleMonth, 549).then(res => {
+          //   // ***用户如果在截止日期前是先暂存后提交月总结，则也自动提交一条奖励工时
+          //   if (res.length === 0) {
+          //     mianshenheWorkTimeSubmit(userID, 549, titleMonth).then(() => {}).catch(err => { console.log(err) })
+          //   }
+          // })
           let promises = []
           let count = 0
           for (let item of row.moreDetailData) {

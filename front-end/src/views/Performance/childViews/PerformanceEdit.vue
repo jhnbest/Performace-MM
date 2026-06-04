@@ -45,15 +45,6 @@
           </el-tooltip>
         </el-form-item>
         <br>
-<!--        <el-form-item label="项目级别" prop="projectLevel">-->
-<!--          <el-select v-model="formData.projectLevel" placeholder="请选择" v-if="formData.isShowProjectLevel" :disabled="true">-->
-<!--            <el-option v-for="item in projectLevels"-->
-<!--                       :key="item.value"-->
-<!--                       :label="item.text"-->
-<!--                       :value="item.value">-->
-<!--            </el-option>-->
-<!--          </el-select>-->
-<!--        </el-form-item>-->
         <!-- 分割线 start -->
         <div class="hr-10"></div>
         <!-- 分割线 end -->
@@ -107,6 +98,7 @@
                 <el-input-number size="mini"
                                  v-model="scope.row.defaultCofficient"
                                  :min="1.0"
+                                 :precision="0"
                                  @change="handleKValueCoffChange(scope.row, scope.$index)"
                                  style="width: 70%">
                 </el-input-number>
@@ -183,33 +175,6 @@
     data () {
       return {
         id: null,
-        userListOptions: [{
-          name: '组织',
-          options: [{
-            value: 'total',
-            name: '全处室',
-            id: '0',
-            disabled: false
-          }, {
-            value: 'techGroup',
-            name: '技术标准组',
-            id: '1',
-            disabled: false
-          }, {
-            value: 'engiGroup',
-            name: '工程组',
-            id: '2',
-            disabled: false
-          }, {
-            value: 'comGroup',
-            name: '通信组',
-            id: '3',
-            disabled: false
-          }]
-        }, {
-          name: '个人',
-          options: []
-        }],
         props: {
           multiple: true,
           value: 'projectTypeID',
@@ -218,7 +183,6 @@
         isInputCommentsWordExceed: false,
         projectTypeOptions: [],
         labelPosition: 'right',
-        optionsWorkType: [],
         partTableData: [{
           workTime: undefined
         }],
@@ -272,19 +236,6 @@
         workTime: 0,
         apdID: null,
         aplID: null,
-        projectLevels: [{
-          value: 1,
-          text: '普通任务'
-        }, {
-          value: 2,
-          text: '处室重点任务'
-        }, {
-          value: 3,
-          text: '部门重点任务'
-        }, {
-          value: 4,
-          text: '公司重点任务'
-        }],
         isRejectWorkTimeSubmit: false,
         projectName: null,
         progress: [{
@@ -388,13 +339,13 @@
                 dept: user.dept,
                 name: user.name,
                 groupName: user.groupName,
+                groupID: user.groupID,
                 disabled: false
               }
               objList.push(obj)
             }
           }
-          this.userListOptions[1].options = objList
-          this.usersList = this.userListOptions
+          this.usersList = objList
         })
         getProjectType(this.$store.state.userInfo.groupName).then(getProjectTypeRes => {
           this.projectTypeOptions = getProjectTypeRes
@@ -425,6 +376,7 @@
               let obj = {
                 id: item.userID,
                 groupName: this.$store.state.userInfo.groupName,
+                groupID: this.$store.state.userInfo.groupID,
                 name: this.$store.state.userInfo.name,
                 applyRole: item.assignRole,
                 assignWorkTime: item.workTime,
@@ -433,11 +385,12 @@
               defaultCurrentUserWorkTime.push(obj)
             }
             // 插入协作者信息
-            tmp = this.usersList[1].options.find((iItem) => {
+            tmp = this.usersList.find((iItem) => {
               if (iItem.id === item.userID) {
                 let obj = {
                   id: iItem.id,
                   groupName: iItem.groupName,
+                  groupID: this.$store.state.userInfo.groupID,
                   name: iItem.name,
                   applyRole: item.assignRole,
                   assignWorkTime: item.workTime,
@@ -501,7 +454,7 @@
             getIsSubmitAllow(applyYear, applyMonth).then(getIsSubmitAllowRes => {
               if (getIsSubmitAllowRes.length === 0 ||
                   this.isRejectWorkTimeSubmit ||
-                  this.$store.state.userInfo.id === 26) {
+                  this.$store.state.userInfo.id === 35) {
                 if (!this.isInputCommentsWordExceed) {
                   let count = 0
                   let promises = []
@@ -572,57 +525,6 @@
           }
         })
       },
-      // // 暂存工时申报
-      // onTemporaryWorkTime (formData) {
-      //   this.$refs[formData].validate(valid => {
-      //     if (valid) {
-      //       getIsSubmitAllow().then(getIsSubmitAllowRes => {
-      //         if (getIsSubmitAllowRes.length === 0 ||
-      //             this.isRejectWorkTimeSubmit ||
-      //             this.$store.state.userInfo.id === 26) {
-      //           if (!this.isInputCommentsWordExceed) {
-      //             let count = 0
-      //             let promises = []
-      //             let assignProjectDetail = {
-      //               apdID: this.formData.workTypeTimeDetail[0].apdID,
-      //               kValue: this.formData.workTypeTimeDetail[0].defaultKValue,
-      //               coefficient: this.formData.workTypeTimeDetail[0].defaultCofficient,
-      //               avaiableWorkTime: this.formData.workTypeTimeDetail[0].avaiableWorkTime,
-      //               projectStageName: this.formData.workTypeTimeDetail[0].workType,
-      //               applyBaseWorkTime: this.formData.workTypeTimeDetail[0].applyBaseWorkTime
-      //             }
-      //             promises[count++] = updateAssignProjectStageInfo(assignProjectDetail)
-      //             let tableDataCopy = []
-      //             let avaiableWorkTime = Number(this.formData.workTypeTimeDetail[0].avaiableWorkTime)
-      //             let applyProcess = this.formData.workTypeTimeDetail[0].applyProcess
-      //             if (avaiableWorkTime !== 0 && applyProcess !== 0) {
-      //               tableDataCopy.push(this.formData.workTypeTimeDetail[0])
-      //             }
-      //             if (tableDataCopy.length !== 0) {
-      //               promises[count++] = temporaryWorkTimeList(this.id, 'update', this.formData.title, this.formData.workTypeTimeDetail, null)
-      //             } else {
-      //               this.$common.toast('申报工时为0，请修改,', 'info', false)
-      //             }
-      //             Promise.all(promises).then(() => {
-      //               this.$common.toast('提交成功', 'success', false)
-      //               this.onCancel(formData)
-      //             }).catch(err => {
-      //               console.log(err)
-      //               this.$common.toast('提交失败', 'success', false)
-      //               this.onCancel(formData)
-      //             })
-      //           } else {
-      //             this.$common.toast('备注字数过多，请删减', 'error', true)
-      //           }
-      //         } else {
-      //           this.$common.toast(this.formData.title + '月已截止申报工时', 'error', true)
-      //         }
-      //       }).catch(err => {
-      //         this.$common.toast(err, 'error', true)
-      //       })
-      //     }
-      //   })
-      // },
       // 取消
       onCancel (formName) {
         this.$router.push({ path: '/home/Performance' })
@@ -674,11 +576,11 @@
       // 工时明细表K值和系数变化处理函数
       handleKValueCoffChange (row) {
         row.avaiableWorkTime = row.applyBaseWorkTime * row.defaultKValue * row.defaultCofficient * (row.applyProcess - row.lastProcess) * 0.01
-        row.avaiableWorkTime = Number(Number(row.avaiableWorkTime).toFixed(1))
+        row.avaiableWorkTime = Number(Number(row.avaiableWorkTime).toFixed(2))
         row.workTimeAssign[0].assignWorkTime = row.avaiableWorkTime
         row.defaultAssignWorkTime = row.defaultAssignWorkTimeIni * row.defaultKValue * row.defaultCofficient * row.applyProcess * 0.01
       },
-      // 新增一行
+      // **新增一行
       addNewLine () {
         let tableLength = this.formData.workTypeTimeDetail.length
         let obj = JSON.parse(JSON.stringify(this.formData.workTypeTimeDetail[tableLength - 1]))
@@ -686,13 +588,6 @@
         this.formData.workTypeTimeDetail.push(obj)
         obj = JSON.parse(JSON.stringify(this.formData.projectType[selectLength - 1]))
         this.formData.projectType.push(obj)
-        this.refreshSelectProjectType()
-      },
-      // 表格删除按钮
-      handleDelete (row, index) {
-        this.formData.workTypeTimeDetail.splice(index, 1)
-        this.formData.projectType.splice(index, 1)
-        this.showFlag.projectType = false
         this.refreshSelectProjectType()
       },
       // 备注输入名称监控

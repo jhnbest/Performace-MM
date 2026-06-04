@@ -16,11 +16,13 @@ import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
 import moment from 'moment'
 import md5 from 'js-md5'
+import VueCron from 'vue-cron'
 
 Vue.config.productionTip = false
 
 Vue.use(ElementUI)
 Vue.use(vueQuillEditor)
+Vue.use(VueCron)
 
 const bus = new Vue()
 window.bus = bus

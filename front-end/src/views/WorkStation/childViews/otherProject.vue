@@ -14,7 +14,7 @@
       </el-table-column>
       <el-table-column label="完成度" align="center" width="100">
         <template slot-scope="scope">
-          <el-progress :text-inside="true" :stroke-width="26" :percentage="scope.row.process"></el-progress>
+          <el-progress :text-inside="true" :stroke-width="35" :percentage="scope.row.process"></el-progress>
         </template>
       </el-table-column>
       <el-table-column label="总工时" align="center" prop="totalWorkTime"></el-table-column>

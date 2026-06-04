@@ -5,8 +5,8 @@ import common from '../assets/js/common.js'
 
 // axios.defaults.timeout = 180000
 axios.defaults.timeout = 15000
-axios.defaults.baseURL = '/demo-weekly/back-end/api' // 测试接口域名线下
-// axios.defaults.baseURL = '/api' // 测试接口域名线上
+axios.defaults.baseURL = '/api'
+
 export const baseURL = axios.defaults.baseURL
 
 // 配置请求拦截器
@@ -78,7 +78,7 @@ axios.interceptors.response.use(response => {
   return Promise.resolve(err.response)
 })
 
-export function http (url, params, responseType) {
+export function http (url, params, responseType, timeout) {
   return new Promise((resolve, reject) => {
     let userId = store.state.userInfo.id
     if (userId && userId > 0) {
@@ -86,9 +86,10 @@ export function http (url, params, responseType) {
     } else {
       params.userId = 0
     }
+    let requestTimeout = timeout || axios.defaults.timeout
     if (!responseType || typeof (responseType) == 'undefined') {
       // 普通post请求
-      axios.post(url, params)
+      axios.post(url, params, { timeout: requestTimeout })
       .then(response => {
         resolve(response.data)
       }, err => {
@@ -97,7 +98,8 @@ export function http (url, params, responseType) {
     } else {
       // 导出下载文件
       axios.post(url, params, {
-        responseType: responseType
+        responseType: responseType,
+        timeout: requestTimeout
       })
       .then(response => {
         resolve(response)

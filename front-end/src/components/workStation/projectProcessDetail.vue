@@ -231,8 +231,6 @@
           if (this.reqFlag.getTypeProjectList) {
             this.reqFlag.getTypeProjectList = false
             getMonthProcess(this.projectStage, this.yearNum).then(monthProcessRes => {
-              console.log('monthProcessRes')
-              console.log(monthProcessRes)
               this.genTableData(this.projectStage, monthProcessRes)
               this.reqFlag.getTypeProjectList = true
             })

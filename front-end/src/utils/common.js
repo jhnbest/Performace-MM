@@ -196,6 +196,53 @@ export function NorCal (usersNum, rank) {
     return 85
   }
 }
+// ***标准计算V2
+export function NorCalV2 (usersNum, rank) {
+  if (rank === 1) {
+    return 95
+  }
+  let A1Num = Math.round(usersNum * 0.1) // **A1档的人数
+  let A2Num = Math.round(usersNum * 0.09) // **A2档的人数
+  let BNum = Math.round(usersNum * 0.3) // **B档的人数
+  let C1Num = Math.round(usersNum * 0.31) // **C1档的人数
+  let C2Num = Math.round(usersNum * 0.2) // **C2档的人数
+
+  let A1FinalRank = A1Num // **A1档最后排名
+  let A2FinalRank = A1FinalRank + A2Num // **A2档最后排名
+  let BFinalRank = A2FinalRank + BNum // **B档最后排名
+  let C1FinalRank = BFinalRank + C1Num // **C1档最后排名
+  let C2FinalRank = C1FinalRank + C2Num // **C1档最后排名
+
+  if (rank < A1FinalRank || rank === A1FinalRank) {
+    return 95
+  } else if (rank < A2FinalRank || rank === A2FinalRank) {
+    return 92.5
+  } else if (rank < BFinalRank || rank === BFinalRank) {
+    return 90
+  } else if (rank < C1FinalRank || rank === C1FinalRank) {
+    return 87.5
+  } else if (rank < C2FinalRank || rank === C2FinalRank) {
+    return 85
+  } else {
+    return 0
+  }
+}
+
+// ***标准计算临时
+export function NorCalTmp (rank) {
+  switch (rank) {
+    case 1:
+      return 95
+    case 2:
+      return 92.5
+    case 3:
+      return 90
+    case 4:
+      return 87.5
+    default:
+      return 0
+  }
+}
 
 // 绩效得分标准化计算(2021年12月启用)
 export function PMScoreNorCal (usersNum, rank) {
@@ -253,7 +300,7 @@ export function getPerformanceIsPublish (applyYear, applyMonth) {
   })
 }
 
-// 根据时间获取某个类型数据的全局标志位
+// ***根据时间获取某个类型数据的全局标志位
 export function getTypeGlobalFlag (applyYear, applyMonth, flagType) {
   const url = urlGetTypeGlobalFlag
   let params = {
@@ -274,7 +321,7 @@ export function getTypeGlobalFlag (applyYear, applyMonth, flagType) {
   })
 }
 
-// 根据数据类型获取全局标志位
+// ***根据数据类型获取全局标志位
 export function getGlobalFlagByType (year, month, flagType) {
   const url = urlGetGlobalFlagByType
   let params = {
@@ -295,7 +342,7 @@ export function getGlobalFlagByType (year, month, flagType) {
   })
 }
 
-// 根据数据类型获取全局标志位
+// ***根据数据类型获取全局标志位
 export function getGlobalFlagByTime (year, month, flagType) {
   const url = urlGetGlobalFlagByTime
   let params = {
@@ -336,7 +383,25 @@ export function rateTypeSwitch (rateType) {
   }
 }
 
-// 星级转评分(新)
+// ***星级转评分
+export function starToRates (star) {
+  switch (star) {
+    case 5:
+      return 92.5
+    case 4:
+      return 90
+    case 3:
+      return 87.5
+    case 2:
+      return 85
+    case 1:
+      return 82.5
+    default:
+      return 87.5
+  }
+}
+
+// ***星级转评分(新)
 export function starToRatesNew (star) {
   switch (star) {
     case 5:
@@ -369,6 +434,24 @@ export function ratesToStar (rates) {
       return 1
     default:
       return 4
+  }
+}
+
+// ***评分转星级(旧版)
+export function ratesToStarOld (rates) {
+  switch (rates) {
+    case 92.5:
+      return 5
+    case 90:
+      return 4
+    case 87.5:
+      return 3
+    case 85:
+      return 2
+    case 82.5:
+      return 1
+    default:
+      return 3
   }
 }
 
@@ -589,6 +672,34 @@ export function sortObjectArrayByParams (array, param1, param2) {
   }
   for (let i = 0; i < arrayTmp.length; i++) {
     arrayTmp[i].sort(sortBy(param2))
+    for (let item of arrayTmp[i]) {
+      result.push(item)
+    }
+  }
+  return result
+}
+
+// 对象数组根据给定的参数从小到打排序
+export function sortObjectArrayByParamsSmall2Big (array, param1, param2) {
+  let preValue = -1
+  let arrayTmp = []
+  let result = []
+  let count = -1
+  array.sort(sortByAscend(param1))
+  for (let item of array) {
+    if (item[param1] === preValue) {
+      arrayTmp[count].push(item)
+    } else {
+      count++
+      if (!arrayTmp[count]) {
+        arrayTmp[count] = []
+      }
+      arrayTmp[count].push(item)
+      preValue = item[param1]
+    }
+  }
+  for (let i = 0; i < arrayTmp.length; i++) {
+    arrayTmp[i].sort(sortByAscend(param2))
     for (let item of arrayTmp[i]) {
       result.push(item)
     }

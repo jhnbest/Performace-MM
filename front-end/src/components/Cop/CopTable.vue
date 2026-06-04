@@ -9,7 +9,7 @@
       <el-table-column label="姓名" prop="name" align="center"></el-table-column>
       <el-table-column label="小组" prop="groupName" align="center" width="110">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.groupName | groupNameFilter">
+          <el-tag :type="scope.row.groupID | groupIDFilter">
             {{scope.row.groupName}}
           </el-tag>
         </template>
@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import { getWorkTimeAssign } from '@/utils/performance'
+import { getWorkAssign } from '@/utils/performance'
 export default {
   data () {
     return {
@@ -43,7 +43,7 @@ export default {
     // 初始化
     init (row) {
       this.tableData = []
-      getWorkTimeAssign(row.id, 'applyer').then(response => {
+      getWorkAssign(row.id, 'applyer').then(response => {
         this.tableData = response[0]
         for (let item of this.tableData) { // 插入审核状态
           item.reviewStatus = response[1][0].reviewStatus
@@ -55,16 +55,20 @@ export default {
     }
   },
   filters: {
-    groupNameFilter (groupName) {
-      switch (groupName) {
-        case '技术标准组':
+    groupIDFilter (groupID) {
+      switch (groupID) {
+        case 0:
           return 'success'
-        case '工程组':
+        case 2:
+          return 'success'
+        case 3:
           return 'warning'
-        case '通信组':
+        case 4:
+          return 'danger'
+        case 5:
           return 'primary'
         default:
-          return 'danger'
+          return 'info'
       }
     },
     reviewStatusTextFilter (status) {

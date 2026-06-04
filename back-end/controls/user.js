@@ -8,67 +8,69 @@ const app = express()
 const $common = require('../utils/common')
 app.set('jwtTokenSecret', 'YOUR_SECRET_STRING')
 
-function formatData(rows) {
-  return rows.map(row => {
-    if(row.create_time) {
-      row.create_time = $time.formatTime(row.create_time)
-    }
-    if(row.update_time) {
-      row.update_time = $time.formatTime(row.update_time)
-    }
-    let type = row.type
-    if(type){
-      switch(type) {
-        case 1:
-          row.role = '管理员'
-          break
-        case 2:
-          row.role = '普通用户'
-          break
-      }
-    }
-    let role = row.role
-    if (role) {
-      switch (role) {
-        case 1:
-          row.role = '管理员'
-          break
-        case 2:
-          row.role = '组长'
-          break
-        case 3:
-          row.role = '普通成员'
-          break
-      }
-    }
-    let dept = row.dept
-    if (dept) {
-      switch (dept) {
-        case 1:
-          row.dept = '通信工程处'
-      }
-    }
-    row.groupID = row.groupName
-    let groupName = row.groupName
-    if (groupName) {
-      switch (groupName) {
-        case 1:
-          row.groupName = '技术标准组'
-          break
-        case 2:
-          row.groupName = '工程组'
-          break
-        case 3:
-          row.groupName = '通信组'
-          break
-        case 4:
-          row.groupName = '处经理'
-          break
-      }
-    }
-    return Object.assign({}, row)
-  })
-}
+// function formatData(rows) {
+//   return rows.map(row => {
+//     if(row.create_time) {
+//       row.create_time = $time.formatTime(row.create_time)
+//     }
+//     if(row.update_time) {
+//       row.update_time = $time.formatTime(row.update_time)
+//     }
+//     let type = row.type
+//     if(type){
+//       switch(type) {
+//         case 1:
+//           row.role = '管理员'
+//           break
+//         case 2:
+//           row.role = '普通用户'
+//           break
+//       }
+//     }
+//     let role = row.role
+//     if (role) {
+//       switch (role) {
+//         case 1:
+//           row.role = '管理员'
+//           break
+//         case 2:
+//           row.role = '组长'
+//           break
+//         case 3:
+//           row.role = '普通成员'
+//           break
+//       }
+//     }
+//     let dept = row.dept
+//     if (dept) {
+//       switch (dept) {
+//         case 1:
+//           row.dept = '通信工程处'
+//       }
+//     }
+//     row.groupID = row.groupName
+//     if (row.groupName) {
+//       switch (row.groupName) {
+//         case 1:
+//           row.groupName = '管理组'
+//           break
+//         case 2:
+//           row.groupName = '多媒体应用组'
+//           break
+//         case 3:
+//           row.groupName = '数字物联组'
+//           break
+//         case 4:
+//           row.groupName = '综合业务组'
+//           break
+//         case 5:
+//           row.groupName = '通信组'
+//           break
+//       }
+//     }
+//     return Object.assign({}, row)
+//   })
+// }
 
 const user = {
   /* 用户登录 start */
@@ -84,7 +86,7 @@ const user = {
       } else {
         let resultData = {}
         resultData.code = 1
-        let data = formatData(result)
+        let data = $common.formatData(result)
         //data.create_time = $time.formatTime(data.create_time)
         //if(data.type > 1) data.role = '普通用户'
         //data.role = '管理员'
@@ -101,7 +103,7 @@ const user = {
         return $http.writeJson(res, resultData)
       }
     }).catch(err => {
-      return $http.writeJson(res, {code:-2, message:'失败',errMsg: err})
+      return $http.writeJson(res, {code:-2, message:'登录失败',errMsg: err})
     })
   },
   /* 用户登录 end */
@@ -245,7 +247,7 @@ const user = {
           }else{
             let resultData = {}
             resultData.totalCount = result[0][0]['totalCount']
-            resultData.list = formatData(result[1])
+            resultData.list = $common.formatData(result[1])
             return $http.writeJson(res, {code: 1, data: resultData, message: '获取用户列表成功'})
           }
         })
@@ -291,25 +293,25 @@ const user = {
           }else{
             let resultData = {}
             resultData.totalCount = result[0][0]['totalCount']
-            resultData.list = formatData(result[1])
+            resultData.list = $common.formatData(result[1])
             return $http.writeJson(res, {code: 1, data: resultData, message: '获取用户列表成功'})
           }
         })
       }
     })
   },
-  /* 获取用户信息 */
+  // **获取用户列表
   getUsersList (req, res) {
     let sendData = req.body
-    let sql = sendData.checkGroupID === 0 ? $sql.user.selectUsersList1 : $sql.user.selectUsersList2
-    let arrayParams = sendData.checkGroupID === 0 ? [] : [sendData.checkGroupID]
+    let sql = sendData.groupID === 0 ? $sql.user.selectUsersList1 : $sql.user.selectUsersList2
+    let arrayParams = sendData.groupID === 0 ? [] : [sendData.groupID]
     $http.userVerify(req, res, () => {
       $http.connPool(sql, arrayParams, (err, result) => {
         if(err) {
           return $http.writeJson(res, {code:-2, message:'失败'})
         } else {
           let resultData = {}
-          resultData.list = formatData(result)
+          resultData.list = $common.formatData(result)
           return $http.writeJson(res, {code: 1, data: resultData, message: '获取用户信息成功'})
         }
       })
@@ -328,7 +330,7 @@ const user = {
         if (err) {
           return $http.writeJson(res, {code: -2, message: '失败'})
         } else {
-          result = formatData(result)
+          result = $common.formatData(result)
           return $http.writeJson(res, {code: 1, data: result, message: '获取组员信息成功'})
         }
       })
@@ -343,7 +345,7 @@ const user = {
       if (err) {
         return $http.writeJson(res, {code: -2, message: '失败'})
       } else {
-        result = formatData(result)
+        result = $common.formatData(result)
         if (result[0].password === data.oldPassword) {
           return $http.writeJson(res, {code: 1, message: '旧密码正确'})
         } else {
@@ -365,21 +367,6 @@ const user = {
       }
     })
   },
-  /* 通过ID获取用户姓名 */
-  getUserNameByID(id) {
-    return new Promise(function (resolve, reject) {
-      let sql = $sql.user.getUserNameByID
-      let arrayParams = [id]
-      $http.connPool(sql, arrayParams, (err, result) => {
-        if (err) {
-          return -1
-        } else {
-          result = JSON.parse(JSON.stringify(result))
-          resolve(result[0].name)
-        }
-      })
-    })
-  }
 }
 
 module.exports = user

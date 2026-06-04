@@ -40,7 +40,6 @@
             trigger="click"
             @show="handleClickCheckSubmitWorkTime(scope.row)">
               <CopTableVue v-if="!scope.row.editable" ref="refCopTableVue"></CopTableVue>
-              <CopTableEdit v-else ref="refCopTableEdit"></CopTableEdit>
               <span slot="reference" class="link-type">查看</span>
           </el-popover>
         </template>
@@ -81,7 +80,6 @@
 
 <script>
 import CopTableVue from '../Cop/CopTable.vue'
-import CopTableEdit from '../Cop/CopTableEdit.vue'
 import { deleteWorkTimeSubmit } from '@/utils/performance'
 export default {
   data () {
@@ -134,8 +132,7 @@ export default {
     }
   },
   components: {
-    CopTableVue,
-    CopTableEdit
+    CopTableVue
   },
   created () {
   },
@@ -150,11 +147,7 @@ export default {
     },
     // 查看工时分配
     handleClickCheckSubmitWorkTime (row) {
-      if (!row.editable) {
-        this.$refs.refCopTableVue.init(row)
-      } else {
-        this.$refs.refCopTableEdit.init(row)
-      }
+      this.$refs.refCopTableVue.init(row)
     },
     // 删除工时申报
     handleDeleteWorkTimeSubmit (row) {
@@ -167,14 +160,6 @@ export default {
         this.$common.toast('删除失败', 'error', false)
       })
     },
-    // 编辑按钮
-    handleEdit (row) {
-      row.editable = true
-      this.tableShowFlag = false
-      this.$nextTick(() => {
-        this.tableShowFlag = true
-      })
-    },
     // 月度进展下拉框下拉时触发
     handleSelectVisibleChange ($event, preMonthProcess) {
       if ($event) {
@@ -185,9 +170,6 @@ export default {
           }
         }
       }
-    },
-    // 保存并提交
-    handleComplete (row) {
     }
   }
 }

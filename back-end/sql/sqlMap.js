@@ -3,7 +3,33 @@ const sqlMap = {
     getTypeGlobalFlag: 'select * from globalflag where year(setTime) = ? and month(setTime) = ? and flagType = ?',
     getGlobalFlagByType: 'select * from globalflag where flagType in (?)',
     updateGlobalFlagVal: 'update globalflag set flagValue = ? where flagType = ?',
-    getGlobalFlagByTime: 'select * from globalflag where flagType in (?) and year(setTime) = ? and month(setTime) = ?'
+    getGlobalFlagByTime: 'select * from globalflag where flagType in (?) and year(setTime) = ? and month(setTime) = ?',
+    insertGlobalFlag: 'insert into globalflag (setTime, flagType, flagValue) values (?, ?, ?)',
+    // 定时任务配置相关SQL，使用新表cron_job_config
+    getCronJobConfig: 'select * from cron_job_config where job_type = ?',
+    insertCronJobConfig: 'insert into cron_job_config (job_type, job_name, cron_expr, job_description, created_at, updated_at) values (?, ?, ?, ?, ?, ?)',
+    updateCronJobConfig: 'update cron_job_config set cron_expr = ?, job_description = ?, updated_at = ? where job_type = ?',
+    updateJobName: 'update cron_job_config set job_name = ?, updated_at = ? where job_type = ?',
+    updateCronJobEnabled: 'update cron_job_config set is_enabled = ?, updated_at = ? where job_type = ?'
+  },
+  globalFlag: {
+    add: 'insert into globalflag (flagType, flagValue, createTime, updateTime) values (?, ?, ?, ?)'
+  },
+  cronJobExecutionLog: {
+    insert: `INSERT INTO cron_job_execution_log 
+            (job_type, job_name, execution_time, execution_status, execution_duration, execution_result, error_message) 
+            VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    selectList: `SELECT * FROM cron_job_execution_log WHERE 1=1`,
+    selectById: `SELECT * FROM cron_job_execution_log WHERE id = ?`,
+    selectStatistics: `SELECT 
+        job_type,
+        COUNT(*) as total_count,
+        SUM(CASE WHEN execution_status = 1 THEN 1 ELSE 0 END) as success_count,
+        SUM(CASE WHEN execution_status = 2 THEN 1 ELSE 0 END) as failed_count,
+        AVG(execution_duration) as avg_duration
+    FROM cron_job_execution_log 
+    WHERE execution_time BETWEEN ? AND ?
+    GROUP BY job_type`
   },
   user: {
     // 登陆
@@ -34,13 +60,11 @@ const sqlMap = {
     // 用户旧密码认证
     oldPasswordAuth: 'select password from users where account = ?',
     // 更新密码
-    updateNewPassword: 'update users set password = ? where account = ?',
-    // 查询用户姓名
-    getUserNameByID: 'select name from users where id = ? and status != 0'
+    updateNewPassword: 'update users set password = ? where account = ?'
   },
   performance: {
     //新增工时申报
-    selectProjectTypeFirst: 'select projectTypeID, projectName from projecttypenew where projectParentID = ? or projectParentID = 0',
+    selectProjectTypeFirst: 'select projectTypeID, projectName from projecttypenew where projectParentID = 0 and obsoleteStatus != 1',
     selectProjectType: 'select projectTypeID, projectName from projecttypenew where projectParentID = ? and obsoleteStatus != 1',
     selectProjectTime: 'select projectTypeID, projectName, workTime, dynamicKValue, isConference, defaultAssignWorkTime ' +
         'from projecttypenew where projectTypeID = ?',
@@ -111,10 +135,22 @@ const sqlMap = {
     + 'CSQTEvaScoreNor, CSQTEvaRank, MGQTEvaScoreUnN, MGQTEvaRank, MGQTEvaScoreNor, AMEvaScoreUnN, AMEvaScoreNor, AMEvaRank, '
     + 'PMScoreUnN, PMScoreNor, PMRank, dimension1CSAveStar, dimension1GPEvaStar, dimension2CSAveStar, dimension2GPEvaStar, userDuty, userJob) '
     + 'values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    savePMDataV3: 'insert into performancedata (userID, applyDate, totalWorkTime, QYEvaRank, QYEvaScoreNor, CSQTEvaScoreUnN, '
+    + 'CSQTEvaScoreNor, CSQTEvaRank, MGQTEvaScoreUnN, MGQTEvaRank, MGQTEvaScoreNor, AMEvaScoreUnN, AMEvaScoreNor, AMEvaRank, '
+    + 'PMScoreUnN, PMScoreNor, PMRank, dimension1CSAveStar, dimension1GPEvaStar, dimension2CSAveStar, dimension2GPEvaStar, userDuty, '
+    +' userJob, teamWorkScore, PBScore) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
     updatePMData: 'update performancedata set totalWorkTime = ?, QYEvaRank = ?, QYEvaScoreNor = ?, CSQTEvaScoreUnN = ?, '
     + 'CSQTEvaScoreNor = ?, CSQTEvaRank = ?, MGQTEvaScoreUnN = ?, MGQTEvaRank = ?, MGQTEvaScoreNor = ?, AMEvaScoreUnN = ?, '
     + 'AMEvaScoreNor = ?, AMEvaRank = ?, PMScoreUnN = ?, PMScoreNor = ?, PMRank = ?, dimension1CSAveStar = ?, '
     + 'dimension1GPEvaStar = ?, dimension2CSAveStar = ?, dimension2GPEvaStar = ? where id = ?',
+    updatePMDataV2: 'update performancedata set totalWorkTime = ?, QYEvaRank = ?, QYEvaScoreNor = ?, CSQTEvaScoreUnN = ?, '
+    + 'CSQTEvaScoreNor = ?, CSQTEvaRank = ?, MGQTEvaScoreUnN = ?, MGQTEvaRank = ?, MGQTEvaScoreNor = ?, AMEvaScoreUnN = ?, '
+    + 'AMEvaScoreNor = ?, AMEvaRank = ?, PMScoreUnN = ?, PMScoreNor = ?, PMRank = ?, dimension1CSAveStar = ?, '
+    + 'dimension1GPEvaStar = ?, dimension2CSAveStar = ?, dimension2GPEvaStar = ?, teamWorkScore = ? where id = ?',
+    updatePMDataV3: 'update performancedata set totalWorkTime = ?, QYEvaRank = ?, QYEvaScoreNor = ?, CSQTEvaScoreUnN = ?, '
+    + 'CSQTEvaScoreNor = ?, CSQTEvaRank = ?, MGQTEvaScoreUnN = ?, MGQTEvaRank = ?, MGQTEvaScoreNor = ?, AMEvaScoreUnN = ?, '
+    + 'AMEvaScoreNor = ?, AMEvaRank = ?, PMScoreUnN = ?, PMScoreNor = ?, PMRank = ?, dimension1CSAveStar = ?, '
+    + 'dimension1GPEvaStar = ?, dimension2CSAveStar = ?, dimension2GPEvaStar = ?, teamWorkScore = ?, PBScore = ? where id = ?',
     getPMData: 'select pm.*, u.name, u.groupName as groupID from performancedata pm left join users u on pm.userID = u.id where pm.applyDate = ?',
     getWorkTimeAssign: 'select u.name, wa.* from worktimeassign wa left join users u on '
     + 'wa.userID = u.id where wa.projectID in (?) and wa.obsoleteStatus != 1',
@@ -127,7 +163,27 @@ const sqlMap = {
     + 'workTimeAssignReviewStatus, reviewer, avaiableWorkTime, applyProcess, lastProcess, applyType, applyBaseWorkTime, '
     + 'obsoleteStatus) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
     insertmianshenheWorktimeassign: 'insert into worktimeassign (userID, projectID, workTime, reviewWorkTime, assignRole) values (?, ?, ?, ?, ?)',
-    getWorkTimeListByType: 'select * from worktimelist where submitID = ? and applyMonth = ? and projectTypeID = ?'
+    getWorkTimeListByType: 'select * from worktimelist where submitID = ? and applyMonth = ? and projectTypeID = ?',
+    getWorkHourStatistics: 'SELECT wl.applyMonth as month, u.id as userId, u.name as userName, ' +
+        'u.groupName as groupName, SUM(wa.reviewWorkTime) as totalWorkTime, ' +
+        'pjn.projectName as childTypeName, ' +
+        'COALESCE(pjn_parent.projectName, pjn.projectName) as parentTypeName, ' +
+        'pjn.projectTypeID as projectTypeID, ' +
+        'GROUP_CONCAT(DISTINCT CASE WHEN apl.projectName IS NOT NULL AND apl.projectName != \'\' ' +
+        'THEN CONCAT(wl.applyMonth, ": ", apl.projectName) END ORDER BY wl.applyMonth SEPARATOR \'；\') as projectNames ' +
+        'FROM worktimeassign wa ' +
+        'LEFT JOIN worktimelist wl ON wa.projectID = wl.id ' +
+        'LEFT JOIN users u ON wa.userID = u.id ' +
+        'LEFT JOIN projecttypenew pjn ON wl.projectTypeID = pjn.projectTypeID ' +
+        'LEFT JOIN projecttypenew pjn_parent ON pjn.projectParentID = pjn_parent.projectTypeID AND pjn_parent.projectParentID = 0 ' +
+        'LEFT JOIN assignprojectlist apl ON wl.aplID = apl.id ' +
+        'WHERE wl.applyMonth BETWEEN ? AND ? ' +
+        'AND wl.reviewStatus = 1 ' +
+        'AND wa.obsoleteStatus != 1 ' +
+        'AND u.status != 0 ' +
+        'AND u.groupName IN (2, 3, 4, 5) ' +
+        'GROUP BY wl.applyMonth, userId, userName, groupName, pjn.projectTypeID ' +
+        'ORDER BY wl.applyMonth, groupName, userName'
   },
   workStation: {
     getAssignProjectListUn: 'select apl.*, users.name as assigner from assignprojectlist apl left join users on apl.assignerID = users.id where ' +
@@ -162,6 +218,10 @@ const sqlMap = {
         'October, November, December) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
     getAssignProjectStageByID: 'select January, February, March, April, May, June, July, August, September, October, November, December from monthprocess where ' +
         'aPDID = ? and type = "fact" and obsoleteStatus != 1',
+    // 获取项目在某年某月之前的所有申报进展记录（用于处理中间月份未申报的情况）
+    getAllProcessBeforeMonth: 'select year, January, February, March, April, May, June, July, August, September, October, November, December ' +
+        'from monthprocess where aPDID = ? and year <= ? and obsoleteStatus != 1 and type = "fact" ' +
+        'order by year desc',
     projectStageProcessInsert: 'update assignprojectdetail set process = ? where id = ?;select aPLID from assignprojectdetail where id = ?',
     getProjectStageProcess: 'select count(*) as totalCount from assignprojectdetail where aPLID = ? and obsoleteStatus != 1;' +
         'select process from assignprojectdetail where aPLID = ? and obsoleteStatus != 1',
@@ -180,7 +240,7 @@ const sqlMap = {
     getAssignedProject: 'select apl.id, apl.assignDate, apl.projectName, apl.projectType as projectTypeID, ' +
         'apl.userID as projectManagerID, apl.process, apl.projectLevel, pjn.projectName ' +
         'as projectType, users.name as projectManager from assignprojectlist apl left join projecttypenew pjn on ' +
-        'apl.projectType = pjn.projectTypeID left join users on apl.userID = users.id where apl.assignerID = ? and' +
+        'apl.projectType = pjn.projectTypeID left join users on apl.userID = users.id where apl.assignerID = ? and ' +
         'apl.obsoleteStatus != 1',
     updateAssignProjectList: 'update assignprojectlist set userID = ?, projectName = ?, projectLevel = ? where id = ?',
     updateAssignProjectInfo: 'update assignprojectlist set userID = ?, projectType = ?, projectName = ?,' +
@@ -215,7 +275,7 @@ const sqlMap = {
     getIsSubmitAllow: 'select * from globalflag where year(setTime) = ? and month(setTime) = ? and flagType = ?',
     getCurGroupWorkTimeReviewFinish: 'select wl.* from worktimelist wl left join users u on wl.submitID = u.id where u.groupName = ? ' +
         'and wl.applyMonth = ? and wl.obsoleteStatus != 1 and wl.reviewStatus = 0 and wl.applyType = "fact" and wl.submitStatus = 1',
-    getManagerMultualRateFinish: 'select * from mutualrate where ratePersion = 26 and rateMonth = ?',
+    getManagerMultualRateFinish: 'select * from mutualrate where ratePersion = 35 and rateMonth = ?',
     getPerformanceIsPublish: 'select * from globalflag where year(setTime) = ? and month(setTime) = ? and flagType = ?',
     updatePerformanceInfoPublish: 'update globalflag set flagValue = ? where id = ?',
     insertPerformanceInfoPublish: 'insert into globalflag (setTime, flagType, flagValue) values (?, ?, ?)',
@@ -311,11 +371,13 @@ const sqlMap = {
     getCurMonthConclusionOverviewDataNewV2: 'select nc.*, u.name from newconclusion nc left join users u on' +
     ' nc.userID = u.id where nc.conclusionYear = ? and nc.conclusionMonth = ? and nc.userID in (?) and nc.dimension != 3',
     getPreMonthConclusionOverviewDataNewV2: 'select nc.*, u.name from newconclusion nc left join users u on' +
+    ' nc.userID = u.id where nc.conclusionYear = ? and nc.conclusionMonth = ? and nc.userID in (?) and nc.dimension = 3',
+    getCurMonthConclusionOverviewDataNewV3: 'select nc.*, u.name from newconclusion nc left join users u on' +
     ' nc.userID = u.id where nc.conclusionYear = ? and nc.conclusionMonth = ? and nc.userID in (?) and nc.dimension = 3'
   },
   achievementsEva: {
     getUserofAchievementToAnotherUser: 'select nce.*, u.name, nc.userID as evaedUserID from newconclusionevadata nce left join users u on' +
-                        ' nce.evaUserID = u.id left join newconclusion nc on nce.dimensionID = nc.id where nce.dimensionID in (?) and evaUserID = ?',
+                    ' nce.evaUserID = u.id left join newconclusion nc on nce.dimensionID = nc.id where nce.dimensionID in (?) and evaUserID = ?',
     submitAMEvaData: 'insert into newconclusionevadata (evaUserID, dimensionID, evaStar, submitTime, updateTime)' +
                     ' values (?, ?, ?, ?, ?)',
     updateAMEvaData: 'update newconclusionevadata set evaStar = ?, updateTime = ? where id = ?',
@@ -331,6 +393,33 @@ const sqlMap = {
                      ' evaUserGroupID, nc.dimension, nc.userID as evaedUserID from newconclusionevadata nce left' +
                      ' join users u on nce.evaUserID = u.id left join' +
                      ' newconclusion nc on nce.dimensionID = nc.id where nce.dimensionID in (?)'
+  },
+  failedAMEvaData: {
+    add: 'insert into failedAMEvaData (evaUserID, evaUserName, evaedUserID, evaedUserName, dimensionID, dimension, dimensionName, evaStar, conclusionYear, conclusionMonth, errorCode, errorMessage) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) on duplicate key update evaUserName = values(evaUserName), evaedUserID = values(evaedUserID), evaedUserName = values(evaedUserName), dimensionName = values(dimensionName), evaStar = values(evaStar), errorCode = values(errorCode), errorMessage = values(errorMessage)',
+    getByEvaUserID: 'select * from failedAMEvaData where evaUserID = ? and conclusionYear = ? and conclusionMonth = ? and obsoleteStatus = 0 and retryStatus = 0',
+    getAll: 'select * from failedAMEvaData where obsoleteStatus = 0 order by createTime desc',
+    updateRetrySuccess: 'update failedAMEvaData set retryStatus = 1, retryTime = NOW() where evaUserID = ? and dimensionID = ?',
+    delete: 'update failedAMEvaData set obsoleteStatus = 1 where id = ?',
+    deleteByEvaUserID: 'update failedAMEvaData set obsoleteStatus = 1 where evaUserID = ? and conclusionYear = ? and conclusionMonth = ?'
+  },
+  performanceBonus: {
+    getPMBDataByUserID: 'select pb.*, pbr.PBType, pbr.PBRule, pbr.PBScore from pmbdata pb ' +
+                        'left join pmbrules pbr on pb.PBRuleID = pbr.id where pb.userID = ? and pb.obsoleteStatus != 1',
+    getPMBData: 'select pb.*, pbr.PBType, pbr.PBRule, pbr.PBScore from pmbdata pb ' +
+                'left join pmbrules pbr on pb.PBRuleID = pbr.id where pb.applyYear in (?) and ' +
+                'pb.applyMonth in (?) and pb.obsoleteStatus != 1',
+    getPMBAssignDataByPBID: 'select pba.*, u.name from pmbassign pba left join users u '+
+                            'on pba.userID = u.id where pba.PBDataID in (?) and pba.obsoleteStatus != 1',
+    getPMBRules: 'select * from pmbrules pbr where parentID = ? and obsoleteStatus != 1',
+    getPMBRulesByID: 'select * from pmbrules where id in (?) and obsoleteStatus != 1',
+    submitPBData: 'insert into pmbdata (PBName, userID, submitTime, updateTime, applyYear, applyMonth, PBRuleID, kValue, submitStatus, ' +
+                  'reviewStatus, PBComments, obsoleteStatus) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    submitPBAssignData: 'insert into pmbassign (PBDataID, userID, role, assignScore, obsoleteStatus) values (?, ?, ?, ?, ?)',
+    updatePBData: 'update pmbdata set PBName = ?, userID = ?, updateTime = ?, applyYear = ?, applyMonth = ?, ' +
+                  'PBRuleID = ?, kValue = ?, submitStatus = ?, reviewStatus = ?, PBComments = ?, obsoleteStatus = ? where id = ?',
+    updatePBAssignData: 'update pmbassign set PBDataID = ?, userID = ?, role = ?, assignScore = ?, obsoleteStatus = ? ' +
+                        'where id = ?',
+    deletePBAssignData: 'update pmbassign set obsoleteStatus = ? where id = ?'
   }
 }
 module.exports = sqlMap;

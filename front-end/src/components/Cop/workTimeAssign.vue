@@ -17,7 +17,8 @@
                            :disabled="formData.isConference === 1"
                            size="mini"
                            :min="0.0"
-                           :precision="1">
+                           :step="0.5"
+                           :precision="2">
           </el-input-number>
         </el-form-item>
         <el-form-item v-if="formData.multiParticipant"
@@ -33,7 +34,7 @@
                      collapse-tags
                      @change="handlePartChange" style="width: 90%">
             <el-option-group
-              v-for="group in formData.usersList"
+              v-for="group in formData.userListOptions"
               :key="group.id"
               :label="group.name"
               :value="group.id">
@@ -62,7 +63,7 @@
           <el-table-column type="index" label="序号" align="center"></el-table-column>
           <el-table-column label="小组" prop="groupName" align="center">
             <template slot-scope="scope">
-              <el-tag :type="scope.row.groupName | groupNameFilter">
+              <el-tag :type="scope.row.groupID | groupIDFilter">
                 {{scope.row.groupName}}
               </el-tag>
             </template>
@@ -78,7 +79,7 @@
                 <el-input-number size="mini"
                                  v-model="scope.row.assignWorkTime"
                                  :step="0.5"
-                                 :precision="1"
+                                 :precision="2"
                                  @change="handleAssignWorkTimeChange(scope.row)">
                 </el-input-number>
               </el-form-item>
@@ -104,46 +105,22 @@
 
 <script>
 import { getUsersList } from '@/utils/users'
+import store from '@/store'
+import jsCookie from 'js-cookie'
 export default {
   data () {
     return {
+      usersList: [],
       formData: {
         copInfoTable: [],
         workTime: 0.0,
-        usersList: [],
         showFlag: false,
         reqFlag: {
           edit: true,
           usersName: true
         },
         multiParticipant: false,
-        userListOptions: [{
-          name: '组织',
-          options: [{
-            value: 'total',
-            name: '全处室',
-            id: '0',
-            disabled: false
-          }, {
-            value: 'techGroup',
-            name: '技术标准组',
-            id: '1',
-            disabled: false
-          }, {
-            value: 'engiGroup',
-            name: '工程组',
-            id: '2',
-            disabled: false
-          }, {
-            value: 'comGroup',
-            name: '通信组',
-            id: '3',
-            disabled: false
-          }]
-        }, {
-          name: '个人',
-          options: []
-        }],
+        userListOptions: store.state.organization,
         participant: [],
         selectIndex: null,
         isConference: false,
@@ -177,17 +154,22 @@ export default {
     // 初始化
     init (params) {
       this.$nextTick(() => {
-        getUsersList(0).then(users => {
+        let groupID = 0
+        getUsersList(groupID).then(users => {
           let findIndex = users.findIndex(user => {
-            return user.account === '03515' // 去除经理
+            return user.account === '03515' // ***去除处经理
           })
-          users.splice(findIndex, 1)
+          if (findIndex !== -1) {
+            users.splice(findIndex, 1)
+          }
           findIndex = users.findIndex(user => {
             return user.account === this.$store.state.userInfo.account // 去除自己
           })
-          users.splice(findIndex, 1)
+          if (findIndex !== -1) {
+            users.splice(findIndex, 1)
+          }
           this.formData.userListOptions[1].options = users
-          this.formData.usersList = this.formData.userListOptions
+          this.usersList = JSON.parse(JSON.stringify(users))
         })
         this.formData.isConference = params.rowCop.isConference
         this.formData.defaultAssignWorkTime = params.rowCop.defaultAssignWorkTime
@@ -249,106 +231,60 @@ export default {
           tableUsers.push(item.id)
         }
       }
-      /* 是否选了全处室 */
-      if (this.formData.participant.indexOf('0') !== -1) {
-        for (let user of this.formData.usersList[1].options) {
-          selectUsers.push(user.id)
-        }
-      } else if (this.formData.participant.indexOf('1') !== -1) { // 是否选了技术标准组
-        for (let user of this.formData.usersList[1].options) {
-          if (user.groupName === '技术标准组') {
-            selectUsers.push(user.id)
-          }
-        }
-        if (this.formData.participant.indexOf('2') !== -1) { // 是否同时选了工程组
-          for (let user of this.formData.usersList[1].options) {
-            if (user.groupName === '工程组') {
-              selectUsers.push(user.id)
-            }
-          }
-        }
-        if (this.formData.participant.indexOf('3') !== -1) { // 是否同时选了通信组
-          for (let user of this.formData.usersList[1].options) {
-            if (user.groupName === '通信组') {
-              selectUsers.push(user.id)
-            }
-          }
-        }
-        if (this.formData.participant.length > 1) {
-          for (let item of this.formData.participant) {
-            if (selectUsers.indexOf(item) === -1 && item !== '1' && item !== '2' && item !== '3' && item !== '0') {
-              selectUsers.push(item)
-            }
-          }
-        }
-      } else if (this.formData.participant.indexOf('2') !== -1) { // 是否选了工程组
-        for (let user of this.formData.usersList[1].options) {
-          if (user.groupName === '工程组') {
-            selectUsers.push(user.id)
-          }
-        }
-        if (this.formData.participant.indexOf('1') !== -1) { // 是否同时选了技术标准组
-          for (let user of this.formData.usersList[1].options) {
-            if (user.groupName === '技术标准组') {
-              selectUsers.push(user.id)
-            }
-          }
-        }
-        if (this.formData.participant.indexOf('3') !== -1) { // 是否同时选了通信组
-          for (let user of this.formData.usersList[1].options) {
-            if (user.groupName === '通信组') {
-              selectUsers.push(user.id)
-            }
-          }
-        }
-        if (this.formData.participant.length > 1) {
-          for (let item of this.formData.participant) {
-            if (selectUsers.indexOf(item) === -1 && item !== '2') {
-              selectUsers.push(item)
-            }
-          }
-        }
-      } else if (this.formData.participant.indexOf('3') !== -1) { // 是否选了通信组
-        for (let user of this.formData.usersList[1].options) {
-          if (user.groupName === '通信组') {
-            selectUsers.push(user.id)
-          }
-        }
-        if (this.formData.participant.indexOf('1') !== -1) { // 是否同时选了技术标准组
-          for (let user of this.formData.usersList[1].options) {
-            if (user.groupName === '技术标准组') {
-              selectUsers.push(user.id)
-            }
-          }
-        }
-        if (this.formData.participant.indexOf('2') !== -1) { // 是否同时选了工程组
-          for (let user of this.formData.usersList[1].options) {
-            if (user.groupName === '工程组') {
-              selectUsers.push(user.id)
-            }
-          }
-        }
-        if (this.formData.participant.length > 1) {
-          for (let item of this.formData.participant) {
-            if (selectUsers.indexOf(item) === -1 && item !== '3') {
-              selectUsers.push(item)
-            }
-          }
-        }
-      } else {
-        selectUsers = this.formData.participant
+
+      selectUsers = JSON.parse(JSON.stringify(this.formData.participant))
+      let usersList = JSON.parse(JSON.stringify(this.usersList))
+      let allUsers = []
+      let allUsersIndex = selectUsers.indexOf('0')
+      if (allUsersIndex !== -1) { // **选择了全处室，全人员数组赋值
+        allUsers = JSON.parse(JSON.stringify(usersList))
+        selectUsers.splice(allUsersIndex, 1)
       }
+      let MediaUsers = []
+      let MediaUsersIndex = selectUsers.indexOf('2')
+      if (MediaUsersIndex !== -1) { // **选择了多媒体应用组，多媒体应用组人员数组赋值
+        MediaUsers = JSON.parse(JSON.stringify(usersList.filter(item => { return item.groupID === 2 })))
+        selectUsers.splice(MediaUsersIndex, 1)
+      }
+      let DigitalUsers = []
+      let DigitalUsersIndex = selectUsers.indexOf('3')
+      if (DigitalUsersIndex !== -1) { // **选择了数字物联组，数字物联组人员数组赋值
+        DigitalUsers = JSON.parse(JSON.stringify(usersList.filter(item => { return item.groupID === 3 })))
+        selectUsers.splice(DigitalUsersIndex, 1)
+      }
+      let ZongheUsers = []
+      let ZongheUsersIndex = selectUsers.indexOf('4')
+      if (ZongheUsersIndex !== -1) { // **选择了综合业务组，综合业务组人员数组赋值
+        ZongheUsers = JSON.parse(JSON.stringify(usersList.filter(item => { return item.groupID === 4 })))
+        selectUsers.splice(ZongheUsersIndex, 1)
+      }
+      let CommueUsers = []
+      let CommueUsersIndex = selectUsers.indexOf('5')
+      if (CommueUsersIndex !== -1) { // **选择了通信组，通信组人员数组赋值
+        CommueUsers = JSON.parse(JSON.stringify(usersList.filter(item => { return item.groupID === 5 })))
+        selectUsers.splice(CommueUsersIndex, 1)
+      }
+      allUsers = allUsers.concat(MediaUsers, DigitalUsers, ZongheUsers, CommueUsers).filter((value, index, self) => {
+        return self.findIndex(t => JSON.stringify(t) === JSON.stringify(value)) === index // **合并以上人员数组并去掉重复项
+      })
+      for (let item of allUsers) { // **只保留选择人员的ID
+        selectUsers.push(item.id)
+      }
+      selectUsers = selectUsers.filter((value, index, self) => { // **选择人员ID去重
+        return self.indexOf(value) === index
+      })
       selectUsersLen = selectUsers.length
       let tableUsersLen = tableUsers.length
       let difference = selectUsers.filter(x => tableUsers.indexOf(x) === -1)
         .concat(tableUsers.filter(x => selectUsers.indexOf(x) === -1))
       if (selectUsersLen > tableUsersLen) {
         for (let index of difference) {
-          tmp = this.formData.usersList[1].options.find((item) => {
+          tmp = this.usersList.find((item) => {
             if (item.id === index) {
               let obj = {
                 id: item.id,
                 groupName: item.groupName,
+                groupID: item.groupID,
                 name: item.name,
                 applyRole: '协作者',
                 assignWorkTime: this.formData.workTime,
@@ -362,7 +298,7 @@ export default {
       } else {
         for (let diff of difference) {
           let index = tableUsers.indexOf(diff)
-          let newArr = this.formData.copInfoTable.splice(index + 1, 1)
+          this.formData.copInfoTable.splice(index + 1, 1)
           tableUsers.splice(index, 1)
         }
       }
@@ -392,16 +328,20 @@ export default {
     }
   },
   filters: {
-    groupNameFilter (groupName) {
-      switch (groupName) {
-        case '技术标准组':
+    groupIDFilter (groupID) {
+      switch (groupID) {
+        case 0:
           return 'success'
-        case '工程组':
+        case 2:
+          return 'success'
+        case 3:
           return 'warning'
-        case '通信组':
+        case 4:
+          return 'danger'
+        case 5:
           return 'primary'
         default:
-          return 'danger'
+          return 'info'
       }
     }
   }

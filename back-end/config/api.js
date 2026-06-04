@@ -1,5 +1,4 @@
-let path = '/demo-weekly/back-end/api'; // 线下
-// let path = '/api'; // 线上
+let path = '/api';
 
 module.exports = {
     // 通用模块
@@ -41,16 +40,20 @@ module.exports = {
     getIsWorkTimeReviewFinish: path + '/performance/getIsWorkTimeReviewFinish', // 判断工时是否都已审核完毕
     getCurApplyAbleMonth: path + '/performance/getCurApplyAbleMonth', // 获取当前可申报的月份
     submitProjectWorkTimeApply: path + '/performance/submitProjectWorkTimeApply', // 提交项目工时申报
-    repairErrorData3: path + '/performance/repairErrorData3', // 修复错误数据3
     updateWorkTimeListReviewStatus: path + '/performance/updateWorkTimeListReviewStatus', // 更新工时条目审核状态
     getWorkTimeAssignInfo: path + '/performance/getWorkTimeAssignInfo', // 获取工时分配信息
     getWorkTimeListInfo: path + '/performance/getWorkTimeListInfo', // 获取工时申报信息
     savePMData: path + '/performance/savePMData', // 写入绩效数据
+    savePMDataV2: path + '/performance/savePMDataV2', // 写入绩效数据
+    savePMDataV3: path + '/performance/savePMDataV3', // 写入绩效数据
     updatePMData: path + '/performance/updatePMData', // 更新绩效数据
+    updatePMDataV2: path + '/performance/updatePMDataV2', // 更新绩效数据
+    updatePMDataV3: path + '/performance/updatePMDataV3', // 更新绩效数据
     getPMData: path + '/performance/getPMData', // 获取绩效数据
     test: path + '/performance/test', // 测试
     mianshenheWorkTimeSubmit: path + '/performance/mianshenheWorkTimeSubmit', // 提交免审核工时
     getWorkTimeListByType: path + '/performance/getWorkTimeListByType', // ***根据项目类型获取工时列表***
+    getWorkHourStatistics: path + '/performance/getWorkHourStatistics', // ***获取工时统计（按组/按人/按项目类型）***
 
 
     // workStation-个人工作台
@@ -65,8 +68,6 @@ module.exports = {
     updateAssignProjectFilled: path + '/workStation/updateAssignProjectFilled', // 更新指派项目是否填报字段
     updateAssignProjectStageInfo: path + '/performance/updateAssignProjectStageInfo', // ***更新项目阶段信息***
     getAssignWorkDetail: path + '/workStation/getAssignWorkDetail', // 获取项目明细
-    submitPersonalProject: path + '/workStation/submitPersonalProject', // 提交个人申报项目
-    submitMonthPlanProcess: path + '/workStation/submitMonthPlanProcess', // 提交计划至计划进展表
     getPlanInfo: path + '/workStation/getPlanInfo', // 获取计划列表
     getAssignedProjectPlan: path + '/workStation/getAssignedProjectPlan', // 获取指派项目列表(计划查询)
     getAssignProjectStageList: path + '/workStation/getAssignProjectStageList', // 获取指派阶段列表
@@ -85,6 +86,7 @@ module.exports = {
     setProjectFinish: path + '/workStation/setProjectFinish', // 将项目置为已完成状态
     getTypeProjectList: path + '/workStation/getTypeProjectList', // 获取特定类型的项目列表
     getMonthProcess: path + '/performance/getMonthProcess', // ***根据项目阶段获取项目进展***
+    getLatestProcessBeforeMonth: path + '/workStation/getLatestProcessBeforeMonth', // ***获取项目在某年某月之前的最近申报进展***
     updateAssignProjectInfo: path + '/performance/updateAssignProjectInfo', // ***更新项目信息***
     getAssignProjectTotalWorkTime: path + '/workStation/getAssignProjectTotalWorkTime', // ***获取项目总工时***
 
@@ -92,7 +94,6 @@ module.exports = {
     getUserRates: path + '/mutualRates/getUserRates', // 获取互评信息
     submitRatesResult: path + '/mutualRates/submitRatesResult', // 提交互评结果
     updateUserRate: path + '/mutualRates/updateUserRate', // 更新互评结果
-    getCurMutualRate: path + '/mutualRates/getCurMutualRate', // 获取本人互评得分
     getAllUserRates: path + '/mutualRates/getAllUserRates', // 获取本处员工互评得分
     getPerformanceIsCount: path + '/mutualRates/getPerformanceIsCount', // 获取绩效信息统计标志
     getMonthEva: path + '/mutualRates/getMonthEva', // 提取定性评价数据
@@ -107,6 +108,12 @@ module.exports = {
     updateAMEvaData: path + '/achievementsEva/updateAMEvaData', // 更新成效评价
     getAchievementEvaOfConclusionDimension: path + '/achievementsEva/getAchievementEvaOfConclusionDimension', // 获取对某个总结的所有评价
     getUserConclusionEvaedData: path + '/achievementsEva/getUserConclusionEvaedData', // 获取某个用户的所有被评价数据
+    addFailedAMEvaData: path + '/achievementsEva/addFailedAMEvaData', // 添加失败成效评价数据
+    getFailedAMEvaData: path + '/achievementsEva/getFailedAMEvaData', // 获取失败成效评价数据
+    getAllFailedAMEvaData: path + '/achievementsEva/getAllFailedAMEvaData', // 获取所有失败成效评价数据（监控用）
+    updateFailedAMEvaRetrySuccess: path + '/achievementsEva/updateFailedAMEvaRetrySuccess', // 更新失败成效评价为重试成功
+    deleteFailedAMEvaData: path + '/achievementsEva/deleteFailedAMEvaData', // 删除失败成效评价数据
+    clearFailedAMEvaData: path + '/achievementsEva/clearFailedAMEvaData', // 清除失败成效评价数据
 
     // 总结模块
     getCurMonthConclusionOverviewData: path + '/conclusion/getCurMonthConclusionOverviewData', // 获取总结数据
@@ -119,5 +126,41 @@ module.exports = {
     updateMonthConclusionNew: path + '/conclusion/updateMonthConclusionNew', // 更新月总结（新）
     getCurMonthConclusionOverviewDataNew: path + '/conclusion/getCurMonthConclusionOverviewDataNew', // 获取月总结概览信息（新）
     getCurMonthConclusionOverviewDataNewV2: path + '/conclusion/getCurMonthConclusionOverviewDataNewV2', // 获取月总结概览信息V2
-    getCurYearConclusionOverviewData: path + '/conclusion/getCurYearConclusionOverviewData' // 获取本年份总结概览数据
+    getCurMonthConclusionOverviewDataNewV3: path + '/conclusion/getCurMonthConclusionOverviewDataNewV3', // 获取当月月总结中的下月计划
+    getCurYearConclusionOverviewData: path + '/conclusion/getCurYearConclusionOverviewData', // 获取本年份总结概览数据
+
+    getPMBDataByUserID: path + '/pmbData/getPMBDataByUserID', // **获取绩效加分数据(通过用户ID)
+    getPBData: path + '/pmbData/getPBData', // **获取绩效加分数据
+    getPMBRules: path + '/pmbData/getPMBRules', // **获取绩效加分标准
+    getPMBRulesByID: path + '/pmbData/getPMBRulesByID', // **获取绩效加分标准(通过ID)
+    submitPBData: path + '/pmbData/submitPBData', // **提交绩效加分数据
+    updatePBData: path + '/pmbData/updatePBData', // **更新绩效加分数据
+    
+    // 定时任务模块
+    getCronJobConfig: path + '/cronJob/getCronJobConfig', // 获取定时任务配置
+    updateCronJobConfig: path + '/cronJob/updateCronJobConfig', // 更新定时任务配置
+    getCronJobStatus: path + '/cronJob/getCronJobStatus', // 获取定时任务状态
+    executeMutualRateFill: path + '/cronJob/executeMutualRateFill', // 手动执行互评填充任务
+    executeAutoConclusion: path + '/cronJob/executeAutoConclusion', // 手动执行月总结自动提交任务
+    getAutoConclusionLogs: path + '/cronJob/getAutoConclusionLogs', // 获取执行日志列表
+    getAutoConclusionDetails: path + '/cronJob/getAutoConclusionDetails', // 获取执行日志详情
+    getAutoConclusionStatistics: path + '/cronJob/getAutoConclusionStatistics', // 获取执行统计数据
+    // 新增定时任务
+    executeAMEvaDeadline: path + '/cronJob/executeAMEvaDeadline', // 手动执行AMEva截止任务
+    executeMutualEvaSubmit: path + '/cronJob/executeMutualEvaSubmit', // 手动执行互评提交任务
+    executeWorkTimeSubmit: path + '/cronJob/executeWorkTimeSubmit', // 手动执行工时提交任务
+    executeResetAssignProject: path + '/cronJob/executeResetAssignProject', // 手动执行重置分配项目任务
+    executeCleanProgress: path + '/cronJob/executeCleanProgress', // 手动执行清理进展任务
+    // 统一任务日志
+    getAllJobExecutionLogs: path + '/cronJob/getAllJobExecutionLogs', // 获取所有任务的执行日志列表
+    getJobExecutionDetail: path + '/cronJob/getJobExecutionDetail', // 获取任务执行日志详情
+    getJobExecutionStatistics: path + '/cronJob/getJobExecutionStatistics', // 获取任务执行统计
+    // 任务名称更新
+    updateJobName: path + '/cronJob/updateJobName', // 更新任务名称
+    // 设置下次执行时间
+     setNextExecution: path + '/cronJob/setNextExecution', // 设置定时任务下次执行时间
+     // 停止定时任务
+     stopCronJob: path + '/cronJob/stopCronJob', // 停止定时任务
+     // 启动定时任务
+     startCronJob: path + '/cronJob/startCronJob' // 启动定时任务
 };

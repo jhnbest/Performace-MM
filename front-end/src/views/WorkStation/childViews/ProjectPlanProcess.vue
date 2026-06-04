@@ -163,6 +163,7 @@
               <el-input-number size="mini"
                                 v-model.number="scope.row.defaultCofficient"
                                 :min="1.0"
+                                :precision="0"
                                 @change="handleCoeffCoffChange(scope.row)"
                                 style="width: 70%">
               </el-input-number>
@@ -201,7 +202,7 @@
 <script>
   import Assign from '@/components/Cop/workTimeAssign'
   import Cop from '@/components/Cop/Cop'
-  import { getAssignProjectDetailV2, projectDetailIsApplyWorkTimeV2, submitProcess, submitProjectWorkTimeApply } from '@/utils/workStation'
+  import { getAssignProjectDetailV2, projectDetailIsApplyWorkTimeV2, submitProcess, submitProjectWorkTimeApply, getLatestProcessBeforeMonth } from '@/utils/workStation'
   import { getCurApplyAbleMonth, mStringToNumber, MonthToString, getIsSubmitAllow } from '@/utils/common'
   import { Notification } from 'element-ui'
   import workTimeTable from '@/components/common/workTimeTable.vue'
@@ -456,8 +457,8 @@
       initData (projectID, yearNum, curApplyMonthNum, curApplyMonth) {
         this.reqFlag.tableDataInit = false
         let _this = this
-        return new Promise(function (resolve, reject) {
-          getAssignProjectDetailV2(projectID, yearNum).then(response => {
+        return new Promise(async function (resolve, reject) {
+          getAssignProjectDetailV2(projectID, yearNum).then(async response => {
             // 构造表格模板数据
             let tableData = []
             let monthProcessObj = {
@@ -520,6 +521,9 @@
             }
             // =====================================查询各个项目阶段在当前申报月份下的工时申报情况===================
             let checkApdID = []
+            let targetYear = parseInt(curApplyMonth.split('-')[0])
+            let targetMonth = parseInt(curApplyMonth.split('-')[1])
+            // 先处理基本的preMonthProcess计算
             for (let tableItem of tableData) {
               tableItem.submitComments = ''
               // =======================插入需要查询的当月是否申报工时的项目阶段ID和上月进展=========================
@@ -544,6 +548,16 @@
                 tableItem.preMonthProcess = 0
               }
             }
+            // 改进版：动态向前查找最近的实际申报进展（处理中间月份未申报的情况）
+            let factTableItems = tableData.filter(item => item.type === 'fact' && item.aPDID !== null && item.process !== 100)
+            if (factTableItems.length > 0) {
+              let promises = factTableItems.map(tableItem => {
+                return getLatestProcessBeforeMonth(tableItem.aPDID, targetYear, targetMonth).then(result => {
+                  tableItem.preMonthProcess = result.latestProcess
+                })
+              })
+              await Promise.all(promises)
+            }
             projectDetailIsApplyWorkTimeV2(checkApdID, 'fact', curApplyMonth).then(response => {
               for (let tableDataItem of tableData) {
                 let findIndex = response.findIndex(item => {
@@ -563,9 +577,9 @@
                 }
                 if (isShow) {
                   _this.isHideProjectStage = true
-                  Notification.warning({
-                    message: '该项目阶段数量较多，已隐藏已完成的项目阶段。若需要，可手动开启显示。'
-                  })
+                  // Notification.warning({
+                  //   message: '该项目阶段数量较多，已隐藏已完成的项目阶段。若需要，可手动开启显示。'
+                  // })
                 }
               }
               resolve(tableData)
@@ -639,22 +653,21 @@
             toSaveProcess.push(this.tableData[i])
           }
         }
-        // 如果有编辑阶段进展未保存，先保存
+        let loadDataPromise = Promise.resolve()
         if (toSaveProcess.length !== 0) {
-          submitProcess(toSaveProcess).then(response => {
-            this.initData(this.$route.query.projectID, this.yearNum, this.curApplyMonthNum, this.curApplyMonth).then(response => {
-              this.tableData = response
-              this.tableDataCache = JSON.parse(JSON.stringify(this.tableData))
-              this.reqFlag.tableDataInit = true
-            }).catch(err => {
-              console.log(err)
-              this.reqFlag.tableDataInit = true
-            })
+          loadDataPromise = submitProcess(toSaveProcess).then(response => {
+            return this.initData(this.$route.query.projectID, this.yearNum, this.curApplyMonthNum, this.curApplyMonth)
+          }).then(response => {
+            this.tableData = response
+            this.tableDataCache = JSON.parse(JSON.stringify(this.tableData))
+            this.reqFlag.tableDataInit = true
           }).catch(err => {
             console.log(err)
+            this.reqFlag.tableDataInit = true
           })
         }
-        let toSubmitWorkTime = []
+        loadDataPromise.then(() => {
+          let toSubmitWorkTime = []
         // 构造提交工时申报的数据格式
         for (let tableDataItem of this.tableData) {
           let obj = {
@@ -726,6 +739,7 @@
           this.applyMonthPlanProcessTableData = []
           this.$common.toast(this.dialogTitle + '月份未填报实际进展', 'error', 'true')
         }
+        })
       },
       // 提交工时申报
       handleWorkTimeApply () {

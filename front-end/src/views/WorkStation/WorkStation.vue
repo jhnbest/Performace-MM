@@ -2,7 +2,7 @@
   <div class="workStation-container">
     <div class="main-search">
       <el-row>
-        <el-col v-if="this.$store.state.userInfo.id !== 26" :span="6">
+        <el-col v-if="this.$store.state.userInfo.id !== 35" :span="6">
           <el-radio-group v-model="formData.selectType" @change="handleSelectTypeChange">
             <el-badge :value="this.unFilledTotalCount" class="item">
               <el-radio-button label="已完成"></el-radio-button>
@@ -37,7 +37,7 @@
     <!-- 分割线 end -->
     <div v-if="showFlag" style="margin-top: 20px;">
       <!-- 普通员工页面 -->
-      <div v-if="this.$store.state.userInfo.id !== 26">
+      <div v-if="this.$store.state.userInfo.id !== 35">
         <el-tabs type="border-card" v-model="selectProjectType" stretch style="width: 99%;margin:auto">
           <el-tab-pane
             v-for="projectType in projectTypes"
@@ -94,6 +94,11 @@
           count: 0,
           searchType: 'unFilled'
         }, {
+          projectTypeID: 560,
+          name: '基础平台类（新）',
+          count: 0,
+          searchType: 'unFilled'
+        }, {
           projectTypeID: 213,
           name: '基础平台（工程组）',
           count: 0,
@@ -145,7 +150,7 @@
     methods: {
       // 初始化
       init () {
-        if (this.$store.state.userInfo.id !== 26) {
+        if (this.$store.state.userInfo.id !== 35) {
           this.unFilledTotalCount = 0
           this.getUnFilledProjectList().then().catch(getUnFilledProjectListErr => {
             this.$common.toast(getUnFilledProjectListErr, 'error', true)

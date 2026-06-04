@@ -11,7 +11,8 @@ import {
   urlUpdateMonthConclusionNew,
   urlGetCurMonthConclusionOverviewDataNew,
   urlGetCurYearConclusionOverviewData,
-  urlGetCurMonthConclusionOverviewDataNewV2
+  urlGetCurMonthConclusionOverviewDataNewV2,
+  urlGetCurMonthConclusionOverviewDataNewV3
 } from '../config/interface'
 import { conclusionManagerEvaStarToWorkTime } from '@/utils/common'
 import store from '@/store'
@@ -61,7 +62,7 @@ export function getCurMonthConclusionOverviewDataNew (conclusionYear, conclusion
   })
 }
 
-// 获取月总结概览信息v2
+// ***获取月总结概览信息v2
 export function getCurMonthConclusionOverviewDataNewV2 (conclusionYear, conclusionMonth, checkUserID, evaUserID, evaUserDuty) {
   const url = urlGetCurMonthConclusionOverviewDataNewV2
   let params = {
@@ -235,6 +236,27 @@ export function getConclusionDataById (id) {
     http(url, params).then(res => {
       if (res.code === 1) {
         resolve(res)
+      } else {
+        reject(res)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
+// 获取当月月总结中的下月计划（dimension=3）
+export function getCurMonthConclusionOverviewDataNewV3 (conclusionYear, conclusionMonth, checkUserID) {
+  const url = urlGetCurMonthConclusionOverviewDataNewV3
+  let params = {
+    conclusionYear: conclusionYear,
+    conclusionMonth: conclusionMonth,
+    checkUserID: checkUserID
+  }
+  return new Promise(function (resolve, reject) {
+    http(url, params).then(res => {
+      if (res.code === 1) {
+        resolve(res.data)
       } else {
         reject(res)
       }
