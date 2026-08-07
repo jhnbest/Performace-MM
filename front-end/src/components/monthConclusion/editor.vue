@@ -13,7 +13,6 @@
   import tinymce from 'tinymce'
   import Editor from '@tinymce/tinymce-vue'
   import 'tinymce/themes/silver'
-  import 'tinymce/plugins/paste'
   import 'tinymce/plugins/image'
   import 'tinymce/plugins/link'
   import 'tinymce/plugins/code'
@@ -59,10 +58,13 @@
     data () {
       return {
         init: {
-          // language_url: `${this.baseUrl}/tinymce/langs/zh_CN.js`, // 如果语言包不存在，指定一个语言包路径
-          // skin_url: `${this.baseUrl}/tinymce/skins/ui/oxide`, // 如果主题不存在，指定一个主题路径
-          language_url: '/static/tinymce/langs/zh_CN.js', // 如果语言包不存在，指定一个语言包路径
-          skin_url: '/static/tinymce/skins/ui/oxide', // 如果主题不存在，指定一个主题路径
+          //开发环境路径配置
+          base_url: `${this.baseUrl}/tinymce`, // TinyMCE 静态资源根目录，修复 webpack 下 baseURL 推断错误的问题
+          language_url: `${this.baseUrl}/tinymce/langs/zh_CN.js`, // 如果语言包不存在，指定一个语言包路径
+          skin_url: `${this.baseUrl}/tinymce/skins/ui/oxide`, // 如果主题不存在，指定一个主题路径
+          //生产环境路径配置
+          // language_url: '/static/tinymce/langs/zh_CN.js', // 如果语言包不存在，指定一个语言包路径
+          // skin_url: '/static/tinymce/skins/ui/oxide', // 如果主题不存在，指定一个主题路径
           language: 'zh_CN', // 语言
           height: '300px',
           plugins: this.plugins, // 插件

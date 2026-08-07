@@ -3,7 +3,7 @@
     <div>
       <el-form :model="formData" :rules="formRules" ref="formData" label-position="left" label-width="0px">
         <el-form-item prop="account">
-          <el-input v-model="formData.account" placeholder="工号" clearable></el-input>
+          <el-input v-model="formData.account" placeholder="工号" :disabled="isAutoLogin" clearable></el-input>
         </el-form-item>
         <el-form-item prop="oldPassword">
           <el-input type="password" v-model="formData.oldPassword" placeholder="旧密码" clearable></el-input>
@@ -81,7 +81,9 @@
             edit: true,
             updateNewPassword: true,
             oldPasswordAuth: true
-          }
+          },
+          isAutoLogin: false,
+          autoLoginPassword: null
         }
       },
       components: {
@@ -90,8 +92,12 @@
       },
       methods: {
         // 初始化
-        init (account) {
+        init (account, autoLogin = false, oldPassword = null) {
           this.formData.account = account
+          this.isAutoLogin = autoLogin
+          if (oldPassword) {
+            this.formData.oldPassword = oldPassword
+          }
           this.$nextTick(() => {
             this.changeShowFlag()
           })
@@ -103,10 +109,14 @@
         onCancel (formName) {
           this.changeShowFlag()
           this.$refs[formName].resetFields()
+          this.isAutoLogin = false
+          this.autoLoginPassword = null
         },
         // 关闭弹出框
         closeDialog (formName) {
           this.$refs[formName].resetFields()
+          this.isAutoLogin = false
+          this.autoLoginPassword = null
         },
         oldPasswordAuth () {
           let it = this
@@ -144,6 +154,9 @@
                 .then(res => {
                   if (res.code === 1) {
                     resolve(true)
+                  } else if (res.code === 4) {
+                    it.$common.toast('新密码在弱密码库中，请使用更复杂的密码', 'error', false)
+                    resolve('weak')
                   } else if (res.code === -1) {
                     resolve(false)
                   }
@@ -158,8 +171,15 @@
               this.oldPasswordAuth().then(res => {
                 if (res) {
                   this.updateNewPassword().then(res => {
-                    if (res) {
+                    if (res === true) {
                       this.$common.toast('修改成功', 'success', 'false')
+                      if (this.isAutoLogin) {
+                        this.autoLoginPassword = this.formData.newPassword
+                        this.$emit('passwordChangeSuccess', {
+                          account: this.formData.account,
+                          password: this.autoLoginPassword
+                        })
+                      }
                       this.onCancel(formName)
                     }
                   })

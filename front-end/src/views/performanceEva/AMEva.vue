@@ -952,10 +952,10 @@ export default {
             // ***如果是处经理，则额外填充其他成员对评价的对象的成效评价数据
             if (store.state.userInfo.duty === 1) {
               allconclusionAndEvaData[i].allAMEvaedData = responseData.AMEvaedData.filter(item => {
-                return item.evaedUserID === allconclusionAndEvaData[i].id && item.dimension !== 5
+                return item.evaedUserID === allconclusionAndEvaData[i].id && item.dimension !== 5 && currentMonthConclusionIDs.has(item.dimensionID)
               })
               allconclusionAndEvaData[i].teamWorkEvaedData = responseData.AMEvaedData.filter(item => {
-                return item.evaedUserID === allconclusionAndEvaData[i].id && item.dimension === 5
+                return item.evaedUserID === allconclusionAndEvaData[i].id && item.dimension === 5 && currentMonthConclusionIDs.has(item.dimensionID)
               })
             }
           }

@@ -6,6 +6,7 @@ const jwt = require('jwt-simple')
 const express = require('express')
 const app = express()
 const $common = require('../utils/common')
+const weakPassword = require('../utils/weakPassword')
 app.set('jwtTokenSecret', 'YOUR_SECRET_STRING')
 
 // function formatData(rows) {
@@ -85,6 +86,12 @@ const user = {
         return $http.writeJson(res, {code: 2, message:'用户或密码不正确'})
       } else {
         let resultData = {}
+        if (weakPassword.isWeakPassword(password)) {
+          resultData.code = 3
+          resultData.msg = '密码为弱密码，请修改后登录'
+          resultData.data = { name: name }
+          return $http.writeJson(res, resultData)
+        }
         resultData.code = 1
         let data = $common.formatData(result)
         //data.create_time = $time.formatTime(data.create_time)
@@ -357,6 +364,9 @@ const user = {
   /* 更新密码 */
   updateNewPassword (req, res) {
     let data = req.body
+    if (weakPassword.isWeakPassword(data.newPassword)) {
+      return $http.writeJson(res, {code: 4, message: '新密码在弱密码库中，请使用更复杂的密码'})
+    }
     let sql = $sql.user.updateNewPassword
     let arrayParams = [data.newPassword, data.account]
     $http.connPool(sql, arrayParams, (err, result) => {

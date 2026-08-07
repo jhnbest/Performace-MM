@@ -49,13 +49,14 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-dialog :visible.sync="editProject" width="80%" center>
+    <el-dialog :visible.sync="editProject" width="80%" center custom-class="project-stage-dialog">
       <span slot="title" style="font-weight: bolder;font-size: 20px">{{dialogProjectName + '项目'}}</span>
-      <el-table :data="dialogProjectData"
+      <el-table ref="projectStageTable"
+                :data="dialogProjectData"
                 border
                 style="margin: auto;width: 99%"
                 size="mini"
-                :height="300"
+                :height="500"
                 :header-cell-style="{ backgroundColor: '#67d4f6', color: '#333'}">
         <el-table-column label="序号" align="center" type="index"></el-table-column>
         <el-table-column label="项目阶段" align="center">
@@ -381,6 +382,13 @@
             kValue: null,
             dynamicKValue: 1
           })
+          // 新增后等待 DOM 更新，将表格内部滚动条滚到最底部，以便看到刚新增的行
+          this.$nextTick(() => {
+            const tableRef = this.$refs.projectStageTable
+            if (tableRef && tableRef.bodyWrapper) {
+              tableRef.bodyWrapper.scrollTop = tableRef.bodyWrapper.scrollHeight
+            }
+          })
         },
         // 项目阶段名称监控
         handleProjectStageNameInput (row) {
@@ -412,6 +420,9 @@
             }).catch(err => {
               this.$common.toast('send handleProjectStageDelete error!' + err, 'error', false)
             })
+          } else {
+            // 本地新增阶段（apdID === -1，未保存到数据库），直接从列表中移除
+            this.dialogProjectData.splice(index, 1)
           }
         },
         // 保存按钮
@@ -524,4 +535,18 @@
 
 <style scoped>
 
+</style>
+
+<style>
+/* 项目阶段编辑弹窗：撑高弹窗以容纳更多阶段，el-dialog 根元素不在当前组件 scope 内，因此用非 scoped 样式 */
+.project-stage-dialog {
+  height: 80vh;
+  margin-top: 5vh !important;
+  display: flex;
+  flex-direction: column;
+}
+.project-stage-dialog .el-dialog__body {
+  flex: 1;
+  overflow: auto;
+}
 </style>

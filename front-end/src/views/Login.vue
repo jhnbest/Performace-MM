@@ -19,7 +19,7 @@
         </el-form-item>
       </el-form>
     </div>
-    <PasswordEdit v-if="showFlag.passwordEdit" ref="passwordEdit"/>
+    <PasswordEdit v-if="showFlag.passwordEdit" ref="passwordEdit" @passwordChangeSuccess="handlePasswordChangeSuccess"/>
   </div>
 </template>
 
@@ -122,13 +122,6 @@ export default {
                 let pwdRegex4 = new RegExp('(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z]).{8,30}')
                 if (pwdRegex.test(this.formData.password) || pwdRegex2.test(this.formData.password) ||
                    pwdRegex3.test(this.formData.password) || pwdRegex4.test(this.formData.password)) {
-                  // if (this.rememberUser) {
-                  // // 传入账号名，密码，和保存天数3个参数
-                  //   this.setCookie(this.formData.name, this.formData.password, 7)
-                  // } else {
-                  //   // 清空Cookie
-                  //   this.clearCookie()
-                  // }
                   let data = res.data
                   localStorage.setItem('userInfo', JSON.stringify(data))
                   this.$store.dispatch('saveUserInfo', data)
@@ -144,6 +137,12 @@ export default {
                     this.$refs.passwordEdit.init(this.formData.name)
                   })
                 }
+              } else if (res.code === 3) {
+                alert('您的密码在弱密码库中，请修改密码后登录！')
+                this.showFlag.passwordEdit = true
+                this.$nextTick(() => {
+                  this.$refs.passwordEdit.init(this.formData.name, true, this.formData.password)
+                })
               }
               this.reqFlag.login = true
             }).catch(err => {
@@ -191,6 +190,37 @@ export default {
     // 清除cookie
     clearCookie: function () {
       this.setCookie('', '', -1) // 修改2值都为空，天数为负1天就好了
+    },
+    // 密码修改成功后自动登录
+    handlePasswordChangeSuccess (data) {
+      const url = urlUserLogin
+      let params = {
+        name: data.account,
+        password: this.$md5(data.password)
+      }
+      this.$http(url, params).then(res => {
+        if (res.code === 1) {
+          let data = res.data
+          localStorage.setItem('userInfo', JSON.stringify(data))
+          this.$store.dispatch('saveUserInfo', data)
+          this.$common.toast('登录成功', 'success', false)
+          this.$router.push({
+            path: '/home/dashboard',
+            query: {}
+          })
+        } else if (res.code === 3) {
+          alert('新密码仍在弱密码库中，请使用更复杂的密码！')
+          this.showFlag.passwordEdit = true
+          this.$nextTick(() => {
+            this.$refs.passwordEdit.init(data.account, true)
+          })
+        } else {
+          this.$common.toast('登录失败', 'error', false)
+        }
+      }).catch(err => {
+        console.log(err)
+        this.$common.toast('登录失败', 'error', false)
+      })
     }
   },
   created () {

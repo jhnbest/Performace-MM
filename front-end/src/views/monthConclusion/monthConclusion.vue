@@ -90,8 +90,7 @@
 <!-- (scope.row.managerRateStar !== null) || (curApplyYear !== Number(title)) ||
                     ((curApplyMonth !== scope.row.submitMonth) && (curApplyYear === Number(title))) -->
           <el-button :disabled="(scope.row.managerRateStar !== null) || (curApplyYear !== Number(title)) ||
-                    ((curApplyMonth !== scope.row.submitMonth) && (curApplyYear === Number(title)) &&
-                     !(scope.row.submitMonth === tempAllowMonth.month && Number(title) === tempAllowMonth.year))"
+                    ((curApplyMonth !== scope.row.submitMonth) && (curApplyYear === Number(title)))"
                      size="mini"
                      type="warning"
                      @click="handleEdit(scope.row)"
@@ -99,8 +98,7 @@
 <!--          暂存-->
           <el-button v-if="scope.row.submitStatus === 1"
                      :disabled=" (scope.row.managerRateStar !== null) || (curApplyYear > Number(title)) ||
-                    ((curApplyMonth > scope.row.submitMonth) && (curApplyYear === Number(title)) &&
-                     !(scope.row.submitMonth === tempAllowMonth.month && Number(title) === tempAllowMonth.year)) ||
+                    ((curApplyMonth > scope.row.submitMonth) && (curApplyYear === Number(title))) ||
                      !reqFlag.updateMonthConclusionStatus"
                      size="mini"
                      type="info"
@@ -110,8 +108,7 @@
                      :disabled="scope.row.moreDetailData.length === 0 || !reqFlag.updateMonthConclusionStatus
                       || (scope.row.managerRateStar !== null)
                       || (curApplyYear > Number(title)) ||
-                    ((curApplyMonth > scope.row.submitMonth) && (curApplyYear === Number(title)) &&
-                     !(scope.row.submitMonth === tempAllowMonth.month && Number(title) === tempAllowMonth.year))"
+                    ((curApplyMonth > scope.row.submitMonth) && (curApplyYear === Number(title)))"
                      size="mini"
                      type="success"
                      @click="handleSubmit(scope.row, 1)">提交</el-button>
@@ -167,7 +164,6 @@ import { getWorkTimeListByType, mianshenheWorkTimeSubmit } from '@/utils/perform
         },
         curApplyYear: 1970,
         curApplyMonth: 1,
-        tempAllowMonth: { year: 2026, month: 4 },
         conclusionDialog: false,
         conclusionDialogNew: false,
         conclusionTitle: null,

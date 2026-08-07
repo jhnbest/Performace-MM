@@ -38,6 +38,7 @@
     <!-- 分割线 end -->
     <div>
       <el-table v-if="showFlag.factTableShow"
+        ref="factTable"
         :data="workDetailTable"
         style="width: 99%;margin: auto; margin-top: 20px"
         border
@@ -260,7 +261,8 @@
               let findResult = worktimeassign.find(worktimeassignItem => {
                   return worktimeassignItem.userID === store.state.userInfo.id
               })
-              if (!isUndefined(findResult)) {
+              // 仅当项目工时分配已审核通过(workTimeAssignReviewStatus=1)时，才计入实际获得工时
+              if (!isUndefined(findResult) && item.workTimeAssignReviewStatus === 1) {
                 item.assignWorkTime = findResult.reviewWorkTime
                 this.totalWorkTime += findResult.reviewWorkTime
               }
@@ -384,9 +386,30 @@
                 this.reqFlag.changeSubmitStatus = false
                 row.submitStatus = row.submitStatus === 1 ? 0 : 1
                 changeSubmitStatus(row.id, row.submitStatus).then(() => {
+                  // 先让当前焦点元素失焦，避免 el-button 在 v-if 销毁时被移除导致浏览器自动滚到顶部
+                  if (document.activeElement && typeof document.activeElement.blur === 'function') {
+                    document.activeElement.blur()
+                  }
+                  // 真正的滚动容器是 .container-wrap（不是 window），保存它的滚动位置
+                  const scrollContainer = document.querySelector('.container-wrap')
+                  const containerScrollTop = scrollContainer ? scrollContainer.scrollTop : 0
+                  const tableBody = this.$refs.factTable && this.$refs.factTable.bodyWrapper
+                  const tableScrollTop = tableBody ? tableBody.scrollTop : 0
                   this.showFlag.factTableShow = false
                   this.$nextTick(() => {
                     this.showFlag.factTableShow = true
+                    this.$nextTick(() => {
+                      // 还原 el-table 内部滚动位置
+                      const newTableBody = this.$refs.factTable && this.$refs.factTable.bodyWrapper
+                      if (newTableBody) {
+                        newTableBody.scrollTop = tableScrollTop
+                      }
+                      // 还原外层 .container-wrap 滚动位置
+                      const newScrollContainer = document.querySelector('.container-wrap')
+                      if (newScrollContainer) {
+                        newScrollContainer.scrollTop = containerScrollTop
+                      }
+                    })
                   })
                   row.reviewStatus = row.submitStatus === 1 ? 0 : row.reviewStatus
                   this.$common.toast('操作成功', 'success', false)

@@ -139,6 +139,37 @@ async function generateBlankConclusions(user, year, month, dimensions) {
 }
 
 /**
+ * 将某员工目标月份的"暂存"月总结批量转为"已提交"
+ * - content 为空或仅空白字符时，填充为默认提示文本
+ * - content 有值时，保留原内容
+ * - submitStatus 由 2 改为 1
+ * @param {Object} user 用户对象
+ * @param {number} year 目标年份
+ * @param {number} month 目标月份
+ * @returns {Promise<Array<number>>} 被更新的记录 ID 列表
+ */
+async function submitDraftConclusions(user, year, month) {
+    const DEFAULT_CONTENT = '超时未提交，系统自动生成空白月总结'
+    let updatedIds = []
+
+    // 先查询暂存记录（仅用于日志统计与结果返回）
+    let drafts = await RCPDDatabase($sql.conclusion.getDraftConclusionIds, [user.id, year, month])
+    if (!drafts || drafts.length === 0) {
+        return updatedIds
+    }
+
+    let now = $time.formatTime()
+    await RCPDDatabase(
+        $sql.conclusion.submitDraftConclusions,
+        [DEFAULT_CONTENT, now, user.id, year, month]
+    )
+
+    drafts.forEach(row => updatedIds.push(row.id))
+    console.log(`用户${user.name}(ID:${user.id})已将 ${updatedIds.length} 条暂存月总结转为已提交`)
+    return updatedIds
+}
+
+/**
  * 记录执行日志
  * @param {Object} logData 日志数据
  * @returns {Promise<number>} 日志ID
@@ -256,6 +287,7 @@ async function executeAutoConclusionJob() {
         
         let successCount = 0
         let failedCount = 0
+        let draftSubmittedCount = 0   // 累计自动提交（从暂存转为已提交）的用户数（按用户计）
         
         // 遍历每个员工
         for (let user of users) {
@@ -265,7 +297,7 @@ async function executeAutoConclusionJob() {
         // 处经理(duty=1)不需要提交月总结，跳过
         if (user.duty === 1) {
           console.log(`用户${user.name}为处经理，不需要提交月总结，跳过`)
-          
+
           await insertProcessingDetail({
             logId: logId,
             userId: user.id,
@@ -281,8 +313,17 @@ async function executeAutoConclusionJob() {
           })
           continue
         }
-                
-                // 获取用户已提交的维度
+
+                // 1) 先把"暂存"状态的记录全部转为"已提交"
+                //    - 其他维度：content 为空时填充默认文本，有值时保留原内容
+                //    - dimension=4（意见建议）：不自动填充默认内容
+                let draftSubmittedIds = await submitDraftConclusions(user, targetYear, targetMonth)
+                if (draftSubmittedIds.length > 0) {
+                    // 按用户计数：只要该用户有任意一条暂存被自动提交，计为 1
+                    draftSubmittedCount += 1
+                }
+
+                // 获取用户已提交的维度（此时已包含刚转正的暂存记录，避免重复生成空白记录）
                 let submittedDimensions = await getUserSubmittedDimensions(user.id, targetYear, targetMonth)
                 console.log(`已提交维度: ${submittedDimensions.join(', ') || '无'}`)
                 
@@ -411,9 +452,10 @@ async function executeAutoConclusionJob() {
         console.log(`成功: ${successCount} 用户`)
         console.log(`失败: ${failedCount} 用户`)
         console.log(`跳过: ${users.length - successCount - failedCount} 用户`)
+        console.log(`暂存自动提交: ${draftSubmittedCount} 用户`)
         console.log(`耗时: ${duration}ms`)
         console.log('=================================\n')
-        
+
         return {
                 success: true,
                 logId: logId,
@@ -421,7 +463,8 @@ async function executeAutoConclusionJob() {
                     total_users: users.length,
                     success_count: successCount,
                     failed_count: failedCount,
-                    skipped_count: users.length - successCount - failedCount
+                    skipped_count: users.length - successCount - failedCount,
+                    draft_submitted_count: draftSubmittedCount
                 }
             }
         

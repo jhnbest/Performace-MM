@@ -120,10 +120,10 @@ const sqlMap = {
     updateProjectWorkTimeAssignReviewStatus: 'update worktimelist set workTimeAssignReviewStatus = ? where id = ?',
     getGroupWorkTimeList: 'select u.id, u.name, wa.reviewWorkTime, wl.applyMonth from worktimeassign wa left join worktimelist ' +
         'wl on wa.projectID = wl.id left join users u on wa.userID = u.id where wl.applyMonth = ? and u.groupName = ? and ' +
-        ' wl.reviewStatus = 1 and wa.obsoleteStatus != 1 and u.status != 0',
+        ' wl.reviewStatus = 1 and wl.workTimeAssignReviewStatus = 1 and wa.obsoleteStatus != 1 and u.status != 0',
     getAllWorkTimeList: 'select u.id, u.name, u.duty, u.groupName as groupID, wa.reviewWorkTime, wl.applyMonth from worktimeassign wa left join worktimelist ' +
         'wl on wa.projectID = wl.id left join users u on wa.userID = u.id where wl.applyMonth = ? and ' +
-        ' wl.reviewStatus = 1 and wa.obsoleteStatus != 1 and u.status != 0',
+        ' wl.reviewStatus = 1 and wl.workTimeAssignReviewStatus = 1 and wa.obsoleteStatus != 1 and u.status != 0',
     getIsWorkTimeReviewFinish: 'select * from worktimelist where applyMonth = ? and obsoleteStatus != 1 and reviewStatus = 0 ' +
         'and applyType = "fact" and submitStatus = 1',
     getCurApplyAbleMonth: 'select date_format((select setTime from globalflag where flagType = "curApplyMonth"), "%Y-%m-%d") as setTime',
@@ -373,7 +373,23 @@ const sqlMap = {
     getPreMonthConclusionOverviewDataNewV2: 'select nc.*, u.name from newconclusion nc left join users u on' +
     ' nc.userID = u.id where nc.conclusionYear = ? and nc.conclusionMonth = ? and nc.userID in (?) and nc.dimension = 3',
     getCurMonthConclusionOverviewDataNewV3: 'select nc.*, u.name from newconclusion nc left join users u on' +
-    ' nc.userID = u.id where nc.conclusionYear = ? and nc.conclusionMonth = ? and nc.userID in (?) and nc.dimension = 3'
+    ' nc.userID = u.id where nc.conclusionYear = ? and nc.conclusionMonth = ? and nc.userID in (?) and nc.dimension = 3',
+    // 将某员工目标月份的所有暂存月总结批量提交
+    // - dimension=4（意见建议）无论 content 是否为空都保留原 content，不自动填充默认文本
+    // - 其他维度：content 为空时填充默认文本，有值时保留原内容
+    // - submitStatus 由 2 改为 1
+    submitDraftConclusions: `UPDATE newconclusion
+        SET content = CASE
+                WHEN dimension = 4 THEN content
+                WHEN content IS NULL OR TRIM(content) = '' THEN ?
+                ELSE content
+            END,
+            submitStatus = 1,
+            updateTime = ?
+        WHERE userID = ? AND conclusionYear = ? AND conclusionMonth = ? AND submitStatus = 2`,
+    // 查询某员工目标月份的暂存记录 ID 与 content（用于日志统计与结果返回）
+    getDraftConclusionIds: `SELECT id, content FROM newconclusion
+        WHERE userID = ? AND conclusionYear = ? AND conclusionMonth = ? AND submitStatus = 2`
   },
   achievementsEva: {
     getUserofAchievementToAnotherUser: 'select nce.*, u.name, nc.userID as evaedUserID from newconclusionevadata nce left join users u on' +
