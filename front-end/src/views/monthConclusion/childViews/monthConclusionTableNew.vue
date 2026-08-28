@@ -15,6 +15,12 @@
   <div class="hr-10"></div>
 
   <div class="main-content">
+    <!-- 初始化完成前显示占位，避免 TinyMCE 在空内容上初始化后无法再同步 :value -->
+    <div v-if="!initComplete" class="section-block" style="text-align: center; color: #909399;">
+      正在加载月总结内容...
+    </div>
+
+    <template v-else>
     <!-- 月度总结（合并模式） -->
     <div v-if="isMergedConclusion" class="section-block">
       <div class="section-header">
@@ -154,10 +160,11 @@
 
     <!-- 底部操作区 -->
     <div class="footer-actions">
-      <el-button type="primary" @click="handleSubmit" :disabled="isSubmit" size="medium" icon="el-icon-upload">提交</el-button>
-      <el-button type="warning" @click="handleTemporary" size="medium" icon="el-icon-folder-opened">暂存</el-button>
+      <el-button type="primary" @click="handleSubmit" :disabled="isSubmit || !initComplete" size="medium" icon="el-icon-upload">提交</el-button>
+      <el-button type="warning" @click="handleTemporary" :disabled="!initComplete" size="medium" icon="el-icon-folder-opened">暂存</el-button>
       <el-button type="info" @click="handleBack" size="medium" icon="el-icon-back">返回</el-button>
     </div>
+    </template>
   </div>
 </div>
 </template>
@@ -166,7 +173,8 @@
   import editorVue from '../../../components/monthConclusion/editor'
   import {
     submitMonthConclusionNew,
-    updateMonthConclusionNew } from '@/utils/conclusion'
+    updateMonthConclusionNew,
+    getCurMonthConclusionOverviewDataNew } from '@/utils/conclusion'
   import store from '@/store'
 import { convertYearMonth2Nor, getIsSubmitAllow } from '@/utils/common'
 import { getProjectList, getWorkTimeListByType, mianshenheWorkTimeSubmit } from '@/utils/performance'
@@ -194,26 +202,49 @@ import { getProjectList, getWorkTimeListByType, mianshenheWorkTimeSubmit } from 
         isSubmit: false,
         moreDetailData: [],
         conclusionTextNew: {},
+        initComplete: false, // 初始化完成标志：未完成时不渲染编辑器，避免 TinyMCE 用空内容初始化后无法再同步
         tableHeaderStyle: { background: '#48bfe5', color: '#333', fontSize: '16px' },
       }
     },
     methods: {
       // 初始化
-      init () {
-        this.moreDetailData = this.$route.query.moreDetailData
-          ? JSON.parse(JSON.stringify(this.$route.query.moreDetailData))
-          : []
+      async init () {
+        // 1) 路由 query 中的基础字段（标量值，不会被 URL 截断）
         this.submitYear = this.$route.query.submitYear
-        this.conclusionTitle = this.submitYear + '年' + this.$route.query.conclusionTitle
         this.submitMonth = this.$route.query.submitMonth
         this.submitter = this.$route.query.submitter
+        this.conclusionTitle = this.submitYear + '年' + this.$route.query.conclusionTitle
 
-        // 根据合并规则初始化conclusionTextNew结构
+        // 2) 不再依赖 route query 中的 moreDetailData（URL 容易被截断、对象解析可能被破坏），
+        //    总是通过后端接口拉取最新数据，确保数据可靠
+        let detailFromApi = []
+        try {
+          const res = await getCurMonthConclusionOverviewDataNew(
+            Number(this.submitYear),
+            Number(this.submitMonth),
+            this.submitter,
+            this.$store.state.userInfo.id, // evaUserID
+            this.$store.state.userInfo.duty // evaUserDuty
+          )
+          if (res && res.data && Array.isArray(res.data.conclusionData)) {
+            detailFromApi = res.data.conclusionData
+          } else {
+            console.log('[monthConclusionTableNew] 拉取月总结详情返回结构异常:', res)
+          }
+        } catch (err) {
+          console.log('[monthConclusionTableNew] 拉取月总结详情失败:', err)
+        }
+        this.moreDetailData = detailFromApi
+
+        // 3) 根据合并规则初始化conclusionTextNew结构
         if (this.isMergedConclusion) {
           this.initMergedStructure()
         } else {
           this.initOldStructure()
         }
+
+        // 4) 初始化完成后再渲染编辑器，避免 TinyMCE 在空内容上初始化后无法再同步 :value
+        this.initComplete = true
       },
       // 初始化合并模式的数据结构
       initMergedStructure () {
@@ -288,10 +319,19 @@ import { getProjectList, getWorkTimeListByType, mianshenheWorkTimeSubmit } from 
             result.push(item)
           }
         } else {
-          // 更新提交：遍历 moreDetailData
-          for (let item of sourceData) {
+          // 更新提交：从 conclusionTextNew 读取用户最新编辑的内容，
+          // 再从 moreDetailData 中按 dimension 匹配出对应的 id，
+          // 这样无论 conclusionTextNew 与 moreDetailData 之间的引用关系是否被破坏，
+          // 编辑器中编辑的最新内容都会被提交
+          for (let key in this.conclusionTextNew) {
+            let item = this.conclusionTextNew[key]
             if (item.dimension === 5 && !isLeader) continue
-            result.push(item)
+            let matched = this.moreDetailData.find(m => m.dimension === item.dimension)
+            result.push({
+              id: matched ? matched.id : undefined,
+              dimension: item.dimension,
+              content: item.content
+            })
           }
         }
         // 合并模式下：补充 dimension=2（空内容），保持关联模块一致性
