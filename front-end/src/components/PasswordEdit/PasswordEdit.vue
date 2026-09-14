@@ -134,6 +134,9 @@
                     resolve(true)
                   } else if (res.code === -1) {
                     resolve(false)
+                  } else if (res.code === 5) {
+                    it.$common.toast(res.message, 'error', false)
+                    resolve(false)
                   }
                   it.reqFlag.oldPasswordAuth = true
                 })
@@ -148,6 +151,7 @@
               it.reqFlag.updateNewPassword = false
               let params = {
                 account: it.formData.account,
+                oldPassword: it.$md5(it.formData.oldPassword),
                 newPassword: it.$md5(it.formData.newPassword)
               }
               it.$http(url, params)

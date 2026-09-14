@@ -59,8 +59,8 @@ const sqlMap = {
     getAllUserName: 'select id, name, groupName from users where status != 0',
     // 用户旧密码认证
     oldPasswordAuth: 'select password from users where account = ?',
-    // 更新密码
-    updateNewPassword: 'update users set password = ? where account = ?'
+    // 更新密码（需同时校验旧密码，原子完成，防止无鉴权直接改任意账号密码）
+    updateNewPassword: 'update users set password = ? where account = ? and password = ?'
   },
   performance: {
     //新增工时申报
