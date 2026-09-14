@@ -2,9 +2,8 @@ let mysql = require('mysql');
 let db = require('../config/db');
 let pool = mysql.createPool(db);
 const jwt = require('jwt-simple');
-const express = require('express')
-const app = express()
-app.set('jwtTokenSecret', 'YOUR_SECRET_STRING')
+// JWT 签名密钥：从配置读取（环境变量 JWT_SECRET 或本地生成密钥文件），避免硬编码
+const secret = require('../config/secret');
 
 const $http = {
     connPool (sql, val, cb) {
@@ -38,7 +37,7 @@ const $http = {
       let userId = params.userId
       let resultData = {}
       let token = req.headers.token //获取前端请求头发送过来的token
-      let decoded = jwt.decode(token, app.get('jwtTokenSecret'))
+      let decoded = jwt.decode(token, secret.jwtSecret)
       if (!userId || decoded.iss != userId) {
         resultData = {
           code: 2,

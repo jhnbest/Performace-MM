@@ -3,11 +3,10 @@ const moment = require('moment')
 const $http = require('../sql/http')
 const $time = require('../utils/time')
 const jwt = require('jwt-simple')
-const express = require('express')
-const app = express()
 const $common = require('../utils/common')
 const weakPassword = require('../utils/weakPassword')
-app.set('jwtTokenSecret', 'YOUR_SECRET_STRING')
+const $pass = require('../utils/passwordHash')
+const secret = require('../config/secret')
 
 // function formatData(rows) {
 //   return rows.map(row => {
@@ -79,36 +78,45 @@ const user = {
     let params = req.body
     let name = params.name
     let password = params.password
-    let sql = $sql.user.login
-    let arrayParams = [name, password]
+    let sql = $sql.user.login // 按账号查询（移除密码条件，改为取回哈希后在内存校验）
+    let arrayParams = [name]
     $common.RCPDDatabase(sql, arrayParams).then(result => {
       if (!result.length) {
+        return $http.writeJson(res, {code: 2, message:'账号不存在'})
+      }
+      let userRow = result[0]
+      let stored = userRow.password
+      // 存量无盐 MD5 账号：无法用客户端强摘要校验，强制人工重置（管理员重置）
+      if ($pass.isLegacyMD5(stored)) {
+        return $http.writeJson(res, {code: 5, message:'出于安全升级，该账号密码已失效，请联系管理员重置密码后登录'})
+      }
+      // 校验客户端 PBKDF2 强摘要（scrypt 存储）
+      if (!$pass.verifyPassword(password, stored)) {
         return $http.writeJson(res, {code: 2, message:'用户或密码不正确'})
-      } else {
-        let resultData = {}
-        if (weakPassword.isWeakPassword(password)) {
-          resultData.code = 3
-          resultData.msg = '密码为弱密码，请修改后登录'
-          resultData.data = { name: name }
-          return $http.writeJson(res, resultData)
-        }
-        resultData.code = 1
-        let data = $common.formatData(result)
-        //data.create_time = $time.formatTime(data.create_time)
-        //if(data.type > 1) data.role = '普通用户'
-        //data.role = '管理员'
-        delete data[0].password
-        /**设置token 1天后过期**/
-        let expires = moment().add(1, 'days').valueOf()
-        let token = jwt.encode({
-          iss: data[0].id,
-          exp: expires,
-        }, app.get('jwtTokenSecret'))
-        data[0].token = token
-        resultData.data = data[0]
-        resultData.msg = '登录成功'
+      }
+      let resultData = {}
+      if (weakPassword.isWeakPassword(password)) {
+        resultData.code = 3
+        resultData.msg = '密码为弱密码，请修改后登录'
+        resultData.data = { name: name }
         return $http.writeJson(res, resultData)
       }
+      resultData.code = 1
+      let data = $common.formatData(result)
+      //data.create_time = $time.formatTime(data.create_time)
+      //if(data.type > 1) data.role = '普通用户'
+      //data.role = '管理员'
+      delete data[0].password
+      /**设置token 1天后过期**/
+      let expires = moment().add(1, 'days').valueOf()
+      let token = jwt.encode({
+        iss: data[0].id,
+        exp: expires,
+      }, secret.jwtSecret)
+      data[0].token = token
+      resultData.data = data[0]
+      resultData.msg = '登录成功'
+      return $http.writeJson(res, resultData)
     }).catch(err => {
       return $http.writeJson(res, {code:-2, message:'登录失败',errMsg: err})
     })
@@ -123,7 +131,7 @@ const user = {
       let token = jwt.encode({
         iss: params.userId,
         exp: expires,
-      }, app.get('jwtTokenSecret'))
+      }, secret.jwtSecret)
       resultData = {
         code: 1,
         message: '退出登录成功'
@@ -139,12 +147,12 @@ const user = {
     $http.userVerify(req, res, () => {
       let curTime = $time.formatTime()
       let name = params.name
-      let password = params.password
       let email = params.email
       let create_time = curTime
       let update_time = curTime
-      if(!name || !password) $http.writeJson(res, {code: 2, message:'参数有误'})
+      if(!name || !params.password) $http.writeJson(res, {code: 2, message:'参数有误'})
       else {
+        let password = $pass.hashPassword(params.password)
         let sql = $sql.user.add
         let arrayParams = [name, password, email, create_time, update_time]
         $http.connPool(sql, arrayParams, (err, result) => {
@@ -164,11 +172,11 @@ const user = {
       let curTime = $time.formatTime()
       let id = params.id
       let name = params.name
-      let password = params.password
       let email = params.email
       let update_time = curTime
-      if(!id || !name || !password) {$http.writeJson(res, {code: 2, message:'参数有误'})}
+      if(!id || !name || !params.password) {$http.writeJson(res, {code: 2, message:'参数有误'})}
       else {
+        let password = $pass.hashPassword(params.password)
         let sql = $sql.user.updateInfo
         let arrayParams = [name, password, email, update_time, id]
         $http.connPool(sql, arrayParams, (err, result) => {
@@ -352,8 +360,11 @@ const user = {
       if (err) {
         return $http.writeJson(res, {code: -2, message: '失败'})
       } else {
-        result = $common.formatData(result)
-        if (result[0].password === data.oldPassword) {
+        if (!result || !result[0]) {
+          return $http.writeJson(res, {code: -1, message: '旧密码错误'})
+        }
+        // 用密码哈希校验客户端旧密码摘要（兼容新版 scrypt 与存量 MD5）
+        if ($pass.verifyPassword(data.oldPassword, result[0].password)) {
           return $http.writeJson(res, {code: 1, message: '旧密码正确'})
         } else {
           return $http.writeJson(res, {code: -1, message: '旧密码错误'})
@@ -367,8 +378,9 @@ const user = {
     if (weakPassword.isWeakPassword(data.newPassword)) {
       return $http.writeJson(res, {code: 4, message: '新密码在弱密码库中，请使用更复杂的密码'})
     }
+    let newHash = $pass.hashPassword(data.newPassword)
     let sql = $sql.user.updateNewPassword
-    let arrayParams = [data.newPassword, data.account]
+    let arrayParams = [newHash, data.account]
     $http.connPool(sql, arrayParams, (err, result) => {
       if (err) {
         return $http.writeJson(res, {code: -2, message: '修改失败'})

@@ -32,9 +32,8 @@ const sqlMap = {
     GROUP BY job_type`
   },
   user: {
-    // 登陆
-    //login: 'select * from user where name = ? and password = ? and state != 0',
-    login: 'select * from users where account = ? and password = ? and status != 0',
+    // 登陆（只按账号查询，密码哈希取回后在内存中用 scrypt 校验，避免在 SQL 里比对明文哈希）
+    login: 'select * from users where account = ? and status != 0',
     // 新增用户
     add: 'insert IGNORE into user (name, password, email, create_time, update_time) values (?, ?, ?, ?, ?)',
     // 更新用户信息
@@ -60,7 +59,9 @@ const sqlMap = {
     // 用户旧密码认证
     oldPasswordAuth: 'select password from users where account = ?',
     // 更新密码
-    updateNewPassword: 'update users set password = ? where account = ?'
+    updateNewPassword: 'update users set password = ? where account = ?',
+    // 登录时存量 MD5 密码迁移升级（重写为 scrypt 哈希）
+    rehashPassword: 'update users set password = ? where account = ?'
   },
   performance: {
     //新增工时申报

@@ -61,6 +61,7 @@
 <script>
 import { urlUserLogin } from '@/config/interface'
 import { isUndefined } from '@/utils/common'
+import { computePasswordDigest } from '@/utils/pbkdf2'
 import PasswordEdit from '@/components/PasswordEdit/PasswordEdit'
 import Cookies from 'js-cookie'
 export default {
@@ -105,50 +106,61 @@ export default {
       if (!isUndefined(Cookies.get('userPwd'))) {
         Cookies.remove('userPwd')
       }
-      this.$refs[formName].validate((valid) => {
+      this.$refs[formName].validate(async (valid) => {
         if (valid) {
           const url = urlUserLogin
           if (this.reqFlag.login) {
             this.reqFlag.login = false
-            let params = {
-              name: this.formData.name,
-              password: this.$md5(this.formData.password)
-            }
-            this.$http(url, params).then(res => {
-              if (res.code === 1) {
-                let pwdRegex = new RegExp('(?=.*[0-9])(?=.*[a-z])(?=.*[^a-zA-Z0-9]).{8,30}')
-                let pwdRegex2 = new RegExp('(?=.*[0-9])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,30}')
-                let pwdRegex3 = new RegExp('(?=.*[A-Z])(?=.*[a-z])(?=.*[^a-zA-Z0-9]).{8,30}')
-                let pwdRegex4 = new RegExp('(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z]).{8,30}')
-                if (pwdRegex.test(this.formData.password) || pwdRegex2.test(this.formData.password) ||
-                   pwdRegex3.test(this.formData.password) || pwdRegex4.test(this.formData.password)) {
-                  let data = res.data
-                  localStorage.setItem('userInfo', JSON.stringify(data))
-                  this.$store.dispatch('saveUserInfo', data)
-                  this.$common.toast('登录成功', 'success', false)
-                  this.$router.push({
-                    path: '/home/dashboard',
-                    query: {}
-                  })
-                } else {
-                  alert('密码需含8位以上字符，至少3种类型组合（小写字母、大写字母、数字、符号组成），请修改密码后登录！')
+            try {
+              // 客户端生成 PBKDF2 强摘要（不再传明文/弱 md5），服务端再做 scrypt 加固
+              const password = await computePasswordDigest(this.formData.name, this.formData.password)
+              let params = {
+                name: this.formData.name,
+                password
+              }
+              this.$http(url, params).then(res => {
+                if (res.code === 1) {
+                  let pwdRegex = new RegExp('(?=.*[0-9])(?=.*[a-z])(?=.*[^a-zA-Z0-9]).{8,30}')
+                  let pwdRegex2 = new RegExp('(?=.*[0-9])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,30}')
+                  let pwdRegex3 = new RegExp('(?=.*[A-Z])(?=.*[a-z])(?=.*[^a-zA-Z0-9]).{8,30}')
+                  let pwdRegex4 = new RegExp('(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z]).{8,30}')
+                  if (pwdRegex.test(this.formData.password) || pwdRegex2.test(this.formData.password) ||
+                     pwdRegex3.test(this.formData.password) || pwdRegex4.test(this.formData.password)) {
+                    let data = res.data
+                    localStorage.setItem('userInfo', JSON.stringify(data))
+                    this.$store.dispatch('saveUserInfo', data)
+                    this.$common.toast('登录成功', 'success', false)
+                    this.$router.push({
+                      path: '/home/dashboard',
+                      query: {}
+                    })
+                  } else {
+                    alert('密码需含8位以上字符，至少3种类型组合（小写字母、大写字母、数字、符号组成），请修改密码后登录！')
+                    this.showFlag.passwordEdit = true
+                    this.$nextTick(() => {
+                      this.$refs.passwordEdit.init(this.formData.name)
+                    })
+                  }
+                } else if (res.code === 3) {
+                  alert('您的密码在弱密码库中，请修改密码后登录！')
                   this.showFlag.passwordEdit = true
                   this.$nextTick(() => {
-                    this.$refs.passwordEdit.init(this.formData.name)
+                    this.$refs.passwordEdit.init(this.formData.name, true, this.formData.password)
                   })
+                } else if (res.code === 5) {
+                  // 存量 MD5 账号无法用强摘要校验，需管理员重置
+                  this.$common.toast('出于安全升级，该账号密码已失效，请联系管理员重置密码后登录', 'error', false)
                 }
-              } else if (res.code === 3) {
-                alert('您的密码在弱密码库中，请修改密码后登录！')
-                this.showFlag.passwordEdit = true
-                this.$nextTick(() => {
-                  this.$refs.passwordEdit.init(this.formData.name, true, this.formData.password)
-                })
-              }
+                this.reqFlag.login = true
+              }).catch(err => {
+                console.log(err)
+                this.reqFlag.login = true
+                this.$common.toast('登录失败', 'error', false)
+              })
+            } catch (e) {
+              console.log(e)
               this.reqFlag.login = true
-            }).catch(err => {
-              console.log(err)
-              this.$common.toast('登录失败', 'error', false)
-            })
+            }
           }
         } else {
           console.log('error submit!!')
@@ -192,11 +204,13 @@ export default {
       this.setCookie('', '', -1) // 修改2值都为空，天数为负1天就好了
     },
     // 密码修改成功后自动登录
-    handlePasswordChangeSuccess (data) {
+    async handlePasswordChangeSuccess (data) {
       const url = urlUserLogin
+      // 用改密时仍持有的明文新密码生成 PBKDF2 强摘要进行登录
+      const password = await computePasswordDigest(data.account, data.password)
       let params = {
         name: data.account,
-        password: this.$md5(data.password)
+        password
       }
       this.$http(url, params).then(res => {
         if (res.code === 1) {

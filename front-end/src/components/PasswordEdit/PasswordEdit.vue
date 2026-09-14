@@ -28,6 +28,7 @@
 
 <script>
   import { urlUpdateNewPassword, urlOldPasswordAuth } from '../../config/interface'
+    import { computePasswordDigest } from '../../utils/pbkdf2'
     export default {
       data () {
         // const reg = /^[0-9a-zA-Z~!·@#$%^&*()_+-= <>,.:;'"]*$/
@@ -118,52 +119,68 @@
           this.isAutoLogin = false
           this.autoLoginPassword = null
         },
-        oldPasswordAuth () {
+        async oldPasswordAuth () {
           let it = this
-          return new Promise(function (resolve, reject) {
-            const url = urlOldPasswordAuth
-            if (it.reqFlag.oldPasswordAuth) {
-              it.reqFlag.oldPasswordAuth = false
+          const url = urlOldPasswordAuth
+          if (it.reqFlag.oldPasswordAuth) {
+            it.reqFlag.oldPasswordAuth = false
+            try {
+              // 客户端生成 PBKDF2 强摘要（不传明文），供后端校验
+              const oldDigest = await computePasswordDigest(it.formData.account, it.formData.oldPassword)
               let params = {
                 account: it.formData.account,
-                oldPassword: it.$md5(it.formData.oldPassword)
+                oldPassword: oldDigest
               }
-              it.$http(url, params)
+              return it.$http(url, params)
                 .then(res => {
                   if (res.code == 1) {
-                    resolve(true)
+                    return true
                   } else if (res.code === -1) {
-                    resolve(false)
+                    return false
                   }
+                })
+                .finally(() => {
                   it.reqFlag.oldPasswordAuth = true
                 })
+            } catch (e) {
+              console.log(e)
+              it.reqFlag.oldPasswordAuth = true
+              return false
             }
-          })
+          }
         },
-        updateNewPassword () {
+        async updateNewPassword () {
           let it = this
-          return new Promise(function (resolve, reject) {
-            const url = urlUpdateNewPassword
-            if (it.reqFlag.updateNewPassword) {
-              it.reqFlag.updateNewPassword = false
+          const url = urlUpdateNewPassword
+          if (it.reqFlag.updateNewPassword) {
+            it.reqFlag.updateNewPassword = false
+            try {
+              // 客户端生成 PBKDF2 强摘要（不传明文），服务端再做 scrypt 加固
+              const newDigest = await computePasswordDigest(it.formData.account, it.formData.newPassword)
               let params = {
                 account: it.formData.account,
-                newPassword: it.$md5(it.formData.newPassword)
+                newPassword: newDigest
               }
-              it.$http(url, params)
+              return it.$http(url, params)
                 .then(res => {
                   if (res.code === 1) {
-                    resolve(true)
+                    return true
                   } else if (res.code === 4) {
                     it.$common.toast('新密码在弱密码库中，请使用更复杂的密码', 'error', false)
-                    resolve('weak')
+                    return 'weak'
                   } else if (res.code === -1) {
-                    resolve(false)
+                    return false
                   }
+                })
+                .finally(() => {
                   it.reqFlag.updateNewPassword = true
                 })
+            } catch (e) {
+              console.log(e)
+              it.reqFlag.updateNewPassword = true
+              return false
             }
-          })
+          }
         },
         submitLogin (formName) {
           this.$refs[formName].validate((valid) => {
