@@ -137,6 +137,9 @@
                     return true
                   } else if (res.code === -1) {
                     return false
+                  } else if (res.code === 5) {
+                    it.$common.toast(res.message, 'error', false)
+                    return false
                   }
                 })
                 .finally(() => {
@@ -156,9 +159,11 @@
             it.reqFlag.updateNewPassword = false
             try {
               // 客户端生成 PBKDF2 强摘要（不传明文），服务端再做 scrypt 加固
+              const oldDigest = await computePasswordDigest(it.formData.account, it.formData.oldPassword)
               const newDigest = await computePasswordDigest(it.formData.account, it.formData.newPassword)
               let params = {
                 account: it.formData.account,
+                oldPassword: oldDigest,
                 newPassword: newDigest
               }
               return it.$http(url, params)

@@ -58,7 +58,7 @@ const sqlMap = {
     getAllUserName: 'select id, name, groupName from users where status != 0',
     // 用户旧密码认证
     oldPasswordAuth: 'select password from users where account = ?',
-    // 更新密码
+    // 更新密码（旧密码已在 service 层用 scrypt 校验，故 SQL 无需再比对）
     updateNewPassword: 'update users set password = ? where account = ?',
     // 登录时存量 MD5 密码迁移升级（重写为 scrypt 哈希）
     rehashPassword: 'update users set password = ? where account = ?'

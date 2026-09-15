@@ -7,6 +7,7 @@ const $common = require('../utils/common')
 const weakPassword = require('../utils/weakPassword')
 const $pass = require('../utils/passwordHash')
 const secret = require('../config/secret')
+const changePasswordLimiter = require('../utils/changePasswordLimiter')
 
 // function formatData(rows) {
 //   return rows.map(row => {
@@ -365,42 +366,78 @@ const user = {
       })
     })
   },
-  /* 旧密码认证 */
+  /* 旧密码认证（含失败限流，防暴力猜解） */
   oldPasswordAuth (req, res) {
     let data = req.body
+    let account = data.account
+    // 参数完整性校验
+    if (!account || !data.oldPassword) {
+      return $http.writeJson(res, {code: -1, message: '参数不完整'})
+    }
+    // 失败限流：连续失败达阈值后锁定一段时间
+    if (changePasswordLimiter.isLocked(account)) {
+      return $http.writeJson(res, {code: 5, message: '尝试次数过多，账号已被锁定，请15分钟后再试'})
+    }
     let sql = $sql.user.oldPasswordAuth
-    let arrayParams = [data.account]
+    let arrayParams = [account]
     $http.connPool(sql, arrayParams, (err, result) => {
       if (err) {
         return $http.writeJson(res, {code: -2, message: '失败'})
+      }
+      result = $common.formatData(result)
+      // 账号存在且旧密码通过 scrypt 校验
+      if (result.length && $pass.verifyPassword(data.oldPassword, result[0].password)) {
+        // 校验成功清除失败记录
+        changePasswordLimiter.reset(account)
+        return $http.writeJson(res, {code: 1, message: '旧密码正确'})
       } else {
-        if (!result || !result[0]) {
-          return $http.writeJson(res, {code: -1, message: '旧密码错误'})
-        }
-        // 用密码哈希校验客户端旧密码摘要（兼容新版 scrypt 与存量 MD5）
-        if ($pass.verifyPassword(data.oldPassword, result[0].password)) {
-          return $http.writeJson(res, {code: 1, message: '旧密码正确'})
-        } else {
-          return $http.writeJson(res, {code: -1, message: '旧密码错误'})
-        }
+        // 账号不存在或旧密码错误（不区分，防账号枚举），记录一次失败
+        changePasswordLimiter.recordFail(account)
+        return $http.writeJson(res, {code: -1, message: '旧密码错误'})
       }
     })
   },
-  /* 更新密码 */
+  /* 更新密码：必须同时校验旧密码，防止无鉴权直接改任意账号密码 */
   updateNewPassword (req, res) {
     let data = req.body
-    if (weakPassword.isWeakPassword(data.newPassword)) {
+    let account = data.account
+    let oldPassword = data.oldPassword
+    let newPassword = data.newPassword
+    // 参数完整性校验
+    if (!account || !oldPassword || !newPassword) {
+      return $http.writeJson(res, {code: -1, message: '参数不完整'})
+    }
+    // 失败限流：连续失败达阈值后锁定一段时间，防暴力猜解旧密码
+    if (changePasswordLimiter.isLocked(account)) {
+      return $http.writeJson(res, {code: 5, message: '尝试次数过多，账号已被锁定，请15分钟后再试'})
+    }
+    // 新密码弱密码校验
+    if (weakPassword.isWeakPassword(newPassword)) {
       return $http.writeJson(res, {code: 4, message: '新密码在弱密码库中，请使用更复杂的密码'})
     }
-    let newHash = $pass.hashPassword(data.newPassword)
     let sql = $sql.user.updateNewPassword
-    let arrayParams = [newHash, data.account]
-    $http.connPool(sql, arrayParams, (err, result) => {
+    // 先校验旧密码（scrypt 兼容），再改密，防止无鉴权直接改任意账号密码
+    let authSql = $sql.user.oldPasswordAuth
+    $http.connPool(authSql, [account], (err, authResult) => {
       if (err) {
         return $http.writeJson(res, {code: -2, message: '修改失败'})
-      } else {
-        return $http.writeJson(res, {code: 1, message: '修改成功'})
       }
+      authResult = $common.formatData(authResult)
+      if (!authResult.length || !$pass.verifyPassword(oldPassword, authResult[0].password)) {
+        // 账号不存在或旧密码错误（不区分，防账号枚举），记录一次失败
+        changePasswordLimiter.recordFail(account)
+        return $http.writeJson(res, {code: -1, message: '账号或旧密码错误'})
+      }
+      // 旧密码通过 → 写入 scrypt 强哈希
+      let newHash = $pass.hashPassword(newPassword)
+      $http.connPool(sql, [newHash, account], (err, result) => {
+        if (err) {
+          return $http.writeJson(res, {code: -2, message: '修改失败'})
+        }
+        // 修改成功后清除失败记录
+        changePasswordLimiter.reset(account)
+        return $http.writeJson(res, {code: 1, message: '修改成功'})
+      })
     })
   },
 }
