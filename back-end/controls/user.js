@@ -86,13 +86,27 @@ const user = {
       }
       let userRow = result[0]
       let stored = userRow.password
-      // 存量无盐 MD5 账号：无法用客户端强摘要校验，强制人工重置（管理员重置）
       if ($pass.isLegacyMD5(stored)) {
-        return $http.writeJson(res, {code: 5, message:'出于安全升级，该账号密码已失效，请联系管理员重置密码后登录'})
-      }
-      // 校验客户端 PBKDF2 强摘要（scrypt 存储）
-      if (!$pass.verifyPassword(password, stored)) {
-        return $http.writeJson(res, {code: 2, message:'用户或密码不正确'})
+        // 存量无盐 MD5 账号：客户端需发一次旧 md5 摘要做兼容校验，校验通过后无缝升级
+        if (!params.legacyPassword) {
+          // code 6 仅用于前端触发静默重试（补发旧格式摘要），不暴露给用户，避免产生误导性提示
+          return $http.writeJson(res, {code: 6, message: ''})
+        }
+        if (!$pass.verifyLegacyDigest(params.legacyPassword, stored)) {
+          return $http.writeJson(res, {code: 2, message:'用户或密码不正确'})
+        }
+        // 旧格式校验通过 → 用本次携带的新强摘要原地升级为 scrypt，后续登录走强路径
+        try {
+          let newHash = $pass.hashPassword(password)
+          $http.connPool($sql.user.rehashPassword, [newHash, name], () => {})
+        } catch (e) {
+          console.log('密码升级写入失败：', e)
+        }
+      } else {
+        // 新版 scrypt：校验客户端 PBKDF2 强摘要
+        if (!$pass.verifyPassword(password, stored)) {
+          return $http.writeJson(res, {code: 2, message:'用户或密码不正确'})
+        }
       }
       let resultData = {}
       if (weakPassword.isWeakPassword(password)) {

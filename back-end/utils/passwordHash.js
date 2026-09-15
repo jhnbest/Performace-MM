@@ -51,8 +51,17 @@ function verifyPassword (digest, stored) {
   return crypto.timingSafeEqual(calc, expected)
 }
 
+// 校验旧版无盐 MD5 摘要（仅在存量账号首次登录迁移时需要），常量时间比较
+function verifyLegacyDigest (digest, stored) {
+  if (!isLegacyMD5(stored) || typeof digest !== 'string') {
+    return false
+  }
+  return crypto.timingSafeEqual(Buffer.from(digest.toLowerCase(), 'utf8'), Buffer.from(stored.toLowerCase(), 'utf8'))
+}
+
 module.exports = {
   hashPassword,
   verifyPassword,
-  isLegacyMD5
+  isLegacyMD5,
+  verifyLegacyDigest
 }
