@@ -11,6 +11,9 @@ yarn-error.log*
 .env.local
 .env.*.local
 
+# 运行时生成的 JWT 密钥，禁止提交
+config/.jwt-secret
+
 # Editor directories and files
 .idea
 .vscode
